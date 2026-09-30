@@ -1,0 +1,35 @@
+id: builder-m02-l03-c2
+order: 2
+type: python
+xp: 10
+starter:
+  py: |
+    temperature = int(input("How hot is it today? "))
+    if temperature > 30:
+        print("It's hot! Drink lots of water.")
+    # Add an elif for "warm" (above 15) and an else for "cold".
+solution:
+  py: |
+    temperature = int(input("How hot is it today? "))
+    if temperature > 30:
+        print("It's hot! Drink lots of water.")
+    elif temperature > 15:
+        print("It's warm. Perfect for football!")
+    else:
+        print("It's cold. Wear a jacket!")
+checks:
+  - id: hot
+    expect: output
+    stdin: '35'
+    includes: hot
+    hint: hot
+  - id: warm
+    expect: output
+    stdin: '20'
+    includes: warm
+    hint: warm
+  - id: cold
+    expect: output
+    stdin: '5'
+    includes: cold
+    hint: cold

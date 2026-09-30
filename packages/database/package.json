@@ -1,0 +1,66 @@
+{
+  "name": "@kcp/database",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Prisma schema, migrations, seed data and the generated database client. Only apps/api may depend on this package.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "generate": "prisma generate",
+    "build": "prisma generate && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src prisma",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.config.e2e.ts",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:create": "prisma migrate dev --create-only",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:reset": "prisma migrate reset",
+    "migrate:status": "prisma migrate status",
+    "migrate:check": "prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code",
+    "seed": "prisma db seed",
+    "studio": "prisma studio"
+  },
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "dependsOn": [
+          "build"
+        ]
+      },
+      "test": {
+        "dependsOn": [
+          "build"
+        ]
+      },
+      "seed": {
+        "dependsOn": [
+          "^build"
+        ],
+        "cache": false
+      }
+    }
+  },
+  "dependencies": {
+    "@kcp/shared": "workspace:*",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0"
+  },
+  "devDependencies": {
+    "@kcp/i18n": "workspace:*",
+    "@types/pg": "^8.23.1",
+    "dotenv": "^18.0.4",
+    "pg": "^8.23.0",
+    "prisma": "7.10.0",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.2"
+  }
+}

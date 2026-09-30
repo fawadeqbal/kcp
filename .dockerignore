@@ -1,0 +1,18 @@
+# Keep the Docker build context small and free of secrets.
+**/node_modules
+**/dist
+**/.next
+**/test-results
+**/playwright-report
+**/coverage
+**/*.tsbuildinfo
+.nx
+packages/database/generated
+.git
+.github
+.vscode
+.idea
+.env
+.env.*
+!.env.example
+docs

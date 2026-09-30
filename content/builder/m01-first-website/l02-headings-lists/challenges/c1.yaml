@@ -1,0 +1,21 @@
+id: builder-m01-l02-c1
+order: 1
+type: html
+xp: 10
+starter:
+  html: |
+    <h1>Things I love</h1>
+solution:
+  html: |
+    <h1>Things I love</h1>
+    <p>These are my favourite things in the world.</p>
+checks:
+  - id: has-p
+    expect: exists
+    selector: p
+    hint: add_p
+  - id: p-text
+    expect: text
+    selector: p
+    notEmpty: true
+    hint: p_text

@@ -1,0 +1,23 @@
+id: builder-m02-l01-c2
+order: 2
+type: python
+xp: 10
+starter:
+  py: |
+    print("Hi! I'm a coder.")
+    # Add two more lines about you (use your nickname, never your real name).
+solution:
+  py: |
+    print("Hi! I'm a coder.")
+    print("I love football and drawing.")
+    print("My favourite number is", 7)
+checks:
+  - id: three-lines
+    expect: output
+    minLines: 3
+    hint: three_lines
+  - id: three-prints
+    expect: python
+    code: |
+      assert __source__.count("print(") >= 3
+    hint: three_prints

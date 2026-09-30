@@ -1,0 +1,32 @@
+{
+  "name": "@kcp/checks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Challenge checks: their types, the preview document builder, the check evaluator and the loop guard. Runs in the browser sandbox and in tools/content-import.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@kcp/shared": "workspace:*",
+    "acorn": "^8.18.0",
+    "acorn-walk": "^8.3.5"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.14.5",
+    "vitest": "^5.0.2"
+  }
+}

@@ -1,0 +1,135 @@
+'use client';
+
+import { FEEDBACK_KINDS, FEEDBACK_MAX_LENGTH, type FeedbackKind } from '@kcp/shared';
+import { clsx } from 'clsx';
+import { useLocale, useTranslations } from 'next-intl';
+import { type FormEvent, useId, useState } from 'react';
+import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-provider';
+import { Alert, Button, Dialog } from './ui';
+
+/** The in-app feedback button, for signed-in students and parents (pilot tool). */
+export function FeedbackButton() {
+  const t = useTranslations('feedback');
+  const locale = useLocale();
+  const { state } = useAuth();
+  const messageId = useId();
+  const hintId = useId();
+  const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState<FeedbackKind>('IDEA');
+  const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<'sent' | 'failed' | null>(null);
+
+  if (state.status !== 'authenticated') return null;
+
+  function close() {
+    setOpen(false);
+    if (result === 'sent') {
+      setMessage('');
+      setKind('IDEA');
+    }
+    setResult(null);
+  }
+
+  async function send(event: FormEvent) {
+    event.preventDefault();
+    if (message.trim().length < 2 || sending) return;
+    setSending(true);
+    setResult(null);
+    try {
+      const { response } = await api.POST('/v1/feedback', {
+        body: {
+          kind,
+          message: message.trim(),
+          // A share page's address is a secret link: it isn't sent.
+          pagePath: window.location.pathname.replace(/^((?:\/[a-z]{2})?\/p\/)[^/]+/, '$1[link]'),
+          languageCode: locale,
+        },
+      });
+      setResult(response.ok ? 'sent' : 'failed');
+    } catch {
+      setResult('failed');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="print-hidden fixed end-4 bottom-4 z-20 min-h-11 rounded-full border border-line bg-surface px-4 font-semibold shadow-lg hover:border-brand-600"
+      >
+        {t('button')}
+      </button>
+      <Dialog open={open} onClose={close} title={t('title')}>
+        {result === 'sent' ? (
+          <>
+            <Alert tone="success">{t('thanks')}</Alert>
+            <Button className="self-end" onClick={close}>
+              {t('close')}
+            </Button>
+          </>
+        ) : (
+          <form onSubmit={(event) => void send(event)} className="flex flex-col gap-4">
+            <fieldset className="flex flex-col gap-2">
+              <legend className="mb-1 font-semibold">{t('kind')}</legend>
+              <div className="grid grid-cols-2 gap-2">
+                {FEEDBACK_KINDS.map((option) => (
+                  <label
+                    key={option}
+                    className={clsx(
+                      'flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-3 text-sm',
+                      kind === option ? 'border-brand-600 bg-brand-50' : 'border-line',
+                      // "Something isn't safe" gets a row of its own, first.
+                      option === 'SAFETY' && 'col-span-2',
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="feedback-kind"
+                      value={option}
+                      checked={kind === option}
+                      onChange={() => setKind(option)}
+                    />
+                    {t(`kind${option}`)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <div className="flex flex-col gap-1">
+              <label htmlFor={messageId} className="font-semibold">
+                {t('message')}
+              </label>
+              <textarea
+                id={messageId}
+                required
+                minLength={2}
+                maxLength={FEEDBACK_MAX_LENGTH}
+                rows={5}
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                aria-describedby={hintId}
+                className="rounded-xl border border-line bg-surface px-3 py-2"
+              />
+              <p id={hintId} className="text-sm text-muted">
+                {t('messageHint')}
+              </p>
+            </div>
+            {result === 'failed' ? <Alert tone="error">{t('failed')}</Alert> : null}
+            <div className="flex flex-wrap justify-end gap-3">
+              <Button variant="secondary" onClick={close}>
+                {t('close')}
+              </Button>
+              <Button type="submit" loading={sending}>
+                {t('send')}
+              </Button>
+            </div>
+          </form>
+        )}
+      </Dialog>
+    </>
+  );
+}

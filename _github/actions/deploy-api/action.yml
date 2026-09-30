@@ -1,0 +1,39 @@
+name: Deploy API
+description: Applies database migrations and imports the lessons, then asks the hosting provider to roll out the new API image.
+
+inputs:
+  api-image:
+    description: Full API image reference, e.g. ghcr.io/owner/kcp-api:sha-abc1234
+    required: true
+  migrate-image:
+    description: Full migrate image reference
+    required: true
+  database-url:
+    description: DATABASE_URL of the target environment
+    required: true
+  deploy-hook-url:
+    description: The hosting provider's deploy hook URL for the API service
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Apply database migrations, reference data and lessons
+      shell: bash
+      env:
+        DATABASE_URL: ${{ inputs.database-url }}
+      run: docker run --rm -e DATABASE_URL "${{ inputs.migrate-image }}"
+
+    - name: Trigger the deploy
+      shell: bash
+      env:
+        DEPLOY_HOOK_URL: ${{ inputs.deploy-hook-url }}
+        API_IMAGE: ${{ inputs.api-image }}
+      # Most container hosts (Render, Railway, Fly via a small webhook, Coolify…) offer a
+      # deploy hook URL. Adjust the request below to your provider's format once chosen.
+      run: |
+        curl --fail --silent --show-error -X POST \
+          -H 'Content-Type: application/json' \
+          -d "{\"image\":\"${API_IMAGE}\"}" \
+          "${DEPLOY_HOOK_URL}"
+        echo "Deploy requested for ${API_IMAGE}"

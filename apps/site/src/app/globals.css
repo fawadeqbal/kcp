@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+/* Shared design tokens, fonts per script, focus styles (packages/ui). */
+@import '@kcp/ui/theme.css';
+
+/*
+ * Nastaliq (Urdu) is a tall script: with Tailwind's default line heights, lines of big text
+ * overlap and clip. In Urdu, every text size gets more room (explicit leading-* still wins).
+ */
+:lang(ur) {
+  --text-xs--line-height: 2;
+  --text-sm--line-height: 2;
+  --text-base--line-height: 2.1;
+  --text-lg--line-height: 2;
+  --text-xl--line-height: 2;
+  --text-2xl--line-height: 1.9;
+  --text-3xl--line-height: 1.8;
+  --text-4xl--line-height: 1.75;
+  --text-5xl--line-height: 1.7;
+}
+
+/* In-page links (#main, FAQ answers) land below the sticky header, not under it. */
+html {
+  scroll-padding-top: 5rem;
+}
+
+/* The disclosure triangle of <details> is replaced by our own chevron. */
+summary::-webkit-details-marker {
+  display: none;
+}

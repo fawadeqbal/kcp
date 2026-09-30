@@ -1,0 +1,52 @@
+{
+  "name": "@kcp/api-client-ts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Typed API client for the web apps, generated from the API's OpenAPI document. Do not edit src/schema.ts by hand.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "generate": "pnpm --filter @kcp/api run openapi:export && openapi-typescript openapi.json --output src/schema.ts --root-types --root-types-no-schema-prefix",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src",
+    "test": "vitest run"
+  },
+  "nx": {
+    "targets": {
+      "generate": {
+        "dependsOn": [
+          {
+            "projects": [
+              "@kcp/api"
+            ],
+            "target": "build"
+          }
+        ],
+        "inputs": [
+          "{workspaceRoot}/apps/api/src/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/openapi.json",
+          "{projectRoot}/src/schema.ts"
+        ],
+        "cache": true
+      }
+    }
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0",
+    "vitest": "^5.0.2"
+  }
+}

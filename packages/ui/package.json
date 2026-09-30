@@ -1,0 +1,42 @@
+{
+  "name": "@kcp/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared React building blocks and design tokens for the web apps. Text comes in as props, so the components work in any language.",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./theme.css": "./src/theme.css"
+  },
+  "files": [
+    "dist",
+    "src/theme.css"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@kcp/shared": "workspace:*",
+    "clsx": "^2.1.1"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "vitest": "^5.0.2"
+  }
+}

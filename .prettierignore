@@ -1,0 +1,12 @@
+pnpm-lock.yaml
+dist
+coverage
+.nx
+packages/database/generated
+packages/database/prisma/migrations
+packages/api-client-ts/src/schema.ts
+packages/api-client-ts/openapi.json
+.next
+next-env.d.ts
+test-results
+playwright-report

@@ -1,0 +1,15 @@
+Created Super admin fawadeqbal@gmail.com
+Temporary password: gnWwd7HfE4YRihY-
+
+
+Demo accounts (local database only):
+
+Demo Parent (English)      parent.en@demo.test  demo password 123  
+  CometCoder (child, en)   atomic-phoenix-8528  kid pass 42        2 lesson(s) done, next one started, 200 XP
+  PixelPanda (child, en)   atomic-owl-6039      kid pass 42        new
+Demo Parent (Arabic)       parent.ar@demo.test  demo password 123
+  StarBuilder (child, ar)  ninja-yak-4597       kid pass 42        1 lesson(s) done, 40 XP
+Demo Parent (Urdu)         parent.ur@demo.test  demo password 123
+  MoonMaker (child, ur)    brave-eagle-7195     kid pass 42        new
+
+Parents log in at http://localhost:3001/en/login, children at http://localhost:3001/en/login/student.

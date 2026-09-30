@@ -1,0 +1,58 @@
+{
+  "name": "@kcp/admin",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Admin panel (Next.js, English only): staff login with two-factor authentication, users, parental consent and the audit log.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3002",
+    "build": "node scripts/build.mjs",
+    "start": "next start --port 3002",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings src e2e",
+    "test": "vitest run",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "@casl/ability": "^7.0.1",
+    "@fontsource-variable/noto-sans": "^5.3.0",
+    "@fontsource-variable/noto-sans-arabic": "^5.3.0",
+    "@kcp/api-client-ts": "workspace:*",
+    "@kcp/shared": "workspace:*",
+    "@kcp/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "next": "16.3.7",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "ioredis": "^6.0.0",
+    "pg": "^8.23.0",
+    "tailwindcss": "^4.3.3",
+    "vitest": "^5.0.2"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/.next"
+        ]
+      },
+      "test:browser": {
+        "dependsOn": [
+          "build",
+          "@kcp/api:build"
+        ],
+        "cache": false
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+id: builder-m01-l03-c2
+order: 2
+type: html
+xp: 10
+starter:
+  html: |
+    <h1>My favourite place</h1>
+    <p>My favourite place is the beach.</p>
+solution:
+  html: |
+    <h1>My favourite place</h1>
+    <p>My favourite place is the beach.</p>
+    <img src="images/beach.svg" alt="Waves on a sunny beach">
+checks:
+  - id: has-image
+    expect: exists
+    selector: img
+    hint: add_img
+  - id: image-source
+    expect: attribute
+    selector: img
+    name: src
+    notEmpty: true
+    hint: img_src
+  - id: image-alt
+    expect: attribute
+    selector: img
+    name: alt
+    notEmpty: true
+    hint: img_alt

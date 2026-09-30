@@ -1,0 +1,88 @@
+id: builder-m01-project
+xp: 100
+starter:
+  html: |
+    <h1>All about me</h1>
+
+    <!-- 1. A paragraph that introduces you (no real names — use your nickname!) -->
+
+    <!-- 2. A list of at least three things you love -->
+
+    <!-- 3. A picture from images/ with alt text -->
+
+    <!-- 4. A link to a website you like -->
+  css: |
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 16px;
+    }
+
+    /* Give your page a background colour, and your heading a colour of its own. */
+  js: |
+    // Optional: make your page do something when it's clicked.
+    // Try: document.querySelector('h1').addEventListener('click', () => alert('Hello!'));
+solution:
+  html: |
+    <h1>All about me</h1>
+    <p>Hi! I'm a coder who loves space, football and drawing.</p>
+    <ul>
+      <li>Looking at the moon</li>
+      <li>Playing football on Fridays</li>
+      <li>Drawing robots</li>
+    </ul>
+    <img src="images/moon.svg" alt="A full moon in a dark sky">
+    <p>My favourite website: <a href="https://www.nasa.gov">NASA</a></p>
+  css: |
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 16px;
+      background-color: lightyellow;
+    }
+
+    h1 {
+      color: navy;
+    }
+  js: |
+    document.querySelector('h1').addEventListener('click', () => alert('Hello!'));
+checks:
+  - id: has-heading
+    expect: exists
+    selector: h1
+    hint: heading
+  - id: has-paragraph
+    expect: text
+    selector: p
+    notEmpty: true
+    hint: paragraph
+  - id: three-things
+    expect: exists
+    selector: ul li, ol li
+    min: 3
+    hint: list
+  - id: has-picture
+    expect: exists
+    selector: img
+    hint: picture
+  - id: picture-alt
+    expect: attribute
+    selector: img
+    name: alt
+    notEmpty: true
+    all: true
+    hint: alt
+  - id: has-link
+    expect: attribute
+    selector: a
+    name: href
+    notEmpty: true
+    hint: link
+  - id: page-background
+    expect: css
+    selector: body
+    property: background-color|background
+    hint: background
+  - id: heading-colour
+    expect: css
+    selector: h1
+    property: color
+    hint: heading_colour

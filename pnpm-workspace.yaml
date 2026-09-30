@@ -1,0 +1,46 @@
+packages:
+  - apps/*
+  - packages/*
+  - tools/*
+
+# pnpm only runs install scripts for packages listed here (supply-chain safety).
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  nx: true
+  prisma: true
+  # Install-time telemetry (pulled in by swagger-ui); not needed.
+  '@scarf/scarf': false
+  # Ship prebuilt binaries through optional dependencies; their scripts aren't needed.
+  '@parcel/watcher': false
+  '@swc/core': false
+
+# Security fixes in build tools' dependencies (pnpm audit), until those tools update:
+# mysql2 and deepmerge-ts come with the Prisma CLI, smol-toml with Nx.
+overrides:
+  mysql2: '^3.24.5'
+  deepmerge-ts: '^8.0.2'
+  smol-toml: '^1.9.0'
+
+# pnpm waits before installing brand-new releases; these were allowed explicitly.
+minimumReleaseAgeExclude:
+  - '@oxlint/binding-openharmony-arm64@1.86.0'
+  - '@oxlint/binding-win32-x64-msvc@1.86.0'
+  - oxlint@1.86.0
+  - '@eloqnt/config@0.1.1'
+  - '@eloqnt/format-po@0.1.1'
+  - '@next/env@16.3.7'
+  - '@next/swc-darwin-arm64@16.3.7'
+  - '@next/swc-darwin-x64@16.3.7'
+  - '@next/swc-linux-arm64-gnu@16.3.7'
+  - '@next/swc-linux-arm64-musl@16.3.7'
+  - '@next/swc-linux-x64-gnu@16.3.7'
+  - '@next/swc-linux-x64-musl@16.3.7'
+  - '@next/swc-win32-arm64-msvc@16.3.7'
+  - '@next/swc-win32-x64-msvc@16.3.7'
+  - icu-minify@4.14.8
+  - next-intl-swc-plugin-extractor@4.14.8
+  - next-intl@4.14.8
+  - next@16.3.7
+  - use-intl@4.14.8
+  - mysql2@3.24.5

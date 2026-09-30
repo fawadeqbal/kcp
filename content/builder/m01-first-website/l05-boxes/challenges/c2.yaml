@@ -1,0 +1,46 @@
+id: builder-m01-l05-c2
+order: 2
+type: css
+xp: 10
+starter:
+  html: |
+    <div class="card">
+      <h2>Football</h2>
+      <p>I play every Friday with my friends.</p>
+    </div>
+    <div class="card">
+      <h2>Drawing</h2>
+      <p>I draw dragons and robots.</p>
+    </div>
+  css: |
+    .card {
+      padding: 16px;
+      border: 2px solid navy;
+    }
+solution:
+  html: |
+    <div class="card">
+      <h2>Football</h2>
+      <p>I play every Friday with my friends.</p>
+    </div>
+    <div class="card">
+      <h2>Drawing</h2>
+      <p>I draw dragons and robots.</p>
+    </div>
+  css: |
+    .card {
+      padding: 16px;
+      border: 2px solid navy;
+      margin-bottom: 12px;
+    }
+checks:
+  - id: two-cards
+    expect: exists
+    selector: .card
+    min: 2
+    hint: two_cards
+  - id: card-margin
+    expect: css
+    selector: .card
+    property: margin|margin-bottom|margin-top
+    hint: card_margin

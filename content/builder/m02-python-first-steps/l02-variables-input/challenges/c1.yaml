@@ -1,0 +1,26 @@
+id: builder-m02-l02-c1
+order: 1
+type: python
+xp: 10
+starter:
+  py: |
+    # Store your nickname in a variable called nickname.
+
+    # Then print a greeting that uses it.
+solution:
+  py: |
+    # Store your nickname in a variable called nickname.
+    nickname = "Rocket"
+    # Then print a greeting that uses it.
+    print("Hello, " + nickname + "!")
+checks:
+  - id: has-nickname
+    expect: python
+    code: |
+      assert isinstance(nickname, str) and nickname.strip()
+    hint: make_variable
+  - id: prints-nickname
+    expect: python
+    code: |
+      assert nickname.strip().lower() in __output__.lower()
+    hint: print_variable

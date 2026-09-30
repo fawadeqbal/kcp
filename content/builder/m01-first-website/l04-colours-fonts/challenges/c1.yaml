@@ -1,0 +1,26 @@
+id: builder-m01-l04-c1
+order: 1
+type: css
+xp: 10
+starter:
+  html: |
+    <h1>My colourful page</h1>
+    <p>This page has my favourite colours.</p>
+  css: |
+    h1 {
+
+    }
+solution:
+  html: |
+    <h1>My colourful page</h1>
+    <p>This page has my favourite colours.</p>
+  css: |
+    h1 {
+      color: tomato;
+    }
+checks:
+  - id: heading-colour
+    expect: css
+    selector: h1
+    property: color
+    hint: h1_color

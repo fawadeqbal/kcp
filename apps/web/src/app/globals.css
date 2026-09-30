@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+/* Shared design tokens, fonts per script, focus styles (packages/ui). */
+@import '@kcp/ui/theme.css';
+
+/* A short "pop" for wins (project shipped). Only used with motion-safe:, so it is
+   skipped for people who ask for reduced motion. */
+@keyframes kcp-pop {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

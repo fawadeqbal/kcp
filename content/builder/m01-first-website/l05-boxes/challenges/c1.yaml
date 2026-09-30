@@ -1,0 +1,36 @@
+id: builder-m01-l05-c1
+order: 1
+type: css
+xp: 10
+starter:
+  html: |
+    <div class="card">
+      <h2>Football</h2>
+      <p>I play every Friday with my friends.</p>
+    </div>
+  css: |
+    .card {
+
+    }
+solution:
+  html: |
+    <div class="card">
+      <h2>Football</h2>
+      <p>I play every Friday with my friends.</p>
+    </div>
+  css: |
+    .card {
+      padding: 16px;
+      border: 2px solid navy;
+    }
+checks:
+  - id: card-padding
+    expect: css
+    selector: .card
+    property: padding|padding-top|padding-left
+    hint: card_padding
+  - id: card-border
+    expect: css
+    selector: .card
+    property: border|border-style|border-top|border-width
+    hint: card_border

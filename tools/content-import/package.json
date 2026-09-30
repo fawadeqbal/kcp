@@ -1,0 +1,47 @@
+{
+  "name": "@kcp/content-import",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Validates the lessons in content/ and writes them into PostgreSQL. `check` also proves every challenge can be solved.",
+  "type": "module",
+  "bin": {
+    "content-import": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.config.e2e.ts",
+    "check-content": "node dist/cli.js check ../../content",
+    "import-content": "node dist/cli.js import ../../content"
+  },
+  "dependencies": {
+    "@kcp/checks": "workspace:*",
+    "@kcp/database": "workspace:*",
+    "dotenv": "^18.0.4",
+    "happy-dom": "^20.14.5",
+    "pyodide": "314.0.7",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.2"
+  },
+  "nx": {
+    "targets": {
+      "check-content": {
+        "dependsOn": [
+          "build"
+        ],
+        "cache": false
+      },
+      "import-content": {
+        "dependsOn": [
+          "build"
+        ],
+        "cache": false
+      }
+    }
+  }
+}

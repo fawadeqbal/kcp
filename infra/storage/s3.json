@@ -1,0 +1,14 @@
+{
+  "identities": [
+    {
+      "name": "kcp-dev",
+      "credentials": [
+        {
+          "accessKey": "kcp-dev-access-key",
+          "secretKey": "kcp-dev-secret-key-not-for-production"
+        }
+      ],
+      "actions": ["Admin", "Read", "List", "Tagging", "Write"]
+    }
+  ]
+}

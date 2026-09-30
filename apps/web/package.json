@@ -1,0 +1,71 @@
+{
+  "name": "@kcp/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Student and parent web app (Next.js): parent sign-up and login, child accounts and consent, student login, lessons with a code editor and auto-checked challenges.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "node scripts/build.mjs",
+    "start": "next start --port 3001",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings src e2e",
+    "test": "vitest run",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.12",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@fontsource-variable/noto-sans": "^5.3.0",
+    "@fontsource-variable/noto-sans-arabic": "^5.3.0",
+    "@fontsource/noto-nastaliq-urdu": "^5.3.0",
+    "@kcp/api-client-ts": "workspace:*",
+    "@kcp/checks": "workspace:*",
+    "@kcp/i18n": "workspace:*",
+    "@kcp/shared": "workspace:*",
+    "@kcp/ui": "workspace:*",
+    "@lezer/highlight": "^1.2.5",
+    "clsx": "^2.1.1",
+    "next": "16.3.7",
+    "next-intl": "^4.14.8",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "ioredis": "^6.0.0",
+    "pg": "^8.23.0",
+    "tailwindcss": "^4.3.3",
+    "vitest": "^5.0.2",
+    "yaml": "^2.9.1"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/.next"
+        ]
+      },
+      "test:browser": {
+        "dependsOn": [
+          "build",
+          "@kcp/api:build"
+        ],
+        "cache": false
+      }
+    }
+  }
+}

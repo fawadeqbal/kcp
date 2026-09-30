@@ -1,0 +1,20 @@
+{
+  "name": "@kcp/load-test",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Load test: many students at once logging in, submitting challenges and reading leaderboards. Runs against a local or staging API; never production.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src",
+    "seed": "node src/seed.ts",
+    "start": "node src/run.ts",
+    "cleanup": "node src/seed.ts --cleanup"
+  },
+  "dependencies": {
+    "@kcp/database": "workspace:*",
+    "@node-rs/argon2": "^2.2.1",
+    "dotenv": "^18.0.4",
+    "yaml": "^2.9.1"
+  }
+}

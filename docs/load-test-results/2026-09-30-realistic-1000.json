@@ -1,0 +1,75 @@
+{
+  "students": 1000,
+  "rampSeconds": 60,
+  "durationSeconds": 282.987,
+  "total": 9491,
+  "errors": 0,
+  "rows": [
+    {
+      "request": "login",
+      "count": 1000,
+      "perSecond": 3.5,
+      "p50": 26,
+      "p95": 49,
+      "p99": 117,
+      "max": 216,
+      "errors": 0,
+      "errorsByStatus": {}
+    },
+    {
+      "request": "lesson map",
+      "count": 1615,
+      "perSecond": 5.7,
+      "p50": 9,
+      "p95": 20,
+      "p99": 38,
+      "max": 263,
+      "errors": 0,
+      "errorsByStatus": {}
+    },
+    {
+      "request": "lesson",
+      "count": 1000,
+      "perSecond": 3.5,
+      "p50": 7,
+      "p95": 16,
+      "p99": 41,
+      "max": 89,
+      "errors": 0,
+      "errorsByStatus": {}
+    },
+    {
+      "request": "submit challenge",
+      "count": 2693,
+      "perSecond": 9.5,
+      "p50": 33,
+      "p95": 69,
+      "p99": 113,
+      "max": 313,
+      "errors": 0,
+      "errorsByStatus": {}
+    },
+    {
+      "request": "leaderboard",
+      "count": 2223,
+      "perSecond": 7.9,
+      "p50": 10,
+      "p95": 22,
+      "p99": 35,
+      "max": 164,
+      "errors": 0,
+      "errorsByStatus": {}
+    },
+    {
+      "request": "progress",
+      "count": 960,
+      "perSecond": 3.4,
+      "p50": 21,
+      "p95": 41,
+      "p99": 60,
+      "max": 133,
+      "errors": 0,
+      "errorsByStatus": {}
+    }
+  ]
+}

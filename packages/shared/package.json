@@ -1,0 +1,25 @@
+{
+  "name": "@kcp/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Rules shared by the API and the apps: avatars, nickname and password rules, age limits. No runtime dependencies.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint --deny-warnings src",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.2"
+  }
+}

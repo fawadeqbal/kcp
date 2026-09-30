@@ -1,0 +1,91 @@
+id: builder-m02-project
+xp: 100
+isPremium: true
+starter:
+  py: |
+    # My text adventure
+
+    # 1. Welcome the player and ask for their name with input().
+
+    # 2. Tell the start of your story (at least three print lines in the whole game).
+
+    # 3. Ask the player to choose, for example "left" or "right".
+
+    # 4. Use if, elif and else to give each choice its own ending.
+solution:
+  py: |
+    # My text adventure
+    print("Welcome to the Crystal Cave!")
+    name = input("What is your name, explorer? ")
+    print("Good luck, " + name + ". You walk into a dark cave.")
+    print("Two tunnels are in front of you.")
+    choice = input("Do you go left or right? ").lower()
+    if choice == "left":
+        print("You find a sleeping dragon and tiptoe past it. Treasure! You win, " + name + "!")
+    elif choice == "right":
+        print("A river blocks the way. You build a raft and sail home safely.")
+    else:
+        print("You wait too long and fall asleep. Try again!")
+checks:
+  - id: asks-name
+    expect: python
+    stdin: |-
+      Zafir
+      left
+      left
+      left
+    code: |
+      assert __source__.count("input(") >= 2
+    hint: two_inputs
+  - id: uses-name
+    expect: output
+    stdin: |-
+      Zafir
+      left
+      left
+      left
+    includes: Zafir
+    hint: use_name
+  - id: tells-story
+    expect: output
+    stdin: |-
+      Zafir
+      left
+      left
+      left
+    minLines: 3
+    hint: story
+  - id: uses-if
+    expect: python
+    stdin: |-
+      Zafir
+      left
+      left
+      left
+    code: |
+      assert "if " in __source__ and "else" in __source__
+    hint: use_if
+  - id: different-endings
+    expect: python
+    stdin: |-
+      Zafir
+      left
+      left
+      left
+    code: |
+      import builtins, contextlib, io
+
+      def play(answers):
+          answers = iter(answers)
+          real_input = builtins.input
+          builtins.input = lambda prompt="": next(answers, "")
+          printed = io.StringIO()
+          try:
+              with contextlib.redirect_stdout(printed):
+                  exec(__source__, {"__name__": "__main__"})
+          finally:
+              builtins.input = real_input
+          return printed.getvalue()
+
+      assert play(["Zafir", "left", "left", "left"]) != play(["Zafir", "right", "right", "right"])
+    hint: endings

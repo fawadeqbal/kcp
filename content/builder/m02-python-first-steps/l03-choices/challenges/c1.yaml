@@ -1,0 +1,35 @@
+id: builder-m02-l03-c1
+order: 1
+type: python
+xp: 10
+starter:
+  py: |
+    secret = 7
+    guess = int(input("Guess my number: "))
+    # If the guess is right, print "You got it!"
+    # Otherwise, print "Try again!"
+solution:
+  py: |
+    secret = 7
+    guess = int(input("Guess my number: "))
+    if guess == secret:
+        print("You got it!")
+    else:
+        print("Try again!")
+checks:
+  - id: right-guess
+    expect: output
+    stdin: '7'
+    includes: You got it
+    hint: right_guess
+  - id: wrong-guess
+    expect: output
+    stdin: '3'
+    includes: Try again
+    hint: wrong_guess
+  - id: not-both
+    expect: python
+    stdin: '3'
+    code: |
+      assert "you got it" not in __output__.lower()
+    hint: use_else

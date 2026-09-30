@@ -1,0 +1,215 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NX_NO_CLOUD: true
+  NX_DAEMON: false
+  LOG_LEVEL: warn
+  DATABASE_URL: postgresql://kcp:kcp@localhost:5432/kcp
+  REDIS_URL: redis://localhost:6379
+  CORS_ORIGINS: http://localhost:3001,http://localhost:3002
+  # CI-only secrets; never reuse these anywhere else.
+  JWT_ACCESS_SECRET: ci-only-access-token-secret-000000000000000000
+  ENCRYPTION_KEY: Y2ktb25seS1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcyE=
+  SMTP_URL: smtp://localhost:1025
+  WEB_APP_URL: http://localhost:3001
+
+jobs:
+  checks:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: kcp
+          POSTGRES_PASSWORD: kcp
+          POSTGRES_DB: kcp
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U kcp -d kcp"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # Nx needs history to work out which projects changed
+
+      # The pnpm version comes from "packageManager" in package.json.
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check dependencies for known vulnerabilities (high and critical fail the build)
+        run: pnpm audit --audit-level=high
+
+      - name: Work out the base commit for affected checks
+        uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Start the file storage (S3-compatible, built from infra/storage)
+        run: |
+          docker build -t kcp-storage:ci infra/storage
+          docker run -d --name kcp-storage -p 8333:8333 kcp-storage:ci
+          for attempt in $(seq 1 60); do
+            curl -fsS http://localhost:8333/healthz > /dev/null 2>&1 && exit 0
+            sleep 1
+          done
+          docker logs kcp-storage
+          exit 1
+
+      - name: Apply migrations and reference data to the CI database
+        run: |
+          pnpm db:deploy
+          pnpm db:seed
+
+      - name: Check the Prisma schema has a migration for every change
+        run: pnpm --filter @kcp/database migrate:check
+
+      # Always, not only when code changed: lessons in content/ aren't an Nx project.
+      - name: Check the lessons in content/ (every challenge solvable, every starter still open)
+        run: pnpm content:check
+
+      - name: Lint, typecheck, unit tests and build (changed projects only)
+        run: pnpm nx affected -t lint typecheck test build
+
+      - name: End-to-end tests against PostgreSQL and Redis (changed projects only)
+        run: pnpm nx affected -t test:e2e --parallel=1
+
+      - name: Check the generated API client is up to date
+        run: |
+          pnpm api:client
+          if ! git diff --quiet -- packages/api-client-ts; then
+            git diff --stat -- packages/api-client-ts
+            echo "::error::The API changed but the generated client did not. Run 'pnpm api:client' and commit the result."
+            exit 1
+          fi
+
+  api-image:
+    name: API Docker image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build the api and migrate targets (not pushed)
+        run: |
+          docker buildx build -f apps/api/Dockerfile --target api .
+          docker buildx build -f apps/api/Dockerfile --target migrate .
+
+  browser:
+    name: Browser tests (web app in en, ar, ur, lessons on laptop and tablet; admin panel; marketing site)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: kcp
+          POSTGRES_PASSWORD: kcp
+          POSTGRES_DB: kcp
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U kcp -d kcp"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      mailpit:
+        image: axllent/mailpit:v1.31
+        ports: ['1025:1025', '8025:8025']
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the Chromium browser for Playwright
+        run: pnpm --filter @kcp/web exec playwright install --with-deps chromium
+
+      - name: Start the file storage (S3-compatible, built from infra/storage)
+        run: |
+          docker build -t kcp-storage:ci infra/storage
+          docker run -d --name kcp-storage -p 8333:8333 kcp-storage:ci
+          for attempt in $(seq 1 60); do
+            curl -fsS http://localhost:8333/healthz > /dev/null 2>&1 && exit 0
+            sleep 1
+          done
+          docker logs kcp-storage
+          exit 1
+
+      - name: Prepare the database
+        run: |
+          pnpm db:deploy
+          pnpm db:seed
+
+      - name: Build the API, the web app, the code sandbox, the admin panel and the site
+        run: pnpm nx run-many -t build -p @kcp/api @kcp/web @kcp/sandbox @kcp/admin @kcp/site @kcp/content-import
+
+      - name: Import the lessons
+        run: pnpm content:import
+
+      - name: Run the web app's browser tests
+        run: pnpm --filter @kcp/web test:browser
+
+      - name: Run the admin panel's browser tests
+        if: success() || failure()
+        run: pnpm --filter @kcp/admin test:browser
+
+      - name: Run the marketing site's browser tests
+        if: success() || failure()
+        run: pnpm --filter @kcp/site test:browser
+
+      - name: Keep the report when tests fail
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results
+            apps/admin/playwright-report
+            apps/admin/test-results
+            apps/site/playwright-report
+            apps/site/test-results
+          retention-days: 7

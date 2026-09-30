@@ -1,0 +1,10 @@
+id: builder-m01
+order: 1
+titles:
+  en: Your first website
+  ar: موقعك الإلكتروني الأول
+  ur: آپ کی پہلی ویب سائٹ
+descriptions:
+  en: Build a web page about the things you love, with HTML and CSS.
+  ar: اصنع صفحة ويب عن الأشياء التي تحبها باستخدام HTML وCSS.
+  ur: HTML اور CSS سے اپنی پسندیدہ چیزوں کے بارے میں ایک ویب صفحہ بنائیں۔

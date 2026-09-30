@@ -1,0 +1,162 @@
+import {
+  AVATAR_KEYS,
+  CHILD_PASSWORD_MIN_LENGTH,
+  NICKNAME_PATTERN,
+  PASSWORD_MAX_LENGTH,
+} from '@kcp/shared';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+
+const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
+
+export class ChildConsentsDto {
+  /** Show the child (nickname and avatar only) on city, country and global leaderboards. */
+  @IsBoolean()
+  publicLeaderboards!: boolean;
+
+  /** Let anyone with the link see the child's finished projects. */
+  @IsBoolean()
+  publicPortfolio!: boolean;
+}
+
+export class CreateChildDto {
+  /** Shown to other children. Letters, digits and _; never the child's real name. */
+  @Transform(trim)
+  @Matches(NICKNAME_PATTERN, { message: 'nickname must be 3–20 letters, digits or _' })
+  nickname!: string;
+
+  @IsIn([...AVATAR_KEYS])
+  avatarKey!: (typeof AVATAR_KEYS)[number];
+
+  /** Only the year is stored, never the full date of birth. */
+  @Type(() => Number)
+  @IsInt()
+  birthYear!: number;
+
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toUpperCase() : value))
+  @Matches(/^[A-Z]{2}$/)
+  countryCode!: string;
+
+  @IsOptional()
+  @IsUUID()
+  regionId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  cityId?: string;
+
+  /** Language the child learns in, e.g. "ur". */
+  @Matches(/^[a-z]{2}$/)
+  languageCode!: string;
+
+  /** Chosen by the parent; the child logs in with it. */
+  @IsString()
+  @MinLength(CHILD_PASSWORD_MIN_LENGTH)
+  @MaxLength(PASSWORD_MAX_LENGTH)
+  password!: string;
+
+  @ValidateNested()
+  @Type(() => ChildConsentsDto)
+  consents!: ChildConsentsDto;
+}
+
+export class UpdateChildDto {
+  @IsOptional()
+  @Transform(trim)
+  @Matches(NICKNAME_PATTERN, { message: 'nickname must be 3–20 letters, digits or _' })
+  nickname?: string;
+
+  @IsOptional()
+  @IsIn([...AVATAR_KEYS])
+  avatarKey?: (typeof AVATAR_KEYS)[number];
+
+  @IsOptional()
+  @Matches(/^[a-z]{2}$/)
+  languageCode?: string;
+
+  @IsOptional()
+  @IsUUID()
+  regionId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  cityId?: string;
+}
+
+export class ResetChildPasswordDto {
+  @IsString()
+  @MinLength(CHILD_PASSWORD_MIN_LENGTH)
+  @MaxLength(PASSWORD_MAX_LENGTH)
+  password!: string;
+}
+
+export class DeleteChildDto {
+  /** Type the child's nickname to confirm. */
+  @IsString()
+  @MaxLength(40)
+  nickname!: string;
+}
+
+export class ChildDto {
+  id!: string;
+  /** The child's login name. */
+  username!: string;
+  nickname!: string;
+  avatarKey!: string;
+  birthYear!: number;
+  languageCode!: string;
+  countryCode!: string | null;
+  regionId!: string | null;
+  cityId!: string | null;
+  status!: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+  consents!: ChildConsentsDto;
+  createdAt!: Date;
+  lastLoginAt!: Date | null;
+  /** Lessons the child has completed. */
+  lessonsCompleted!: number;
+  /** When today's premium ends (a plan renews on its own); null without premium. */
+  premiumUntil!: Date | null;
+  /** Where premium comes from: the family's plan, our team, or the free trial. */
+  premiumSource!: 'subscription' | 'grant' | 'trial' | null;
+  /** The child's free trial (over or not). */
+  trialEndsAt!: Date | null;
+  /** All XP earned so far. */
+  xpTotal!: number;
+  level!: number;
+  /** Days in a row with the daily goal met (0 once a day is missed). */
+  streak!: number;
+  /** Badges earned. */
+  badges!: number;
+}
+
+export class ChildRulesDto {
+  /** Birth years a parent may choose right now. */
+  birthYears!: number[];
+  avatarKeys!: string[];
+  /** Whether accounts for children under 13 are open. */
+  under13Open!: boolean;
+}
+
+export class NicknameSuggestionsDto {
+  suggestions!: string[];
+}
+
+export class ConsentRecordDto {
+  id!: string;
+  type!: 'ACCOUNT' | 'PUBLIC_LEADERBOARDS' | 'PUBLIC_PORTFOLIO' | 'HUB_WORK' | 'EARNINGS';
+  policyVersion!: string;
+  method!: string;
+  grantedAt!: Date;
+  revokedAt!: Date | null;
+}

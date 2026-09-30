@@ -1,0 +1,21 @@
+id: builder-m02-l01-c1
+order: 1
+type: python
+xp: 10
+starter:
+  py: |
+    # Make Python say hello!
+solution:
+  py: |
+    # Make Python say hello!
+    print("Hello, world!")
+checks:
+  - id: prints-hello
+    expect: output
+    includes: hello
+    hint: print_hello
+  - id: uses-print
+    expect: python
+    code: |
+      assert "print(" in __source__
+    hint: use_print

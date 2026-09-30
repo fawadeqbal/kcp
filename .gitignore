@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.next/
+*.tsbuildinfo
+coverage/
+test-results/
+playwright-report/
+next-env.d.ts
+
+# Generated code (recreated by `pnpm db:generate` / `pnpm build`)
+packages/database/generated/
+
+# Environment files (copy .env.example to .env)
+.env
+.env.*
+!.env.example
+
+# Nx
+.nx/cache/
+.nx/workspace-data/
+
+# Editors and OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+dump.rdb

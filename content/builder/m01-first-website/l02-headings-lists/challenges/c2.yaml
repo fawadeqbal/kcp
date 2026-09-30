@@ -1,0 +1,33 @@
+id: builder-m01-l02-c2
+order: 2
+type: html
+xp: 10
+starter:
+  html: |
+    <h1>Things I love</h1>
+    <p>These are my favourite things in the world.</p>
+solution:
+  html: |
+    <h1>Things I love</h1>
+    <p>These are my favourite things in the world.</p>
+    <ul>
+      <li>Pizza</li>
+      <li>Cats</li>
+      <li>Rockets</li>
+    </ul>
+checks:
+  - id: has-list
+    expect: exists
+    selector: ul, ol
+    hint: add_list
+  - id: three-items
+    expect: exists
+    selector: ul li, ol li
+    min: 3
+    hint: more_items
+  - id: items-text
+    expect: text
+    selector: ul li, ol li
+    notEmpty: true
+    all: true
+    hint: item_text

@@ -1,0 +1,134 @@
+name: Deploy API
+
+# main → build images → staging (automatic)
+# tag v* → build images → production (waits for approval: add required reviewers to
+#                                     the "production" environment in the repo settings)
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths:
+      - apps/api/**
+      - packages/database/**
+      - packages/shared/**
+      - packages/checks/**
+      - tools/content-import/**
+      - content/**
+      - pnpm-lock.yaml
+      - .github/workflows/deploy-api.yml
+      - .github/actions/deploy-api/**
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  API_IMAGE: ghcr.io/${{ github.repository_owner }}/kcp-api
+  MIGRATE_IMAGE: ghcr.io/${{ github.repository_owner }}/kcp-migrate
+
+jobs:
+  images:
+    name: Build and push images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Work out the image tag
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: API image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          target: api
+          push: true
+          build-args: APP_VERSION=${{ steps.version.outputs.tag }}
+          tags: ${{ env.API_IMAGE }}:${{ steps.version.outputs.tag }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      - name: Migrate image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          target: migrate
+          push: true
+          tags: ${{ env.MIGRATE_IMAGE }}:${{ steps.version.outputs.tag }}
+          cache-from: type=gha,scope=migrate
+          cache-to: type=gha,scope=migrate,mode=max
+
+  staging:
+    name: Deploy to staging
+    needs: images
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check the staging environment is configured
+        id: configured
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$DATABASE_URL" ] && [ -n "$DEPLOY_HOOK_URL" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Add DATABASE_URL and DEPLOY_HOOK_URL secrets to the 'staging' environment to enable deploys. Images were still built and pushed."
+          fi
+      - if: steps.configured.outputs.ready == 'true'
+        uses: ./.github/actions/deploy-api
+        with:
+          api-image: ${{ env.API_IMAGE }}:${{ needs.images.outputs.tag }}
+          migrate-image: ${{ env.MIGRATE_IMAGE }}:${{ needs.images.outputs.tag }}
+          database-url: ${{ secrets.DATABASE_URL }}
+          deploy-hook-url: ${{ secrets.DEPLOY_HOOK_URL }}
+
+  production:
+    name: Deploy to production
+    needs: images
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: ./.github/actions/deploy-api
+        with:
+          api-image: ${{ env.API_IMAGE }}:${{ needs.images.outputs.tag }}
+          migrate-image: ${{ env.MIGRATE_IMAGE }}:${{ needs.images.outputs.tag }}
+          database-url: ${{ secrets.DATABASE_URL }}
+          deploy-hook-url: ${{ secrets.DEPLOY_HOOK_URL }}

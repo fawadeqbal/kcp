@@ -1,0 +1,29 @@
+id: builder-m02-l02-c2
+order: 2
+type: python
+xp: 10
+starter:
+  py: |
+    name = "friend"
+    print("Nice to meet you, " + name + "!")
+solution:
+  py: |
+    name = input("What's your name? ")
+    print("Nice to meet you, " + name + "!")
+checks:
+  - id: uses-input
+    expect: python
+    stdin: Sara
+    code: |
+      assert "input(" in __source__
+    hint: use_input
+  - id: greets-sara
+    expect: output
+    stdin: Sara
+    includes: Sara
+    hint: greet_answer
+  - id: greets-omar
+    expect: output
+    stdin: Omar
+    includes: Omar
+    hint: greet_answer

@@ -1,0 +1,36 @@
+id: builder-m01-l04-c2
+order: 2
+type: css
+xp: 10
+starter:
+  html: |
+    <h1>My colourful page</h1>
+    <p>This page has my favourite colours.</p>
+  css: |
+    h1 {
+      color: tomato;
+    }
+solution:
+  html: |
+    <h1>My colourful page</h1>
+    <p>This page has my favourite colours.</p>
+  css: |
+    h1 {
+      color: tomato;
+    }
+
+    body {
+      background-color: lightyellow;
+      font-family: Georgia, serif;
+    }
+checks:
+  - id: page-background
+    expect: css
+    selector: body
+    property: background-color|background
+    hint: body_background
+  - id: page-font
+    expect: css
+    selector: body
+    property: font-family|font
+    hint: body_font

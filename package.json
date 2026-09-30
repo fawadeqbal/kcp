@@ -1,0 +1,46 @@
+{
+  "name": "kcp",
+  "private": true,
+  "description": "Kids Coding Platform monorepo: NestJS API, Next.js apps (web and admin), Flutter app and shared packages",
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "nx run-many -t dev -p @kcp/api @kcp/web @kcp/admin @kcp/site @kcp/ui @kcp/sandbox --parallel=6 --output-style=stream",
+    "build": "nx run-many -t build",
+    "lint": "nx run-many -t lint",
+    "typecheck": "nx run-many -t typecheck",
+    "test": "nx run-many -t test",
+    "test:e2e": "nx run-many -t test:e2e --parallel=1",
+    "test:browser": "nx run-many -t test:browser --parallel=1",
+    "check": "nx run-many -t lint typecheck test",
+    "affected": "nx affected -t lint typecheck test build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "services:up": "docker compose up -d --wait",
+    "services:down": "docker compose down",
+    "services:reset": "docker compose down -v",
+    "db:generate": "pnpm --filter @kcp/database generate",
+    "db:migrate": "pnpm --filter @kcp/database migrate:dev",
+    "db:deploy": "pnpm --filter @kcp/database migrate:deploy",
+    "db:seed": "nx run @kcp/database:seed",
+    "db:reset": "nx run @kcp/shared:build && pnpm --filter @kcp/database migrate:reset",
+    "db:studio": "pnpm --filter @kcp/database studio",
+    "db:drill": "node scripts/backup-restore-drill.mjs",
+    "content:check": "nx run @kcp/content-import:check-content",
+    "content:import": "nx run @kcp/content-import:import-content",
+    "api:client": "nx run @kcp/api-client-ts:generate",
+    "bootstrap": "pnpm services:up && pnpm db:generate && pnpm db:deploy && pnpm db:seed && pnpm build && pnpm content:import",
+    "staff:create": "pnpm --filter @kcp/api staff:create",
+    "demo:accounts": "pnpm --filter @kcp/api demo:accounts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "nx": "23.2.1",
+    "oxlint": "^1.86.0",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.3"
+  }
+}

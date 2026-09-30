@@ -1,0 +1,29 @@
+id: builder-m01-l03-c1
+order: 1
+type: html
+xp: 10
+starter:
+  html: |
+    <h1>My favourite place</h1>
+    <p>My favourite place is the beach.</p>
+solution:
+  html: |
+    <h1>My favourite place</h1>
+    <p>My favourite place is the beach.</p>
+    <a href="https://en.wikipedia.org/wiki/Beach">Read about beaches</a>
+checks:
+  - id: has-link
+    expect: exists
+    selector: a
+    hint: add_link
+  - id: link-address
+    expect: attribute
+    selector: a
+    name: href
+    includes: http
+    hint: full_address
+  - id: link-text
+    expect: text
+    selector: a
+    notEmpty: true
+    hint: link_text

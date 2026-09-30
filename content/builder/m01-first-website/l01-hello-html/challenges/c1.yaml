@@ -1,0 +1,19 @@
+id: builder-m01-l01-c1
+order: 1
+type: html
+xp: 10
+starter:
+  html: ''
+solution:
+  html: |
+    <h1>Hello, world!</h1>
+checks:
+  - id: has-h1
+    expect: exists
+    selector: h1
+    hint: add_h1
+  - id: h1-text
+    expect: text
+    selector: h1
+    notEmpty: true
+    hint: h1_text

@@ -1,0 +1,116 @@
+# Local development services. Start with `pnpm services:up`, stop with `pnpm services:down`.
+# Data is kept in named volumes; `pnpm services:reset` wipes it.
+name: kcp
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kcp
+      POSTGRES_PASSWORD: kcp
+      POSTGRES_DB: kcp
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kcp -d kcp']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.31
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:1025:1025' # SMTP
+      - '127.0.0.1:8025:8025' # Web inbox: http://localhost:8025
+
+  # Project files (S3-compatible, built from infra/storage). Staging and production
+  # use Cloudflare R2 through the same S3 API. Only reachable from this computer.
+  storage:
+    build: ./infra/storage
+    image: kcp-storage:dev
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8333:8333' # S3 API
+      - '127.0.0.1:8888:8888' # Browse the stored files: http://localhost:8888/buckets/
+    volumes:
+      - storage-data:/data
+
+  # Runs the API in a container, built from apps/api/Dockerfile — the same image
+  # that is deployed. Optional: day-to-day you run the API with `pnpm dev`.
+  # Start with: docker compose --profile api up -d --build
+  api:
+    profiles: ['api']
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: api
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      API_PORT: 3000
+      DATABASE_URL: postgresql://kcp:kcp@postgres:5432/kcp
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: http://localhost:3001
+      JWT_ACCESS_SECRET: dev-only-access-token-secret-change-me-0123456789
+      ENCRYPTION_KEY: ZGV2LW9ubHktZW5jcnlwdGlvbi1rZXktMzJieXRlcyE=
+      # The production image refuses the development secrets above, except on
+      # localhost with this switch. Never set it on a real server.
+      ALLOW_DEVELOPMENT_SECRETS: 'true'
+      SMTP_URL: smtp://mailpit:1025
+      WEB_APP_URL: http://localhost:3001
+      # The storage container's development credentials (infra/storage/s3.json).
+      S3_ENDPOINT: http://storage:8333
+      S3_ACCESS_KEY_ID: kcp-dev-access-key
+      S3_SECRET_ACCESS_KEY: kcp-dev-secret-key-not-for-production
+    ports:
+      - '127.0.0.1:3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  migrate:
+    profiles: ['api']
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: migrate
+    environment:
+      DATABASE_URL: postgresql://kcp:kcp@postgres:5432/kcp
+    # Like the deployed image, but new modules are published straight away (on a real
+    # server they wait for staff to publish them in the admin panel).
+    command:
+      - sh
+      - -c
+      - prisma migrate deploy && prisma db seed && node /repo/tools/content-import/dist/cli.js import /repo/content
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  redis-data:
+  storage-data:

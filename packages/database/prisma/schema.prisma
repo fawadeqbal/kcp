@@ -1,0 +1,1249 @@
+// Kids Coding Platform — database schema
+//
+// Accounts and families, consent, roles and permissions, sessions, locations,
+// languages, learning content and progress, audit log and feature flags. Later
+// sprints add game, portfolio and money models (see implementation-plan.md).
+//
+// Conventions
+// - Models are PascalCase; tables and columns are snake_case (@@map / @map).
+// - IDs are UUID v7 (time-ordered) unless a natural key exists (country code, language code).
+// - Append-only tables (audit_logs, consent_records) are never updated in place;
+//   audit_logs is protected by a database trigger (see the init migration).
+
+generator client {
+  provider               = "prisma-client"
+  output                 = "../generated/prisma"
+  moduleFormat           = "esm"
+  runtime                = "nodejs"
+  importFileExtension    = "js"
+  generatedFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────
+// Accounts
+// ─────────────────────────────────────────────────────────────
+
+/// STUDENT accounts sign in with a username set by their parent.
+/// ADULT accounts (parents, mentors, staff, teachers, clients) sign in with email.
+enum AccountKind {
+  STUDENT
+  ADULT
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+model User {
+  id                   String      @id @default(uuid(7)) @db.Uuid
+  kind                 AccountKind
+  status               UserStatus  @default(PENDING_VERIFICATION)
+  /// Every account has exactly one role (scope: "Roles and permissions").
+  roleId               String      @map("role_id") @db.Uuid
+  /// Adults only. Stored lowercase.
+  email                String?     @unique
+  emailVerifiedAt      DateTime?   @map("email_verified_at")
+  /// Students only. Generated and non-identifying, e.g. "blue-falcon-42".
+  username             String?     @unique
+  passwordHash         String?     @map("password_hash")
+  /// Adults only. Never shown publicly.
+  displayName          String?     @map("display_name")
+  languageCode         String      @default("en") @map("language_code")
+  countryCode          String?     @map("country_code") @db.Char(2)
+  regionId             String?     @map("region_id") @db.Uuid
+  cityId               String?     @map("city_id") @db.Uuid
+  /// Encrypted TOTP secret; required for staff roles.
+  totpSecret           String?     @map("totp_secret")
+  totpEnabledAt        DateTime?   @map("totp_enabled_at")
+  lastLoginAt          DateTime?   @map("last_login_at")
+  /// Version of the terms and privacy policy the adult accepted at sign-up.
+  termsVersion         String?     @map("terms_version")
+  termsAcceptedAt      DateTime?   @map("terms_accepted_at")
+  /// Parents: the monthly email about their children's progress (they can switch it off).
+  monthlySummaryEmails Boolean     @default(true) @map("monthly_summary_emails")
+  /// Parents: free trials started for their children, ever (deleted children count
+  /// too), so deleting and re-adding a child can't restart the trial again and again.
+  trialsStarted        Int         @default(0) @map("trials_started") @db.SmallInt
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime    @updatedAt @map("updated_at")
+  deletedAt            DateTime?   @map("deleted_at")
+
+  role     Role     @relation(fields: [roleId], references: [id])
+  language Language @relation(fields: [languageCode], references: [code])
+  country  Country? @relation(fields: [countryCode], references: [code])
+  region   Region?  @relation(fields: [regionId], references: [id])
+  city     City?    @relation(fields: [cityId], references: [id])
+
+  studentProfile     StudentProfile?
+  childLinks         ParentChildLink[]   @relation("ParentLinks")
+  parentLinks        ParentChildLink[]   @relation("ChildLinks")
+  consentsGiven      ConsentRecord[]     @relation("ConsentParent")
+  consentsReceived   ConsentRecord[]     @relation("ConsentChild")
+  sessions           Session[]
+  verificationTokens VerificationToken[]
+  lessonProgress     LessonProgress[]
+  challengeDrafts    ChallengeDraft[]
+  submissions        Submission[]
+  projects           Project[]
+  portfolioItems     PortfolioItem[]
+  xpEvents           XpEvent[]
+  streak             Streak?
+  feedback           Feedback[]
+  premiumGrants      PremiumGrant[]      @relation("PremiumGrantStudent")
+  badges             UserBadge[]
+  leaderboardResults LeaderboardResult[]
+  premiumGranted     PremiumGrant[]      @relation("PremiumGrantStaff")
+  premiumRevoked     PremiumGrant[]      @relation("PremiumGrantRevoker")
+  billingCustomers   BillingCustomer[]
+  subscriptions      Subscription[]
+  payments           Payment[]           @relation("PaymentParent")
+  paymentsRecorded   Payment[]           @relation("PaymentRecorder")
+  invoices           Invoice[]
+  refundsMade        Refund[]
+  notifications      Notification[]
+  certificates       Certificate[]
+
+  @@index([roleId])
+  @@index([countryCode, regionId, cityId])
+  @@map("users")
+}
+
+/// Public identity of a student: nickname and preset avatar only.
+/// Never store a real name, photo, school name or exact location here.
+model StudentProfile {
+  userId              String    @id @map("user_id") @db.Uuid
+  nickname            String
+  avatarKey           String    @map("avatar_key")
+  birthYear           Int       @map("birth_year") @db.SmallInt
+  /// Mirrors the latest PUBLIC_LEADERBOARDS consent, for fast leaderboard writes.
+  showOnPublicBoards  Boolean   @default(false) @map("show_on_public_boards")
+  /// Mirrors the latest PUBLIC_PORTFOLIO consent.
+  publicPortfolio     Boolean   @default(false) @map("public_portfolio")
+  /// Set only after mentor check + parent approval (Phase 3).
+  isHubEligible       Boolean   @default(false) @map("is_hub_eligible")
+  /// Sum of the student's XP events, kept up to date in the same transaction (a cache:
+  /// xp_events is the source of truth).
+  xpTotal             Int       @default(0) @map("xp_total")
+  /// The unlisted link to the portfolio, made by the parent. Works only while
+  /// publicPortfolio is on; a new link replaces the old one.
+  portfolioShareToken String?   @unique @map("portfolio_share_token")
+  /// Every new student gets premium to try until this moment (TRIAL_DAYS).
+  trialEndsAt         DateTime? @map("trial_ends_at")
+  /// When the parent was told the trial ends soon (once per trial).
+  trialReminderSentAt DateTime? @map("trial_reminder_sent_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("student_profiles")
+}
+
+enum GuardianRelationship {
+  PARENT
+  GUARDIAN
+}
+
+model ParentChildLink {
+  id           String               @id @default(uuid(7)) @db.Uuid
+  parentId     String               @map("parent_id") @db.Uuid
+  childId      String               @map("child_id") @db.Uuid
+  relationship GuardianRelationship @default(PARENT)
+  isPrimary    Boolean              @default(true) @map("is_primary")
+  createdAt    DateTime             @default(now()) @map("created_at")
+
+  parent User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
+  child  User @relation("ChildLinks", fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, childId])
+  @@index([childId])
+  @@map("parent_child_links")
+}
+
+enum ConsentType {
+  ACCOUNT
+  PUBLIC_LEADERBOARDS
+  PUBLIC_PORTFOLIO
+  HUB_WORK
+  EARNINGS
+}
+
+/// How consent was verified. The lawyer decides which methods are enough per
+/// country; storing the method lets us upgrade it later without losing history.
+enum ConsentMethod {
+  EMAIL_CONFIRMATION
+  PAYMENT_CARD
+  ID_DOCUMENT
+  SIGNED_FORM
+  OTHER
+}
+
+/// Append-only: a new grant is a new row; revoking sets revoked_at.
+model ConsentRecord {
+  id            String        @id @default(uuid(7)) @db.Uuid
+  parentId      String        @map("parent_id") @db.Uuid
+  childId       String        @map("child_id") @db.Uuid
+  type          ConsentType
+  policyVersion String        @map("policy_version")
+  method        ConsentMethod
+  grantedAt     DateTime      @default(now()) @map("granted_at")
+  revokedAt     DateTime?     @map("revoked_at")
+  ipAddress     String?       @map("ip_address")
+  userAgent     String?       @map("user_agent")
+
+  parent User @relation("ConsentParent", fields: [parentId], references: [id], onDelete: Cascade)
+  child  User @relation("ConsentChild", fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId, type])
+  @@index([parentId])
+  @@index([grantedAt])
+  @@map("consent_records")
+}
+
+model Session {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  /// SHA-256 of the refresh token; the raw token is never stored.
+  refreshTokenHash String    @unique @map("refresh_token_hash")
+  /// Set when this session's token was rotated into a new one.
+  replacedById     String?   @map("replaced_by_id") @db.Uuid
+  userAgent        String?   @map("user_agent")
+  ipAddress        String?   @map("ip_address")
+  /// When the user last typed their password (and code): kept through refresh-token
+  /// rotation, so a session can't be extended forever (an absolute lifetime).
+  authenticatedAt  DateTime  @default(now()) @map("authenticated_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+enum VerificationPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+/// One-time links sent by email. Only a SHA-256 hash of the token is stored.
+model VerificationToken {
+  id        String              @id @default(uuid(7)) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  purpose   VerificationPurpose
+  tokenHash String              @unique @map("token_hash")
+  expiresAt DateTime            @map("expires_at")
+  usedAt    DateTime?           @map("used_at")
+  createdAt DateTime            @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Roles and permissions (enforced by NestJS guards + CASL)
+// ─────────────────────────────────────────────────────────────
+
+model Role {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// Stable key used in code, e.g. "student", "parent", "super_admin".
+  key         String   @unique
+  name        String
+  description String?
+  /// Staff roles must use two-factor login and the admin panel.
+  isStaff     Boolean  @default(false) @map("is_staff")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String  @id @default(uuid(7)) @db.Uuid
+  /// CASL action: "manage", "create", "read", "update", "delete", or a custom verb.
+  action      String
+  /// CASL subject: a model name such as "User", or "all".
+  subject     String
+  description String?
+
+  roles RolePermission[]
+
+  @@unique([action, subject])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  roleId       String   @map("role_id") @db.Uuid
+  permissionId String   @map("permission_id") @db.Uuid
+  /// Optional CASL conditions with placeholders, e.g. { "id": "${user.id}" }.
+  conditions   Json?
+  /// Limits the rule to these fields (empty = all fields).
+  fields       String[] @default([])
+  /// true = "cannot" rule (an explicit deny).
+  inverted     Boolean  @default(false)
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@index([roleId])
+  @@map("role_permissions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Location (country → region → city) — also used by leaderboards
+// ─────────────────────────────────────────────────────────────
+
+model Country {
+  /// ISO 3166-1 alpha-2, e.g. "PK".
+  code                  String   @id @db.Char(2)
+  /// Names per language code, e.g. { "en": "Pakistan", "ar": "باكستان", "ur": "پاکستان" }.
+  names                 Json
+  /// ISO 4217, e.g. "PKR".
+  currency              String   @db.Char(3)
+  timezone              String
+  defaultLanguageCode   String   @map("default_language_code")
+  /// Countries are switched on one by one from the admin panel.
+  isActive              Boolean  @default(false) @map("is_active")
+  /// Each child after the first costs this much less (the family discount).
+  familyDiscountPercent Int      @default(30) @map("family_discount_percent") @db.SmallInt
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  defaultLanguage Language    @relation(fields: [defaultLanguageCode], references: [code])
+  regions         Region[]
+  users           User[]
+  prices          PlanPrice[]
+
+  @@map("countries")
+}
+
+model Region {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  countryCode String   @map("country_code") @db.Char(2)
+  slug        String
+  names       Json
+  /// Overrides the country's timezone when set.
+  timezone    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  country Country @relation(fields: [countryCode], references: [code])
+  cities  City[]
+  users   User[]
+
+  @@unique([countryCode, slug])
+  @@map("regions")
+}
+
+model City {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  regionId  String   @map("region_id") @db.Uuid
+  slug      String
+  names     Json
+  timezone  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  region Region @relation(fields: [regionId], references: [id])
+  users  User[]
+
+  @@unique([regionId, slug])
+  @@map("cities")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Languages
+// ─────────────────────────────────────────────────────────────
+
+enum TextDirection {
+  LTR
+  RTL
+}
+
+model Language {
+  /// BCP 47 code, e.g. "en", "ar", "ur".
+  code       String        @id
+  name       String
+  nativeName String        @map("native_name")
+  direction  TextDirection @default(LTR)
+  isActive   Boolean       @default(false) @map("is_active")
+  sortOrder  Int           @default(0) @map("sort_order")
+
+  users                 User[]
+  countries             Country[]
+  lessonTranslations    LessonTranslation[]
+  challengeTranslations ChallengeTranslation[]
+  briefTranslations     ProjectBriefTranslation[]
+
+  @@map("languages")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Learning
+//
+// Content (tracks, modules, lessons, challenges and their translations) is written
+// as files in content/ and written here by tools/content-import. Its IDs are the
+// content keys (e.g. "builder-m01-l03"), so progress survives every re-import.
+// Content is never deleted, only switched off (isActive = false).
+// ─────────────────────────────────────────────────────────────
+
+enum ChallengeType {
+  HTML
+  CSS
+  JS
+  /// Runs with Pyodide in a Web Worker on the sandbox origin (Sprint 5).
+  PYTHON
+}
+
+enum LessonStatus {
+  STARTED
+  COMPLETED
+}
+
+/// A learning path, e.g. "builder".
+model Track {
+  id        String   @id
+  /// Title per language code, e.g. { "en": "Builder", "ar": "…" }.
+  titles    Json
+  sortOrder Int      @default(0) @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  modules Module[]
+
+  @@map("tracks")
+}
+
+model Module {
+  id           String    @id
+  trackId      String    @map("track_id")
+  /// Folder name, e.g. "m01-first-website".
+  slug         String
+  titles       Json
+  descriptions Json
+  sortOrder    Int       @default(0) @map("sort_order")
+  /// In content/ (the importer switches off what was removed from the files).
+  isActive     Boolean   @default(true) @map("is_active")
+  /// Students see a module once staff publish it (Admin → Content). Imports in
+  /// staging and production leave new modules unpublished; development publishes them.
+  publishedAt  DateTime? @map("published_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  track          Track           @relation(fields: [trackId], references: [id])
+  lessons        Lesson[]
+  projectBrief   ProjectBrief?
+  portfolioItems PortfolioItem[]
+
+  @@index([trackId, sortOrder])
+  @@map("modules")
+}
+
+model Lesson {
+  id        String   @id
+  moduleId  String   @map("module_id")
+  slug      String
+  sortOrder Int      @default(0) @map("sort_order")
+  xp        Int      @default(0)
+  /// Stored from Sprint 3; enforced when plans arrive (Sprint 6).
+  isPremium Boolean  @default(false) @map("is_premium")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  module       Module              @relation(fields: [moduleId], references: [id])
+  translations LessonTranslation[]
+  challenges   Challenge[]
+  progress     LessonProgress[]
+
+  @@index([moduleId, sortOrder])
+  @@map("lessons")
+}
+
+model LessonTranslation {
+  lessonId      String  @map("lesson_id")
+  languageCode  String  @map("language_code")
+  title         String
+  summary       String
+  /// The explainer, in Markdown.
+  body          String
+  /// Optional video in this language, e.g. provider "youtube" and its video ID.
+  videoProvider String? @map("video_provider")
+  videoId       String? @map("video_id")
+
+  lesson   Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageCode], references: [code])
+
+  @@id([lessonId, languageCode])
+  @@map("lesson_translations")
+}
+
+/// A "try it" step: starter code, and checks that run in the browser sandbox.
+model Challenge {
+  id        String        @id
+  lessonId  String        @map("lesson_id")
+  sortOrder Int           @default(0) @map("sort_order")
+  type      ChallengeType
+  xp        Int           @default(0)
+  /// Starting code per file: { "html": "…", "css": "…", "js": "…" }.
+  starter   Json
+  /// Declarative checks and JavaScript tests (types in packages/checks).
+  checks    Json
+  isActive  Boolean       @default(true) @map("is_active")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  lesson       Lesson                 @relation(fields: [lessonId], references: [id])
+  translations ChallengeTranslation[]
+  drafts       ChallengeDraft[]
+  submissions  Submission[]
+
+  @@index([lessonId, sortOrder])
+  @@map("challenges")
+}
+
+model ChallengeTranslation {
+  challengeId  String @map("challenge_id")
+  languageCode String @map("language_code")
+  title        String
+  /// What to do, in Markdown.
+  instructions String
+  /// Hint texts by key, e.g. { "add_link": "Use the <a> tag…" }.
+  hints        Json
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  language  Language  @relation(fields: [languageCode], references: [code])
+
+  @@id([challengeId, languageCode])
+  @@map("challenge_translations")
+}
+
+model LessonProgress {
+  userId      String       @map("user_id") @db.Uuid
+  lessonId    String       @map("lesson_id")
+  status      LessonStatus @default(STARTED)
+  startedAt   DateTime     @default(now()) @map("started_at")
+  completedAt DateTime?    @map("completed_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@id([userId, lessonId])
+  @@index([lessonId])
+  @@map("lesson_progress")
+}
+
+/// The student's latest code for a challenge, saved while they type.
+model ChallengeDraft {
+  userId      String   @map("user_id") @db.Uuid
+  challengeId String   @map("challenge_id")
+  /// { "html": "…", "css": "…", "js": "…" }
+  code        Json
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+
+  @@id([userId, challengeId])
+  @@index([challengeId])
+  @@map("challenge_drafts")
+}
+
+/// One "Check my code": the code and what the checks in the browser sandbox found.
+model Submission {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  challengeId String   @map("challenge_id")
+  code        Json
+  passed      Boolean
+  /// Per check: { id, passed } — see packages/checks.
+  results     Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+
+  @@index([userId, challengeId, createdAt])
+  @@index([challengeId])
+  @@map("submissions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// System
+// ─────────────────────────────────────────────────────────────
+
+/// Who changed what and when. Append-only: UPDATE and DELETE are blocked by a trigger.
+model AuditLog {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  actorId    String?  @map("actor_id") @db.Uuid
+  actorRole  String?  @map("actor_role")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  before     Json?
+  after      Json?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  requestId  String?  @map("request_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // No foreign key on actor_id on purpose: the audit trail must outlive the accounts it mentions.
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model FeatureFlag {
+  key          String   @id
+  description  String?
+  enabled      Boolean  @default(false)
+  /// Empty = applies to every country.
+  countryCodes String[] @default([]) @map("country_codes")
+  updatedById  String?  @map("updated_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("feature_flags")
+}
+
+// ── Projects and portfolio ───────────────────────────────────────────────────
+
+enum ProjectStatus {
+  DRAFT
+  SHIPPED
+}
+
+/// The project that ends a module (content/…/project.yaml), imported like lessons.
+model ProjectBrief {
+  /// Content key, e.g. "builder-m01-project".
+  id        String   @id
+  moduleId  String   @unique @map("module_id")
+  xp        Int      @default(100)
+  /// Starting files: { "html": "…", "css": "…", "js": "…" }.
+  starter   Json
+  /// What the project needs before it can be shipped (see packages/checks).
+  checks    Json
+  /// Premium projects need a trial, a subscription or premium given by hand.
+  isPremium Boolean  @default(false) @map("is_premium")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  module       Module                    @relation(fields: [moduleId], references: [id])
+  translations ProjectBriefTranslation[]
+  projects     Project[]
+
+  @@map("project_briefs")
+}
+
+model ProjectBriefTranslation {
+  briefId      String   @map("brief_id")
+  languageCode String   @map("language_code")
+  title        String
+  summary      String
+  /// The brief, in Markdown.
+  body         String
+  /// Hint texts by key.
+  hints        Json     @default("{}")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  brief    ProjectBrief @relation(fields: [briefId], references: [id], onDelete: Cascade)
+  language Language     @relation(fields: [languageCode], references: [code])
+
+  @@id([briefId, languageCode])
+  @@map("project_brief_translations")
+}
+
+/// A student's project for one brief: the draft they work on, and whether it shipped.
+model Project {
+  id        String        @id @default(uuid(7)) @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  briefId   String        @map("brief_id")
+  /// The current draft: { "html": "…", "css": "…", "js": "…" }.
+  files     Json
+  status    ProjectStatus @default(DRAFT)
+  shippedAt DateTime?     @map("shipped_at")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brief         ProjectBrief   @relation(fields: [briefId], references: [id])
+  portfolioItem PortfolioItem?
+
+  @@unique([userId, briefId])
+  @@index([briefId])
+  @@map("projects")
+}
+
+/// A shipped project on the student's portfolio. Its files are in file storage
+/// (R2), one folder per version; shipping again adds a version. Who can see the
+/// portfolio is decided by the family: the parent's share link and "Public projects".
+model PortfolioItem {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  projectId   String   @unique @map("project_id") @db.Uuid
+  moduleId    String   @map("module_id")
+  version     Int      @default(1)
+  /// Storage keys per file: { "html": "projects/<user>/<project>/v2/index.html", … }.
+  files       Json
+  /// When this version was shipped.
+  publishedAt DateTime @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  module  Module  @relation(fields: [moduleId], references: [id])
+
+  @@index([userId, publishedAt])
+  @@map("portfolio_items")
+}
+
+// ── XP, levels and streaks ───────────────────────────────────────────────────
+
+enum XpSource {
+  CHALLENGE
+  LESSON
+  PROJECT
+  /// Corrections by staff (Sprint 5), with a written reason in the audit log.
+  ADMIN
+}
+
+/// Every XP gain. Never changed or deleted (database trigger): totals, streaks and
+/// leaderboards are all rebuilt from these rows.
+model XpEvent {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  amount    Int
+  source    XpSource
+  /// What earned it, e.g. the challenge ID. XP is given once per thing.
+  sourceId  String   @map("source_id")
+  /// The student's own date (their country's time zone): daily cap, streaks and the
+  /// week and season an XP gain counts for.
+  day       DateTime @db.Date
+  /// Staff corrections (negative amounts): why. Also in the audit log.
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // No cascade: accounts are anonymised, never removed, and XP history stays.
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, source, sourceId])
+  @@index([userId, day])
+  @@index([day])
+  @@index([createdAt])
+  @@map("xp_events")
+}
+
+/// XP needed for each level (seeded).
+model Level {
+  number Int @id
+  minXp  Int @unique @map("min_xp")
+
+  @@map("levels")
+}
+
+/// The daily goal streak: days in a row on which the student met their goal.
+model Streak {
+  userId      String    @id @map("user_id") @db.Uuid
+  current     Int       @default(0)
+  longest     Int       @default(0)
+  /// The last day (student's time zone) on which the goal was met.
+  lastGoalDay DateTime? @map("last_goal_day") @db.Date
+  dailyGoalXp Int       @default(20) @map("daily_goal_xp")
+  /// Streak freezes held (at most 2): each one covers a missed day. One is earned
+  /// every 7 days of streak.
+  freezes     Int       @default(0)
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
+
+enum BadgeCategory {
+  SKILL
+  SHIPPING
+  STREAK
+  LEVEL
+  LEADERBOARD
+  HELPING
+}
+
+/// Badges students can earn. Names and descriptions live in packages/i18n
+/// (badges.<key>), so every language has them; the seed keeps this table in step.
+model Badge {
+  key       String        @id
+  category  BadgeCategory
+  /// How it is earned, e.g. { "type": "lessons_completed", "min": 5 }. "manual"
+  /// badges are given by staff; "weekly_top" by the weekly results job.
+  criteria  Json
+  /// A single emoji, shown next to the name.
+  icon      String
+  sortOrder Int           @default(0) @map("sort_order")
+  isActive  Boolean       @default(true) @map("is_active")
+
+  userBadges UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  userId      String    @map("user_id") @db.Uuid
+  badgeKey    String    @map("badge_key")
+  awardedAt   DateTime  @default(now()) @map("awarded_at")
+  /// When the student saw the celebration; null shows it next time.
+  seenAt      DateTime? @map("seen_at")
+  /// Staff awards: who gave it, and why.
+  awardedById String?   @map("awarded_by_id") @db.Uuid
+  reason      String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeKey], references: [key])
+
+  @@id([userId, badgeKey])
+  @@index([badgeKey])
+  @@map("user_badges")
+}
+
+enum SeasonStatus {
+  ACTIVE
+  ENDED
+}
+
+/// A leaderboard season, run by staff (e.g. "Autumn 2026"). Counts XP earned from
+/// startDay up to (not including) endDay, by each student's own date. At most one is
+/// active (a partial unique index).
+model LeaderboardSeason {
+  id          String       @id @default(uuid(7)) @db.Uuid
+  name        String
+  startDay    DateTime     @map("start_day") @db.Date
+  /// The day after the last day; null while the end isn't planned.
+  endDay      DateTime?    @map("end_day") @db.Date
+  status      SeasonStatus @default(ACTIVE)
+  createdById String?      @map("created_by_id") @db.Uuid
+  endedById   String?      @map("ended_by_id") @db.Uuid
+  endedAt     DateTime?    @map("ended_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  results LeaderboardResult[]
+
+  @@index([status])
+  @@map("leaderboard_seasons")
+}
+
+enum BoardPeriod {
+  WEEK
+  SEASON
+}
+
+enum BoardScope {
+  GLOBAL
+  COUNTRY
+  REGION
+  CITY
+}
+
+/// The final top 10 of a board once its week or season is over.
+model LeaderboardResult {
+  id        String      @id @default(uuid(7)) @db.Uuid
+  period    BoardPeriod
+  /// "2026-W40" for a week, the season ID for a season.
+  periodKey String      @map("period_key")
+  seasonId  String?     @map("season_id") @db.Uuid
+  scope     BoardScope
+  /// Country code, region or city ID; "" for the global board.
+  scopeId   String      @default("") @map("scope_id")
+  rank      Int
+  userId    String      @map("user_id") @db.Uuid
+  xp        Int
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  season LeaderboardSeason? @relation(fields: [seasonId], references: [id])
+  // No cascade: accounts are anonymised, never removed.
+  user   User               @relation(fields: [userId], references: [id])
+
+  @@unique([period, periodKey, scope, scopeId, userId])
+  @@index([period, periodKey, scope, scopeId, rank])
+  @@index([userId])
+  @@map("leaderboard_results")
+}
+
+// ── Pilot tools ──────────────────────────────────────────────────────────────
+
+enum FeedbackKind {
+  BUG
+  IDEA
+  PRAISE
+  OTHER
+  /// "Something here isn't safe" — first in the admin inbox.
+  SAFETY
+}
+
+enum FeedbackStatus {
+  NEW
+  READ
+  DONE
+}
+
+/// Sent with the in-app feedback button. Only staff read it.
+model Feedback {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  userId       String?        @map("user_id") @db.Uuid
+  kind         FeedbackKind
+  message      String
+  /// The page it was sent from, without query or fragment.
+  pagePath     String?        @map("page_path")
+  languageCode String         @map("language_code")
+  status       FeedbackStatus @default(NEW)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("feedback")
+}
+
+/// Premium given by hand (pilot families, schools, support). Works next to subscriptions.
+model PremiumGrant {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  /// The student who gets premium.
+  userId      String    @map("user_id") @db.Uuid
+  grantedById String    @map("granted_by_id") @db.Uuid
+  reason      String
+  startsAt    DateTime  @default(now()) @map("starts_at")
+  endsAt      DateTime  @map("ends_at")
+  revokedAt   DateTime? @map("revoked_at")
+  revokedById String?   @map("revoked_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user      User  @relation("PremiumGrantStudent", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User  @relation("PremiumGrantStaff", fields: [grantedById], references: [id])
+  revokedBy User? @relation("PremiumGrantRevoker", fields: [revokedById], references: [id])
+
+  @@index([userId, endsAt])
+  @@map("premium_grants")
+}
+
+/// The five numbers, per day and country, written by the nightly job.
+model MetricsDaily {
+  day           DateTime @db.Date
+  countryCode   String   @map("country_code") @db.Char(2)
+  /// Parent accounts whose first child was created that day.
+  signUps       Int      @default(0) @map("sign_ups")
+  /// Students who shipped their first project that day.
+  firstProjects Int      @default(0) @map("first_projects")
+  /// Students with an XP event in the 7 days up to and including that day.
+  weeklyActive  Int      @default(0) @map("weekly_active")
+  /// From Sprint 6 (payments).
+  payingParents Int      @default(0) @map("paying_parents")
+  cancellations Int      @default(0)
+  computedAt    DateTime @default(now()) @map("computed_at")
+
+  @@id([day, countryCode])
+  @@map("metrics_daily")
+}
+
+// ─── Payments (Sprint 6) ─────────────────────────────────────────────────────
+// A family (the parent's account) subscribes; every child of theirs gets premium.
+// Amounts are in the currency's minor unit (paisa, piastres, fils, halalas).
+
+enum BillingInterval {
+  MONTH
+  YEAR
+}
+
+enum PaymentProvider {
+  /// Recorded by staff: bank transfer, mobile wallet, cash.
+  MANUAL
+  /// Cards, through Stripe Checkout (a mock of Stripe in development).
+  STRIPE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  /// A renewal payment failed; the provider is retrying. Premium stays until the period ends.
+  PAST_DUE
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  PARTIALLY_REFUNDED
+  REFUNDED
+}
+
+enum InvoiceStatus {
+  OPEN
+  PAID
+  VOID
+  REFUNDED
+}
+
+/// What families can buy. Names and descriptions come from the translations.
+model Plan {
+  /// "monthly" or "yearly".
+  key       String          @id
+  interval  BillingInterval
+  isActive  Boolean         @default(true) @map("is_active")
+  sortOrder Int             @default(0) @map("sort_order")
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  prices        PlanPrice[]
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+/// A plan's price for one child in one country, in that country's currency.
+model PlanPrice {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  planKey     String   @map("plan_key")
+  countryCode String   @map("country_code") @db.Char(2)
+  /// ISO 4217, the country's currency.
+  currency    String   @db.Char(3)
+  amountMinor Int      @map("amount_minor")
+  updatedById String?  @map("updated_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  plan    Plan    @relation(fields: [planKey], references: [key])
+  country Country @relation(fields: [countryCode], references: [code])
+
+  @@unique([planKey, countryCode])
+  @@map("plan_prices")
+}
+
+/// The family's account at a payment provider (Stripe's customer ID).
+model BillingCustomer {
+  parentId   String          @map("parent_id") @db.Uuid
+  provider   PaymentProvider
+  customerId String          @map("customer_id")
+  createdAt  DateTime        @default(now()) @map("created_at")
+
+  parent User @relation(fields: [parentId], references: [id])
+
+  @@id([parentId, provider])
+  @@unique([provider, customerId])
+  @@map("billing_customers")
+}
+
+/// A family's premium subscription. Only one is live (ACTIVE or PAST_DUE) at a time.
+model Subscription {
+  id                     String             @id @default(uuid(7)) @db.Uuid
+  parentId               String             @map("parent_id") @db.Uuid
+  planKey                String             @map("plan_key")
+  provider               PaymentProvider
+  status                 SubscriptionStatus
+  currency               String             @db.Char(3)
+  /// One period for the whole family, family discount included.
+  amountMinor            Int                @map("amount_minor")
+  /// Children the price was worked out for (every child is covered).
+  children               Int                @default(1)
+  /// Stripe's subscription ID ("sub_…"); null for manual subscriptions.
+  providerSubscriptionId String?            @unique @map("provider_subscription_id")
+  currentPeriodStart     DateTime           @map("current_period_start")
+  currentPeriodEnd       DateTime           @map("current_period_end")
+  /// Cancelled by the family: premium stays until the period ends, then stops.
+  cancelAtPeriodEnd      Boolean            @default(false) @map("cancel_at_period_end")
+  canceledAt             DateTime?          @map("canceled_at")
+  /// When premium actually stopped (period over, refunded or cancelled right away).
+  endedAt                DateTime?          @map("ended_at")
+  createdAt              DateTime           @default(now()) @map("created_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
+
+  parent   User      @relation(fields: [parentId], references: [id])
+  plan     Plan      @relation(fields: [planKey], references: [key])
+  payments Payment[]
+  invoices Invoice[]
+
+  @@index([parentId, status])
+  @@index([status, currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+/// Money received (or tried): a card payment through Stripe, or a manual one.
+model Payment {
+  id                String          @id @default(uuid(7)) @db.Uuid
+  parentId          String          @map("parent_id") @db.Uuid
+  subscriptionId    String?         @map("subscription_id") @db.Uuid
+  provider          PaymentProvider
+  /// Stripe's payment intent ("pi_…"); null for manual payments.
+  providerPaymentId String?         @map("provider_payment_id")
+  status            PaymentStatus
+  currency          String          @db.Char(3)
+  amountMinor       Int             @map("amount_minor")
+  refundedMinor     Int             @default(0) @map("refunded_minor")
+  /// Manual payments: how the family paid, e.g. "Bank transfer", and the bank's reference.
+  method            String?
+  reference         String?
+  /// Staff member who recorded a manual payment.
+  recordedById      String?         @map("recorded_by_id") @db.Uuid
+  paidAt            DateTime?       @map("paid_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  parent       User          @relation("PaymentParent", fields: [parentId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  recordedBy   User?         @relation("PaymentRecorder", fields: [recordedById], references: [id])
+  invoice      Invoice?
+  refunds      Refund[]
+
+  @@unique([provider, providerPaymentId])
+  @@index([parentId, createdAt])
+  @@index([status, createdAt])
+  @@map("payments")
+}
+
+/// Money given back, always with a reason.
+model Refund {
+  id               String   @id @default(uuid(7)) @db.Uuid
+  paymentId        String   @map("payment_id") @db.Uuid
+  amountMinor      Int      @map("amount_minor")
+  reason           String
+  /// Stripe's refund ID ("re_…"); null for manual refunds.
+  providerRefundId String?  @unique @map("provider_refund_id")
+  /// Null when the provider reported a refund made outside the admin panel.
+  createdById      String?  @map("created_by_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  payment   Payment @relation(fields: [paymentId], references: [id])
+  createdBy User?   @relation(fields: [createdById], references: [id])
+
+  @@index([paymentId])
+  @@map("refunds")
+}
+
+/// Our invoice (receipt) for one period. Numbered in order: KCP-000001, KCP-000002…
+model Invoice {
+  id                String        @id @default(uuid(7)) @db.Uuid
+  number            Int           @unique @default(autoincrement())
+  parentId          String        @map("parent_id") @db.Uuid
+  subscriptionId    String?       @map("subscription_id") @db.Uuid
+  paymentId         String?       @unique @map("payment_id") @db.Uuid
+  /// Stripe's invoice ID ("in_…"): the same Stripe invoice never makes two of ours.
+  providerInvoiceId String?       @unique @map("provider_invoice_id")
+  status            InvoiceStatus
+  currency          String        @db.Char(3)
+  amountMinor       Int           @map("amount_minor")
+  /// [{ "kind": "first" | "extra", "quantity": 1, "unitMinor": 150000 }]
+  lines             Json
+  periodStart       DateTime      @map("period_start")
+  periodEnd         DateTime      @map("period_end")
+  issuedAt          DateTime      @default(now()) @map("issued_at")
+  paidAt            DateTime?     @map("paid_at")
+
+  parent       User          @relation(fields: [parentId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  payment      Payment?      @relation(fields: [paymentId], references: [id])
+
+  @@index([parentId, issuedAt])
+  @@map("invoices")
+}
+
+/// Everything that happened to payments, as it arrived: provider webhooks and staff
+/// actions. Append-only. The unique event ID makes each webhook count once.
+model PaymentEvent {
+  id             String          @id @default(uuid(7)) @db.Uuid
+  provider       PaymentProvider
+  /// Stripe's event ID ("evt_…"), or ours for manual actions.
+  eventId        String          @map("event_id")
+  type           String
+  parentId       String?         @map("parent_id") @db.Uuid
+  subscriptionId String?         @map("subscription_id") @db.Uuid
+  paymentId      String?         @map("payment_id") @db.Uuid
+  /// Staff member, for manual payments and refunds.
+  actorId        String?         @map("actor_id") @db.Uuid
+  /// The event's data (providers never send full card numbers).
+  payload        Json
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  @@unique([provider, eventId])
+  @@index([parentId, createdAt])
+  @@map("payment_events")
+}
+
+// ─── Sprint 7: waitlist, notifications, certificates ─────────────────────────
+
+enum WaitlistAgeBand {
+  AGE_9_12
+  AGE_13_16
+}
+
+/// Families waiting for the platform to open in their country (the marketing site).
+/// Double opt-in: an entry counts once the email address is confirmed.
+model WaitlistEntry {
+  id             String          @id @default(uuid(7)) @db.Uuid
+  /// Stored lowercase.
+  email          String          @unique
+  countryCode    String          @map("country_code") @db.Char(2)
+  ageBand        WaitlistAgeBand @map("age_band")
+  languageCode   String          @map("language_code")
+  /// SHA-256 of the link's token (the token itself is only in the email).
+  tokenHash      String?         @unique @map("token_hash")
+  tokenExpiresAt DateTime?       @map("token_expires_at")
+  confirmedAt    DateTime?       @map("confirmed_at")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@index([countryCode, confirmedAt])
+  @@map("waitlist_entries")
+}
+
+/// A message in the app's bell: shown in the reader's language from `type` and `data`.
+model Notification {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  /// e.g. "badge_earned", "certificate_issued", "payment_receipt", "trial_ending".
+  type      String
+  /// What the message needs, e.g. { "badgeKey": "first-ship" } (no free text from users).
+  data      Json      @default("{}")
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+/// A certificate for finishing a module (every lesson and its project). Anyone with
+/// the code can check it is real; it shows the nickname only.
+model Certificate {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  /// Short and unguessable, e.g. "KCP-7F3K-9Q2M": printed on the certificate.
+  code         String    @unique
+  userId       String    @map("user_id") @db.Uuid
+  moduleId     String    @map("module_id")
+  /// As they were when it was issued (a certificate doesn't change afterwards).
+  nickname     String
+  moduleTitles Json      @map("module_titles")
+  trackTitles  Json      @map("track_titles")
+  issuedAt     DateTime  @default(now()) @map("issued_at")
+  /// Staff can revoke one (for example after cheating); verification then says so.
+  revokedAt    DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@map("certificates")
+}
