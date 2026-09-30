@@ -49,10 +49,11 @@ async function main() {
         if (mod.project) sum.projects++;
         sum.lessons += mod.lessons.length;
         sum.challenges += mod.lessons.reduce((n, lesson) => n + lesson.challenges.length, 0);
+        sum.quizzes += mod.lessons.reduce((n, lesson) => n + lesson.quizzes.length, 0);
       }
       return sum;
     },
-    { lessons: 0, challenges: 0, projects: 0 },
+    { lessons: 0, challenges: 0, quizzes: 0, projects: 0 },
   );
   if (errors) {
     console.error(`${errors} error(s) in ${path.relative(process.cwd(), root) || root}`);
@@ -60,7 +61,7 @@ async function main() {
   }
   if (command === 'check') {
     console.log(
-      `Content OK: ${counts.lessons} lessons, ${counts.challenges} challenges, ${counts.projects} project(s).`,
+      `Content OK: ${counts.lessons} lessons, ${counts.challenges} challenges, ${counts.quizzes} quizzes, ${counts.projects} project(s).`,
     );
     return;
   }
@@ -69,7 +70,7 @@ async function main() {
     const summary = await importContent(prisma, tracks, { holdNew });
     console.log(
       `Imported ${summary.tracks} track(s), ${summary.modules} module(s), ${summary.lessons} lessons, ` +
-        `${summary.challenges} challenges, ${summary.projects} project(s); ` +
+        `${summary.challenges} challenges, ${summary.quizzes} quizzes, ${summary.projects} project(s); ` +
         `switched off ${summary.deactivated} removed item(s).`,
     );
     if (summary.newModules.length) {

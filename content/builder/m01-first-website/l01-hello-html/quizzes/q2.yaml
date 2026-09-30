@@ -1,0 +1,17 @@
+id: builder-m01-l01-q2
+order: 2
+kind: bug
+xp: 5
+language: html
+prompt:
+  en: One line has a mistake. Tap it.
+  ar: في أحد الأسطر خطأ. اضغط عليه.
+  ur: ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - '<h1>My page</h1>'
+  - '<p>Welcome to my page!<p>'
+bugLine: 2
+explanation:
+  en: A closing tag needs a slash. The second tag should be </p>.
+  ar: وسم الإغلاق يحتاج إلى شرطة مائلة. يجب أن يكون الوسم الثاني </p>.
+  ur: بند ہونے والے ٹیگ میں سلیش ضروری ہے۔ دوسرا ٹیگ </p> ہونا چاہیے۔

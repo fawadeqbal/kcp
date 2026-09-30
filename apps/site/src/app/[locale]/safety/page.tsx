@@ -21,7 +21,7 @@ export default async function SafetyPage({ params }: LocaleParams) {
   const locale = await pageLocale(params);
   const t = await getTranslations('safety');
   const appLink =
-    'inline-flex items-center gap-2 font-semibold text-brand-700 underline-offset-4 hover:underline';
+    'inline-flex items-center gap-2 font-semibold text-brand-text underline-offset-4 hover:underline';
 
   return (
     <>
@@ -32,7 +32,7 @@ export default async function SafetyPage({ params }: LocaleParams) {
         <div className="grid gap-5 md:grid-cols-2">
           <section
             aria-labelledby="details-title"
-            className="flex gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-6"
+            className="flex gap-4 rounded-card bg-surface p-6"
           >
             <IconBadge>
               <ShieldIcon />
@@ -60,7 +60,7 @@ export default async function SafetyPage({ params }: LocaleParams) {
           </section>
           <section
             aria-labelledby="report-title"
-            className="flex gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-6"
+            className="flex gap-4 rounded-card bg-surface p-6"
           >
             <IconBadge tone="accent">
               <HeartIcon />

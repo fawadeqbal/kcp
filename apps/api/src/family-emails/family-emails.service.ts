@@ -8,6 +8,7 @@ import { PrismaService } from '../database/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import { type ChildMonth, MAIL_COPY, toMailLanguage } from '../mail/templates.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { PushService } from '../push/push.service.js';
 import { REDIS } from '../redis/redis.constants.js';
 
 /** Parents hear this many days before a trial ends. */
@@ -22,6 +23,7 @@ const SUMMARY_MARKER_SECONDS = 40 * 24 * 60 * 60;
  *   trial, and only when nothing else gives the child premium);
  * - on the 1st of each month (06:20 UTC): last month's progress, per child (parents
  *   can switch it off on their dashboard).
+ * Parents signed in to the mobile app also get a push notification for each.
  */
 @Injectable()
 export class FamilyEmailsService {
@@ -32,6 +34,7 @@ export class FamilyEmailsService {
     private readonly mail: MailService,
     private readonly notifications: NotificationsService,
     private readonly entitlements: EntitlementsService,
+    private readonly push: PushService,
     private readonly config: AppConfigService,
     @Inject(REDIS) private readonly redis: Redis,
   ) {}
@@ -106,12 +109,25 @@ export class FamilyEmailsService {
       // A plan or premium from our team keeps premium on: nothing to remind.
       const status = await this.entitlements.status(student.userId, now);
       if (status.source !== 'trial' || !student.trialEndsAt) continue;
+      const endsAt = student.trialEndsAt;
       for (const { parent } of student.user.parentLinks) {
         await this.notifications.notify([parent.id], 'trial_ending', {
           childId: student.userId,
           nickname: student.nickname,
-          endsAt: student.trialEndsAt.toISOString(),
+          endsAt: endsAt.toISOString(),
         });
+        await this.push.sendToUsers(
+          [parent.id],
+          {
+            kind: 'trialEnding',
+            params: (language) => ({
+              nickname: student.nickname,
+              date: formatDate(language, endsAt, parent.country?.timezone ?? 'UTC'),
+            }),
+            data: { childId: student.userId },
+          },
+          now,
+        );
         if (!parent.email) continue;
         const language = toMailLanguage(parent.languageCode);
         try {
@@ -124,7 +140,7 @@ export class FamilyEmailsService {
               actionUrl: this.url(language, '/billing'),
               vars: {
                 nickname: student.nickname,
-                date: formatDate(language, student.trialEndsAt, parent.country?.timezone ?? 'UTC'),
+                date: formatDate(language, endsAt, parent.country?.timezone ?? 'UTC'),
               },
             },
           });
@@ -220,6 +236,14 @@ export class FamilyEmailsService {
           },
         });
         sent++;
+        await this.push.sendToUsers(
+          [parent.id],
+          {
+            kind: 'monthlySummary',
+            params: (pushLanguage) => ({ month: formatMonth(pushLanguage, start) }),
+          },
+          now,
+        );
       } catch (error) {
         // Let the next run try again.
         await this.redis.del(marker);

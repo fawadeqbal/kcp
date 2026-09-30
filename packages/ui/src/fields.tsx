@@ -1,6 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
+import { Icon } from './icons.js';
 import {
   type InputHTMLAttributes,
   type ReactNode,
@@ -33,7 +34,7 @@ function FieldShell({
 }: FieldProps & { id: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="font-medium">
+      <label htmlFor={id} className="text-sm font-semibold">
         {label}
       </label>
       {children}
@@ -43,7 +44,7 @@ function FieldShell({
         </p>
       ) : null}
       {error ? (
-        <p id={`${id}-error`} className="text-sm text-danger" role="alert">
+        <p id={`${id}-error`} className="text-sm font-semibold text-danger" role="alert">
           {error}
         </p>
       ) : null}
@@ -51,11 +52,21 @@ function FieldShell({
   );
 }
 
-export const inputClass = (error?: string) =>
+const fieldClass = (error: string | undefined, shape: string) =>
   clsx(
-    'min-h-11 w-full rounded-xl border bg-surface px-3.5 py-2 text-start text-base',
-    error ? 'border-danger' : 'border-line focus:border-brand-500',
+    'w-full border bg-raised text-start text-base text-ink caret-brand transition-colors placeholder:text-muted',
+    'focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-brand/30 focus-visible:outline-none',
+    error ? 'border-danger' : 'border-line hover:border-ink/45',
+    shape,
   );
+
+/** Pill-shaped text fields on a light well, with the accent ring when focused. */
+export const inputClass = (error?: string) =>
+  fieldClass(error, 'min-h-12 rounded-full px-4.5 py-2');
+
+/** Several lines of text: the same field, with a softer round corner. */
+export const textareaClass = (error?: string) =>
+  fieldClass(error, 'min-h-24 rounded-row px-4.5 py-3 leading-relaxed');
 
 export function TextField({
   label,
@@ -104,15 +115,17 @@ export function PasswordField({
           type={visible ? 'text' : 'password'}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(id, hint, error)}
-          className={clsx(inputClass(error), 'pe-24')}
+          className={clsx(inputClass(error), 'pe-14')}
         />
         <button
           type="button"
           onClick={() => setVisible((v) => !v)}
-          className="absolute inset-y-1 end-1 rounded-lg px-3 text-sm font-medium text-brand-700 hover:bg-brand-50"
+          className="absolute inset-y-1 end-1 grid w-11 place-items-center rounded-full text-lg text-muted hover:bg-ink/7 hover:text-ink"
           aria-pressed={visible}
+          aria-label={visible ? hideLabel : showLabel}
+          title={visible ? hideLabel : showLabel}
         >
-          {visible ? hideLabel : showLabel}
+          <Icon name={visible ? 'eyeOff' : 'eye'} />
         </button>
       </div>
     </FieldShell>
@@ -129,15 +142,21 @@ export function SelectField({
   const id = useId();
   return (
     <FieldShell id={id} label={label} hint={hint} error={error}>
-      <select
-        id={id}
-        {...props}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy(id, hint, error)}
-        className={inputClass(error)}
-      >
-        {children}
-      </select>
+      <div className="relative">
+        <select
+          id={id}
+          {...props}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, hint, error)}
+          className={clsx(inputClass(error), 'appearance-none pe-11')}
+        >
+          {children}
+        </select>
+        <Icon
+          name="chevD"
+          className="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-muted"
+        />
+      </div>
     </FieldShell>
   );
 }
@@ -157,12 +176,12 @@ export function Checkbox({
           {...props}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          className="mt-1.5 size-5 shrink-0 accent-brand-600"
+          className="mt-1 size-5 shrink-0 accent-primary"
         />
         <span>{label}</span>
       </label>
       {error ? (
-        <p id={`${id}-error`} className="text-sm text-danger" role="alert">
+        <p id={`${id}-error`} className="text-sm font-semibold text-danger" role="alert">
           {error}
         </p>
       ) : null}
@@ -193,7 +212,7 @@ export function Switch({
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex flex-col gap-0.5">
-        <span id={`${id}-label`} className="font-medium">
+        <span id={`${id}-label`} className="font-bold">
           {label}
         </span>
         {description ? (
@@ -212,15 +231,15 @@ export function Switch({
         disabled={disabled || busy}
         onClick={() => onChange(!checked)}
         className={clsx(
-          'relative mt-1 inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60',
-          checked ? 'bg-brand-600' : 'bg-muted/40',
+          'relative mt-0.5 inline-flex h-7 w-11.5 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45',
+          checked ? 'bg-sage-600' : 'bg-sand-400',
         )}
       >
         <span
           aria-hidden
           className={clsx(
-            'absolute top-1 size-5 rounded-full bg-white shadow transition-[inset-inline-start]',
-            checked ? 'start-6' : 'start-1',
+            'elev-sm absolute top-0.75 size-5.5 rounded-full bg-white transition-[inset-inline-start]',
+            checked ? 'start-5.25' : 'start-0.75',
           )}
         />
       </button>

@@ -1,0 +1,20 @@
+id: builder-m01-l02-q2
+order: 2
+kind: bug
+xp: 5
+language: html
+prompt:
+  en: One line in this list has a mistake. Tap it.
+  ar: في أحد أسطر هذه القائمة خطأ. اضغط عليه.
+  ur: اس فہرست کی ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - '<ul>'
+  - '  <li>Drawing</li>'
+  - '  Football'
+  - '  <li>Space</li>'
+  - '</ul>'
+bugLine: 3
+explanation:
+  en: Every item in a list goes between <li> and </li>, so this line should be <li>Football</li>.
+  ar: كل عنصر في القائمة يوضع بين ‎<li>‎ و‎</li>‎، لذلك يجب أن يكون هذا السطر ‎<li>Football</li>‎.
+  ur: فہرست کی ہر چیز ‎<li>‎ اور ‎</li>‎ کے درمیان آتی ہے، اس لیے یہ سطر ‎<li>Football</li>‎ ہونی چاہیے۔

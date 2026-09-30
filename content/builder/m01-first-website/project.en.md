@@ -10,6 +10,15 @@ hints:
   link: 'Add a link with <a href="https://…">…</a>.'
   background: 'In style.css, give body a background-color.'
   heading_colour: 'In style.css, add a rule for h1 with a color.'
+checks:
+  has-heading: 'The page has a heading'
+  has-paragraph: 'There is a paragraph about you'
+  three-things: 'A list of at least 3 things'
+  has-picture: 'The page has a picture'
+  picture-alt: 'Every picture has alt text'
+  has-link: 'The page has a link'
+  page-background: 'The page has a background colour'
+  heading-colour: 'The heading has a colour'
 ---
 
 Time to build something of your own! Make a web page about **you**: the things you love, a picture, and a link to a site you like. When every requirement is ticked, press **Ship it** — your page goes into your **portfolio**, where your family can see it.

@@ -97,6 +97,34 @@ export class MockStripe implements StripeApi {
     await this.redis.set(`${KEY}${kind}:${id}`, JSON.stringify(value), 'EX', KEEP_SECONDS);
   }
 
+  /**
+   * Development helper (`pnpm demo:data`): keeps a customer, subscription or invoice
+   * made outside the mock, so it can renew, cancel or change it like one of its own.
+   */
+  async store(
+    kind: 'customer' | 'subscription' | 'invoice',
+    value: { id: string } & Record<string, unknown>,
+  ) {
+    await this.save(kind, value.id, value);
+  }
+
+  /** Development helper: a paid invoice's charge, so the payment can be refunded. */
+  async storeCharge(invoiceId: string, paymentIntent: string, amount: number, currency: string) {
+    const charge: StoredCharge = {
+      id: newId('ch'),
+      object: 'charge',
+      amount,
+      amount_refunded: 0,
+      currency,
+      refunded: false,
+      payment_intent: paymentIntent,
+      invoice: invoiceId,
+    };
+    await this.save('charge', charge.id, charge);
+    await this.redis.set(`${KEY}invoice-pi:${invoiceId}`, paymentIntent, 'EX', KEEP_SECONDS);
+    await this.redis.set(`${KEY}pi-charge:${paymentIntent}`, charge.id, 'EX', KEEP_SECONDS);
+  }
+
   // ── Webhooks ───────────────────────────────────────────────────────────────
 
   /** Signs and sends events one after another, a moment later (like Stripe). */

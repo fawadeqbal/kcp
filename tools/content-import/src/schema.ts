@@ -170,6 +170,86 @@ export const challengeSchema = z
   )
   .refine(checksFitCode, CHECKS_FIT);
 
+/** Text per language code for a quiz; English is required, others fall back to it. */
+const quizText = texts;
+
+const quizOption = z
+  .object({
+    /** A short ID the answer refers to, e.g. "a". */
+    id: z.string().regex(/^[a-z0-9]{1,8}$/, 'option IDs are short, e.g. "a"'),
+    /** Shown as code, the same in every language… */
+    code: z.string().min(1).max(200).optional(),
+    /** …or as text, translated. */
+    text: quizText.optional(),
+  })
+  .strict()
+  .refine((o) => (o.code === undefined) !== (o.text === undefined), 'an option has code or text');
+
+/**
+ * quizzes/<name>.yaml: a short question that works on a phone. The server grades
+ * it, so the answer never reaches the app.
+ * - order:  put the lines of `code` (given in the right order here) back in order;
+ * - bug:    which line of `code` has the mistake (`bugLine`, counting from 1);
+ * - output: what `code` shows (`options`, one `answer`);
+ * - choice: a question about the lesson (`options`, one `answer`; `code` optional).
+ */
+export const quizSchema = z
+  .object({
+    id: contentId,
+    order: z.number().int().min(0),
+    kind: z.enum(['order', 'bug', 'output', 'choice']),
+    xp: z.number().int().min(0).max(50).default(5),
+    /** How the code is shown (syntax colours). */
+    language: z.enum(['html', 'css', 'js', 'python']).optional(),
+    prompt: quizText,
+    code: z.array(z.string().max(120)).max(14).optional(),
+    bugLine: z.number().int().min(1).optional(),
+    options: z.array(quizOption).max(6).optional(),
+    answer: z.string().optional(),
+    /** Shown after answering: why the answer is right. */
+    explanation: quizText,
+  })
+  .strict()
+  .superRefine((quiz, ctx) => {
+    const problem = (message: string) => ctx.addIssue({ code: 'custom', message });
+    const lines = quiz.code ?? [];
+    if (lines.length > 0 && !quiz.language) problem('quizzes with code need a "language"');
+    switch (quiz.kind) {
+      case 'order':
+        if (lines.length < 3) problem('an order quiz needs at least 3 lines of code');
+        if (new Set(lines.map((line) => line.trim())).size < 2) {
+          problem('the lines of an order quiz must not all be the same');
+        }
+        if (quiz.options || quiz.answer || quiz.bugLine) {
+          problem(
+            'an order quiz has only code (in the right order): no options, answer or bugLine',
+          );
+        }
+        break;
+      case 'bug':
+        if (lines.length < 2) problem('a bug quiz needs at least 2 lines of code');
+        if (!quiz.bugLine || quiz.bugLine > lines.length) {
+          problem('"bugLine" must be the number of a line in the code (from 1)');
+        }
+        if (quiz.options || quiz.answer) problem('a bug quiz has no options or answer');
+        break;
+      case 'output':
+      case 'choice': {
+        if (quiz.kind === 'output' && lines.length === 0) problem('an output quiz needs code');
+        const options = quiz.options ?? [];
+        if (options.length < 2) problem('needs at least 2 options');
+        if (new Set(options.map((o) => o.id)).size !== options.length) {
+          problem('option IDs must be unique');
+        }
+        if (!options.some((o) => o.id === quiz.answer)) {
+          problem('"answer" must be the ID of one of the options');
+        }
+        if (quiz.bugLine) problem('only bug quizzes have a "bugLine"');
+        break;
+      }
+    }
+  });
+
 /** project.yaml: the project at the end of a module. */
 export const projectSchema = z
   .object({
@@ -189,12 +269,19 @@ export const projectSchema = z
   )
   .refine(checksFitCode, CHECKS_FIT);
 
+/**
+ * What each check looks at, in a few words ("The heading has a colour"), by check ID.
+ * The lesson shows them as a checklist that ticks as the student's code passes.
+ */
+const checkLabels = z.record(z.string(), z.string().min(1).max(80)).default({});
+
 /** Front matter of project.<lang>.md */
 export const projectFrontMatter = z
   .object({
     title: z.string().min(1).max(120),
     summary: z.string().min(1).max(300),
     hints: z.record(z.string(), z.string().min(1)).default({}),
+    checks: checkLabels,
   })
   .strict();
 
@@ -211,6 +298,7 @@ export const challengeFrontMatter = z
   .object({
     title: z.string().min(1).max(120),
     hints: z.record(z.string(), z.string().min(1)).default({}),
+    checks: checkLabels,
   })
   .strict();
 
@@ -218,4 +306,5 @@ export type TrackFile = z.infer<typeof trackSchema>;
 export type ModuleFile = z.infer<typeof moduleSchema>;
 export type LessonFile = z.infer<typeof lessonSchema>;
 export type ChallengeFile = z.infer<typeof challengeSchema>;
+export type QuizFile = z.infer<typeof quizSchema>;
 export type ProjectFile = z.infer<typeof projectSchema>;

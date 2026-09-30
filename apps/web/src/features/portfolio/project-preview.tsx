@@ -47,7 +47,7 @@ function PagePreview({
       sandbox="allow-scripts"
       title={title}
       loading="lazy"
-      className={`w-full rounded-xl border border-line bg-white ${className}`}
+      className={`w-full rounded-well bg-white ${className}`}
     />
   );
 }
@@ -64,7 +64,7 @@ function PythonProjectPreview({ files, title }: { files: CodeFiles; title: strin
       <pre
         dir="ltr"
         aria-label={title}
-        className="max-h-80 overflow-auto rounded-xl border border-line bg-canvas p-3 text-start font-mono text-sm"
+        className="max-h-80 overflow-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm"
       >
         {files.py}
       </pre>
@@ -99,7 +99,7 @@ function PythonRunner({ files, title }: { files: CodeFiles; title: string }) {
         src={`${SANDBOX_URL}/`}
         sandbox="allow-scripts"
         title={title}
-        className="h-60 w-full rounded-xl border border-line bg-white"
+        className="h-60 w-full rounded-well bg-white"
       />
     </>
   );

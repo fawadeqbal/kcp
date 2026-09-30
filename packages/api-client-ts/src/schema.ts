@@ -36,6 +36,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Registers this phone, or refreshes it (the app calls it on every start). */
+        put: operations["Devices_register"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/devices/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stops notifications to this phone (on logout; works without a session). */
+        post: operations["Devices_remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/health/live": {
         parameters: {
             query?: never;
@@ -1328,6 +1362,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/learning/quizzes/{id}/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grades an answer. The first right answer earns the quiz's XP. */
+        post: operations["Quizzes_answer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learning/practice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today's practice: a few quizzes from the lessons the student is on. */
+        get: operations["Quizzes_practice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/feedback": {
         parameters: {
             query?: never;
@@ -1797,6 +1865,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/app/crashes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The mobile app reports a crash (no sign-in needed: it may crash before anyone
+         *     signs in). Nothing in the report names the account or the phone.
+         */
+        post: operations["AppCrashes_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/app-crashes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Crash reports, newest first (staff). */
+        get: operations["AppCrashes_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1824,6 +1929,20 @@ export interface components {
             ids?: string[];
             /** @description Marks every notification read. */
             all?: boolean;
+        };
+        RegisterDeviceDto: {
+            /** @description The phone's Firebase Cloud Messaging token. */
+            token: string;
+            /** @enum {string} */
+            platform: "android" | "ios";
+            /**
+             * @description The app's language (en, ar or ur): notifications are written in it.
+             * @enum {string}
+             */
+            language: "en" | "ar" | "ur";
+        };
+        RemoveDeviceDto: {
+            token: string;
         };
         LivenessResponseDto: {
             /**
@@ -1891,10 +2010,11 @@ export interface components {
             /**
              * @description Which app is signing in. The admin panel keeps its own refresh cookie, so a
              *     staff session and a parent session in the same browser never overwrite each
-             *     other, and only staff can sign in to it.
+             *     other, and only staff can sign in to it. The mobile app is for students and
+             *     parents only, and always gets its refresh token in the body.
              * @enum {string}
              */
-            app?: "web" | "admin";
+            app?: "web" | "admin" | "mobile";
         };
         RoleSummaryDto: {
             key: string;
@@ -1959,10 +2079,11 @@ export interface components {
             /**
              * @description Which app is signing in. The admin panel keeps its own refresh cookie, so a
              *     staff session and a parent session in the same browser never overwrite each
-             *     other, and only staff can sign in to it.
+             *     other, and only staff can sign in to it. The mobile app is for students and
+             *     parents only, and always gets its refresh token in the body.
              * @enum {string}
              */
-            app?: "web" | "admin";
+            app?: "web" | "admin" | "mobile";
         };
         MfaTokenDto: {
             /** @description The short-lived token returned by login when a second step is needed. */
@@ -1988,10 +2109,11 @@ export interface components {
             /**
              * @description Which app is signing in. The admin panel keeps its own refresh cookie, so a
              *     staff session and a parent session in the same browser never overwrite each
-             *     other, and only staff can sign in to it.
+             *     other, and only staff can sign in to it. The mobile app is for students and
+             *     parents only, and always gets its refresh token in the body.
              * @enum {string}
              */
-            app?: "web" | "admin";
+            app?: "web" | "admin" | "mobile";
         };
         RefreshDto: {
             /** @description Only for tokenDelivery "body" clients; browsers send the cookie instead. */
@@ -2006,10 +2128,11 @@ export interface components {
             /**
              * @description Which app is signing in. The admin panel keeps its own refresh cookie, so a
              *     staff session and a parent session in the same browser never overwrite each
-             *     other, and only staff can sign in to it.
+             *     other, and only staff can sign in to it. The mobile app is for students and
+             *     parents only, and always gets its refresh token in the body.
              * @enum {string}
              */
-            app?: "web" | "admin";
+            app?: "web" | "admin" | "mobile";
         };
         ChangePasswordDto: {
             currentPassword: string;
@@ -2357,6 +2480,8 @@ export interface components {
             streak: number;
             /** @description Badges earned. */
             badges: number;
+            /** @description Evening reminders in the mobile app when the streak is about to end. */
+            streakReminders: boolean;
         };
         ChildRulesDto: {
             /** @description Birth years a parent may choose right now. */
@@ -2395,6 +2520,8 @@ export interface components {
             regionId?: string;
             /** Format: uuid */
             cityId?: string;
+            /** @description Evening reminders on the child's phone when their streak is about to end. */
+            streakReminders?: boolean;
         };
         ConsentRecordDto: {
             id: string;
@@ -2461,6 +2588,10 @@ export interface components {
             checks: Record<string, never>[];
             /** @description Hint texts by key, in the requested language with English filling gaps. */
             hints: {
+                [key: string]: string;
+            };
+            /** @description What each check looks at, by check ID, in the requested language (English fills gaps). */
+            checkLabels: {
                 [key: string]: string;
             };
             /** @description The student's saved code, if any. */
@@ -2890,6 +3021,8 @@ export interface components {
             /** @description Premium, and the student has no premium now (no trial, plan or grant). */
             locked: boolean;
             challengeCount: number;
+            /** @description Quizzes the lesson has (short questions that work on a phone). */
+            quizCount: number;
             /**
              * @description Always NOT_STARTED for accounts that aren't students.
              * @enum {string}
@@ -2964,10 +3097,51 @@ export interface components {
             hints: {
                 [key: string]: string;
             };
+            /**
+             * @description What each check looks at, by check ID ("The heading has a colour"), in the
+             *     requested language with English filling gaps: the checklist beside the editor.
+             */
+            checkLabels: {
+                [key: string]: string;
+            };
             /** @description The student's saved code, if any. */
             draft: components["schemas"]["CodeFilesDto"] | null;
             /** @description Whether the student has passed this challenge before. */
             passed: boolean;
+        };
+        QuizLineDto: {
+            id: string;
+            text: string;
+        };
+        QuizOptionDto: {
+            id: string;
+            /** @description Text in the student's language, or null when the option is code. */
+            text: string | null;
+            /** @description Code, shown as it is in every language, or null for a text option. */
+            code: string | null;
+        };
+        QuizDto: {
+            id: string;
+            lessonId: string;
+            /**
+             * @description ORDER: put `lines` in order and send their IDs back. BUG: tap the line with the
+             *     mistake (send its number). OUTPUT: pick what the code shows. CHOICE: pick the
+             *     right answer.
+             * @enum {string}
+             */
+            kind: "BUG" | "ORDER" | "OUTPUT" | "CHOICE";
+            xp: number;
+            /** @description html, css, js or python: how to colour the code. */
+            codeLanguage: string | null;
+            prompt: string;
+            /**
+             * @description ORDER: the lines, shuffled. BUG, OUTPUT and CHOICE: the code as it is (the ID
+             *     is the line number). Empty when the quiz has no code.
+             */
+            lines: components["schemas"]["QuizLineDto"][];
+            options: components["schemas"]["QuizOptionDto"][];
+            /** @description The student has answered it correctly before. */
+            solved: boolean;
         };
         LessonDto: {
             id: string;
@@ -2991,6 +3165,8 @@ export interface components {
             previousLessonId: string | null;
             nextLessonId: string | null;
             challenges: components["schemas"]["ChallengeDto"][];
+            /** @description Short questions about the lesson (graded by the server). */
+            quizzes: components["schemas"]["QuizDto"][];
         };
         LessonProgressDto: {
             /** @enum {string} */
@@ -3017,6 +3193,76 @@ export interface components {
             dailyCapReached: boolean;
             /** @description Badges this earned (keys; names are translated in the apps), to celebrate. */
             badgesEarned: string[];
+        };
+        QuizAnswerDto: {
+            /** @description ORDER: the line IDs in the student's order. */
+            order?: string[];
+            /** @description BUG: the number of the line with the mistake, from 1. */
+            line?: number;
+            /** @description OUTPUT and CHOICE: the chosen option's ID. */
+            option?: string;
+        };
+        QuizRevealDto: {
+            order: string[] | null;
+            line: number | null;
+            option: string | null;
+        };
+        PracticeProgressDto: {
+            /** @description The student's day, e.g. "2026-10-01". */
+            day: string;
+            total: number;
+            answered: number;
+            done: boolean;
+        };
+        QuizResultDto: {
+            correct: boolean;
+            /** @description Why the answer is right: shown once the quiz is answered correctly or revealed. */
+            explanation: string | null;
+            /** @description After a few wrong tries, the right answer, so the student can learn from it. */
+            reveal: components["schemas"]["QuizRevealDto"] | null;
+            /**
+             * @description XP this answer earned: the quiz's on the first right answer (none once the
+             *     answer has been shown), and today's practice when this answer finished it.
+             */
+            xpAwarded: number;
+            dailyCapReached: boolean;
+            badgesEarned: string[];
+            /** @description When the quiz is part of today's practice: how far along it is. */
+            practice: components["schemas"]["PracticeProgressDto"] | null;
+        };
+        PracticeQuizDto: {
+            id: string;
+            lessonId: string;
+            /**
+             * @description ORDER: put `lines` in order and send their IDs back. BUG: tap the line with the
+             *     mistake (send its number). OUTPUT: pick what the code shows. CHOICE: pick the
+             *     right answer.
+             * @enum {string}
+             */
+            kind: "BUG" | "ORDER" | "OUTPUT" | "CHOICE";
+            xp: number;
+            /** @description html, css, js or python: how to colour the code. */
+            codeLanguage: string | null;
+            prompt: string;
+            /**
+             * @description ORDER: the lines, shuffled. BUG, OUTPUT and CHOICE: the code as it is (the ID
+             *     is the line number). Empty when the quiz has no code.
+             */
+            lines: components["schemas"]["QuizLineDto"][];
+            options: components["schemas"]["QuizOptionDto"][];
+            /** @description The student has answered it correctly before. */
+            solved: boolean;
+            lessonTitle: string;
+        };
+        PracticeDto: {
+            day: string;
+            /** @description XP for finishing today's practice. */
+            xp: number;
+            total: number;
+            done: boolean;
+            /** @description Quizzes of today's practice already answered correctly today. */
+            answeredQuizIds: string[];
+            quizzes: components["schemas"]["PracticeQuizDto"][];
         };
         CreateFeedbackDto: {
             /** @enum {string} */
@@ -3352,6 +3598,43 @@ export interface components {
             /** @description The parent's password, to confirm. */
             password: string;
         };
+        ReportCrashDto: {
+            /** @description e.g. "1.0.0+12". */
+            appVersion: string;
+            /** @enum {string} */
+            platform: "android" | "ios";
+            /** @description e.g. "Android 15 (API 35)". */
+            osVersion: string;
+            /** @description The app had to stop (not just an error it recovered from). */
+            fatal: boolean;
+            message: string;
+            /** @description The stack trace; longer ones are cut. */
+            stack: string;
+        };
+        AppCrashDto: {
+            id: string;
+            appVersion: string;
+            platform: string;
+            osVersion: string;
+            fatal: boolean;
+            message: string;
+            stack: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AppCrashVersionDto: {
+            appVersion: string;
+            /** @description Reports in the last 7 days. */
+            count: number;
+        };
+        AppCrashListDto: {
+            items: components["schemas"]["AppCrashDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
+            /** @description Reports per app version over the last 7 days, most first. */
+            lastWeek: components["schemas"]["AppCrashVersionDto"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -3362,6 +3645,8 @@ export interface components {
 export type NotificationDto = components['schemas']['NotificationDto'];
 export type NotificationListDto = components['schemas']['NotificationListDto'];
 export type MarkReadDto = components['schemas']['MarkReadDto'];
+export type RegisterDeviceDto = components['schemas']['RegisterDeviceDto'];
+export type RemoveDeviceDto = components['schemas']['RemoveDeviceDto'];
 export type LivenessResponseDto = components['schemas']['LivenessResponseDto'];
 export type ParentSignUpDto = components['schemas']['ParentSignUpDto'];
 export type AcceptedResponseDto = components['schemas']['AcceptedResponseDto'];
@@ -3479,11 +3764,20 @@ export type PremiumInfoDto = components['schemas']['PremiumInfoDto'];
 export type LearningOverviewDto = components['schemas']['LearningOverviewDto'];
 export type VideoDto = components['schemas']['VideoDto'];
 export type ChallengeDto = components['schemas']['ChallengeDto'];
+export type QuizLineDto = components['schemas']['QuizLineDto'];
+export type QuizOptionDto = components['schemas']['QuizOptionDto'];
+export type QuizDto = components['schemas']['QuizDto'];
 export type LessonDto = components['schemas']['LessonDto'];
 export type LessonProgressDto = components['schemas']['LessonProgressDto'];
 export type SaveDraftDto = components['schemas']['SaveDraftDto'];
 export type SubmitDto = components['schemas']['SubmitDto'];
 export type SubmissionResultDto = components['schemas']['SubmissionResultDto'];
+export type QuizAnswerDto = components['schemas']['QuizAnswerDto'];
+export type QuizRevealDto = components['schemas']['QuizRevealDto'];
+export type PracticeProgressDto = components['schemas']['PracticeProgressDto'];
+export type QuizResultDto = components['schemas']['QuizResultDto'];
+export type PracticeQuizDto = components['schemas']['PracticeQuizDto'];
+export type PracticeDto = components['schemas']['PracticeDto'];
 export type CreateFeedbackDto = components['schemas']['CreateFeedbackDto'];
 export type FeedbackCreatedDto = components['schemas']['FeedbackCreatedDto'];
 export type FeedbackSenderDto = components['schemas']['FeedbackSenderDto'];
@@ -3526,6 +3820,10 @@ export type FeatureFlagDto = components['schemas']['FeatureFlagDto'];
 export type FeatureFlagListDto = components['schemas']['FeatureFlagListDto'];
 export type UpdateFeatureFlagDto = components['schemas']['UpdateFeatureFlagDto'];
 export type DeleteAccountDto = components['schemas']['DeleteAccountDto'];
+export type ReportCrashDto = components['schemas']['ReportCrashDto'];
+export type AppCrashDto = components['schemas']['AppCrashDto'];
+export type AppCrashVersionDto = components['schemas']['AppCrashVersionDto'];
+export type AppCrashListDto = components['schemas']['AppCrashListDto'];
 export type $defs = Record<string, never>;
 export interface operations {
     Notifications_list: {
@@ -3575,6 +3873,55 @@ export interface operations {
             };
             /** @description Not signed in */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Devices_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterDeviceDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Devices_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveDeviceDto"];
+            };
+        };
+        responses: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6481,6 +6828,84 @@ export interface operations {
             };
         };
     };
+    Quizzes_answer: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizAnswerDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Quizzes_practice: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Feedback_create: {
         parameters: {
             query?: never;
@@ -7519,6 +7944,64 @@ export interface operations {
             };
             /** @description Not signed in */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AppCrashes_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportCrashDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AppCrashes_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                platform?: "android" | "ios";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppCrashListDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

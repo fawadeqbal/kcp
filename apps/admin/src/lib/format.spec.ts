@@ -1,4 +1,13 @@
-import { formatMoney, humanize, pageSummary, parseMoney, shortId, statusTone } from './format';
+import {
+  describeAction,
+  formatAgo,
+  formatMoney,
+  humanize,
+  pageSummary,
+  parseMoney,
+  shortId,
+  statusTone,
+} from './format';
 
 describe('format helpers', () => {
   it('turns API enums into words', () => {
@@ -32,5 +41,27 @@ describe('money', () => {
     expect(parseMoney('24.5', 'AED')).toBe(2_450);
     expect(parseMoney('24.505', 'AED')).toBeNull();
     expect(parseMoney('abc', 'AED')).toBeNull();
+  });
+});
+
+describe('activity', () => {
+  it('says how long ago', () => {
+    const now = new Date('2026-10-01T12:00:00Z');
+    expect(formatAgo('2026-10-01T11:59:40Z', now)).toBe('Just now');
+    expect(formatAgo('2026-10-01T11:58:00Z', now)).toBe('2 min ago');
+    expect(formatAgo('2026-10-01T09:00:00Z', now)).toBe('3 h ago');
+  });
+
+  it('describes audit actions', () => {
+    expect(describeAction('user.suspend')).toEqual({
+      tag: 'Suspended',
+      tone: 'danger',
+      text: 'account',
+    });
+    expect(describeAction('robot.wave_hello')).toEqual({
+      tag: 'Robot',
+      tone: 'neutral',
+      text: 'wave hello',
+    });
   });
 });

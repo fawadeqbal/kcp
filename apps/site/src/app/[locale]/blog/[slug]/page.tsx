@@ -41,7 +41,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
   const t = await getTranslations('blog');
   const backLink =
-    'inline-flex items-center gap-2 font-semibold text-brand-700 underline-offset-4 hover:underline';
+    'inline-flex items-center gap-2 font-semibold text-brand-text underline-offset-4 hover:underline';
 
   return (
     <Container width="article" className="py-12 sm:py-16">
@@ -53,7 +53,7 @@ export default async function BlogPostPage({ params }: Props) {
       </p>
       <article className="mt-8">
         <header className="border-b border-line pb-8">
-          <h1 className="text-3xl font-bold text-balance sm:text-4xl">{post.title}</h1>
+          <h1 className="text-4xl text-balance sm:text-4xl">{post.title}</h1>
           <p className="mt-4 text-sm text-muted">
             {t('published', { date: formatDate(post.date, locale) })}
           </p>

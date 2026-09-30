@@ -72,6 +72,8 @@ pnpm staff:create --email you@example.com --name "Your Name" --role super_admin
 
 Want to try it without signing up? `pnpm demo:accounts` creates demo families on your local database and prints their logins.
 
+To see every page with data in it, run `pnpm demo:data`. It loads about 40 families and 60 children in Pakistan and Egypt with nine weeks of history: lessons, quizzes and practice, projects and certificates, XP, streaks and badges, weekly and season leaderboards (Lahore and Punjab have enough students for city and region boards), card plans through the Stripe mock and manual payments, feedback and the audit trail. It prints the logins. Streaks and "this week" go stale after a few days: `pnpm demo:data --fresh` removes the demo data and loads it again, dated from today. It only runs against a local database.
+
 If port 5432 or 6379 is already taken (for example by a local PostgreSQL), stop that service or change the port in `docker-compose.yml` and `.env`.
 
 ## Daily commands
@@ -84,6 +86,7 @@ If port 5432 or 6379 is already taken (for example by a local PostgreSQL), stop 
 | `pnpm test:browser`                  | Browser tests of the web app, admin panel and site (needs Mailpit and a build)               |
 | `pnpm staff:create`                  | Creates a staff account with a temporary password                                            |
 | `pnpm demo:accounts`                 | Creates demo families on your local database, with some lesson progress                      |
+| `pnpm demo:data`                     | Fills the local database with nine weeks of demo families, learning, boards and payments     |
 | `pnpm build`                         | Builds every project (Nx caches unchanged ones)                                              |
 | `pnpm affected`                      | Lint, typecheck, test and build only what your changes affect                                |
 | `pnpm format`                        | Formats the code with Prettier                                                               |
@@ -167,4 +170,5 @@ docker compose --profile api up -d --build   # builds the images, runs migration
 ```
 
 This is the same image that is deployed. Day to day, `pnpm dev` is faster.
+
 # kcp

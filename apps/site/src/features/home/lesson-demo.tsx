@@ -1,57 +1,73 @@
+import { Avatar } from '@kcp/ui';
 import { getTranslations } from 'next-intl/server';
-import { CheckIcon, StarIcon } from '@/components/icons';
+import { CheckIcon, FlameIcon } from '@/components/icons';
 
 /**
- * A picture of a lesson step, drawn in HTML (no screenshot): the task, a few lines of code
- * and the automatic check. Code always reads left to right, also on Arabic and Urdu pages.
+ * A picture of a lesson step, drawn in HTML (no screenshot): the task, a line of code,
+ * what it shows and the automatic check, on two soft circles, with the streak beside
+ * it. Code always reads left to right, also on Arabic and Urdu pages.
  */
 export async function LessonDemo() {
   const t = await getTranslations('home.demo');
   return (
     <figure className="relative mx-auto w-full max-w-md lg:max-w-none">
-      <div className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-xl shadow-brand-600/10">
-        <div className="flex items-center gap-3 border-b border-line bg-canvas px-4 py-3">
-          <span className="flex gap-1.5" aria-hidden="true">
-            <span className="size-2.5 rounded-full bg-line" />
-            <span className="size-2.5 rounded-full bg-line" />
-            <span className="size-2.5 rounded-full bg-line" />
-          </span>
-          <span className="truncate text-sm font-medium text-muted">{t('lesson')}</span>
-        </div>
-        <div className="flex flex-col gap-4 p-5">
-          <p className="font-medium">{t('task')}</p>
+      <div className="relative lg:h-[32.5rem]">
+        <span
+          aria-hidden="true"
+          className="absolute -end-10 top-0 size-[min(29rem,90vw)] rounded-full bg-brand-200 max-lg:-top-6"
+        />
+        <span
+          aria-hidden="true"
+          className="absolute start-2 bottom-0 size-40 rounded-full bg-sage-300 max-lg:-bottom-6"
+        />
+        <div className="elev-lg relative flex flex-col gap-3.5 rounded-card bg-surface p-5 lg:absolute lg:start-10 lg:top-17 lg:w-[27.5rem]">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-bold tracking-[0.08em] text-brand-text uppercase">
+              {t('lesson')}
+            </span>
+            <Avatar avatarKey="rocket" size="sm" />
+          </div>
+          <p className="font-display text-xl">{t('task')}</p>
           <pre
             dir="ltr"
-            className="overflow-x-auto rounded-xl bg-ink px-4 py-4 text-start font-mono text-sm leading-7 text-white"
+            className="overflow-x-auto rounded-[1.125rem] bg-code-bg px-4 py-3.5 text-start font-mono text-sm leading-7 text-ink"
           >
             <code>
-              <span className="text-accent">&lt;h1&gt;</span>
+              <span className="text-code-tag">&lt;h1&gt;</span>
               Hello, world!
-              <span className="text-accent">&lt;/h1&gt;</span>
-              {'\n'}
-              <span className="text-accent">&lt;p&gt;</span>I build websites.
-              <span className="text-accent">&lt;/p&gt;</span>
+              <span className="text-code-tag">&lt;/h1&gt;</span>
             </code>
           </pre>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-sm font-semibold text-success">
-              <CheckIcon className="size-4" />
+          {/* What the code shows: a white page, like the real preview. */}
+          <p
+            dir="ltr"
+            aria-hidden="true"
+            className="rounded-[1.125rem] bg-[#fffaf2] p-4 text-start font-[system-ui,sans-serif] text-[1.625rem] font-bold text-[#1d1d27]"
+          >
+            Hello, world!
+          </p>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage-100 px-3 py-1.5 text-[0.8rem] font-bold text-sage-800">
+              <CheckIcon className="size-3.5" />
               {t('passed')}
             </span>
-            <span className="inline-flex items-center gap-2 text-sm font-semibold">
-              {/* "+10 XP" keeps its order in Arabic and Urdu. */}
-              <span dir="ltr" className="font-latin rounded-full bg-accent px-3 py-1 text-ink">
-                {t('xp')}
-              </span>
-              <span className="inline-flex items-center gap-1 text-muted">
-                <StarIcon className="size-4 text-accent" />
-                {t('streak')}
-              </span>
+            {/* "+10 XP" keeps its order in Arabic and Urdu. */}
+            <span
+              dir="ltr"
+              className="font-latin rounded-full bg-brand-100 px-3 py-1.5 text-[0.8rem] font-bold text-brand-800"
+            >
+              {t('xp')}
             </span>
           </div>
         </div>
+        <p className="elev-md relative mt-4 ms-auto flex w-fit items-center gap-2.5 rounded-full bg-canvas py-3 ps-3 pe-4.5 text-sm font-bold lg:absolute lg:end-0 lg:bottom-15 lg:mt-0">
+          <span className="grid size-8.5 place-items-center rounded-full bg-primary text-on-primary">
+            <FlameIcon className="size-4" />
+          </span>
+          {t('streak')}
+        </p>
       </div>
-      <figcaption className="mt-3 text-center text-sm text-muted">{t('caption')}</figcaption>
+      <figcaption className="sr-only">{t('caption')}</figcaption>
     </figure>
   );
 }

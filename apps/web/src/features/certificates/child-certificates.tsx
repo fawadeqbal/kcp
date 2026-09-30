@@ -3,7 +3,7 @@
 import type { components } from '@kcp/api-client-ts';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Badge, Button } from '@/components/ui';
+import { Badge, Button, Icon } from '@/components/ui';
 import { api } from '@/lib/api';
 import { downloadCertificate } from './download';
 
@@ -28,11 +28,14 @@ export function ChildCertificates({ childId }: { childId: string }) {
   if (!certificates?.length) return null;
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="font-semibold">{t('title')}</h4>
+      <h5 className="font-sans text-sm font-bold">{t('title')}</h5>
       <ul className="flex flex-col gap-2">
         {certificates.map((c) => (
-          <li key={c.id} className="flex flex-wrap items-center gap-3 text-sm">
-            <span aria-hidden="true">🎓</span>
+          <li
+            key={c.id}
+            className="flex flex-wrap items-center gap-3 rounded-row bg-canvas px-3.5 py-2.5 text-sm"
+          >
+            <Icon name="award" className="text-base text-brand" />
             <span className="flex-1">
               <strong>{c.moduleTitle}</strong> ·{' '}
               {format.dateTime(new Date(c.issuedAt), { dateStyle: 'medium' })}

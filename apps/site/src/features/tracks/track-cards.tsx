@@ -16,7 +16,7 @@ export async function TrackCards({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
 
   return (
-    <ul className="grid gap-5 md:grid-cols-3">
+    <ul className="grid gap-4.5 md:grid-cols-3">
       {TRACKS.map((track) => {
         const open = track === 'builder';
         const Icon = ICONS[track];
@@ -24,12 +24,12 @@ export async function TrackCards({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
           <li
             key={track}
             className={clsx(
-              'flex flex-col gap-4 rounded-[var(--radius-card)] border bg-surface p-6',
-              open ? 'border-brand-500 shadow-lg shadow-brand-600/10' : 'border-line',
+              'flex flex-col gap-4 rounded-hero p-7',
+              open ? 'bg-brand-100' : 'bg-surface',
             )}
           >
             <div className="flex items-start justify-between gap-3">
-              <IconBadge tone={open ? 'brand' : 'accent'}>
+              <IconBadge tone={open ? 'brand' : 'sage'} size="lg">
                 <Icon />
               </IconBadge>
               <Badge tone={open ? 'success' : 'neutral'}>
@@ -37,10 +37,10 @@ export async function TrackCards({ headingLevel = 3 }: { headingLevel?: 2 | 3 })
               </Badge>
             </div>
             <div>
-              <Heading className="text-xl font-bold">{t(`${track}.name`)}</Heading>
-              <p className="mt-1 text-sm font-semibold text-brand-700">{t(`${track}.ages`)}</p>
+              <Heading className="text-[1.625rem]">{t(`${track}.name`)}</Heading>
+              <p className="mt-1 text-sm font-bold text-brand-text">{t(`${track}.ages`)}</p>
             </div>
-            <p className="text-muted">{t(`${track}.summary`)}</p>
+            <p className={open ? 'text-brand-900' : 'text-muted'}>{t(`${track}.summary`)}</p>
           </li>
         );
       })}

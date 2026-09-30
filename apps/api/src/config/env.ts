@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseServiceAccount } from '../push/fcm.js';
 
 const LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'] as const;
 
@@ -127,6 +128,30 @@ export const envSchema = z
       .optional(),
     /** Use the mock of Stripe (never in production). Defaults to on without STRIPE_SECRET_KEY. */
     STRIPE_MOCK: z.stringbool().optional(),
+
+    // ── Push notifications (the mobile app) ──
+    /**
+     * The Firebase service account (JSON, or the JSON base64-encoded) from the Firebase
+     * console → Project settings → Service accounts. With it, push notifications go
+     * through Firebase Cloud Messaging; without it, they are only written to the log.
+     */
+    FIREBASE_SERVICE_ACCOUNT: z
+      .string()
+      .optional()
+      .refine((value) => {
+        if (!value) return true;
+        try {
+          parseServiceAccount(value);
+          return true;
+        } catch {
+          return false;
+        }
+      }, 'FIREBASE_SERVICE_ACCOUNT must be the service account JSON (or that JSON base64-encoded)'),
+    /**
+     * fcm = send through Firebase; log = only log them; memory = keep in memory (tests).
+     * Defaults to fcm with FIREBASE_SERVICE_ACCOUNT, otherwise log.
+     */
+    PUSH_TRANSPORT: z.enum(['fcm', 'log', 'memory']).optional(),
   })
   .refine((env) => env.MAIL_TRANSPORT !== 'smtp' || Boolean(env.SMTP_URL), {
     message: 'SMTP_URL is required when MAIL_TRANSPORT is smtp',
@@ -144,6 +169,10 @@ export const envSchema = z
   .refine((env) => !env.STRIPE_SECRET_KEY || Boolean(env.STRIPE_WEBHOOK_SECRET), {
     message: 'STRIPE_WEBHOOK_SECRET is required with STRIPE_SECRET_KEY',
     path: ['STRIPE_WEBHOOK_SECRET'],
+  })
+  .refine((env) => env.PUSH_TRANSPORT !== 'fcm' || Boolean(env.FIREBASE_SERVICE_ACCOUNT), {
+    message: 'FIREBASE_SERVICE_ACCOUNT is required when PUSH_TRANSPORT is fcm',
+    path: ['FIREBASE_SERVICE_ACCOUNT'],
   })
   .refine((env) => env.NODE_ENV !== 'production' || env.STRIPE_MOCK !== true, {
     message: 'STRIPE_MOCK must not be on in production',
@@ -193,6 +222,7 @@ export const envSchema = z
       STRIPE_WEBHOOK_SECRET:
         env.STRIPE_WEBHOOK_SECRET ??
         (stripeMode === 'mock' ? MOCK_STRIPE_WEBHOOK_SECRET : undefined),
+      PUSH_TRANSPORT: env.PUSH_TRANSPORT ?? (env.FIREBASE_SERVICE_ACCOUNT ? 'fcm' : 'log'),
       SWAGGER_ENABLED: env.SWAGGER_ENABLED ?? env.NODE_ENV !== 'production',
       S3_ENDPOINT: endpoint,
       S3_ACCESS_KEY_ID: env.S3_ACCESS_KEY_ID ?? (local ? LOCAL_STORAGE.accessKeyId : undefined),

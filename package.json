@@ -32,9 +32,11 @@
     "content:check": "nx run @kcp/content-import:check-content",
     "content:import": "nx run @kcp/content-import:import-content",
     "api:client": "nx run @kcp/api-client-ts:generate",
+    "api:client:dart": "node packages/api-client-dart/tool/generate.mjs",
     "bootstrap": "pnpm services:up && pnpm db:generate && pnpm db:deploy && pnpm db:seed && pnpm build && pnpm content:import",
     "staff:create": "pnpm --filter @kcp/api staff:create",
-    "demo:accounts": "pnpm --filter @kcp/api demo:accounts"
+    "demo:accounts": "pnpm --filter @kcp/api demo:accounts",
+    "demo:data": "pnpm --filter @kcp/api demo:data"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

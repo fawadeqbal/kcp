@@ -33,3 +33,8 @@ Thumbs.db
 # Logs
 *.log
 dump.rdb
+
+# Dart and Flutter (the pub workspace; apps/mobile has its own .gitignore too)
+.dart_tool/
+apps/mobile/config/local.json
+/build/

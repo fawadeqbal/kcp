@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@casl/ability": "^7.0.1",
-    "@fontsource-variable/noto-sans": "^5.3.0",
+    "@fontsource-variable/baloo-bhaijaan-2": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource-variable/noto-sans-arabic": "^5.3.0",
+    "@fontsource/caprasimo": "^5.3.0",
     "@kcp/api-client-ts": "workspace:*",
     "@kcp/shared": "workspace:*",
     "@kcp/ui": "workspace:*",

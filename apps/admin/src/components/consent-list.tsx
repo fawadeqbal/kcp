@@ -29,7 +29,7 @@ function PersonLink({ person }: { person: Person }) {
     <div className="flex flex-col">
       <Link
         href={`/users/${person.id}`}
-        className="font-semibold whitespace-nowrap text-brand-700 underline-offset-4 hover:underline"
+        className="font-semibold whitespace-nowrap text-brand-text underline-offset-4 hover:underline"
       >
         {person.displayName ?? person.email ?? person.username}
       </Link>

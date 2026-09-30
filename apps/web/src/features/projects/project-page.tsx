@@ -5,7 +5,7 @@ import type { Check, CheckResult, CodeFileKey, CodeFiles } from '@kcp/checks';
 import { clsx } from 'clsx';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Badge, Button, buttonClass, Card, PageSpinner } from '@/components/ui';
+import { Alert, Badge, Button, buttonClass, Icon, PageSpinner } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
@@ -14,6 +14,7 @@ import { hintsFor, ResetDialog } from '../learn/challenge-workspace';
 import { Markdown } from '../learn/markdown';
 import { PremiumLocked } from '../learn/premium-locked';
 import {
+  CheckList,
   FilesEditor,
   PreviewPane,
   ProblemList,
@@ -22,6 +23,7 @@ import {
   useLivePreview,
   useSaveText,
 } from '../learn/workspace';
+import { useStreak, WorkspaceHeader } from '../learn/workspace-header';
 import { refreshNotifications } from '@/components/notification-bell';
 
 type Project = components['schemas']['ProjectDto'];
@@ -86,7 +88,7 @@ export function ProjectPage({ briefId }: { briefId: string }) {
   if (failure === 'premium') return <PremiumLocked kind="project" />;
   if (failure) {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 py-16">
         <Alert tone={failure === 'notFound' ? 'info' : 'error'}>{t(failure)}</Alert>
         <Link href="/learn" className={clsx(buttonClass('secondary'), 'self-start')}>
           {tl('backToMap')}
@@ -111,6 +113,7 @@ function ProjectWorkspace({ project }: { project: Project }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [newBadges, setNewBadges] = useState<string[]>([]);
   const [status, setStatus] = useState(project.status);
+  const { streak, refresh: refreshStreak } = useStreak();
   const shippedHeading = useRef<HTMLHeadingElement>(null);
   const save = useCallback((code: CodeFiles) => saveDraft(project.id, code), [project.id]);
   const code = useCodeFiles({
@@ -170,6 +173,7 @@ function ProjectWorkspace({ project }: { project: Project }) {
       code.markSaved(files);
       if (data.shipped) {
         setStatus('SHIPPED');
+        refreshStreak();
         setOutcome({ kind: 'shipped', result: data });
         if (data.badgesEarned.length) {
           setNewBadges(data.badgesEarned);
@@ -186,177 +190,177 @@ function ProjectWorkspace({ project }: { project: Project }) {
   }
 
   const checkedResults = outcome?.kind === 'checked' ? outcome.results : results;
-  const passedIds = new Set(checkedResults?.filter((r) => r.passed).map((r) => r.id));
+  const passedIds = checkedResults
+    ? new Set(checkedResults.filter((r) => r.passed).map((r) => r.id))
+    : status === 'SHIPPED'
+      ? new Set(checks.map((c) => c.id))
+      : null;
   const failing = checkedResults?.filter((r) => !r.passed) ?? [];
   const cannotCheck = busy !== null || !canRun;
   const cannotShip = cannotCheck || !ready;
 
   return (
-    <article className="mx-auto flex max-w-6xl flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <nav aria-label={tl('backToLearning')} className="text-sm">
-          <ol className="flex flex-wrap items-center gap-2 text-muted">
-            <li>
-              <Link
-                href="/learn"
-                className="font-semibold text-brand-700 underline underline-offset-4"
-              >
-                {tl('backToLearning')}
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li>{project.moduleTitle}</li>
-          </ol>
-        </nav>
-        <p className="text-sm font-semibold text-brand-700">{t('label')}</p>
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">{project.title}</h1>
-          {status === 'SHIPPED' ? <Badge tone="success">{t('statusShipped')}</Badge> : null}
-          <Badge tone="brand">{tp('xp', { xp: String(project.xp) })}</Badge>
-        </div>
-        <p className="max-w-3xl text-lg text-muted">{project.summary}</p>
-      </header>
+    <article className="flex min-h-dvh flex-1 flex-col xl:h-dvh">
+      <WorkspaceHeader
+        context={`${t('label')} · ${project.moduleTitle}`}
+        title={project.title}
+        badge={
+          status === 'SHIPPED' ? (
+            <Badge tone="success">{t('statusShipped')}</Badge>
+          ) : (
+            <Badge tone="brand">{tp('xpGained', { xp: String(project.xp) })}</Badge>
+          )
+        }
+        saveText={saveText}
+        saveState={code.saveState}
+        streak={streak}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
-        <Card title={t('brief')}>
-          <div lang={project.language !== locale ? project.language : undefined}>
-            <Markdown>{project.body}</Markdown>
-          </div>
-        </Card>
-        <Card title={t('requirements')}>
-          <p className="-mt-2 mb-3 text-sm text-muted">{t('requirementsHelp')}</p>
-          <ul className="flex flex-col gap-2">
-            {checks.map((requirement) => {
-              const met = passedIds.has(requirement.id);
-              const text = (requirement.hint && project.hints[requirement.hint]) || requirement.id;
-              return (
-                <li key={requirement.id} className="flex items-start gap-3">
-                  <span
-                    aria-hidden="true"
-                    className={clsx(
-                      'mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold',
-                      met ? 'bg-success text-white' : 'border-2 border-line',
-                    )}
-                  >
-                    {met ? '✓' : ''}
-                  </span>
-                  <span className={clsx(met && 'text-muted')}>
-                    <span className="sr-only">{met ? `${t('requirementMet')}: ` : ''}</span>
-                    <bdi>{text}</bdi>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
-      </div>
+      <div className="grid min-h-0 flex-1 gap-3.5 px-4 pb-4 sm:px-6 sm:pb-6 md:grid-cols-2 xl:grid-cols-[24rem_minmax(0,1fr)_minmax(0,1fr)]">
+        <aside className="flex flex-col gap-4 rounded-panel bg-surface p-6 md:col-span-2 xl:col-span-1 xl:min-h-0 xl:overflow-y-auto">
+          <section aria-labelledby="project-brief" className="flex flex-col gap-2">
+            <h2
+              id="project-brief"
+              className="font-sans text-xs font-bold tracking-[0.1em] text-brand-text uppercase"
+            >
+              {t('brief')}
+            </h2>
+            <p className="font-semibold">{project.summary}</p>
+            <div
+              className="text-[0.95rem]"
+              lang={project.language !== locale ? project.language : undefined}
+            >
+              <Markdown>{project.body}</Markdown>
+            </div>
+          </section>
+          <section aria-label={t('requirements')}>
+            <CheckList
+              checks={checks as { id: string; hint?: string }[]}
+              labels={project.checkLabels}
+              hints={project.hints}
+              passed={passedIds}
+              title={t('requirements')}
+              help={t('requirementsHelp')}
+            />
+          </section>
+          <ProblemList errors={sandbox.output.errors} />
 
-      <section aria-label={t('title')} className="flex flex-col gap-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <FilesEditor
-            fileKeys={project.files as CodeFileKey[]}
-            labelFor={(key) => PROJECT_FILE_NAMES[key]}
-            files={files}
-            saveText={saveText}
-            onChange={code.update}
-          />
-          <PreviewPane
-            sandbox={sandbox}
-            title={python ? tl('outputTitle') : tl('previewTitle')}
-            python={python}
-          />
-        </div>
-
-        {python ? <PythonControls load={pythonLoad} canRun={canRun} onRun={runProgram} /> : null}
-
-        <ProblemList
-          errors={sandbox.output.errors}
-          console={python ? [] : sandbox.output.console}
-        />
-
-        <div aria-live="polite" aria-atomic="true">
-          {outcome?.kind === 'checked' && failing.length === 0 ? (
-            <Alert tone="success" live={false}>
-              {t('allMet')}
-            </Alert>
-          ) : null}
-          {outcome?.kind === 'checked' && failing.length > 0 ? (
-            <Alert tone="warning" live={false}>
-              <p>
-                {t('notReady', {
-                  passed: String(outcome.results.length - failing.length),
-                  total: String(outcome.results.length),
-                })}
+          <div aria-live="polite" aria-atomic="true" className="mt-auto flex flex-col gap-3">
+            {outcome?.kind === 'checked' && failing.length === 0 ? (
+              <p className="flex items-center gap-2 rounded-row bg-sage-100 px-4 py-3.5 font-bold text-sage-800">
+                <Icon name="check" />
+                {t('allMet')}
               </p>
-              <ul className="mt-2 list-disc ps-5">
-                {hintsFor(outcome.results, project.hints, tl('checkFailedNoHint')).map((hint) => (
-                  <li key={hint}>
-                    <bdi>{hint}</bdi>
-                  </li>
-                ))}
-              </ul>
-            </Alert>
-          ) : null}
-          {outcome?.kind === 'error' ? (
-            <Alert tone="error" live={false}>
-              {outcome.message}
-            </Alert>
-          ) : null}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Button
-            variant={ready ? 'secondary' : 'primary'}
-            onClick={() => void onCheck()}
-            aria-disabled={cannotCheck}
-            aria-busy={busy === 'checking' || undefined}
-            className={clsx(cannotCheck && 'cursor-not-allowed opacity-60')}
-          >
-            {busy === 'checking' ? t('checking') : t('check')}
-          </Button>
-          <Button
-            onClick={() => void onShip()}
-            aria-disabled={cannotShip}
-            aria-busy={busy === 'shipping' || undefined}
-            className={clsx(cannotShip && 'cursor-not-allowed opacity-60')}
-          >
-            {busy === 'shipping' ? t('shipping') : t('ship')}
-          </Button>
-          <Button variant="ghost" onClick={() => setConfirmReset(true)}>
-            {tl('reset')}
-          </Button>
-        </div>
-      </section>
-
-      {outcome?.kind === 'shipped' ? (
-        <section className="motion-safe:animate-[kcp-pop_300ms_ease-out] rounded-[var(--radius-card)] border border-success/30 bg-success/10 p-5 sm:p-6">
-          <h2 ref={shippedHeading} tabIndex={-1} className="text-2xl font-bold outline-none">
-            {t('shipped')}
-            {outcome.result.xpAwarded > 0 ? (
-              <span className="ms-3 text-xl text-success">
-                {tp('xpGained', { xp: String(outcome.result.xpAwarded) })}
-              </span>
             ) : null}
-          </h2>
-          <p className="mt-2 text-muted">
-            {outcome.result.version && outcome.result.version > 1
-              ? t('shippedVersion', { version: String(outcome.result.version) })
-              : t('shippedBody')}
-          </p>
-          {outcome.result.dailyCapReached ? (
-            <p className="mt-1 text-sm text-muted">{tp('capReached')}</p>
-          ) : null}
-          <p className="mt-1 text-sm text-muted">{t('reshipHint')}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link href="/learn/portfolio" className={buttonClass('primary')}>
-              {t('openPortfolio')}
-            </Link>
-            <Link href="/learn" className={buttonClass('secondary')}>
-              {tl('backToMap')}
-            </Link>
+            {outcome?.kind === 'checked' && failing.length > 0 ? (
+              <div className="flex flex-col gap-1 rounded-row bg-warn-soft px-4 py-3.5 text-sm text-warn-text">
+                <p className="font-bold">
+                  {t('notReady', {
+                    passed: String(outcome.results.length - failing.length),
+                    total: String(outcome.results.length),
+                  })}
+                </p>
+                <ul className="list-disc ps-5">
+                  {hintsFor(outcome.results, project.hints, tl('checkFailedNoHint')).map((hint) => (
+                    <li key={hint}>
+                      <bdi>{hint}</bdi>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {outcome?.kind === 'error' ? (
+              <Alert tone="error" live={false}>
+                {outcome.message}
+              </Alert>
+            ) : null}
           </div>
-        </section>
-      ) : null}
+
+          {outcome?.kind === 'shipped' ? (
+            <section className="flex flex-col gap-2.5 rounded-row bg-sage-100 p-5 text-sage-900 motion-safe:animate-[kcp-pop_300ms_ease-out]">
+              <h2
+                ref={shippedHeading}
+                tabIndex={-1}
+                className="flex flex-wrap items-center gap-2.5 text-2xl outline-none"
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-sage text-base text-on-primary">
+                  <Icon name="rocket" />
+                </span>
+                {t('shipped')}
+                {outcome.result.xpAwarded > 0 ? (
+                  <span className="rounded-full bg-brand-100 px-2.5 py-0.5 font-sans text-sm font-bold text-brand-800">
+                    {tp('xpGained', { xp: String(outcome.result.xpAwarded) })}
+                  </span>
+                ) : null}
+              </h2>
+              <p className="text-sm text-sage-800">
+                {outcome.result.version && outcome.result.version > 1
+                  ? t('shippedVersion', { version: String(outcome.result.version) })
+                  : t('shippedBody')}
+              </p>
+              {outcome.result.dailyCapReached ? (
+                <p className="text-sm text-sage-800">{tp('capReached')}</p>
+              ) : null}
+              <p className="text-sm text-sage-800">{t('reshipHint')}</p>
+              <div className="flex flex-wrap gap-2.5">
+                <Link href="/learn/portfolio" className={buttonClass('primary')}>
+                  {t('openPortfolio')}
+                </Link>
+                <Link href="/learn" className={buttonClass('secondary')}>
+                  {tl('backToMap')}
+                </Link>
+              </div>
+            </section>
+          ) : null}
+        </aside>
+
+        <FilesEditor
+          fileKeys={project.files as CodeFileKey[]}
+          labelFor={(key) => PROJECT_FILE_NAMES[key]}
+          files={files}
+          onChange={code.update}
+          className="min-h-[26rem] xl:min-h-0"
+          actions={
+            <>
+              <Button variant="ghost" onClick={() => setConfirmReset(true)} className="text-muted">
+                <Icon name="undo" />
+                {tl('reset')}
+              </Button>
+              <span className="ms-auto flex flex-wrap gap-2.5">
+                <Button
+                  variant={ready ? 'secondary' : 'primary'}
+                  size="lg"
+                  onClick={() => void onCheck()}
+                  aria-disabled={cannotCheck}
+                  aria-busy={busy === 'checking' || undefined}
+                >
+                  <Icon name="check" />
+                  {busy === 'checking' ? t('checking') : t('check')}
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => void onShip()}
+                  aria-disabled={cannotShip}
+                  aria-busy={busy === 'shipping' || undefined}
+                >
+                  <Icon name="rocket" />
+                  {busy === 'shipping' ? t('shipping') : t('ship')}
+                </Button>
+              </span>
+            </>
+          }
+        />
+        <PreviewPane
+          sandbox={sandbox}
+          title={python ? tl('outputTitle') : tl('previewTitle')}
+          python={python}
+          console={python ? [] : sandbox.output.console}
+          className="min-h-[26rem] xl:min-h-0"
+          footer={
+            python ? <PythonControls load={pythonLoad} canRun={canRun} onRun={runProgram} /> : null
+          }
+        />
+      </div>
 
       <BadgeCelebration keys={newBadges} />
       <ResetDialog

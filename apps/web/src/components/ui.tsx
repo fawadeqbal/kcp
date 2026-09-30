@@ -19,9 +19,18 @@ export {
   Checkbox,
   Dialog,
   EmptyState,
+  Icon,
+  IconBubble,
+  type IconName,
+  inputClass,
+  Kicker,
+  LogoMark,
+  Meter,
   PageSpinner,
+  SectionHeading,
   SelectField,
   Switch,
+  textareaClass,
   TextField,
 } from '@kcp/ui';
 

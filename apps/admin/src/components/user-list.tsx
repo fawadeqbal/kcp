@@ -86,11 +86,11 @@ export function UserList() {
             empty={users.data.items.length === 0}
           >
             {users.data.items.map((user) => (
-              <tr key={user.id} className="hover:bg-canvas/60">
+              <tr key={user.id} className="hover:bg-raised">
                 <Cell>
                   <Link
                     href={`/users/${user.id}`}
-                    className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+                    className="font-semibold text-brand-text underline-offset-4 hover:underline"
                   >
                     {user.displayName ?? '(no name)'}
                   </Link>

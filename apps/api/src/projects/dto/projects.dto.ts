@@ -23,6 +23,8 @@ export class ProjectDto {
   checks!: Record<string, unknown>[];
   /** Hint texts by key, in the requested language with English filling gaps. */
   hints!: Record<string, string>;
+  /** What each check looks at, by check ID, in the requested language (English fills gaps). */
+  checkLabels!: Record<string, string>;
   /** The student's saved code, if any. */
   draft!: CodeFilesDto | null;
   status!: ProjectStatusValue;

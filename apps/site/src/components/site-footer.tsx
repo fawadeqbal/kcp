@@ -1,13 +1,13 @@
 import type { Locale } from '@kcp/i18n';
+import { LogoMark } from '@kcp/ui';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { Link } from '@/i18n/navigation';
 import { BRAND_NAME } from '@/lib/brand';
 import { webAppUrl } from '@/lib/config';
 import { Container } from './layout';
-import { LogoMark } from './icons';
 
-const linkClass = 'text-ink underline-offset-4 hover:text-brand-700 hover:underline';
+const linkClass = 'font-semibold text-ink underline-offset-4 hover:text-brand-text hover:underline';
 
 const page = (href: string, label: string) => (
   <li>
@@ -20,7 +20,7 @@ const page = (href: string, label: string) => (
 function Column({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-muted">{title}</h2>
+      <h2 className="font-sans text-xs font-bold tracking-[0.1em] text-muted uppercase">{title}</h2>
       <ul className="mt-3 flex flex-col gap-2">{children}</ul>
     </div>
   );
@@ -38,13 +38,13 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
   );
 
   return (
-    <footer className="print-hidden border-t border-line bg-surface">
-      <Container className="py-12">
+    <footer className="print-hidden">
+      <Container className="py-14">
         <div className="grid gap-10 md:grid-cols-[2fr_3fr]">
           <div className="max-w-sm">
-            <p className="flex items-center gap-2.5 text-lg font-bold">
+            <p className="flex items-center gap-2.5">
               <LogoMark />
-              <span className="font-latin">{BRAND_NAME}</span>
+              <span className="font-display text-xl">{BRAND_NAME}</span>
             </p>
             <p className="mt-3 text-muted">{t('about')}</p>
           </div>

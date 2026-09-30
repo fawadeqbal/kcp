@@ -1,0 +1,30 @@
+id: builder-m02-l01-q1
+order: 1
+kind: output
+xp: 5
+language: python
+prompt:
+  en: What does this program print?
+  ar: ماذا يطبع هذا البرنامج؟
+  ur: یہ پروگرام کیا دکھائے گا؟
+code:
+  - 'print("3 + 4")'
+  - 'print(3 + 4)'
+options:
+  - id: a
+    code: |-
+      7
+      7
+  - id: b
+    code: |-
+      3 + 4
+      7
+  - id: c
+    code: |-
+      3 + 4
+      3 + 4
+answer: b
+explanation:
+  en: Text inside quote marks is a string, so Python shows it just as it is. Without quote marks, 3 + 4 is a sum, so Python shows 7.
+  ar: النص بين علامتي التنصيص سلسلة نصية، لذلك يعرضه بايثون كما هو. وبدون علامتي التنصيص تكون ‎3 + 4‎ عملية جمع، فيعرض بايثون 7.
+  ur: کوٹیشن مارکس کے اندر والا متن اسٹرنگ ہے، اس لیے پائتھن اسے ویسے ہی دکھاتا ہے۔ کوٹیشن مارکس کے بغیر ‎3 + 4‎ جمع کا سوال ہے، اس لیے پائتھن 7 دکھاتا ہے۔

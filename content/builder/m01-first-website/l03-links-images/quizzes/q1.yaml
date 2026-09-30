@@ -1,0 +1,18 @@
+id: builder-m01-l03-q1
+order: 1
+kind: bug
+xp: 5
+language: html
+prompt:
+  en: One line has a mistake. Tap it.
+  ar: في أحد الأسطر خطأ. اضغط عليه.
+  ur: ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - '<h1>My favourite place</h1>'
+  - '<img src="images/beach.svg" alt="A sunny beach">'
+  - '<a src="https://en.wikipedia.org/wiki/Beach">Beaches</a>'
+bugLine: 3
+explanation:
+  en: 'A link uses href to say where it goes: <a href="...">. The src attribute is for pictures, in <img>.'
+  ar: 'يستخدم الرابط href ليحدّد إلى أين يذهب: ‎<a href="...">‎. أما السمة src فهي للصور، في ‎<img>‎.'
+  ur: 'لنک href سے بتاتا ہے کہ وہ کہاں لے کر جائے گا: ‎<a href="...">‎۔ src ایٹریبیوٹ تصویروں کے لیے ہوتا ہے، یعنی ‎<img>‎ میں۔'

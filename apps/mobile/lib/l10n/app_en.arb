@@ -1,0 +1,641 @@
+{
+  "@@locale": "en",
+  "appName": "Kids Coding",
+  "loading": "Loading",
+  "tryAgain": "Try again",
+  "cancel": "Cancel",
+  "saved": "Saved.",
+  "sending": "Sending…",
+  "backHome": "Back home",
+  "notFound": "This page doesn't exist in the app.",
+  "openWebsite": "Open the website",
+  "premium": "Premium",
+  "fieldRequired": "Please fill this in.",
+  "errorOffline": "No connection. Check your internet and try again.",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorInvalidCredentials": "That login name or password isn't right.",
+  "errorNotFamily": "The app is for students and parents. Staff use the admin panel.",
+  "errorSuspended": "This account is switched off. Please contact us.",
+  "errorEmailNotVerified": "Please confirm your email address first: open the link we sent you.",
+  "errorPremium": "This is part of premium.",
+  "errorTooMany": "Too many tries. Please wait a moment.",
+  "sessionExpired": "You were signed out. Please sign in again.",
+  "welcomeTitle": "Learn to code, a little every day",
+  "welcomeBody": "Quick questions, your streak and your progress, in your pocket.",
+  "welcomeStudent": "I'm a student",
+  "welcomeParent": "I'm a parent",
+  "welcomeNoAccount": "No account yet? A parent creates one for the family on our website.",
+  "loginStudentTitle": "Student sign-in",
+  "loginParentTitle": "Parent sign-in",
+  "loginStudentBody": "Use the login name and password your parent gave you.",
+  "loginParentBody": "Use the email and password of your family account.",
+  "loginUsername": "Login name",
+  "loginEmail": "Email",
+  "loginPassword": "Password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "signIn": "Sign in",
+  "signingIn": "Signing in…",
+  "loginStudentForgot": "Forgot your password? Ask your parent: they can set a new one.",
+  "loginParentForgot": "Forgot your password? Reset it on our website.",
+  "tabToday": "Today",
+  "tabLearn": "Lessons",
+  "tabLeaderboard": "Leaderboard",
+  "tabMe": "Me",
+  "homeGreeting": "Hi, {name}!",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "streakDays": "{count, plural, =0{No streak yet} =1{1 day in a row} other{{count} days in a row}}",
+  "@streakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakFreezes": "{count, plural, =1{1 streak freeze} other{{count} streak freezes}}",
+  "@streakFreezes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakFreezeUsed": "{count, plural, =1{Meet today's goal and a streak freeze covers the day you missed.} other{Meet today's goal and streak freezes cover the {count} days you missed.}}",
+  "@streakFreezeUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "goalToday": "Today's goal: {xp} of {goal} XP",
+  "@goalToday": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "goalDone": "Today's goal is done. Your streak is safe!",
+  "levelNumber": "Level {level}",
+  "@levelNumber": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "levelTop": "The top level. Amazing!",
+  "xpTotal": "{xp} XP",
+  "@xpTotal": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "xpToNext": "{xp} XP to level {level}",
+  "@xpToNext": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "xpBarLabel": "XP towards level {level}",
+  "@xpBarLabel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyCapReached": "You've reached today's XP limit. More tomorrow!",
+  "nextLesson": "Your next lesson",
+  "laptopTitle": "Coding is on your laptop",
+  "laptopBody": "Code challenges and projects need a keyboard. Open the website on a laptop or computer:",
+  "practiceTitle": "Today's practice",
+  "practiceSummary": "{count} quick questions · +{xp} XP when you finish",
+  "@practiceSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceProgress": "{answered} of {total} done",
+  "@practiceProgress": {
+    "placeholders": {
+      "answered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceStart": "Start",
+  "practiceContinue": "Continue",
+  "practiceDoneToday": "Today's practice is done. See you tomorrow!",
+  "practiceNone": "No practice yet: start a lesson first.",
+  "practiceQuestionOf": "Question {number} of {total}",
+  "@practiceQuestionOf": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceFromLesson": "From “{title}”",
+  "@practiceFromLesson": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceFinish": "Finish",
+  "practiceFinishedTitle": "Practice done!",
+  "practiceXpEarned": "+{xp} XP today",
+  "@practiceXpEarned": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceStreakKept": "{count, plural, =1{Your streak: 1 day. Keep it going tomorrow!} other{Your streak: {count} days. Keep it going tomorrow!}}",
+  "@practiceStreakKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quizOrderHelp": "Put the lines in the right order with the arrow buttons.",
+  "quizBugHelp": "Tap the line with the mistake.",
+  "quizOutputHelp": "What does this code show?",
+  "quizChoiceHelp": "Pick one answer.",
+  "quizCheck": "Check my answer",
+  "quizChecking": "Checking…",
+  "quizCorrect": "Correct!",
+  "quizCorrectXp": "Correct! +{xp} XP",
+  "@quizCorrectXp": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "quizWrong": "Not quite. Have another go.",
+  "quizRevealed": "Here is the right answer:",
+  "quizNext": "Next question",
+  "quizLine": "Line {number}",
+  "@quizLine": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quizMoveUp": "Move line {number} up",
+  "@quizMoveUp": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quizMoveDown": "Move line {number} down",
+  "@quizMoveDown": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quizMoved": "Moved to place {position}.",
+  "@quizMoved": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "questionOf": "Question {number} of {total}",
+  "@questionOf": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonTitle": "Lesson",
+  "lessonOf": "Lesson {number} of {total}",
+  "@lessonOf": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonDone": "Done",
+  "lessonStarted": "Started",
+  "lessonNotStarted": "Not started",
+  "lessonLocked": "Locked",
+  "lessonQuizCount": "{count, plural, =1{1 question} other{{count} questions}}",
+  "@lessonQuizCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonPremium": "This lesson is part of premium. Ask your parent about it.",
+  "lessonNotFound": "This lesson doesn't exist, or isn't open yet.",
+  "lessonVideoOnLaptop": "This lesson has a video: watch it on the website.",
+  "checkYourself": "Check yourself",
+  "checkYourselfIntro": "Quick questions about this lesson. The first right answer earns XP.",
+  "lessonChallenges": "Try it on your laptop",
+  "lessonStep": "Step {number}",
+  "@lessonStep": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonStepDone": "Done",
+  "lessonsDone": "{count, plural, =0{No lessons finished yet} =1{1 lesson finished} other{{count} lessons finished}}",
+  "@lessonsDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leaderboardTitle": "Leaderboard",
+  "boardGlobal": "World",
+  "boardCountry": "Country",
+  "boardRegion": "Region",
+  "boardCity": "City",
+  "boardWeek": "This week (resets on Monday)",
+  "boardTooFew": "This board opens when at least {count} students are on it.",
+  "@boardTooFew": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "boardEmpty": "Nobody has earned XP this week yet. Be the first!",
+  "boardYou": "You",
+  "boardHidden": "Your place is hidden: public leaderboards are off. Your parent can switch them on.",
+  "boardMeRank": "You are number {rank} with {xp} XP.",
+  "@boardMeRank": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "boardMeNoRank": "You have {xp} XP this week.",
+  "@boardMeNoRank": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "badgesTitle": "Badges",
+  "badgesEarned": "{earned} of {total} earned",
+  "@badgesEarned": {
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "badgeLocked": "Not earned yet",
+  "badgesCount": "{count, plural, =0{No badges yet} =1{1 badge} other{{count} badges}}",
+  "@badgesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "parentTitle": "Your family",
+  "parentGreeting": "Hello, {name}",
+  "@parentGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "parentNoChildren": "No children here yet. Add them on our website.",
+  "termsChanged": "Our terms and privacy policy have changed. Please read and accept them on the website.",
+  "childTitle": "Child",
+  "childNotFound": "This child isn't in your family account.",
+  "childSwitches": "What you allow",
+  "consentLeaderboards": "Public leaderboards",
+  "consentLeaderboardsBody": "Show your child's nickname and avatar on city, country and world leaderboards.",
+  "consentPortfolio": "Public projects",
+  "consentPortfolioBody": "Let anyone with the link see your child's finished projects.",
+  "streakReminders": "Streak reminder",
+  "streakRemindersBody": "One reminder at 6 pm on {nickname}'s phone, on days the streak is about to end. Nothing else is sent to it.",
+  "@streakRemindersBody": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "childMoreOnWebsite": "Passwords, profiles, projects and certificates: on the website.",
+  "lastSignedIn": "Last signed in {date}",
+  "@lastSignedIn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "neverSignedIn": "Not signed in yet",
+  "premiumPlan": "Premium (family plan)",
+  "premiumTrial": "Free trial until {date}",
+  "@premiumTrial": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumUntil": "Premium until {date}",
+  "@premiumUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumNone": "No premium",
+  "planTitle": "Family plan",
+  "planActive": "Active. Renews on {date}.",
+  "@planActive": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planEnding": "Ends on {date}.",
+  "@planEnding": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planPastDue": "The last payment didn't go through.",
+  "planNone": "No plan at the moment.",
+  "notificationsTitle": "Notifications",
+  "notificationsEmpty": "Nothing new.",
+  "notificationBadge": "You earned a badge: {name}!",
+  "@notificationBadge": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationCertificate": "Your certificate for “{module}” is ready.",
+  "@notificationCertificate": {
+    "placeholders": {
+      "module": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationReceipt": "Payment received. Receipt {number}.",
+  "@notificationReceipt": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationPaymentFailed": "A payment didn't go through. Please check your card on the website.",
+  "notificationPlanEnded": "Your plan has ended.",
+  "notificationTrialEnding": "{nickname}'s free trial ends on {date}.",
+  "@notificationTrialEnding": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildShipped": "{nickname} shipped a project: {title}!",
+  "@notificationChildShipped": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildCertificate": "{nickname} earned a certificate: {module}.",
+  "@notificationChildCertificate": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "module": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationOther": "Something new happened.",
+  "settingsTitle": "Settings",
+  "settingsLanguage": "Language",
+  "languageSystem": "The phone's language",
+  "settingsNotifications": "Notifications",
+  "pushUnavailable": "Notifications are not available in this version of the app.",
+  "pushTurnOn": "Turn on notifications",
+  "pushStudentBody": "A reminder at 6 pm when your streak is about to end.",
+  "pushParentBody": "When a trial is ending, and your children's monthly summary.",
+  "pushOn": "Notifications are on.",
+  "pushBlocked": "Notifications are off. You can allow them in the phone's settings.",
+  "monthlySummary": "Monthly summary email",
+  "monthlySummaryBody": "Once a month: each child's lessons, XP and projects.",
+  "feedbackTitle": "Send us feedback",
+  "feedbackIntro": "Tell us about a problem, an idea, or anything that felt unsafe. The team reads every message.",
+  "feedbackBug": "Something is broken",
+  "feedbackIdea": "An idea",
+  "feedbackSafety": "Something felt unsafe",
+  "feedbackPraise": "Something I like",
+  "feedbackOther": "Something else",
+  "feedbackMessage": "Your message",
+  "feedbackSend": "Send",
+  "feedbackSent": "Thank you! Your message was sent.",
+  "feedbackTooShort": "Please write a little more.",
+  "privacyPolicy": "Privacy policy",
+  "termsOfUse": "Terms of use",
+  "accountOnWebsite": "Account and data",
+  "accountOnWebsiteBody": "Download your data or delete the account on the website.",
+  "logOut": "Log out",
+  "appVersion": "Version {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "gateTitle": "For grown-ups",
+  "gateBody": "Ask a grown-up to answer this question to continue.",
+  "gateQuestion": "What is {a} times {b}?",
+  "@gateQuestion": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      }
+    }
+  },
+  "gateAnswerLabel": "Answer (in numbers)",
+  "gateWrong": "That's not right. Here's another one.",
+  "gateContinue": "Continue",
+  "gateNumberWords": "zero,one,two,three,four,five,six,seven,eight,nine,ten,eleven,twelve,thirteen,fourteen,fifteen,sixteen,seventeen,eighteen,nineteen",
+  "reminderCardTitle": "Keep your streak going",
+  "reminderCardBody": "Get one reminder at 6 pm on days your streak is about to end.",
+  "reminderCardAction": "Turn on reminders",
+  "reminderCardDismiss": "Not now",
+  "notificationOpen": "Open",
+  "goalTitle": "Today's goal",
+  "goalProgress": "{xp} of {goal} XP",
+  "@goalProgress": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "goalMore": "{xp} XP more keeps your streak going.",
+  "@goalMore": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "levelAndXp": "Level {level} · {xp} XP",
+  "@levelAndXp": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "continueKicker": "Pick up where you left off",
+  "continueAction": "Continue",
+  "continueLesson": "Lesson {number} · {module}",
+  "@continueLesson": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "module": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceRow": "{count} quick questions · +{xp} XP",
+  "@practiceRow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "boardRankWorld": "#{rank} in the world",
+  "@boardRankWorld": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "boardThisWeek": "This week · {xp} XP",
+  "@boardThisWeek": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "parentKicker": "Parent",
+  "statLevel": "Level",
+  "statStreak": "Days in a row",
+  "statLessons": "Lessons done",
+  "parentSafetyNote": "Leaderboards and public projects stay off until you switch them on.",
+  "addChild": "Add a child",
+  "closePractice": "Close the practice",
+  "quizProgress": "{number} / {total}",
+  "@quizProgress": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+id: builder-m01-l02-q1
+order: 1
+kind: order
+xp: 5
+language: html
+prompt:
+  en: 'Put the lines in order to make a numbered list: first "Wake up", then "Eat breakfast".'
+  ar: 'رتّب الأسطر لتصنع قائمة مرقّمة: أولًا "Wake up"، ثم "Eat breakfast".'
+  ur: 'سطروں کو ترتیب سے لگائیں تاکہ نمبروں والی فہرست بنے: پہلے "Wake up"، پھر "Eat breakfast"۔'
+code:
+  - '<ol>'
+  - '  <li>Wake up</li>'
+  - '  <li>Eat breakfast</li>'
+  - '</ol>'
+explanation:
+  en: Each <li> goes between <ol> and </ol>, and the browser numbers the items in the order you write them.
+  ar: يوضع كل ‎<li>‎ بين ‎<ol>‎ و‎</ol>‎، ويرقّم المتصفح العناصر بالترتيب الذي تكتبها به.
+  ur: ہر ‎<li>‎ کو ‎<ol>‎ اور ‎</ol>‎ کے درمیان لکھا جاتا ہے، اور براؤزر چیزوں کو اسی ترتیب سے نمبر دیتا ہے جس ترتیب سے آپ انہیں لکھتے ہیں۔

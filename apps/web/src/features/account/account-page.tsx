@@ -25,7 +25,7 @@ export function AccountPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <h1 className="text-4xl">{t('title')}</h1>
         <p className="mt-2 text-muted">{t('intro')}</p>
       </div>
       <ChangePassword />
@@ -192,7 +192,7 @@ function DeleteAccount({ onDeleted }: { onDeleted: () => void }) {
   }
 
   return (
-    <Card title={t('account.deleteTitle')} className="border-danger/30">
+    <Card title={t('account.deleteTitle')} className="border-transparent">
       <p className="text-muted">{t('account.deleteBody')}</p>
       <Button variant="danger" className="mt-4" onClick={() => setOpen(true)}>
         {t('account.deleteButton')}

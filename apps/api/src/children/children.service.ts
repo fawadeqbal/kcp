@@ -12,6 +12,7 @@ import {
   allowedBirthYears,
   AVATAR_KEYS,
   type ChildConsent,
+  MAX_CHILDREN_PER_PARENT,
   MAX_TRIALS_PER_FAMILY,
   TRIAL_DAYS,
 } from '@kcp/shared';
@@ -42,7 +43,6 @@ import type {
 import { checkNickname, generateUsername, suggestNicknames } from './nickname-policy.js';
 
 /** A family can't grow endlessly (limits abuse of the sign-up flow). */
-const MAX_CHILDREN_PER_PARENT = 10;
 
 const CONSENT_TYPES: Record<ChildConsent, ConsentType> = {
   publicLeaderboards: 'PUBLIC_LEADERBOARDS',
@@ -100,6 +100,7 @@ function toChildDto(
     xpTotal: profile.xpTotal,
     level: levelFor(profile.xpTotal, levels).number,
     badges: child._count.badges,
+    streakReminders: profile.streakReminders,
     streak: visibleStreak(
       {
         current: child.streak?.current ?? 0,
@@ -333,6 +334,9 @@ export class ChildrenService {
             update: {
               ...(dto.nickname ? { nickname: dto.nickname } : {}),
               ...(dto.avatarKey ? { avatarKey: dto.avatarKey } : {}),
+              ...(dto.streakReminders !== undefined
+                ? { streakReminders: dto.streakReminders }
+                : {}),
             },
           },
         },

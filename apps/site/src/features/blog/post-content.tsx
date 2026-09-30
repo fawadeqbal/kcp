@@ -5,27 +5,23 @@ import { localizeHref, MDX_OPTIONS } from '@/lib/mdx';
 
 /** <Callout> in a post: a highlighted note. */
 function Callout({ children }: { children?: ReactNode }) {
-  return (
-    <aside className="my-8 rounded-[var(--radius-card)] border border-brand-100 bg-brand-50 px-5 py-4 [&>p]:mt-0">
-      {children}
-    </aside>
-  );
+  return <aside className="my-8 rounded-panel bg-brand-100 px-5 py-4 [&>p]:mt-0">{children}</aside>;
 }
 
 /** How each Markdown element looks in a post (no typography plugin needed). */
 function components(locale: Locale): NonNullable<MDXRemoteProps['components']> {
   return {
-    h2: (props: ComponentProps<'h2'>) => <h2 className="mt-10 text-2xl font-bold" {...props} />,
-    h3: (props: ComponentProps<'h3'>) => <h3 className="mt-8 text-xl font-bold" {...props} />,
+    h2: (props: ComponentProps<'h2'>) => <h2 className="mt-10 text-3xl" {...props} />,
+    h3: (props: ComponentProps<'h3'>) => <h3 className="mt-8 text-2xl" {...props} />,
     p: (props: ComponentProps<'p'>) => <p className="mt-4" {...props} />,
     ul: (props: ComponentProps<'ul'>) => (
-      <ul className="mt-4 flex list-disc flex-col gap-2 ps-6 marker:text-brand-600" {...props} />
+      <ul className="mt-4 flex list-disc flex-col gap-2 ps-6 marker:text-brand" {...props} />
     ),
     ol: (props: ComponentProps<'ol'>) => (
-      <ol className="mt-4 flex list-decimal flex-col gap-2 ps-6 marker:text-brand-600" {...props} />
+      <ol className="mt-4 flex list-decimal flex-col gap-2 ps-6 marker:text-brand" {...props} />
     ),
     blockquote: (props: ComponentProps<'blockquote'>) => (
-      <blockquote className="mt-6 border-s-4 border-brand-100 ps-4 text-muted" {...props} />
+      <blockquote className="mt-6 border-s-4 border-brand-200 ps-4 text-muted" {...props} />
     ),
     hr: () => <hr className="my-10 border-line" />,
     a: ({ href = '', children }: ComponentProps<'a'>) => {
@@ -34,7 +30,7 @@ function components(locale: Locale): NonNullable<MDXRemoteProps['components']> {
         <a
           href={localizeHref(href, locale)}
           rel={external ? 'noopener noreferrer' : undefined}
-          className="font-semibold text-brand-700 underline underline-offset-4 hover:text-brand-600"
+          className="font-semibold text-brand-text underline underline-offset-4 hover:text-brand"
         >
           {children}
         </a>
@@ -44,14 +40,14 @@ function components(locale: Locale): NonNullable<MDXRemoteProps['components']> {
     pre: (props: ComponentProps<'pre'>) => (
       <pre
         dir="ltr"
-        className="mt-6 overflow-x-auto rounded-xl bg-ink p-4 text-start font-mono text-sm leading-7 text-white [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit"
+        className="mt-6 overflow-x-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm leading-7 text-ink [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit"
         {...props}
       />
     ),
     code: (props: ComponentProps<'code'>) => (
       <code
         dir="ltr"
-        className="rounded-md bg-line/60 px-1.5 py-0.5 font-mono text-[0.9em] text-ink"
+        className="rounded-md bg-sand-200 px-1.5 py-0.5 font-mono text-[0.9em] text-ink"
         {...props}
       />
     ),

@@ -24,6 +24,7 @@ export type Subject =
   | 'Waitlist'
   | 'Certificate'
   | 'Content'
+  | 'AppCrash'
   | 'Country'
   | 'Language';
 export type AdminAbility = MongoAbility<[Action, Subject | ReturnType<typeof subject>]>;

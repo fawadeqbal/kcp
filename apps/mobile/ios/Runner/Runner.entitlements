@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Push notifications (through Firebase and APNs) and Universal Links (lesson and
+  dashboard links on the website open the app). Xcode turns on the matching
+  capabilities for the App ID when you sign with your team (docs/mobile-release.md).
+  Change the domain when the website's address is final; aps-environment becomes
+  "production" in App Store builds on its own.
+-->
+<plist version="1.0">
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:app.kidscoding.example</string>
+	</array>
+</dict>
+</plist>

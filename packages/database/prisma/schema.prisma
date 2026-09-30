@@ -109,6 +109,9 @@ model User {
   refundsMade        Refund[]
   notifications      Notification[]
   certificates       Certificate[]
+  quizAttempts       QuizAttempt[]
+  practiceSessions   PracticeSession[]
+  deviceTokens       DeviceToken[]
 
   @@index([roleId])
   @@index([countryCode, regionId, cityId])
@@ -138,6 +141,9 @@ model StudentProfile {
   trialEndsAt         DateTime? @map("trial_ends_at")
   /// When the parent was told the trial ends soon (once per trial).
   trialReminderSentAt DateTime? @map("trial_reminder_sent_at")
+  /// Evening reminders on the child's phone when today's goal isn't met yet; the
+  /// parent can switch them off.
+  streakReminders     Boolean   @default(true) @map("streak_reminders")
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
 
@@ -223,7 +229,9 @@ model Session {
   expiresAt        DateTime  @map("expires_at")
   revokedAt        DateTime? @map("revoked_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Phones registered for push notifications while signed in with this session.
+  deviceTokens DeviceToken[]
 
   @@index([userId])
   @@map("sessions")
@@ -467,6 +475,7 @@ model Lesson {
   module       Module              @relation(fields: [moduleId], references: [id])
   translations LessonTranslation[]
   challenges   Challenge[]
+  quizzes      Quiz[]
   progress     LessonProgress[]
 
   @@index([moduleId, sortOrder])
@@ -523,6 +532,8 @@ model ChallengeTranslation {
   instructions String
   /// Hint texts by key, e.g. { "add_link": "Use the <a> tag…" }.
   hints        Json
+  /// What each check looks at, by check ID, e.g. { "has-link": "The page has a link" }.
+  checkLabels  Json   @default("{}") @map("check_labels")
 
   challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   language  Language  @relation(fields: [languageCode], references: [code])
@@ -661,6 +672,8 @@ model ProjectBriefTranslation {
   body         String
   /// Hint texts by key.
   hints        Json     @default("{}")
+  /// What each check looks at, by check ID.
+  checkLabels  Json     @default("{}") @map("check_labels")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   brief    ProjectBrief @relation(fields: [briefId], references: [id], onDelete: Cascade)
@@ -720,6 +733,10 @@ enum XpSource {
   CHALLENGE
   LESSON
   PROJECT
+  /// A quiz answered correctly the first time (Phase 1b).
+  QUIZ
+  /// Today's practice finished (source ID: the student's day, e.g. 2026-10-01).
+  PRACTICE
   /// Corrections by staff (Sprint 5), with a written reason in the audit log.
   ADMIN
 }
@@ -1246,4 +1263,123 @@ model Certificate {
 
   @@unique([userId, moduleId])
   @@map("certificates")
+}
+
+// ── Phase 1b: quizzes, practice, the mobile app ──────────────────────────────
+
+enum QuizKind {
+  /// Put the lines of code back in order.
+  ORDER
+  /// Tap the line with the mistake.
+  BUG
+  /// Pick what the code shows.
+  OUTPUT
+  /// A question about the lesson.
+  CHOICE
+}
+
+/// A short question that works on a phone (and on the lesson page). The server
+/// grades it: `answer` never leaves the API.
+model Quiz {
+  id           String   @id
+  lessonId     String   @map("lesson_id")
+  sortOrder    Int      @default(0) @map("sort_order")
+  kind         QuizKind
+  xp           Int      @default(5)
+  /// html, css, js or python: how `code` is shown.
+  codeLanguage String?  @map("code_language")
+  /// The lines of code (string[]). For ORDER quizzes, in the right order.
+  code         Json?
+  /// [{ id, code? }]: options shown as code; text options are in `texts`.
+  options      Json?
+  /// BUG: { line } (from 1); OUTPUT and CHOICE: { option }; ORDER: {} (the order of `code`).
+  answer       Json
+  /// Per language: { prompt, explanation, options: { <option id>: text } }.
+  texts        Json
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  lesson   Lesson        @relation(fields: [lessonId], references: [id])
+  attempts QuizAttempt[]
+
+  @@index([lessonId, sortOrder])
+  @@map("quizzes")
+}
+
+/// Every answer a student sends (right or wrong); the first right one earns the XP.
+model QuizAttempt {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  quizId    String   @map("quiz_id")
+  correct   Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id])
+
+  @@index([userId, quizId])
+  @@index([userId, createdAt])
+  @@map("quiz_attempts")
+}
+
+/// A student's daily practice: a few quizzes picked once per day (the student's own
+/// day). Finishing it earns PRACTICE XP, enough for the default daily goal.
+model PracticeSession {
+  userId      String    @map("user_id") @db.Uuid
+  day         DateTime  @db.Date
+  /// The quiz IDs picked for the day (string[]).
+  quizIds     Json      @map("quiz_ids")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, day])
+  @@map("practice_sessions")
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+}
+
+/// A phone that gets push notifications for a signed-in account. Pushes go only to
+/// accounts with a live session; the app removes its token when it signs out.
+model DeviceToken {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  userId       String         @map("user_id") @db.Uuid
+  /// The Firebase Cloud Messaging registration token.
+  token        String         @unique
+  platform     DevicePlatform
+  /// The app's language, for the notification texts.
+  languageCode String         @map("language_code")
+  /// The sign-in on that phone: notifications go only while it lasts (it follows
+  /// refresh-token rotation; signing out ends it).
+  sessionId    String?        @map("session_id") @db.Uuid
+  createdAt    DateTime       @default(now()) @map("created_at")
+  lastSeenAt   DateTime       @default(now()) @map("last_seen_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session Session? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@map("device_tokens")
+}
+
+/// A crash in the mobile app, sent by the app itself: no account, no device ID.
+/// Kept for 90 days.
+model AppCrash {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  appVersion String   @map("app_version")
+  platform   String
+  osVersion  String   @map("os_version")
+  fatal      Boolean
+  message    String
+  stack      String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("app_crashes")
 }

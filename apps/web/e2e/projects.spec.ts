@@ -237,7 +237,10 @@ test('leaderboards show a student only when their family allows it', async ({ pa
   await logInAsStudent(page, 'en', shown.username);
   // The badge for the project shipped (through the API) is celebrated once, on arrival.
   await celebrate(page, m, ['first-ship']);
-  await page.getByRole('link', { name: m.nav.leaderboard }).click();
+  await page
+    .getByRole('navigation', { name: m.nav.main })
+    .getByRole('link', { name: m.nav.leaderboard })
+    .click();
   await expect(page).toHaveURL(/\/en\/learn\/leaderboard$/);
   await expect(page.getByRole('tab', { name: m.leaderboard.global, selected: true })).toBeVisible();
   await expect(

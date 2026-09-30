@@ -23,6 +23,7 @@ import {
   pickTranslation,
   type Texts,
 } from './content.js';
+import { QuizService } from './quiz.service.js';
 import { confirmResults, isUnchanged } from './server-checks.js';
 import type {
   ChallengeDto,
@@ -62,6 +63,7 @@ export class LearningService {
     private readonly limiter: RateLimiterService,
     private readonly progress: ProgressService,
     private readonly entitlements: EntitlementsService,
+    private readonly quizzes: QuizService,
   ) {}
 
   /** Every active lesson in learning order: track, then module, then lesson. */
@@ -109,7 +111,12 @@ export class LearningService {
                 orderBy: { sortOrder: 'asc' },
                 include: {
                   translations: true,
-                  _count: { select: { challenges: { where: activeContent } } },
+                  _count: {
+                    select: {
+                      challenges: { where: activeContent },
+                      quizzes: { where: activeContent },
+                    },
+                  },
                 },
               },
               projectBrief: { include: { translations: true } },
@@ -156,6 +163,7 @@ export class LearningService {
             isPremium: lesson.isPremium,
             locked: locked(lesson.isPremium),
             challengeCount: lesson._count.challenges,
+            quizCount: lesson._count.quizzes,
             status,
           };
         }),
@@ -248,6 +256,10 @@ export class LearningService {
         starter,
         checks: challenge.checks as Record<string, unknown>[],
         hints: { ...(english?.hints as Texts), ...(translation?.hints as Texts) },
+        checkLabels: {
+          ...(english?.checkLabels as Texts),
+          ...(translation?.checkLabels as Texts),
+        },
         draft: draftBy.get(challenge.id) ?? null,
         passed: passed.has(challenge.id),
       };
@@ -274,6 +286,7 @@ export class LearningService {
       previousLessonId: position > 0 ? (order[position - 1] ?? null) : null,
       nextLessonId: position >= 0 ? (order[position + 1] ?? null) : null,
       challenges,
+      quizzes: await this.quizzes.forLesson(lesson.id, user, language),
     };
   }
 

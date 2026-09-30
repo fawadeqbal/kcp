@@ -29,7 +29,16 @@ test('an admin sets up two-factor, suspends a parent and finds it in the audit l
   await firstLogin(page, admin);
   await page.screenshot({ path: 'test-results/screens/overview.png', fullPage: true });
 
-  // Find the parent.
+  // Find the parent from the overview's search box: the list opens with the search
+  // applied, and the search stays out of the URL.
+  const find = page.getByLabel('Find a user');
+  await find.fill(parent.email);
+  await find.press('Enter');
+  await expect(page).toHaveURL(/\/users$/);
+  await expect(page.getByLabel('Search')).toHaveValue(parent.email);
+  await expect(page.getByRole('table').getByRole('link')).toHaveCount(1);
+
+  // And from the list's own filters.
   await page
     .getByRole('navigation', { name: 'Admin' })
     .getByRole('link', { name: 'Users' })
@@ -199,13 +208,16 @@ test('an admin runs the pilot: feedback, premium by hand and the five numbers', 
   await page.getByLabel('Country').selectOption('PK');
   await page.getByRole('button', { name: 'Apply' }).click();
   await expect(page).toHaveURL(/country=PK/);
+  // Shown with thousands separators ("1,290").
   const signUps = Number(
-    (await totals
-      .locator('div')
-      .filter({ hasText: 'New families' })
-      .locator('p')
-      .nth(1)
-      .textContent()) ?? '0',
+    (
+      (await totals
+        .locator('div')
+        .filter({ hasText: 'New families' })
+        .locator('p')
+        .nth(1)
+        .textContent()) ?? '0'
+    ).replaceAll(/\D/g, ''),
   );
   expect(signUps).toBeGreaterThanOrEqual(1);
   await page.getByRole('button', { name: 'Work out again' }).click();
@@ -374,6 +386,34 @@ test('an admin reads the waitlist and revokes a certificate', async ({ page, req
 
   const verified = await request.get(`${API_URL}/v1/public/certificates/${code}`);
   expect(((await verified.json()) as { valid: boolean }).valid).toBe(false);
+});
+
+test('an admin reads the mobile app’s crash reports', async ({ page, request }) => {
+  const admin = createStaff('admin');
+  const marker = `browser-${Math.random().toString(36).slice(2, 8)}`;
+  const crash = await request.post(`${API_URL}/v1/app/crashes`, {
+    data: {
+      appVersion: '1.0.0+7',
+      platform: 'ios',
+      osVersion: 'iOS 26.0',
+      fatal: true,
+      message: `RangeError ${marker}`,
+      stack: '#0 main (package:kcp_app/main.dart:1:1)',
+    },
+  });
+  expect(crash.status()).toBe(204);
+
+  await firstLogin(page, admin);
+  await page
+    .getByRole('navigation', { name: 'Admin' })
+    .getByRole('link', { name: 'App crashes' })
+    .click();
+  await expect(page.getByRole('heading', { name: 'App crashes', level: 1 })).toBeVisible();
+  const row = page.getByRole('row').filter({ hasText: marker });
+  await expect(row).toContainText('1.0.0+7');
+  await expect(row).toContainText('App closed');
+  await row.getByText('Stack trace').click();
+  await expect(row.getByText('#0 main (package:kcp_app/main.dart:1:1)')).toBeVisible();
 });
 
 test('an admin previews and publishes content, opens a country and switches a flag', async ({

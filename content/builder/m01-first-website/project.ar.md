@@ -10,6 +10,15 @@ hints:
   link: 'أضف رابطًا باستخدام <a href="https://…">…</a>.'
   background: 'في style.css أعطِ body لون خلفية background-color.'
   heading_colour: 'في style.css أضف قاعدة لـ h1 فيها color.'
+checks:
+  has-heading: 'في الصفحة عنوان'
+  has-paragraph: 'توجد فقرة عنك'
+  three-things: 'قائمة من 3 أشياء على الأقل'
+  has-picture: 'في الصفحة صورة'
+  picture-alt: 'لكل صورة نص بديل (alt)'
+  has-link: 'في الصفحة رابط'
+  page-background: 'للصفحة لون خلفية'
+  heading-colour: 'للعنوان لون'
 ---
 
 حان وقت بناء شيء خاص بك! اصنع صفحة ويب **عنك أنت**: الأشياء التي تحبها، وصورة، ورابط لموقع يعجبك. عندما تكتمل كل المتطلبات اضغط **انشر المشروع** — تنتقل صفحتك إلى **معرض أعمالك** حيث تستطيع عائلتك رؤيتها.

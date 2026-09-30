@@ -202,6 +202,7 @@ function BoardViewer({
                 : null}
             </p>
             <Table
+              bare
               caption="Board"
               columns={['Rank', 'Nickname', 'Username', 'XP']}
               empty={board.data.entries.length === 0}
@@ -212,7 +213,7 @@ function BoardViewer({
                   <Cell>
                     <Link
                       href={`/users/${entry.userId}`}
-                      className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+                      className="font-semibold text-brand-text underline-offset-4 hover:underline"
                     >
                       {entry.nickname}
                     </Link>
@@ -254,6 +255,7 @@ function Seasons({
         {seasons.error ? <Alert tone="error">{seasons.error}</Alert> : null}
         {seasons.data ? (
           <Table
+            bare
             caption="Seasons"
             columns={['Name', 'Dates', 'Status', '']}
             empty={seasons.data.seasons.length === 0}
@@ -448,7 +450,7 @@ function Results() {
               {results.data.boards.map((board) => (
                 <section
                   key={`${board.periodKey}|${board.scope}|${board.scopeId}`}
-                  className="rounded-xl border border-line p-4"
+                  className="rounded-row bg-raised p-4"
                 >
                   <h3 className="font-semibold">
                     {board.seasonName ?? board.periodKey} ·{' '}
@@ -461,7 +463,7 @@ function Results() {
                           {entry.rank}.{' '}
                           <Link
                             href={`/users/${entry.userId}`}
-                            className="text-brand-700 underline-offset-4 hover:underline"
+                            className="text-brand-text underline-offset-4 hover:underline"
                           >
                             {entry.nickname ?? 'Deleted student'}
                           </Link>

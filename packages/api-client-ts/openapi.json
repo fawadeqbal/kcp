@@ -62,6 +62,64 @@
         ]
       }
     },
+    "/v1/devices": {
+      "put": {
+        "operationId": "Devices_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Not signed in"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registers this phone, or refreshes it (the app calls it on every start).",
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/v1/devices/remove": {
+      "post": {
+        "operationId": "Devices_remove",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Stops notifications to this phone (on logout; works without a session).",
+        "tags": [
+          "devices"
+        ]
+      }
+    },
     "/v1/health/live": {
       "get": {
         "operationId": "Health_live",
@@ -3972,6 +4030,112 @@
         ]
       }
     },
+    "/v1/learning/quizzes/{id}/answers": {
+      "post": {
+        "operationId": "Quizzes_answer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lang",
+            "required": false,
+            "in": "query",
+            "description": "Language for titles and texts, e.g. \"ar\". Falls back to English for anything untranslated.",
+            "schema": {
+              "pattern": "^[a-z]{2}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizResultDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Signed in, but not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Grades an answer. The first right answer earns the quiz's XP.",
+        "tags": [
+          "learning"
+        ]
+      }
+    },
+    "/v1/learning/practice": {
+      "get": {
+        "operationId": "Quizzes_practice",
+        "parameters": [
+          {
+            "name": "lang",
+            "required": false,
+            "in": "query",
+            "description": "Language for titles and texts, e.g. \"ar\". Falls back to English for anything untranslated.",
+            "schema": {
+              "pattern": "^[a-z]{2}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Signed in, but not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Today's practice: a few quizzes from the lessons the student is on.",
+        "tags": [
+          "learning"
+        ]
+      }
+    },
     "/v1/feedback": {
       "post": {
         "operationId": "Feedback_create",
@@ -5248,6 +5412,98 @@
           "account"
         ]
       }
+    },
+    "/v1/app/crashes": {
+      "post": {
+        "operationId": "AppCrashes_report",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportCrashDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "The mobile app reports a crash (no sign-in needed: it may crash before anyone\nsigns in). Nothing in the report names the account or the phone.",
+        "tags": [
+          "app"
+        ]
+      }
+    },
+    "/v1/admin/app-crashes": {
+      "get": {
+        "operationId": "AppCrashes_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          },
+          {
+            "name": "platform",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "android",
+                "ios"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppCrashListDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Signed in, but not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crash reports, newest first (staff).",
+        "tags": [
+          "app"
+        ]
+      }
     }
   },
   "info": {
@@ -5332,6 +5588,47 @@
             "description": "Marks every notification read."
           }
         }
+      },
+      "RegisterDeviceDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The phone's Firebase Cloud Messaging token."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "description": "The app's language (en, ar or ur): notifications are written in it.",
+            "enum": [
+              "en",
+              "ar",
+              "ur"
+            ]
+          }
+        },
+        "required": [
+          "token",
+          "platform",
+          "language"
+        ]
+      },
+      "RemoveDeviceDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
       },
       "LivenessResponseDto": {
         "type": "object",
@@ -5503,10 +5800,11 @@
           },
           "app": {
             "type": "string",
-            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it.",
+            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it. The mobile app is for students and\nparents only, and always gets its refresh token in the body.",
             "enum": [
               "web",
-              "admin"
+              "admin",
+              "mobile"
             ]
           }
         },
@@ -5685,10 +5983,11 @@
           },
           "app": {
             "type": "string",
-            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it.",
+            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it. The mobile app is for students and\nparents only, and always gets its refresh token in the body.",
             "enum": [
               "web",
-              "admin"
+              "admin",
+              "mobile"
             ]
           }
         },
@@ -5751,10 +6050,11 @@
           },
           "app": {
             "type": "string",
-            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it.",
+            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it. The mobile app is for students and\nparents only, and always gets its refresh token in the body.",
             "enum": [
               "web",
-              "admin"
+              "admin",
+              "mobile"
             ]
           }
         },
@@ -5781,10 +6081,11 @@
             "type": "string"
           },
           "app": {
-            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it.",
+            "description": "Which app is signing in. The admin panel keeps its own refresh cookie, so a\nstaff session and a parent session in the same browser never overwrite each\nother, and only staff can sign in to it. The mobile app is for students and\nparents only, and always gets its refresh token in the body.",
             "enum": [
               "web",
-              "admin"
+              "admin",
+              "mobile"
             ],
             "type": "string"
           }
@@ -6995,6 +7296,10 @@
           "badges": {
             "type": "number",
             "description": "Badges earned."
+          },
+          "streakReminders": {
+            "type": "boolean",
+            "description": "Evening reminders in the mobile app when the streak is about to end."
           }
         },
         "required": [
@@ -7018,7 +7323,8 @@
           "xpTotal",
           "level",
           "streak",
-          "badges"
+          "badges",
+          "streakReminders"
         ]
       },
       "ChildRulesDto": {
@@ -7161,6 +7467,10 @@
           "cityId": {
             "type": "string",
             "format": "uuid"
+          },
+          "streakReminders": {
+            "type": "boolean",
+            "description": "Evening reminders on the child's phone when their streak is about to end."
           }
         }
       },
@@ -7387,6 +7697,13 @@
             },
             "description": "Hint texts by key, in the requested language with English filling gaps."
           },
+          "checkLabels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "What each check looks at, by check ID, in the requested language (English fills gaps)."
+          },
           "draft": {
             "nullable": true,
             "description": "The student's saved code, if any.",
@@ -7429,6 +7746,7 @@
           "starter",
           "checks",
           "hints",
+          "checkLabels",
           "draft",
           "status",
           "shippedAt",
@@ -8942,6 +9260,10 @@
           "challengeCount": {
             "type": "number"
           },
+          "quizCount": {
+            "type": "number",
+            "description": "Quizzes the lesson has (short questions that work on a phone)."
+          },
           "status": {
             "type": "string",
             "description": "Always NOT_STARTED for accounts that aren't students.",
@@ -8960,6 +9282,7 @@
           "isPremium",
           "locked",
           "challengeCount",
+          "quizCount",
           "status"
         ]
       },
@@ -9203,6 +9526,13 @@
             },
             "description": "Hint texts by key, in the requested language with English filling gaps."
           },
+          "checkLabels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "What each check looks at, by check ID (\"The heading has a colour\"), in the\nrequested language with English filling gaps: the checklist beside the editor."
+          },
           "draft": {
             "nullable": true,
             "description": "The student's saved code, if any.",
@@ -9228,8 +9558,107 @@
           "starter",
           "checks",
           "hints",
+          "checkLabels",
           "draft",
           "passed"
+        ]
+      },
+      "QuizLineDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ]
+      },
+      "QuizOptionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true,
+            "description": "Text in the student's language, or null when the option is code."
+          },
+          "code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Code, shown as it is in every language, or null for a text option."
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "code"
+        ]
+      },
+      "QuizDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "lessonId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "description": "ORDER: put `lines` in order and send their IDs back. BUG: tap the line with the\nmistake (send its number). OUTPUT: pick what the code shows. CHOICE: pick the\nright answer.",
+            "enum": [
+              "BUG",
+              "ORDER",
+              "OUTPUT",
+              "CHOICE"
+            ]
+          },
+          "xp": {
+            "type": "number"
+          },
+          "codeLanguage": {
+            "type": "string",
+            "nullable": true,
+            "description": "html, css, js or python: how to colour the code."
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "lines": {
+            "description": "ORDER: the lines, shuffled. BUG, OUTPUT and CHOICE: the code as it is (the ID\nis the line number). Empty when the quiz has no code.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizLineDto"
+            }
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizOptionDto"
+            }
+          },
+          "solved": {
+            "type": "boolean",
+            "description": "The student has answered it correctly before."
+          }
+        },
+        "required": [
+          "id",
+          "lessonId",
+          "kind",
+          "xp",
+          "codeLanguage",
+          "prompt",
+          "lines",
+          "options",
+          "solved"
         ]
       },
       "LessonDto": {
@@ -9304,6 +9733,13 @@
             "items": {
               "$ref": "#/components/schemas/ChallengeDto"
             }
+          },
+          "quizzes": {
+            "description": "Short questions about the lesson (graded by the server).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizDto"
+            }
           }
         },
         "required": [
@@ -9323,7 +9759,8 @@
           "status",
           "previousLessonId",
           "nextLessonId",
-          "challenges"
+          "challenges",
+          "quizzes"
         ]
       },
       "LessonProgressDto": {
@@ -9418,6 +9855,238 @@
           "xpAwarded",
           "dailyCapReached",
           "badgesEarned"
+        ]
+      },
+      "QuizAnswerDto": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "description": "ORDER: the line IDs in the student's order.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{12}$"
+            }
+          },
+          "line": {
+            "type": "number",
+            "description": "BUG: the number of the line with the mistake, from 1.",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "option": {
+            "type": "string",
+            "description": "OUTPUT and CHOICE: the chosen option's ID.",
+            "pattern": "^[a-z0-9]{1,8}$"
+          }
+        }
+      },
+      "QuizRevealDto": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "line": {
+            "type": "number",
+            "nullable": true
+          },
+          "option": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "order",
+          "line",
+          "option"
+        ]
+      },
+      "PracticeProgressDto": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string",
+            "description": "The student's day, e.g. \"2026-10-01\"."
+          },
+          "total": {
+            "type": "number"
+          },
+          "answered": {
+            "type": "number"
+          },
+          "done": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "day",
+          "total",
+          "answered",
+          "done"
+        ]
+      },
+      "QuizResultDto": {
+        "type": "object",
+        "properties": {
+          "correct": {
+            "type": "boolean"
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why the answer is right: shown once the quiz is answered correctly or revealed."
+          },
+          "reveal": {
+            "nullable": true,
+            "description": "After a few wrong tries, the right answer, so the student can learn from it.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/QuizRevealDto"
+              }
+            ]
+          },
+          "xpAwarded": {
+            "type": "number",
+            "description": "XP this answer earned: the quiz's on the first right answer (none once the\nanswer has been shown), and today's practice when this answer finished it."
+          },
+          "dailyCapReached": {
+            "type": "boolean"
+          },
+          "badgesEarned": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "practice": {
+            "nullable": true,
+            "description": "When the quiz is part of today's practice: how far along it is.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PracticeProgressDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "correct",
+          "explanation",
+          "reveal",
+          "xpAwarded",
+          "dailyCapReached",
+          "badgesEarned",
+          "practice"
+        ]
+      },
+      "PracticeQuizDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "lessonId": {
+            "type": "string"
+          },
+          "kind": {
+            "description": "ORDER: put `lines` in order and send their IDs back. BUG: tap the line with the\nmistake (send its number). OUTPUT: pick what the code shows. CHOICE: pick the\nright answer.",
+            "enum": [
+              "BUG",
+              "ORDER",
+              "OUTPUT",
+              "CHOICE"
+            ],
+            "type": "string"
+          },
+          "xp": {
+            "type": "number"
+          },
+          "codeLanguage": {
+            "type": "string",
+            "nullable": true,
+            "description": "html, css, js or python: how to colour the code."
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "lines": {
+            "description": "ORDER: the lines, shuffled. BUG, OUTPUT and CHOICE: the code as it is (the ID\nis the line number). Empty when the quiz has no code.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizLineDto"
+            }
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizOptionDto"
+            }
+          },
+          "solved": {
+            "type": "boolean",
+            "description": "The student has answered it correctly before."
+          },
+          "lessonTitle": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "lessonId",
+          "kind",
+          "xp",
+          "codeLanguage",
+          "prompt",
+          "lines",
+          "options",
+          "solved",
+          "lessonTitle"
+        ]
+      },
+      "PracticeDto": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          },
+          "xp": {
+            "type": "number",
+            "description": "XP for finishing today's practice."
+          },
+          "total": {
+            "type": "number"
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "answeredQuizIds": {
+            "description": "Quizzes of today's practice already answered correctly today.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "quizzes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PracticeQuizDto"
+            }
+          }
+        },
+        "required": [
+          "day",
+          "xp",
+          "total",
+          "done",
+          "answeredQuizIds",
+          "quizzes"
         ]
       },
       "CreateFeedbackDto": {
@@ -10602,6 +11271,141 @@
         },
         "required": [
           "password"
+        ]
+      },
+      "ReportCrashDto": {
+        "type": "object",
+        "properties": {
+          "appVersion": {
+            "type": "string",
+            "description": "e.g. \"1.0.0+12\".",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "osVersion": {
+            "type": "string",
+            "description": "e.g. \"Android 15 (API 35)\".",
+            "maxLength": 64
+          },
+          "fatal": {
+            "type": "boolean",
+            "description": "The app had to stop (not just an error it recovered from)."
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "stack": {
+            "type": "string",
+            "description": "The stack trace; longer ones are cut.",
+            "maxLength": 16000
+          }
+        },
+        "required": [
+          "appVersion",
+          "platform",
+          "osVersion",
+          "fatal",
+          "message",
+          "stack"
+        ]
+      },
+      "AppCrashDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "appVersion": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "osVersion": {
+            "type": "string"
+          },
+          "fatal": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "stack": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "appVersion",
+          "platform",
+          "osVersion",
+          "fatal",
+          "message",
+          "stack",
+          "createdAt"
+        ]
+      },
+      "AppCrashVersionDto": {
+        "type": "object",
+        "properties": {
+          "appVersion": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number",
+            "description": "Reports in the last 7 days."
+          }
+        },
+        "required": [
+          "appVersion",
+          "count"
+        ]
+      },
+      "AppCrashListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppCrashDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "lastWeek": {
+            "description": "Reports per app version over the last 7 days, most first.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppCrashVersionDto"
+            }
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize",
+          "lastWeek"
         ]
       }
     }

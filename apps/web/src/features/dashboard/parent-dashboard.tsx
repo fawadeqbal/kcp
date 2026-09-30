@@ -2,7 +2,17 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Alert, buttonClass, Card, EmptyState, PageSpinner, Switch } from '@/components/ui';
+import { MAX_CHILDREN_PER_PARENT } from '@kcp/shared';
+import {
+  Alert,
+  buttonClass,
+  EmptyState,
+  Icon,
+  IconBubble,
+  PageSpinner,
+  SectionHeading,
+  Switch,
+} from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
@@ -34,32 +44,59 @@ export function ParentDashboard() {
   };
 
   const addChild = (
-    <Link href="/children/new" className={buttonClass('primary')}>
+    <Link href="/children/new" className={buttonClass('primary', 'lg')}>
+      <Icon name="userPlus" />
       {t('addChild')}
     </Link>
   );
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8">
-      <section>
-        <h1 className="text-3xl font-bold">{t('greeting', { name: user.displayName ?? '' })}</h1>
-        <p className="mt-2 max-w-2xl text-muted">{t('subtitle')}</p>
+    <div className="mx-auto flex max-w-300 flex-col gap-7">
+      <section className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+        <div>
+          <h1 className="text-4xl sm:text-[2.75rem]">
+            {t('greeting', { name: user.displayName ?? '' })}
+          </h1>
+          <p className="mt-1.5 max-w-xl text-lg text-muted">{t('subtitle')}</p>
+        </div>
+        {children?.length ? addChild : null}
       </section>
 
-      <section aria-labelledby="children-heading" className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="children-heading" className="text-2xl font-bold">
-            {t('childrenTitle')}
-          </h2>
-          {children?.length ? addChild : null}
-        </div>
-        {notice ? <Alert tone="success">{notice}</Alert> : null}
+      {notice ? (
+        <p
+          role="status"
+          className="flex items-center gap-3 self-start rounded-row bg-sage-100 px-5 py-3.5 text-sm font-semibold text-sage-800 sm:rounded-full"
+        >
+          <Icon name="check" className="text-base" />
+          {notice}
+        </p>
+      ) : null}
+
+      <section aria-labelledby="children-heading" className="flex flex-col gap-4.5">
+        <SectionHeading
+          id="children-heading"
+          detail={
+            children?.length
+              ? t('childrenCount', {
+                  count: String(children.length),
+                  max: String(MAX_CHILDREN_PER_PARENT),
+                })
+              : undefined
+          }
+        >
+          {t('childrenTitle')}
+        </SectionHeading>
         {failed ? (
           <Alert tone="error">{t('loadFailed')}</Alert>
         ) : children === null ? (
           <PageSpinner />
         ) : children.length === 0 ? (
-          <EmptyState title={t('emptyTitle')} body={t('emptyBody')} action={addChild} />
+          <EmptyState
+            icon="userPlus"
+            title={t('emptyTitle')}
+            body={t('emptyBody')}
+            action={addChild}
+          />
         ) : (
           <div className="flex flex-col gap-4">
             {children.map((child) => (
@@ -69,29 +106,39 @@ export function ParentDashboard() {
         )}
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card title={t('billingTitle')}>
-          <p className="text-muted">{t('billingBody')}</p>
+      <div className="mt-2 grid gap-4.5 md:grid-cols-3">
+        <section className="flex flex-col gap-2.5 rounded-card bg-brand-100 p-6.5">
+          <IconBubble icon="card" tone="solid" />
+          <h2 className="mt-1 text-xl">{t('billingTitle')}</h2>
+          <p className="text-sm text-brand-800">{t('billingBody')}</p>
           <Link
             href="/billing"
-            className="mt-3 inline-block font-semibold text-brand-700 underline underline-offset-4"
+            className="mt-auto flex items-center gap-1.5 self-start rounded-full py-1 text-sm font-bold text-brand-text hover:underline"
           >
             {t('billingLink')}
+            <Icon name="arrow" />
           </Link>
-        </Card>
-        <Card title={t('safetyTitle')}>
-          <p className="text-muted">{t('safetyBody')}</p>
-        </Card>
-        <Card title={t('accountTitle')}>
-          <p className="text-muted">{t('accountEmail', { email: isolate(user.email ?? '') })}</p>
+        </section>
+        <section className="flex flex-col gap-2.5 rounded-card bg-sage-100 p-6.5">
+          <IconBubble icon="shield" tone="sageSolid" />
+          <h2 className="mt-1 text-xl">{t('safetyTitle')}</h2>
+          <p className="text-sm text-sage-800">{t('safetyBody')}</p>
+        </section>
+        <section className="flex flex-col gap-2.5 rounded-card bg-surface p-6.5">
+          <IconBubble icon="user" tone="neutral" />
+          <h2 className="mt-1 text-xl">{t('accountTitle')}</h2>
+          <p className="text-sm text-muted">
+            {t('accountEmail', { email: isolate(user.email ?? '') })}
+          </p>
+          <MonthlySummarySwitch />
           <Link
             href="/account"
-            className="mt-3 inline-block font-semibold text-brand-700 underline underline-offset-4"
+            className="flex items-center gap-1.5 self-start rounded-full py-1 text-sm font-bold text-brand-text hover:underline"
           >
             {t('accountSettings')}
+            <Icon name="arrow" />
           </Link>
-          <MonthlySummarySwitch />
-        </Card>
+        </section>
       </div>
     </div>
   );
@@ -112,7 +159,7 @@ function MonthlySummarySwitch() {
 
   if (on === null) return null;
   return (
-    <div className="mt-4 flex flex-col gap-1">
+    <div className="flex flex-col gap-1 rounded-row bg-raised px-4 py-3">
       <Switch
         label={t('monthlySummary')}
         checked={on}

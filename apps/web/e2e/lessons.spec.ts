@@ -91,6 +91,9 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
         page.getByText(fill(m.lesson.lessonOf, { number: lessonIndex + 1, total: MODULE.length })),
       ).toBeVisible();
 
+      // A new lesson opens on its introduction; "Let's try it" starts the steps.
+      await screen.press(page.getByRole('button', { name: m.lesson.startSteps }));
+
       for (const [step, challenge] of lesson.challenges.entries()) {
         const hints = { ...challenge.hints['en'], ...challenge.hints[locale] };
         if (step > 0) {

@@ -424,16 +424,41 @@ export function renderMail(
         .map((line) => `<li style="margin:0 0 6px;">${escapeHtml(line)}</li>`)
         .join('')}</ul>`
     : '';
+  // The Organic design system in an email: a cream page, a soft card, a terracotta pill
+  // button. Only the fonts every phone has (no web fonts: they would let the font's
+  // server see who opened the email), and a dark version where the mail app allows.
+  const display = `Georgia,'Times New Roman',serif`;
   const html = `<!doctype html>
 <html lang="${language}" dir="${copy.dir}">
-<body style="margin:0;padding:24px;background:#f5f5f7;font-family:Arial,Tahoma,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:12px;padding:32px;text-align:${align};color:#1d1d1f;line-height:1.6;">
-    <p style="font-size:16px;margin:0 0 16px;">${escapeHtml(greeting)}</p>
-    <p style="font-size:16px;margin:0 0 24px;">${escapeHtml(intro)}</p>
-    ${list}
-    <p style="margin:0 0 24px;"><a href="${escapeHtml(params.actionUrl)}" style="display:inline-block;background:#4f46e5;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold;">${escapeHtml(t.button)}</a></p>
-    <p style="font-size:14px;color:#6e6e73;margin:0 0 24px;">${escapeHtml(outro)}</p>
-    <p style="font-size:14px;margin:0;">${escapeHtml(copy.signOff)}</p>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<style>
+  @media (prefers-color-scheme: dark) {
+    .kcp-page { background:#1a1815 !important; }
+    .kcp-card { background:#25221e !important; color:#f2e8d8 !important; }
+    .kcp-muted { color:#b9ae9c !important; }
+    .kcp-title { color:#f2e8d8 !important; }
+    .kcp-button { background:#e08d55 !important; color:#1a1815 !important; }
+  }
+</style>
+</head>
+<body class="kcp-page" style="margin:0;padding:24px 12px;background:#f5ead8;font-family:'Helvetica Neue',Arial,Tahoma,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;">
+    <p style="margin:0 0 16px;padding:0 8px;font-family:${display};font-size:20px;font-weight:bold;color:#201e1d;text-align:${align};" class="kcp-title">
+      <span style="display:inline-block;width:32px;height:32px;line-height:32px;border-radius:16px;background:#c67139;color:#fffaf3;text-align:center;font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;vertical-align:middle;">&lt;&gt;</span>
+      <span style="vertical-align:middle;">&nbsp;${escapeHtml(BRAND_NAME)}</span>
+    </p>
+    <div class="kcp-card" style="background:#f9f4ed;border-radius:28px;padding:32px;text-align:${align};color:#201e1d;line-height:1.6;">
+      <p style="font-family:${display};font-size:22px;font-weight:bold;margin:0 0 16px;">${escapeHtml(greeting)}</p>
+      <p style="font-size:16px;margin:0 0 24px;">${escapeHtml(intro)}</p>
+      ${list}
+      <p style="margin:0 0 24px;"><a class="kcp-button" href="${escapeHtml(params.actionUrl)}" style="display:inline-block;background:#a05626;color:#fffaf3;text-decoration:none;padding:14px 26px;border-radius:999px;font-family:${display};font-size:16px;font-weight:bold;">${escapeHtml(t.button)}</a></p>
+      <p class="kcp-muted" style="font-size:14px;color:#645c50;margin:0 0 24px;">${escapeHtml(outro)}</p>
+      <p style="font-size:14px;margin:0;">${escapeHtml(copy.signOff)}</p>
+    </div>
   </div>
 </body>
 </html>`;

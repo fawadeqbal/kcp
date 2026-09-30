@@ -1,0 +1,6 @@
+# Generated code: analysed by the generator, not by our lint rules.
+analyzer:
+  errors:
+    unused_import: ignore
+    unused_element: ignore
+    deprecated_member_use_from_same_package: ignore

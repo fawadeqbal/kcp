@@ -1,0 +1,29 @@
+id: builder-m01-l01-q3
+order: 3
+kind: choice
+xp: 5
+prompt:
+  en: What does the browser do with an HTML tag like <h1>?
+  ar: ماذا يفعل المتصفح بوسم HTML مثل <h1>؟
+  ur: براؤزر ‎<h1>‎ جیسے HTML ٹیگ کے ساتھ کیا کرتا ہے؟
+options:
+  - id: a
+    text:
+      en: It shows the tag on the page, angle brackets and all.
+      ar: يعرض الوسم على الصفحة كما هو، مع الأقواس.
+      ur: ٹیگ کو صفحے پر ویسے ہی دکھاتا ہے، بریکٹس سمیت۔
+  - id: b
+    text:
+      en: It uses the tag to decide how the text looks, and hides the tag.
+      ar: يستخدم الوسم ليقرّر شكل النص، ولا يعرض الوسم نفسه.
+      ur: ٹیگ سے طے کرتا ہے کہ متن کیسا دکھے، اور ٹیگ خود نہیں دکھاتا۔
+  - id: c
+    text:
+      en: It deletes the text inside the tag.
+      ar: يحذف النص الموجود داخل الوسم.
+      ur: ٹیگ کے اندر والا متن مٹا دیتا ہے۔
+answer: b
+explanation:
+  en: Tags are instructions for the browser. People see the text, not the tags.
+  ar: الوسوم تعليمات للمتصفح. يرى الناس النص، لا الوسوم.
+  ur: ٹیگ براؤزر کے لیے ہدایات ہیں۔ لوگ متن دیکھتے ہیں، ٹیگ نہیں۔

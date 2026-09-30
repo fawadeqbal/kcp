@@ -1,0 +1,26 @@
+id: builder-m02-l01-q3
+order: 3
+kind: output
+xp: 5
+language: python
+prompt:
+  en: What does this program print?
+  ar: ماذا يطبع هذا البرنامج؟
+  ur: یہ پروگرام کیا دکھائے گا؟
+code:
+  - '# print("Hello!")'
+  - 'print("My age is", 13)'
+options:
+  - id: a
+    code: |-
+      Hello!
+      My age is 13
+  - id: b
+    code: 'My age is, 13'
+  - id: c
+    code: 'My age is 13'
+answer: c
+explanation:
+  en: 'Python skips the first line, because a line that starts with # is a comment. The comma in print() is not shown: Python puts a space between the two things.'
+  ar: 'يتجاهل بايثون السطر الأول، لأن السطر الذي يبدأ بـ ‎#‎ تعليق. والفاصلة داخل ‎print()‎ لا تظهر، بل يضع بايثون مسافة بين الشيئين.'
+  ur: 'پائتھن پہلی سطر چھوڑ دیتا ہے، کیونکہ جو سطر ‎#‎ سے شروع ہو وہ کمنٹ ہے۔ ‎print()‎ کے اندر والا کوما نظر نہیں آتا، بلکہ پائتھن دونوں چیزوں کے درمیان اسپیس لگا دیتا ہے۔'

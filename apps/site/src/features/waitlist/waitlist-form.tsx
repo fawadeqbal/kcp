@@ -56,7 +56,7 @@ export function WaitlistForm() {
 
   if (sentTo) {
     return (
-      <div ref={success} tabIndex={-1} className="rounded-xl">
+      <div ref={success} tabIndex={-1} className="rounded-row">
         <Alert tone="success">
           <p className="text-lg font-bold">{t('successTitle')}</p>
           <p className="mt-1 text-ink">{t('success', { email: isolate(sentTo) })}</p>
@@ -100,14 +100,14 @@ export function WaitlistForm() {
           {AGE_BANDS.map((band) => (
             <label
               key={band}
-              className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-line bg-surface px-4 py-2 has-checked:border-brand-500 has-checked:bg-brand-50"
+              className="flex min-h-11 cursor-pointer items-center gap-3 rounded-row bg-surface px-4 py-2 has-checked:border-brand has-checked:bg-brand-100"
             >
               <input
                 type="radio"
                 name="ageBand"
                 value={band}
                 aria-invalid={errors.ageBand ? true : undefined}
-                className="size-5 shrink-0 accent-brand-600"
+                className="size-5 shrink-0 accent-primary"
               />
               {t(AGE_LABELS[band])}
             </label>

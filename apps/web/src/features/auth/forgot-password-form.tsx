@@ -66,7 +66,7 @@ export function ForgotPasswordForm() {
       )}
       <Link
         href="/login"
-        className="text-center font-semibold text-brand-700 underline-offset-4 hover:underline"
+        className="text-center font-semibold text-brand-text underline-offset-4 hover:underline"
       >
         {t('auth.forgot.backToLogin')}
       </Link>

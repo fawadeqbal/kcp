@@ -42,6 +42,10 @@ const EXPECTED_PUBLIC_ROUTES = [
   'POST /waitlist/confirm',
   // Anyone can check a certificate by the code printed on it.
   'GET /public/certificates/:code',
+  // The mobile app: crash reports (it may crash before anyone signs in), and turning
+  // off notifications to a phone at logout (the push token itself is the proof).
+  'POST /app/crashes',
+  'POST /devices/remove',
 ].toSorted();
 
 interface Route {

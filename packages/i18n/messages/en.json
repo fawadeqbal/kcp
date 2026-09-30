@@ -21,7 +21,9 @@
     "privacy": "Privacy",
     "footer": "More information",
     "badges": "Badges",
-    "billing": "Plans and billing"
+    "billing": "Plans and billing",
+    "main": "Main",
+    "studentMenu": "Menu of {nickname}"
   },
   "home": {
     "title": "Learn to code, build real things, get rewarded",
@@ -77,7 +79,9 @@
       "createAccount": "Create a parent account",
       "staffNote": "Staff accounts sign in through the admin panel.",
       "resendLink": "Send the confirmation link again",
-      "studentLink": "Student? Log in with your username"
+      "subtitle": "Parents and guardians.",
+      "studentTitle": "I’m a student",
+      "studentBody": "Log in with your username"
     },
     "forgot": {
       "title": "Reset your password",
@@ -104,6 +108,11 @@
       "parentLink": "Parent or guardian? Log in here",
       "someoneSignedIn": "{name} is signed in on this device. Log out so your child can log in.",
       "logOutFirst": "Log out"
+    },
+    "panel": {
+      "parents": "Parents create and approve every child account",
+      "languages": "Lessons in English, Arabic and Urdu",
+      "build": "Every module ends with something real"
     }
   },
   "learn": {
@@ -111,7 +120,7 @@
     "greeting": "Hi {nickname}!",
     "subtitle": "Welcome to your learning space.",
     "usernameTitle": "Your username",
-    "usernameBody": "You log in with {username}. Keep your password secret.",
+    "usernameBody": "You log in with <b>{username}</b>. Keep your password secret.",
     "safetyTitle": "Stay safe",
     "safetyBody": "Others only ever see your nickname and avatar. Never share your real name, your school or your password.",
     "continueTitle": "Pick up where you left off",
@@ -129,7 +138,9 @@
     "lockedLessonTitle": "This lesson is part of premium",
     "lockedProjectTitle": "This project is part of premium",
     "lockedBody": "Ask your parent to choose a plan on their dashboard. Your free lessons are still open, and everything you made stays yours.",
-    "lockedBack": "Back to my lessons"
+    "lockedBack": "Back to my lessons",
+    "moduleNumber": "Module {number}",
+    "trackDetail": "Modules: {modules} · Lessons: {lessons} · Projects: {projects}"
   },
   "lesson": {
     "title": "Lesson",
@@ -204,7 +215,33 @@
       "ZeroDivisionError": "You can’t divide by zero.",
       "IndexError": "The list doesn’t have that many items. Positions start at 0.",
       "KeyError": "The dictionary doesn’t have that key. Check the spelling."
-    }
+    },
+    "quiz": {
+      "title": "Check yourself",
+      "intro": "Quick questions about this lesson. They come back in the app's daily practice.",
+      "questionOf": "Question {number} of {total}",
+      "solved": "Answered",
+      "orderHelp": "Put the lines in the right order with the arrow buttons.",
+      "bugHelp": "Pick the line with the mistake.",
+      "outputHelp": "What does this code show?",
+      "choiceHelp": "Pick one answer.",
+      "moveUp": "Move line {number} up",
+      "moveDown": "Move line {number} down",
+      "moved": "Moved to place {position}.",
+      "line": "Line {number}",
+      "check": "Check my answer",
+      "checking": "Checking…",
+      "correct": "Correct!",
+      "correctXp": "Correct! +{xp} XP",
+      "wrong": "Not quite. Have another go.",
+      "revealed": "Here is the right answer:",
+      "failed": "We couldn't check your answer. Try again in a moment."
+    },
+    "intro": "Watch and read",
+    "steps": "Parts of this lesson",
+    "startSteps": "Let’s try it",
+    "checks": "Checks",
+    "consoleEmpty": "Nothing here yet. console.log() in your JavaScript writes here."
   },
   "dashboard": {
     "greeting": "Welcome, {name}",
@@ -268,7 +305,12 @@
     "billingLink": "See plans and invoices",
     "monthlySummary": "Monthly progress email",
     "monthlySummaryHint": "Once a month: lessons, XP and projects of each child.",
-    "accountSettings": "Password, your data and your account"
+    "accountSettings": "Password, your data and your account",
+    "remindersTitle": "Phone reminders",
+    "streakReminders": "Streak reminder",
+    "streakRemindersBody": "If {nickname} uses our mobile app: one reminder at 6 pm on days their streak is about to end. Nothing else is sent to their phone.",
+    "accountPanel": "Account",
+    "childrenCount": "{count} of {max}"
   },
   "addChild": {
     "title": "Add a child",

@@ -1,0 +1,24 @@
+id: builder-m02-l02-q1
+order: 1
+kind: output
+xp: 5
+language: python
+prompt:
+  en: What does this program print?
+  ar: ماذا يطبع هذا البرنامج؟
+  ur: یہ پروگرام کیا دکھائے گا؟
+code:
+  - 'nickname = "Rocket"'
+  - 'print("Hello, " + nickname + "!")'
+options:
+  - id: a
+    code: 'Hello, Rocket!'
+  - id: b
+    code: 'Hello, nickname!'
+  - id: c
+    code: 'Hello, "Rocket"!'
+answer: a
+explanation:
+  en: The variable nickname holds Rocket, so Python uses that value. The + joins the strings together, and the quote marks are not shown.
+  ar: المتغيّر nickname يحمل القيمة Rocket، لذلك يستخدم بايثون هذه القيمة. علامة ‎+‎ تصل السلاسل النصية ببعضها، وعلامات التنصيص لا تظهر.
+  ur: ویری ایبل nickname میں Rocket رکھا ہے، اس لیے پائتھن یہی ویلیو استعمال کرتا ہے۔ ‎+‎ کا نشان اسٹرنگز کو جوڑتا ہے، اور کوٹیشن مارکس نظر نہیں آتے۔

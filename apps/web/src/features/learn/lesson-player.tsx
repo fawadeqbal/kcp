@@ -5,19 +5,33 @@ import type { CodeFiles } from '@kcp/checks';
 import { directionOf, isLocale } from '@kcp/i18n';
 import { clsx } from 'clsx';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Badge, Button, buttonClass, Card, PageSpinner } from '@/components/ui';
+import { type ReactNode, type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Alert,
+  Badge,
+  Button,
+  buttonClass,
+  Icon,
+  type IconName,
+  PageSpinner,
+} from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { ChallengeWorkspace } from './challenge-workspace';
+import { LessonQuizzes } from './lesson-quizzes';
 import { Markdown } from './markdown';
 import { PremiumLocked } from './premium-locked';
 import { onTabKeyDown } from './tabs';
+import { type SaveState, useSaveText } from './workspace';
+import { useStreak, WorkspaceHeader } from './workspace-header';
 
 type Lesson = components['schemas']['LessonDto'];
 type Video = components['schemas']['VideoDto'];
 type SubmissionResult = components['schemas']['SubmissionResultDto'];
+
+/** Where the student is in a lesson: the intro, a "try it" step, or the quick questions. */
+type View = 'intro' | 'quiz' | number;
 
 /** Videos are streamed from YouTube (privacy-enhanced mode) or Cloudflare Stream. */
 function videoUrl(video: Video): string | null {
@@ -34,8 +48,10 @@ function languageProps(language: string, locale: string) {
 }
 
 /**
- * A lesson: a short video, an explainer, then "try it" steps with a code editor.
- * The lesson counts as done once every step's checks have passed.
+ * A lesson, as a full-screen workspace: a short video and explainer, then "try it"
+ * steps (instructions, code editor, live preview), then a few quick questions. The
+ * stepper at the top moves between them. The lesson counts as done once every step's
+ * checks have passed (the questions are extra practice).
  */
 export function LessonPlayer({ lessonId }: { lessonId: string }) {
   const t = useTranslations('lesson');
@@ -44,13 +60,16 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
   const signedIn = user !== null;
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [failure, setFailure] = useState<'notFound' | 'loadFailed' | 'premium' | null>(null);
-  const [step, setStep] = useState(0);
+  const [view, setView] = useState<View>('intro');
   const [passed, setPassed] = useState<ReadonlySet<string>>(new Set());
   const [completed, setCompleted] = useState<{
     nextLessonId: string | null;
     justNow: boolean;
   } | null>(null);
   const [focusStepTitle, setFocusStepTitle] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const saveText = useSaveText(saveState);
+  const { streak, refresh: refreshStreak } = useStreak();
   const completeHeading = useRef<HTMLHeadingElement>(null);
   /** The latest code of each step, so going back to a step shows what the student wrote. */
   const codeByStep = useRef(new Map<string, CodeFiles>());
@@ -83,7 +102,9 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
         const firstOpen = data.challenges.findIndex((c) => !done.has(c.id));
         setLesson(data);
         setPassed(done);
-        setStep(firstOpen === -1 ? 0 : firstOpen);
+        // A new lesson starts with its video and explainer; a started one where the
+        // student left off.
+        setView(data.status === 'NOT_STARTED' || firstOpen === -1 ? 'intro' : firstOpen);
         setCompleted(
           data.status === 'COMPLETED' ? { nextLessonId: data.nextLessonId, justNow: false } : null,
         );
@@ -115,7 +136,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
   if (failure === 'premium') return <PremiumLocked kind="lesson" />;
   if (failure) {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 py-16">
         <Alert tone={failure === 'notFound' ? 'info' : 'error'}>{t(failure)}</Alert>
         <Link href="/learn" className={clsx(buttonClass('secondary'), 'self-start')}>
           {t('backToMap')}
@@ -126,189 +147,309 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
   if (!user || !lesson) return <PageSpinner />;
 
   const text = languageProps(lesson.language, locale);
-  const challenge = lesson.challenges[step];
-  const video = lesson.video ? videoUrl(lesson.video) : null;
+  const stepCount = lesson.challenges.length;
+  const challenge = typeof view === 'number' ? lesson.challenges[view] : undefined;
 
   const onPassed = (result: SubmissionResult) => {
     if (!challenge) return;
     setPassed((current) => new Set(current).add(challenge.id));
+    refreshStreak();
     if (result.lessonCompleted) {
       setCompleted({ nextLessonId: result.nextLessonId, justNow: true });
     }
   };
 
-  const selectStep = (index: number, focusTitle = false) => {
+  const select = (next: View, focusTitle = false) => {
     setFocusStepTitle(focusTitle);
-    setStep(index);
+    setView(next);
   };
-  const stepCount = lesson.challenges.length;
+
+  // The stepper's tabs: the intro, each step, and the quick questions (if any).
+  const tabs: View[] = ['intro', ...lesson.challenges.map((_, i) => i)];
+  if (lesson.quizzes.length > 0) tabs.push('quiz');
+  const current = tabs.indexOf(view);
+
+  const completion = completed ? (
+    <CompletionCard
+      lesson={lesson}
+      nextLessonId={completed.nextLessonId}
+      headingRef={completeHeading}
+      onQuiz={lesson.quizzes.length > 0 ? () => select('quiz') : null}
+    />
+  ) : null;
 
   return (
-    <article className="mx-auto flex max-w-6xl flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <nav aria-label={t('backToLearning')} className="text-sm">
-          <ol className="flex flex-wrap items-center gap-2 text-muted">
-            <li>
-              <Link
-                href="/learn"
-                className="font-semibold text-brand-700 underline underline-offset-4"
-              >
-                {t('backToLearning')}
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li {...text}>{lesson.moduleTitle}</li>
-          </ol>
-        </nav>
-        <p className="text-sm font-semibold text-brand-700">
-          {t('lessonOf', { number: String(lesson.number), total: String(lesson.lessonCount) })}
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold" {...text}>
-            {lesson.title}
-          </h1>
-          {completed ? <Badge tone="success">{t('completedBadge')}</Badge> : null}
-        </div>
-        <p className="max-w-3xl text-lg text-muted" {...text}>
+    <article className="flex min-h-dvh flex-1 flex-col xl:h-dvh">
+      <WorkspaceHeader
+        context={`${t('lessonOf', {
+          number: String(lesson.number),
+          total: String(lesson.lessonCount),
+        })} · ${lesson.moduleTitle}`}
+        title={lesson.title}
+        badge={completed ? <Badge tone="success">{t('completedBadge')}</Badge> : null}
+        saveText={saveText}
+        saveState={saveState}
+        streak={streak}
+        steps={
+          <div role="tablist" aria-label={t('steps')} className="flex w-max items-center gap-1.5">
+            {tabs.map((tab, index) => (
+              <StepTab
+                key={String(tab)}
+                tab={tab}
+                index={index}
+                count={tabs.length}
+                selected={index === current}
+                done={
+                  typeof tab === 'number'
+                    ? passed.has(lesson.challenges[tab]!.id)
+                    : tab === 'intro'
+                      ? lesson.status !== 'NOT_STARTED' || passed.size > 0 || index < current
+                      : false
+                }
+                first={index === 0}
+                onSelect={(i) => select(tabs[i]!)}
+              />
+            ))}
+          </div>
+        }
+      />
+
+      <div
+        id="lesson-step-panel"
+        role="tabpanel"
+        aria-labelledby={`lesson-tab-${String(view)}`}
+        className="flex min-h-0 flex-1 flex-col"
+      >
+        {view === 'intro' ? (
+          <IntroPanel
+            lesson={lesson}
+            textProps={text}
+            completion={completion}
+            onStart={stepCount > 0 ? () => select(0, true) : null}
+          />
+        ) : null}
+        {challenge && typeof view === 'number' ? (
+          <ChallengeWorkspace
+            key={challenge.id}
+            challenge={challenge}
+            kicker={`${t('step', { number: String(view + 1) })} · ${t('tryIt')}`}
+            initialCode={
+              codeByStep.current.get(challenge.id) ?? challenge.draft ?? challenge.starter
+            }
+            isStudent
+            focusTitle={focusStepTitle}
+            onCodeChange={rememberCode}
+            onSaveState={setSaveState}
+            onPassed={onPassed}
+            after={
+              completed?.justNow ? (
+                completion
+              ) : passed.has(challenge.id) && view < stepCount - 1 ? (
+                <Button size="lg" onClick={() => select(view + 1, true)}>
+                  {t('nextStep')}
+                  <Icon name="arrow" />
+                </Button>
+              ) : passed.has(challenge.id) && view === stepCount - 1 && lesson.quizzes.length ? (
+                <Button variant="secondary" onClick={() => select('quiz')}>
+                  <Icon name="list" />
+                  {t('quiz.title')}
+                </Button>
+              ) : null
+            }
+          />
+        ) : null}
+        {view === 'quiz' ? (
+          <div className="flex-1 overflow-y-auto px-4 pb-10 sm:px-6">
+            <div className="mx-auto flex max-w-3xl flex-col gap-6 pt-4">
+              {completion}
+              <LessonQuizzes quizzes={lesson.quizzes} language={locale} textProps={text} />
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+/** One tab of the stepper: an icon for the intro and the questions, a number for steps. */
+function StepTab({
+  tab,
+  index,
+  count,
+  selected,
+  done,
+  first,
+  onSelect,
+}: {
+  tab: View;
+  index: number;
+  count: number;
+  selected: boolean;
+  done: boolean;
+  first: boolean;
+  onSelect: (index: number) => void;
+}) {
+  const t = useTranslations('lesson');
+  const label =
+    tab === 'intro'
+      ? t('intro')
+      : tab === 'quiz'
+        ? t('quiz.title')
+        : t(done ? 'stepDone' : 'step', { number: String(tab + 1) });
+  const icon: IconName | null =
+    tab === 'intro' ? 'play' : tab === 'quiz' ? 'list' : done ? 'check' : null;
+  return (
+    <>
+      {first ? null : (
+        <span
+          aria-hidden="true"
+          className={clsx('h-0.75 w-5 shrink-0 rounded-full', done ? 'bg-sage' : 'bg-track')}
+        />
+      )}
+      <button
+        id={`lesson-tab-${String(tab)}`}
+        type="button"
+        role="tab"
+        aria-selected={selected}
+        aria-controls="lesson-step-panel"
+        aria-label={label}
+        title={label}
+        tabIndex={selected ? 0 : -1}
+        onClick={() => onSelect(index)}
+        onKeyDown={(event) => onTabKeyDown(event, count, index, onSelect)}
+        className={clsx(
+          'grid h-8 min-w-8 shrink-0 place-items-center rounded-full text-[0.8rem] font-bold transition-colors',
+          selected
+            ? 'bg-primary px-3.5 text-on-primary'
+            : done
+              ? 'bg-sage text-on-primary hover:bg-sage-600'
+              : 'bg-track text-muted hover:bg-sand-300 hover:text-ink',
+        )}
+      >
+        {selected && typeof tab === 'number' ? (
+          <span aria-hidden="true">{t('step', { number: String(tab + 1) })}</span>
+        ) : icon ? (
+          <Icon name={icon} className="text-[0.95rem]" />
+        ) : (
+          <span aria-hidden="true">{typeof tab === 'number' ? tab + 1 : ''}</span>
+        )}
+      </button>
+    </>
+  );
+}
+
+/** The start of a lesson: the video and the explainer, then "Try it". */
+function IntroPanel({
+  lesson,
+  textProps,
+  completion,
+  onStart,
+}: {
+  lesson: Lesson;
+  textProps: { lang?: string; dir?: 'ltr' | 'rtl' };
+  completion: ReactNode;
+  onStart: (() => void) | null;
+}) {
+  const t = useTranslations('lesson');
+  const video = lesson.video ? videoUrl(lesson.video) : null;
+  return (
+    <div className="flex-1 overflow-y-auto px-4 pb-10 sm:px-6">
+      <div className="mx-auto flex max-w-3xl flex-col gap-5 pt-2">
+        {completion}
+        <p className="text-lg text-muted" {...textProps}>
           {lesson.summary}
         </p>
-      </header>
-
-      {video ? (
-        <section aria-labelledby="lesson-video" className="flex flex-col gap-3">
-          <h2 id="lesson-video" className="text-xl font-bold">
-            {t('video')}
-          </h2>
-          <div className="aspect-video w-full max-w-3xl overflow-hidden rounded-[var(--radius-card)] bg-ink">
-            <iframe
-              src={video}
-              title={`${t('video')}: ${lesson.title}`}
-              className="h-full w-full"
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              allowFullScreen
-            />
-          </div>
-        </section>
-      ) : null}
-
-      <Card className="max-w-3xl">
-        <div {...text}>
+        {video ? (
+          <section aria-labelledby="lesson-video" className="flex flex-col gap-3">
+            <h2 id="lesson-video" className="sr-only">
+              {t('video')}
+            </h2>
+            <div className="aspect-video w-full overflow-hidden rounded-card bg-sand-900">
+              <iframe
+                src={video}
+                title={`${t('video')}: ${lesson.title}`}
+                className="h-full w-full"
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        ) : null}
+        <div className="rounded-card bg-surface p-6 sm:p-8" {...textProps}>
           <Markdown>{lesson.body}</Markdown>
         </div>
-      </Card>
-
-      {lesson.challenges.length > 0 && challenge ? (
-        <section aria-labelledby="lesson-steps" className="flex flex-col gap-4">
-          <h2 id="lesson-steps" className="text-2xl font-bold">
-            {t('tryIt')}
-          </h2>
-          {lesson.challenges.length > 1 ? (
-            <div role="tablist" aria-label={t('tryIt')} className="flex flex-wrap gap-2">
-              {lesson.challenges.map((c, index) => {
-                const isDone = passed.has(c.id);
-                const label = t(isDone ? 'stepDone' : 'step', { number: String(index + 1) });
-                return (
-                  <button
-                    key={c.id}
-                    id={`lesson-step-${index}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={index === step}
-                    aria-controls="lesson-step-panel"
-                    aria-label={label}
-                    tabIndex={index === step ? 0 : -1}
-                    onClick={() => selectStep(index)}
-                    onKeyDown={(event) => onTabKeyDown(event, stepCount, index, selectStep)}
-                    className={clsx(
-                      'flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold',
-                      index === step
-                        ? 'border-brand-600 bg-brand-600 text-white'
-                        : 'border-line bg-surface hover:border-brand-600',
-                    )}
-                  >
-                    <span aria-hidden="true">{isDone ? '✓' : index + 1}</span>
-                    <span aria-hidden="true">{t('step', { number: String(index + 1) })}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-
-          <div
-            id="lesson-step-panel"
-            role={stepCount > 1 ? 'tabpanel' : undefined}
-            aria-labelledby={stepCount > 1 ? `lesson-step-${step}` : undefined}
-          >
-            <ChallengeWorkspace
-              key={challenge.id}
-              challenge={challenge}
-              initialCode={
-                codeByStep.current.get(challenge.id) ?? challenge.draft ?? challenge.starter
-              }
-              isStudent
-              focusTitle={focusStepTitle}
-              onCodeChange={rememberCode}
-              onPassed={onPassed}
-            />
-          </div>
-
-          {passed.has(challenge.id) &&
-          step < lesson.challenges.length - 1 &&
-          !completed?.justNow ? (
-            <Button className="self-start" onClick={() => selectStep(step + 1, true)}>
-              {t('nextStep')}
-            </Button>
-          ) : null}
-        </section>
-      ) : null}
-
-      {completed ? (
-        <section className="rounded-[var(--radius-card)] border border-success/30 bg-success/10 p-5 sm:p-6">
-          <h2 ref={completeHeading} tabIndex={-1} className="text-2xl font-bold outline-none">
-            {t('lessonComplete')}
-          </h2>
-          <p className="mt-2 text-muted">{t('lessonCompleteBody', { title: lesson.title })}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {completed.nextLessonId ? (
-              <Link href={`/learn/${completed.nextLessonId}`} className={buttonClass('primary')}>
-                {t('nextLesson')}
-              </Link>
-            ) : null}
-            <Link
-              href="/learn"
-              className={buttonClass(completed.nextLessonId ? 'secondary' : 'primary')}
-            >
-              {t('backToMap')}
+        {onStart ? (
+          <Button size="lg" className="self-start" onClick={onStart}>
+            {t('startSteps')}
+            <Icon name="arrow" />
+          </Button>
+        ) : null}
+        <nav aria-label={t('lessonNav')} className="flex flex-wrap justify-between gap-3 pt-4">
+          {lesson.previousLessonId ? (
+            <Link href={`/learn/${lesson.previousLessonId}`} className={buttonClass('ghost')}>
+              <Icon name="chevL" />
+              {t('previousLesson')}
             </Link>
-          </div>
-        </section>
-      ) : null}
+          ) : (
+            <span />
+          )}
+          {lesson.nextLessonId ? (
+            <Link href={`/learn/${lesson.nextLessonId}`} className={buttonClass('ghost')}>
+              {t('nextLesson')}
+              <Icon name="chevR" />
+            </Link>
+          ) : null}
+        </nav>
+      </div>
+    </div>
+  );
+}
 
-      <nav
-        aria-label={t('lessonNav')}
-        className="flex flex-wrap justify-between gap-3 border-t border-line pt-6"
+/** "Lesson complete!": where to go next. */
+function CompletionCard({
+  lesson,
+  nextLessonId,
+  headingRef,
+  onQuiz,
+}: {
+  lesson: Lesson;
+  nextLessonId: string | null;
+  headingRef: RefObject<HTMLHeadingElement | null>;
+  onQuiz: (() => void) | null;
+}) {
+  const t = useTranslations('lesson');
+  return (
+    <section className="flex flex-col gap-3 rounded-row bg-sage-100 p-5 text-sage-900 motion-safe:animate-[kcp-pop_300ms_ease-out]">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="flex items-center gap-2.5 text-2xl outline-none"
       >
-        {lesson.previousLessonId ? (
-          <Link href={`/learn/${lesson.previousLessonId}`} className={buttonClass('ghost')}>
-            <span aria-hidden="true" className="inline-block rtl:-scale-x-100">
-              ←
-            </span>{' '}
-            {t('previousLesson')}
-          </Link>
-        ) : (
-          <span />
-        )}
-        {lesson.nextLessonId ? (
-          <Link href={`/learn/${lesson.nextLessonId}`} className={buttonClass('ghost')}>
-            {t('nextLesson')}{' '}
-            <span aria-hidden="true" className="inline-block rtl:-scale-x-100">
-              →
-            </span>
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-sage text-base text-on-primary">
+          <Icon name="star" />
+        </span>
+        {t('lessonComplete')}
+      </h2>
+      <p className="text-sm text-sage-800">{t('lessonCompleteBody', { title: lesson.title })}</p>
+      <div className="flex flex-wrap gap-2.5">
+        {nextLessonId ? (
+          <Link href={`/learn/${nextLessonId}`} className={buttonClass('primary')}>
+            {t('nextLesson')}
+            <Icon name="arrow" />
           </Link>
         ) : null}
-      </nav>
-    </article>
+        <Link href="/learn" className={buttonClass(nextLessonId ? 'secondary' : 'primary')}>
+          {t('backToMap')}
+        </Link>
+        {onQuiz ? (
+          <Button variant="ghost" onClick={onQuiz}>
+            <Icon name="list" />
+            {t('quiz.title')}
+          </Button>
+        ) : null}
+      </div>
+    </section>
   );
 }

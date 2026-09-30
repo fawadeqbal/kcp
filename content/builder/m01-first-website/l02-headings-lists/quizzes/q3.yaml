@@ -1,0 +1,29 @@
+id: builder-m01-l02-q3
+order: 3
+kind: choice
+xp: 5
+prompt:
+  en: Which is the right way to use headings on a page?
+  ar: ما الطريقة الصحيحة لاستخدام العناوين في الصفحة؟
+  ur: صفحے پر سرخیاں استعمال کرنے کا درست طریقہ کون سا ہے؟
+options:
+  - id: a
+    text:
+      en: Use <h6> for the page title, because it is the biggest heading.
+      ar: استخدم ‎<h6>‎ لعنوان الصفحة، لأنه أكبر عنوان.
+      ur: صفحے کے عنوان کے لیے ‎<h6>‎ استعمال کریں، کیونکہ یہ سب سے بڑی سرخی ہے۔
+  - id: b
+    text:
+      en: Use <h1> once, for the page title, and <h2> for each section.
+      ar: استخدم ‎<h1>‎ مرة واحدة لعنوان الصفحة، و‎<h2>‎ لكل قسم.
+      ur: صفحے کے عنوان کے لیے ‎<h1>‎ ایک بار استعمال کریں، اور ہر حصے کے لیے ‎<h2>‎۔
+  - id: c
+    text:
+      en: Use <h1> for every sentence, so all the text is big.
+      ar: استخدم ‎<h1>‎ لكل جملة، ليصبح النص كله كبيرًا.
+      ur: ہر جملے کے لیے ‎<h1>‎ استعمال کریں، تاکہ سارا متن بڑا ہو۔
+answer: b
+explanation:
+  en: The biggest heading is <h1> and the smallest is <h6>. Use <h1> once, for the page title, <h2> for sections, and <p> for normal text.
+  ar: أكبر عنوان هو ‎<h1>‎ وأصغرها ‎<h6>‎. استخدم ‎<h1>‎ مرة واحدة لعنوان الصفحة، و‎<h2>‎ للأقسام، و‎<p>‎ للنص العادي.
+  ur: سب سے بڑی سرخی ‎<h1>‎ ہے اور سب سے چھوٹی ‎<h6>‎۔ صفحے کے عنوان کے لیے ‎<h1>‎ ایک بار استعمال کریں، حصوں کے لیے ‎<h2>‎، اور عام متن کے لیے ‎<p>‎۔

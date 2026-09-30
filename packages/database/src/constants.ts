@@ -74,6 +74,8 @@ export const SUBJECTS = [
   'Certificate',
   /** Tracks, modules and lessons as staff preview and publish them. */
   'Content',
+  /** Crash reports sent by the mobile app (no account or device in them). */
+  'AppCrash',
 ] as const;
 export type Subject = (typeof SUBJECTS)[number];
 

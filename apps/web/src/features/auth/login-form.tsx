@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { type FormEvent, useState } from 'react';
-import { Alert, AuthCard, Button, PasswordField, TextField } from '@/components/ui';
+import { Alert, AuthCard, Avatar, Button, Icon, PasswordField, TextField } from '@/components/ui';
 import { Link, useRouter } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { homePath, useAuth } from '@/lib/auth-provider';
@@ -56,7 +56,7 @@ export function LoginForm() {
   }
 
   return (
-    <AuthCard title={t('auth.login.title')}>
+    <AuthCard title={t('auth.login.title')} subtitle={t('auth.login.subtitle')}>
       <form className="flex flex-col gap-5" onSubmit={onSubmit} noValidate>
         <TextField
           label={t('auth.email')}
@@ -77,6 +77,12 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           error={errors.password}
         />
+        <Link
+          href="/forgot-password"
+          className="-mt-1 self-start rounded-full text-sm font-bold text-brand-text underline-offset-4 hover:underline"
+        >
+          {t('auth.login.forgot')}
+        </Link>
         {formError ? (
           <Alert tone="error">
             {formError}
@@ -88,31 +94,31 @@ export function LoginForm() {
           </Alert>
         ) : null}
         {notice ? <Alert>{notice}</Alert> : null}
-        <Button type="submit" loading={submitting}>
+        <Button type="submit" size="lg" loading={submitting}>
           {t('auth.login.submit')}
         </Button>
       </form>
-      <Link
-        href="/forgot-password"
-        className="text-center font-semibold text-brand-700 underline-offset-4 hover:underline"
-      >
-        {t('auth.login.forgot')}
-      </Link>
-      <Link
-        href="/login/student"
-        className="rounded-xl border border-line px-4 py-3 text-center font-semibold hover:bg-brand-50"
-      >
-        {t('auth.login.studentLink')}
-      </Link>
-      <p className="text-center text-muted">
+      <p className="text-sm text-muted">
         {t('auth.login.noAccount')}{' '}
         <Link
           href="/sign-up"
-          className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+          className="font-bold text-brand-text underline-offset-4 hover:underline"
         >
           {t('auth.login.createAccount')}
         </Link>
       </p>
+      <Link
+        href="/login/student"
+        className="flex items-center gap-3.5 rounded-row bg-brand-100 px-4.5 py-3.5 transition-colors hover:bg-brand-200"
+      >
+        <Avatar avatarKey="star" size="md" className="size-10" />
+        <span className="min-w-0 flex-1">
+          <span className="block font-bold">{t('auth.login.studentTitle')}</span>
+          <span className="block text-sm text-brand-800">{t('auth.login.studentBody')}</span>
+        </span>
+        <Icon name="arrow" className="text-lg text-brand-text" />
+      </Link>
+      <p className="text-xs text-muted">{t('auth.login.staffNote')}</p>
     </AuthCard>
   );
 }

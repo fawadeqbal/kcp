@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The dev flavour talks to the API on your computer over plain HTTP: 10.0.2.2 from
+     the Android emulator, or the computer's address on your Wi-Fi from a real phone.
+     Only this flavour allows it; staging and production are HTTPS only. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

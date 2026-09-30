@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsIn, IsOptional, IsString, Length, Matches, MaxLength } from 'class-validator';
 
 export type TokenDelivery = 'cookie' | 'body';
-export type ClientApp = 'web' | 'admin';
+export type ClientApp = 'web' | 'admin' | 'mobile';
 
 export class TokenDeliveryDto {
   /**
@@ -17,10 +17,11 @@ export class TokenDeliveryDto {
   /**
    * Which app is signing in. The admin panel keeps its own refresh cookie, so a
    * staff session and a parent session in the same browser never overwrite each
-   * other, and only staff can sign in to it.
+   * other, and only staff can sign in to it. The mobile app is for students and
+   * parents only, and always gets its refresh token in the body.
    */
   @IsOptional()
-  @IsIn(['web', 'admin'])
+  @IsIn(['web', 'admin', 'mobile'])
   app?: ClientApp;
 }
 

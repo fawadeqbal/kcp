@@ -14,6 +14,7 @@
     "about": "About us",
     "waitlist": "Join the waitlist",
     "waitlistShort": "Join the waitlist",
+    "logIn": "Log in",
     "menu": "Menu",
     "language": "Language",
     "skipToContent": "Skip to content"
@@ -31,7 +32,7 @@
     "copyright": "© {year} {brand}"
   },
   "cta": {
-    "signUp": "Sign up as a parent",
+    "signUp": "Create a parent account",
     "waitlist": "Join the waitlist"
   },
   "common": {
@@ -100,6 +101,16 @@
     "tracksMore": "Explore the tracks",
     "safetyTitle": "Safe by design",
     "safetySubtitle": "Safety comes before every feature. These are our promises to every family.",
+    "promises": {
+      "parentsTitle": "Parents approve every account",
+      "parents": "Children never sign up on their own.",
+      "anonymousTitle": "Nicknames only",
+      "anonymous": "Never a real name, photo or school.",
+      "noChatTitle": "No chat, no messages",
+      "noChat": "Strangers can't reach your child.",
+      "sandboxTitle": "Code runs in a safe box",
+      "sandbox": "On its own domain, cut off from accounts."
+    },
     "safetyMore": "Read all our safety promises",
     "pricingTitle": "Start free, upgrade when you're ready",
     "pricingBody": "The Free plan includes the first lessons. Premium unlocks every lesson and project, Python, a shareable portfolio and the Builder certificate.",

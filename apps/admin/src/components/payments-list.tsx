@@ -87,7 +87,7 @@ export function PaymentsList() {
             }}
             className={
               view === key
-                ? 'rounded-full bg-brand-600 px-4 py-2 font-semibold text-white'
+                ? 'rounded-full bg-primary px-4 py-2 font-semibold text-on-primary'
                 : 'rounded-full border border-line bg-surface px-4 py-2 font-semibold'
             }
           >
@@ -140,7 +140,7 @@ export function PaymentsList() {
                 <Cell>
                   <Link
                     href={`/users/${s.parentId}`}
-                    className="font-semibold break-all text-brand-700 underline-offset-4 hover:underline"
+                    className="font-semibold break-all text-brand-text underline-offset-4 hover:underline"
                   >
                     {s.parentEmail ?? 'Deleted parent'}
                   </Link>
@@ -181,7 +181,7 @@ export function PaymentsList() {
                 <Cell>
                   <Link
                     href={`/users/${p.parentId}`}
-                    className="font-semibold break-all text-brand-700 underline-offset-4 hover:underline"
+                    className="font-semibold break-all text-brand-text underline-offset-4 hover:underline"
                   >
                     {p.parentEmail ?? 'Deleted parent'}
                   </Link>

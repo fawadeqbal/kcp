@@ -179,6 +179,7 @@ export class ProjectsService {
       starter,
       checks: brief.checks as Record<string, unknown>[],
       hints: { ...(english?.hints as Texts), ...(text?.hints as Texts) },
+      checkLabels: { ...(english?.checkLabels as Texts), ...(text?.checkLabels as Texts) },
       draft: (project?.files as CodeFilesDto | undefined) ?? null,
       status,
       shippedAt: project?.shippedAt ?? null,

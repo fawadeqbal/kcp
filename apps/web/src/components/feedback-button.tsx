@@ -6,10 +6,13 @@ import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useId, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-provider';
-import { Alert, Button, Dialog } from './ui';
+import { Alert, Button, Dialog, Icon, textareaClass } from './ui';
 
-/** The in-app feedback button, for signed-in students and parents (pilot tool). */
-export function FeedbackButton() {
+/**
+ * The in-app feedback button, for signed-in students and parents (pilot tool): a
+ * floating pill on ordinary pages, a small button in a workspace's own header.
+ */
+export function FeedbackButton({ inline = false }: { inline?: boolean }) {
   const t = useTranslations('feedback');
   const locale = useLocale();
   const { state } = useAuth();
@@ -60,9 +63,15 @@ export function FeedbackButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="print-hidden fixed end-4 bottom-4 z-20 min-h-11 rounded-full border border-line bg-surface px-4 font-semibold shadow-lg hover:border-brand-600"
+        className={clsx(
+          'print-hidden flex items-center gap-2 rounded-full font-semibold',
+          inline
+            ? 'min-h-10 px-3 text-sm text-muted hover:bg-ink/7 hover:text-ink'
+            : 'elev-md fixed end-4 bottom-4 z-20 min-h-11 bg-surface px-4.5 hover:bg-sand-300',
+        )}
       >
-        {t('button')}
+        <Icon name="msg" className={inline ? 'text-base' : 'text-brand'} />
+        <span className={clsx(inline && 'max-xl:sr-only')}>{t('button')}</span>
       </button>
       <Dialog open={open} onClose={close} title={t('title')}>
         {result === 'sent' ? (
@@ -75,14 +84,16 @@ export function FeedbackButton() {
         ) : (
           <form onSubmit={(event) => void send(event)} className="flex flex-col gap-4">
             <fieldset className="flex flex-col gap-2">
-              <legend className="mb-1 font-semibold">{t('kind')}</legend>
+              <legend className="mb-1 text-sm font-semibold">{t('kind')}</legend>
               <div className="grid grid-cols-2 gap-2">
                 {FEEDBACK_KINDS.map((option) => (
                   <label
                     key={option}
                     className={clsx(
-                      'flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-3 text-sm',
-                      kind === option ? 'border-brand-600 bg-brand-50' : 'border-line',
+                      'flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border-2 px-4 text-sm font-semibold has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand has-[:focus-visible]:outline-solid',
+                      kind === option
+                        ? 'border-primary bg-brand-100 text-brand-800'
+                        : 'border-line hover:bg-ink/7',
                       // "Something isn't safe" gets a row of its own, first.
                       option === 'SAFETY' && 'col-span-2',
                     )}
@@ -93,6 +104,7 @@ export function FeedbackButton() {
                       value={option}
                       checked={kind === option}
                       onChange={() => setKind(option)}
+                      className="size-4 accent-primary"
                     />
                     {t(`kind${option}`)}
                   </label>
@@ -100,7 +112,7 @@ export function FeedbackButton() {
               </div>
             </fieldset>
             <div className="flex flex-col gap-1">
-              <label htmlFor={messageId} className="font-semibold">
+              <label htmlFor={messageId} className="text-sm font-semibold">
                 {t('message')}
               </label>
               <textarea
@@ -112,7 +124,7 @@ export function FeedbackButton() {
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 aria-describedby={hintId}
-                className="rounded-xl border border-line bg-surface px-3 py-2"
+                className={textareaClass()}
               />
               <p id={hintId} className="text-sm text-muted">
                 {t('messageHint')}

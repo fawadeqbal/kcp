@@ -25,7 +25,7 @@ export function SharedPortfolio({ token }: { token: string }) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-4">
       <PageSpinner />
-      <a href={url} className="font-semibold text-brand-700 underline" rel="noreferrer">
+      <a href={url} className="font-semibold text-brand-text underline" rel="noreferrer">
         {t('title')}
       </a>
     </div>

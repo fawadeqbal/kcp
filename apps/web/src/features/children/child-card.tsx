@@ -3,17 +3,19 @@
 import type { components } from '@kcp/api-client-ts';
 import { type AvatarKey, type ChildConsent, isAvatarKey } from '@kcp/shared';
 import { useFormatter, useTranslations } from 'next-intl';
-import { type FormEvent, useId, useState } from 'react';
+import { clsx } from 'clsx';
+import { type FormEvent, type ReactNode, useId, useState } from 'react';
 import {
   Alert,
   Avatar,
   AvatarPicker,
-  Badge,
   Button,
-  Card,
   Dialog,
+  Icon,
+  type IconName,
   PasswordField,
   SelectField,
+  Switch,
   TextField,
 } from '@/components/ui';
 import { api, errorCode } from '@/lib/api';
@@ -28,6 +30,41 @@ import { useLanguages } from './reference-data';
 export type Child = components['schemas']['ChildDto'];
 
 type Message = { tone: 'success' | 'error'; text: string } | null;
+
+/** A round pill with a figure about the child ("Level 3", "5 days in a row"). */
+function Stat({
+  icon,
+  tone = 'plain',
+  children,
+}: {
+  icon?: IconName;
+  tone?: 'plain' | 'brand' | 'sage';
+  children: ReactNode;
+}) {
+  return (
+    <li
+      className={clsx(
+        'flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.8rem] font-semibold',
+        tone === 'plain' && 'bg-raised',
+        tone === 'brand' && 'bg-brand-100 font-bold text-brand-800',
+        tone === 'sage' && 'bg-sage-100 font-bold text-sage-800',
+      )}
+    >
+      {icon ? <Icon name={icon} className="text-[0.85rem] text-brand" /> : null}
+      {children}
+    </li>
+  );
+}
+
+/** One of the three panels under "Manage": sharing, projects, account. */
+function Panel({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="flex flex-col gap-4 rounded-inner bg-raised p-5.5">
+      <h4 className="text-lg">{title}</h4>
+      {children}
+    </section>
+  );
+}
 
 /** One child on the parent dashboard, with everything the parent can change. */
 export function ChildCard({
@@ -44,21 +81,21 @@ export function ChildCard({
   const [open, setOpen] = useState(false);
   const headingId = useId();
   const panelId = useId();
+  const nickname = isolate(child.nickname);
 
   return (
-    <article
-      aria-labelledby={headingId}
-      className="rounded-[var(--radius-card)] border border-line bg-surface"
-    >
-      <div className="flex flex-wrap items-center gap-4 p-5">
-        <Avatar avatarKey={child.avatarKey} size="lg" />
-        <div className="min-w-0 flex-1">
-          <h3 id={headingId} className="font-latin text-xl font-bold">
-            <bdi>{child.nickname}</bdi>
-          </h3>
-          <p className="font-latin text-muted">
-            <bdi>{child.username}</bdi>
-          </p>
+    <article aria-labelledby={headingId} className="overflow-hidden rounded-hero bg-surface">
+      <div className="flex flex-wrap items-center gap-5 p-5 sm:px-7 sm:py-6.5">
+        <Avatar avatarKey={child.avatarKey} size="xl" />
+        <div className="flex min-w-0 flex-1 basis-72 flex-col gap-1">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <h3 id={headingId} className="text-[1.65rem]">
+              <bdi>{child.nickname}</bdi>
+            </h3>
+            <p className="font-mono text-sm text-muted">
+              <bdi>{child.username}</bdi>
+            </p>
+          </div>
           <p className="text-sm text-muted">
             {t('bornIn', { year: String(child.birthYear) })}
             {' · '}
@@ -70,14 +107,12 @@ export function ChildCard({
             {' · '}
             {t('lessonsDone', { count: String(child.lessonsCompleted) })}
           </p>
-          <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="font-semibold text-brand-700">
-              {t('level', { level: String(child.level) })}
-            </span>
-            <span>{t('xp', { xp: String(child.xpTotal) })}</span>
-            <span>{t('streak', { count: String(child.streak) })}</span>
-            <span>{t('badges', { count: String(child.badges) })}</span>
-            <Badge tone={child.premiumSource ? 'success' : 'neutral'}>
+          <ul className="mt-1.5 flex flex-wrap gap-2">
+            <Stat tone="brand">{t('level', { level: String(child.level) })}</Stat>
+            <Stat>{t('xp', { xp: String(child.xpTotal) })}</Stat>
+            <Stat icon="flame">{t('streak', { count: String(child.streak) })}</Stat>
+            <Stat icon="award">{t('badges', { count: String(child.badges) })}</Stat>
+            <Stat tone={child.premiumSource ? 'sage' : 'plain'}>
               {child.premiumSource === 'subscription'
                 ? t('premiumPlan')
                 : child.premiumSource && child.premiumUntil
@@ -85,8 +120,8 @@ export function ChildCard({
                       date: format.dateTime(new Date(child.premiumUntil), { dateStyle: 'medium' }),
                     })
                   : t('premiumNone')}
-            </Badge>
-          </p>
+            </Stat>
+          </ul>
         </div>
         <Button
           variant="secondary"
@@ -95,19 +130,66 @@ export function ChildCard({
           onClick={() => setOpen((o) => !o)}
         >
           {open ? t('close') : t('manage')}
+          <Icon name={open ? 'chevU' : 'chevD'} />
         </Button>
       </div>
       {open ? (
-        <div id={panelId} className="flex flex-col gap-4 border-t border-line bg-canvas/60 p-5">
-          <SharingSection child={child} onChange={onChange} />
-          <ProjectsSection child={child} />
-          <ChildCertificates childId={child.id} />
-          <ProfileSection child={child} onChange={onChange} />
-          <PasswordSection child={child} />
-          <DeleteSection child={child} onDeleted={onDeleted} />
+        <div id={panelId} className="grid gap-3.5 px-5 pb-6 sm:px-7 sm:pb-7 lg:grid-cols-3">
+          <Panel title={t('sharingTitle', { nickname })}>
+            <SharingSection child={child} onChange={onChange} />
+          </Panel>
+          <Panel title={t('projectsTitle')}>
+            <ProjectsSection child={child} />
+            <ChildCertificates childId={child.id} />
+          </Panel>
+          <Panel title={t('accountPanel')}>
+            <AccountActions child={child} onChange={onChange} onDeleted={onDeleted} />
+          </Panel>
         </div>
       ) : null}
     </article>
+  );
+}
+
+/** The account panel: profile, password, phone reminders and delete. */
+function AccountActions({
+  child,
+  onChange,
+  onDeleted,
+}: {
+  child: Child;
+  onChange: (child: Child) => void;
+  onDeleted: (child: Child) => void;
+}) {
+  const t = useTranslations('dashboard');
+  const [dialog, setDialog] = useState<'profile' | 'password' | null>(null);
+  const row =
+    'flex min-h-12 w-full items-center gap-3 rounded-full px-3 text-start text-sm font-semibold hover:bg-ink/7';
+  return (
+    <div className="-mt-1 flex flex-col">
+      <button type="button" className={row} onClick={() => setDialog('profile')}>
+        <Icon name="user" className="text-base text-muted" />
+        <span className="flex-1">{t('profileTitle')}</span>
+        <Icon name="chevR" className="text-sm text-muted" />
+      </button>
+      <button type="button" className={row} onClick={() => setDialog('password')}>
+        <Icon name="key" className="text-base text-muted" />
+        <span className="flex-1">{t('passwordTitle')}</span>
+        <Icon name="chevR" className="text-sm text-muted" />
+      </button>
+      <RemindersSection child={child} onChange={onChange} />
+      <DeleteSection child={child} onDeleted={onDeleted} rowClassName={row} />
+      <Dialog open={dialog === 'profile'} onClose={() => setDialog(null)} title={t('profileTitle')}>
+        <ProfileSection child={child} onChange={onChange} onDone={() => setDialog(null)} />
+      </Dialog>
+      <Dialog
+        open={dialog === 'password'}
+        onClose={() => setDialog(null)}
+        title={t('passwordTitle')}
+      >
+        <PasswordSection child={child} onDone={() => setDialog(null)} />
+      </Dialog>
+    </div>
   );
 }
 
@@ -116,7 +198,11 @@ function StatusLine({ message }: { message: Message }) {
   return (
     <p
       aria-live="polite"
-      className={message?.tone === 'error' ? 'text-sm text-danger' : 'text-sm text-success'}
+      className={
+        message?.tone === 'error'
+          ? 'text-sm font-semibold text-danger'
+          : 'text-sm font-semibold text-sage-text'
+      }
     >
       {message?.text}
     </p>
@@ -155,19 +241,68 @@ function SharingSection({ child, onChange }: { child: Child; onChange: (child: C
   }
 
   return (
-    <Card
-      title={t('dashboard.sharingTitle', { nickname: isolate(child.nickname) })}
-      headingLevel={3}
-    >
+    <>
       <ConsentSwitches value={child.consents} onChange={toggle} busy={busy} />
-      <div className="mt-3">
-        <StatusLine message={message} />
-      </div>
-    </Card>
+      <StatusLine message={message} />
+    </>
   );
 }
 
-function ProfileSection({ child, onChange }: { child: Child; onChange: (child: Child) => void }) {
+/** Notifications on the child's phone (the mobile app): only the streak reminder. */
+function RemindersSection({ child, onChange }: { child: Child; onChange: (child: Child) => void }) {
+  const t = useTranslations();
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<Message>(null);
+
+  async function toggle(on: boolean) {
+    const previous = child;
+    onChange({ ...child, streakReminders: on });
+    setBusy(true);
+    setMessage(null);
+    try {
+      const { data, error } = await api.PATCH('/v1/children/{id}', {
+        params: { path: { id: child.id } },
+        body: { streakReminders: on },
+      });
+      if (data) {
+        onChange(data);
+        setMessage({ tone: 'success', text: t('dashboard.saved') });
+      } else {
+        onChange(previous);
+        setMessage({ tone: 'error', text: t(`errors.${errorMessageKey(errorCode(error))}`) });
+      }
+    } catch {
+      onChange(previous);
+      setMessage({ tone: 'error', text: t('errors.network') });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-1 px-3 py-2.5">
+      <Switch
+        label={t('dashboard.streakReminders')}
+        description={t('dashboard.streakRemindersBody', { nickname: isolate(child.nickname) })}
+        checked={child.streakReminders}
+        busy={busy}
+        disabled={busy}
+        onChange={(on) => void toggle(on)}
+      />
+      <StatusLine message={message} />
+    </div>
+  );
+}
+
+function ProfileSection({
+  child,
+  onChange,
+  onDone,
+}: {
+  child: Child;
+  onChange: (child: Child) => void;
+  onDone: () => void;
+}) {
   const t = useTranslations();
   const avatarLabels = useAvatarLabels();
   const languages = useLanguages();
@@ -215,53 +350,54 @@ function ProfileSection({ child, onChange }: { child: Child; onChange: (child: C
   }
 
   return (
-    <Card title={t('dashboard.profileTitle')} headingLevel={3}>
-      <form className="flex flex-col gap-5" onSubmit={onSubmit} noValidate>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <TextField
-            label={t('addChild.nickname')}
-            hint={t('addChild.nicknameHint')}
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            dir="ltr"
-            className="font-latin"
-            maxLength={20}
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            error={nicknameError}
-          />
-          <SelectField
-            label={t('addChild.language')}
-            value={languageCode}
-            onChange={(e) => setLanguageCode(e.target.value)}
-          >
-            {languages.map((language) => (
-              <option key={language.code} value={language.code} lang={language.code}>
-                {language.nativeName}
-              </option>
-            ))}
-          </SelectField>
-        </div>
-        <AvatarPicker
-          legend={t('addChild.avatar')}
-          name={`avatar-${child.id}`}
-          value={avatarKey}
-          onChange={setAvatarKey}
-          labels={avatarLabels}
+    <form className="flex flex-col gap-5" onSubmit={onSubmit} noValidate>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <TextField
+          label={t('addChild.nickname')}
+          hint={t('addChild.nicknameHint')}
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          dir="ltr"
+          className="font-latin"
+          maxLength={20}
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          error={nicknameError}
         />
-        <div className="flex flex-wrap items-center gap-4">
-          <Button type="submit" variant="secondary" loading={saving}>
-            {t('dashboard.profileSave')}
-          </Button>
-          <StatusLine message={message} />
-        </div>
-      </form>
-    </Card>
+        <SelectField
+          label={t('addChild.language')}
+          value={languageCode}
+          onChange={(e) => setLanguageCode(e.target.value)}
+        >
+          {languages.map((language) => (
+            <option key={language.code} value={language.code} lang={language.code}>
+              {language.nativeName}
+            </option>
+          ))}
+        </SelectField>
+      </div>
+      <AvatarPicker
+        legend={t('addChild.avatar')}
+        name={`avatar-${child.id}`}
+        value={avatarKey}
+        onChange={setAvatarKey}
+        labels={avatarLabels}
+      />
+      <StatusLine message={message} />
+      <div className="flex flex-wrap justify-end gap-3">
+        <Button variant="secondary" onClick={onDone}>
+          {t('dashboard.close')}
+        </Button>
+        <Button type="submit" loading={saving}>
+          {t('dashboard.profileSave')}
+        </Button>
+      </div>
+    </form>
   );
 }
 
-function PasswordSection({ child }: { child: Child }) {
+function PasswordSection({ child, onDone }: { child: Child; onDone: () => void }) {
   const t = useTranslations();
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>();
@@ -299,31 +435,40 @@ function PasswordSection({ child }: { child: Child }) {
   }
 
   return (
-    <Card title={t('dashboard.passwordTitle')} headingLevel={3}>
-      <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
-        <p className="text-muted">
-          {t('dashboard.passwordBody', { nickname: isolate(child.nickname) })}
-        </p>
-        <PasswordField
-          label={t('addChild.password')}
-          hint={t('addChild.passwordHint', { min: CHILD_PASSWORD_MIN_LENGTH })}
-          autoComplete="new-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={error}
-        />
-        <div className="flex flex-wrap items-center gap-4">
-          <Button type="submit" variant="secondary" loading={saving}>
-            {t('dashboard.passwordSubmit')}
-          </Button>
-          <StatusLine message={message} />
-        </div>
-      </form>
-    </Card>
+    <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
+      <p className="text-muted">
+        {t('dashboard.passwordBody', { nickname: isolate(child.nickname) })}
+      </p>
+      <PasswordField
+        label={t('addChild.password')}
+        hint={t('addChild.passwordHint', { min: CHILD_PASSWORD_MIN_LENGTH })}
+        autoComplete="new-password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        error={error}
+      />
+      <StatusLine message={message} />
+      <div className="flex flex-wrap justify-end gap-3">
+        <Button variant="secondary" onClick={onDone}>
+          {t('dashboard.close')}
+        </Button>
+        <Button type="submit" loading={saving}>
+          {t('dashboard.passwordSubmit')}
+        </Button>
+      </div>
+    </form>
   );
 }
 
-function DeleteSection({ child, onDeleted }: { child: Child; onDeleted: (child: Child) => void }) {
+function DeleteSection({
+  child,
+  onDeleted,
+  rowClassName,
+}: {
+  child: Child;
+  onDeleted: (child: Child) => void;
+  rowClassName: string;
+}) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [typed, setTyped] = useState('');
@@ -363,11 +508,15 @@ function DeleteSection({ child, onDeleted }: { child: Child; onDeleted: (child: 
   }
 
   return (
-    <Card title={t('dashboard.deleteTitle')} headingLevel={3} className="border-danger/30">
-      <p className="text-muted">{t('dashboard.deleteBody', { nickname })}</p>
-      <Button variant="danger" className="mt-4" onClick={() => setOpen(true)}>
+    <>
+      <button
+        type="button"
+        className={clsx(rowClassName, 'text-danger hover:bg-danger-soft')}
+        onClick={() => setOpen(true)}
+      >
+        <Icon name="trash" className="text-base" />
         {t('dashboard.deleteButton')}
-      </Button>
+      </button>
       <Dialog open={open} onClose={close} title={t('dashboard.deleteDialogTitle', { nickname })}>
         <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
           <Alert tone="warning">{t('dashboard.deleteBody', { nickname })}</Alert>
@@ -392,6 +541,6 @@ function DeleteSection({ child, onDeleted }: { child: Child; onDeleted: (child: 
           </div>
         </form>
       </Dialog>
-    </Card>
+    </>
   );
 }

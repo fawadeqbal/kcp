@@ -29,20 +29,17 @@ export default async function TracksPage({ params }: LocaleParams) {
       <PageIntro title={t('title')} subtitle={t('subtitle')} />
 
       <Container className="flex flex-col gap-10 py-14 sm:py-20">
-        <section
-          aria-labelledby="builder-title"
-          className="rounded-[var(--radius-card)] border border-brand-500 bg-surface p-6 shadow-xl shadow-brand-600/10 sm:p-10"
-        >
+        <section aria-labelledby="builder-title" className="rounded-hero bg-brand-100 p-6 sm:p-10">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-center gap-4">
               <IconBadge>
                 <CodeIcon />
               </IconBadge>
               <div>
-                <h2 id="builder-title" className="text-3xl font-bold">
+                <h2 id="builder-title" className="text-4xl">
                   {t('builder.name')}
                 </h2>
-                <p className="font-semibold text-brand-700">{t('builder.ages')}</p>
+                <p className="font-semibold text-brand-text">{t('builder.ages')}</p>
               </div>
             </div>
             <Badge tone="success">{common('availableNow')}</Badge>
@@ -79,25 +76,22 @@ export default async function TracksPage({ params }: LocaleParams) {
         </section>
 
         <section aria-labelledby="later-title">
-          <h2 id="later-title" className="text-2xl font-bold">
+          <h2 id="later-title" className="text-3xl">
             {t('laterTitle')}
           </h2>
           <ul className="mt-6 grid gap-5 md:grid-cols-2">
             {later.map((track) => (
-              <li
-                key={track}
-                className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-6"
-              >
+              <li key={track} className="flex flex-col gap-3 rounded-card bg-surface p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-xl font-bold">{t(`${track}.name`)}</h3>
+                  <h3 className="text-2xl">{t(`${track}.name`)}</h3>
                   <Badge tone="neutral">{common('comingLater')}</Badge>
                 </div>
-                <p className="font-semibold text-brand-700">{t(`${track}.ages`)}</p>
+                <p className="font-semibold text-brand-text">{t(`${track}.ages`)}</p>
                 <p className="text-muted">{t(`${track}.summary`)}</p>
               </li>
             ))}
           </ul>
-          <div className="mt-6 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-brand-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 flex flex-col items-start gap-4 rounded-card bg-brand-100 p-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="font-medium">{t('laterBody')}</p>
             <WaitlistLink variant="primary" />
           </div>

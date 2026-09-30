@@ -1,0 +1,20 @@
+id: builder-m01-l05-q2
+order: 2
+kind: bug
+xp: 5
+language: css
+prompt:
+  en: One line of this CSS has a mistake. Tap it.
+  ar: في أحد أسطر كود CSS هذا خطأ. اضغط عليه.
+  ur: اس CSS کی ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - '.card {'
+  - '  padding: 16px;'
+  - '  border: 2px navy;'
+  - '  margin-bottom: 12px;'
+  - '}'
+bugLine: 3
+explanation:
+  en: 'A border needs three things: how thick it is, its style and its colour. The style is missing, so it should be border: 2px solid navy;'
+  ar: 'تحتاج الحدود إلى ثلاثة أشياء: السُّمك والنمط واللون. النمط غير موجود، لذلك يجب أن يكون السطر ‎border: 2px solid navy;‎'
+  ur: 'بارڈر کو تین چیزیں چاہییں: موٹائی، انداز اور رنگ۔ یہاں انداز نہیں ہے، اس لیے سطر ‎border: 2px solid navy;‎ ہونی چاہیے۔'

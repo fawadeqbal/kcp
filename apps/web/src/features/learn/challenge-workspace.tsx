@@ -4,19 +4,20 @@ import type { components } from '@kcp/api-client-ts';
 import type { Check, CheckResult, CodeFileKey, CodeFiles } from '@kcp/checks';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Button, Dialog } from '@/components/ui';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Button, Dialog, Icon } from '@/components/ui';
 import { api } from '@/lib/api';
 import { BadgeCelebration } from '../badges/badge-celebration';
 import { Markdown } from './markdown';
 import {
+  CheckList,
   FilesEditor,
   PreviewPane,
   ProblemList,
   PythonControls,
+  type SaveState,
   useCodeFiles,
   useLivePreview,
-  useSaveText,
 } from './workspace';
 import { refreshNotifications } from '@/components/notification-bell';
 
@@ -24,6 +25,13 @@ export type Challenge = components['schemas']['ChallengeDto'];
 type SubmissionResult = components['schemas']['SubmissionResultDto'];
 
 const FILE_LABELS = { html: 'fileHtml', css: 'fileCss', js: 'fileJs', py: 'filePy' } as const;
+/** The file each tab edits, shown beside the tabs. */
+export const FILE_NAMES: Record<CodeFileKey, string> = {
+  html: 'index.html',
+  css: 'style.css',
+  js: 'script.js',
+  py: 'main.py',
+};
 
 type Feedback =
   | { kind: 'passed'; xp: number; capReached: boolean }
@@ -54,31 +62,43 @@ export function hintsFor(
 }
 
 /**
- * One "try it" step: instructions, a code editor per file, a live preview from the
- * sandbox, and "Check my code". The student's code is saved as they type; the
- * lesson keeps the latest version (`onCodeChange`) for when they come back to a step.
+ * One "try it" step, in three panes: what to do (the instructions and the checklist),
+ * the code editor, and the live preview from the sandbox. The student's code is saved
+ * as they type; the lesson keeps the latest version (`onCodeChange`) for when they
+ * come back to a step.
  */
 export function ChallengeWorkspace({
   challenge,
+  kicker,
   initialCode,
   isStudent,
   focusTitle = false,
+  after,
   onCodeChange,
+  onSaveState,
   onPassed,
 }: {
   challenge: Challenge;
+  /** "Step 3 · Try it". */
+  kicker: string;
   /** The code to start from: what the student wrote last, or the starter. */
   initialCode: CodeFiles;
   isStudent: boolean;
   /** Move focus to the step's title when it opens (after "Next step"). */
   focusTitle?: boolean;
+  /** What comes after a pass: "Next step", or the finished lesson. */
+  after?: ReactNode;
   onCodeChange: (challengeId: string, code: CodeFiles) => void;
+  onSaveState: (state: SaveState) => void;
   onPassed: (result: SubmissionResult) => void;
 }) {
   const t = useTranslations('lesson');
   const tp = useTranslations('progress');
   const [checking, setChecking] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [passedIds, setPassedIds] = useState<ReadonlySet<string> | null>(
+    challenge.passed ? new Set(challenge.checks.map((c) => String(c['id']))) : null,
+  );
   const [confirmReset, setConfirmReset] = useState(false);
   const [newBadges, setNewBadges] = useState<string[]>([]);
   const title = useRef<HTMLHeadingElement>(null);
@@ -103,7 +123,10 @@ export function ChallengeWorkspace({
   } = useLivePreview(files, {
     python,
   });
-  const saveText = useSaveText(code.saveState);
+
+  useEffect(() => {
+    onSaveState(code.saveState);
+  }, [code.saveState, onSaveState]);
 
   useEffect(() => {
     if (focusTitle) title.current?.focus();
@@ -120,6 +143,7 @@ export function ChallengeWorkspace({
       return;
     }
     const local: CheckResult[] = run.results;
+    setPassedIds(new Set(local.filter((r) => r.passed).map((r) => r.id)));
     let result: SubmissionResult | undefined;
     if (isStudent) {
       try {
@@ -174,86 +198,103 @@ export function ChallengeWorkspace({
   const labelFor = (key: CodeFileKey) => t(FILE_LABELS[key]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h3 ref={title} tabIndex={-1} className="text-xl font-bold outline-none">
+    <div className="grid min-h-0 flex-1 gap-3.5 px-4 pb-4 sm:px-6 sm:pb-6 md:grid-cols-2 xl:grid-cols-[22rem_minmax(0,1fr)_minmax(0,1fr)]">
+      <aside className="flex flex-col gap-3.5 rounded-panel bg-surface p-6 md:col-span-2 xl:col-span-1 xl:min-h-0 xl:overflow-y-auto">
+        <p className="text-xs font-bold tracking-[0.1em] text-brand-text uppercase">{kicker}</p>
+        <h3 ref={title} tabIndex={-1} className="text-2xl outline-none">
           {challenge.title}
         </h3>
-        <div className="mt-2">
+        <div className="text-[0.95rem]">
           <Markdown>{challenge.instructions}</Markdown>
         </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <FilesEditor
-          fileKeys={challenge.files as CodeFileKey[]}
-          labelFor={labelFor}
-          files={files}
-          saveText={saveText}
-          onChange={code.update}
+        <CheckList
+          checks={challenge.checks as unknown as { id: string; hint?: string }[]}
+          labels={challenge.checkLabels}
+          hints={challenge.hints}
+          passed={passedIds}
+          title={t('checks')}
         />
-        <PreviewPane
-          sandbox={sandbox}
-          title={python ? t('outputTitle') : t('previewTitle')}
-          python={python}
-        />
-      </div>
+        <ProblemList errors={sandbox.output.errors} />
 
-      {python ? <PythonControls load={pythonLoad} canRun={canRun} onRun={runProgram} /> : null}
+        {/* Always on the page, so screen readers announce each new result. */}
+        <div aria-live="polite" aria-atomic="true" className="mt-auto flex flex-col gap-3">
+          {feedback?.kind === 'passed' ? (
+            <div className="flex flex-col gap-1 rounded-row bg-sage-100 px-4 py-3.5 text-sage-800">
+              <p className="flex flex-wrap items-center gap-2 font-bold">
+                <Icon name="check" />
+                {t('allPassed')}
+                {feedback.xp > 0 ? (
+                  <span className="rounded-full bg-brand-100 px-2.5 py-0.5 text-sm text-brand-800">
+                    {tp('xpGained', { xp: String(feedback.xp) })}
+                  </span>
+                ) : null}
+              </p>
+              {feedback.capReached ? <p className="text-sm">{tp('capReached')}</p> : null}
+            </div>
+          ) : null}
+          {feedback?.kind === 'failed' ? (
+            <div className="flex flex-col gap-1 rounded-row bg-warn-soft px-4 py-3.5 text-sm text-warn-text">
+              <p className="font-bold">
+                {t('someFailed', {
+                  passed: String(feedback.passed),
+                  total: String(feedback.total),
+                })}
+              </p>
+              <ul className={clsx(feedback.hints.length > 1 && 'list-disc ps-5')}>
+                {feedback.hints.map((hint) => (
+                  <li key={hint}>
+                    <bdi>{hint}</bdi>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {feedback?.kind === 'error' ? (
+            <Alert tone="error" live={false}>
+              {feedback.message}
+            </Alert>
+          ) : null}
+        </div>
+        {after}
+      </aside>
 
-      <ProblemList errors={sandbox.output.errors} console={python ? [] : sandbox.output.console} />
-
-      {/* Always on the page, so screen readers announce each new result. */}
-      <div aria-live="polite" aria-atomic="true">
-        {feedback?.kind === 'passed' ? (
-          <Alert tone="success" live={false}>
-            <p>
-              {t('allPassed')}
-              {feedback.xp > 0 ? (
-                <strong className="ms-2">{tp('xpGained', { xp: String(feedback.xp) })}</strong>
-              ) : null}
-            </p>
-            {feedback.capReached ? <p className="mt-1 text-sm">{tp('capReached')}</p> : null}
-          </Alert>
-        ) : null}
-        {feedback?.kind === 'failed' ? (
-          <Alert tone="warning" live={false}>
-            <p>
-              {t('someFailed', {
-                passed: String(feedback.passed),
-                total: String(feedback.total),
-              })}
-            </p>
-            <ul className="mt-2 list-disc ps-5">
-              {feedback.hints.map((hint) => (
-                <li key={hint}>
-                  <bdi>{hint}</bdi>
-                </li>
-              ))}
-            </ul>
-          </Alert>
-        ) : null}
-        {feedback?.kind === 'error' ? (
-          <Alert tone="error" live={false}>
-            {feedback.message}
-          </Alert>
-        ) : null}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        {/* aria-disabled rather than disabled, so keyboard focus stays on the button. */}
-        <Button
-          onClick={() => void onCheck()}
-          aria-disabled={cannotCheck}
-          aria-busy={checking || undefined}
-          className={clsx(cannotCheck && 'cursor-not-allowed opacity-60')}
-        >
-          {checking ? t('checking') : t('check')}
-        </Button>
-        <Button variant="secondary" onClick={() => setConfirmReset(true)}>
-          {t('reset')}
-        </Button>
-      </div>
+      <FilesEditor
+        fileKeys={challenge.files as CodeFileKey[]}
+        labelFor={labelFor}
+        fileNameFor={(key) => FILE_NAMES[key]}
+        files={files}
+        onChange={code.update}
+        className="min-h-[26rem] xl:min-h-0"
+        actions={
+          <>
+            <Button variant="ghost" onClick={() => setConfirmReset(true)} className="text-muted">
+              <Icon name="undo" />
+              {t('reset')}
+            </Button>
+            {/* aria-disabled rather than disabled, so keyboard focus stays on the button. */}
+            <Button
+              size="lg"
+              onClick={() => void onCheck()}
+              aria-disabled={cannotCheck}
+              aria-busy={checking || undefined}
+              className="ms-auto"
+            >
+              <Icon name="check" />
+              {checking ? t('checking') : t('check')}
+            </Button>
+          </>
+        }
+      />
+      <PreviewPane
+        sandbox={sandbox}
+        title={python ? t('outputTitle') : t('previewTitle')}
+        python={python}
+        console={python ? [] : sandbox.output.console}
+        className="min-h-[26rem] xl:min-h-0"
+        footer={
+          python ? <PythonControls load={pythonLoad} canRun={canRun} onRun={runProgram} /> : null
+        }
+      />
 
       <ResetDialog open={confirmReset} onClose={() => setConfirmReset(false)} onConfirm={reset} />
       <BadgeCelebration keys={newBadges} />

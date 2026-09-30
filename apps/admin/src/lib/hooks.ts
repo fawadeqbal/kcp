@@ -39,6 +39,17 @@ export function useLoad<T>(load: () => Promise<ApiResult<T>>, key: string) {
   return { data: loaded?.key === key ? loaded.data : null, error, reload };
 }
 
+/** A search typed on another page (the overview's search box), for the list it opens. */
+let handedOff: { path: string; values: Record<string, string> } | null = null;
+
+/**
+ * Opens a list with a private search already applied, without putting it in the URL:
+ * call it right before navigating to `path`.
+ */
+export function handOffSearch(path: string, values: Record<string, string>) {
+  handedOff = { path, values };
+}
+
 /**
  * Filters and page number kept in the URL, with a draft for the filter form.
  * `privateKeys` (free-text searches, which may hold an email or a child's username)
@@ -53,7 +64,15 @@ export function useUrlFilters<K extends string>(
   const router = useRouter();
   const pathname = usePathname();
   const query = params.toString();
-  const [privateApplied, setPrivateApplied] = useState<Partial<Record<K, string>>>({});
+  const [privateApplied, setPrivateApplied] = useState<Partial<Record<K, string>>>(() => {
+    if (handedOff?.path !== pathname) return {};
+    const values: Partial<Record<K, string>> = {};
+    for (const key of privateKeys) values[key] = handedOff.values[key];
+    return values;
+  });
+  useEffect(() => {
+    if (handedOff?.path === pathname) handedOff = null;
+  }, [pathname]);
 
   // `keys` and `privateKeys` are module-level constants in every caller.
   const applied = useMemo(() => {

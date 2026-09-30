@@ -5,8 +5,7 @@ import { BADGE_CATEGORIES } from '@kcp/shared';
 import { clsx } from 'clsx';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Alert, PageSpinner } from '@/components/ui';
-import { Link } from '@/i18n/navigation';
+import { Alert, Icon, PageSpinner } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { BadgeCelebration, badgeIcon } from './badge-celebration';
@@ -16,7 +15,6 @@ type Badge = components['schemas']['BadgeDto'];
 /** Every badge, grouped by kind: earned ones in colour, the rest waiting to be earned. */
 export function BadgesPage() {
   const t = useTranslations('badges');
-  const tl = useTranslations('lesson');
   const format = useFormatter();
   const user = useAccount('STUDENT');
   const signedIn = user !== null;
@@ -47,17 +45,15 @@ export function BadgesPage() {
   const description = (key: string) => t(`${key}.description` as 'first-steps.description');
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <nav aria-label={tl('backToLearning')} className="text-sm">
-        <Link href="/learn" className="font-semibold text-brand-700 underline underline-offset-4">
-          {tl('backToLearning')}
-        </Link>
-      </nav>
-      <header>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="mt-1 text-muted">{t('subtitle')}</p>
+    <div className="mx-auto flex max-w-300 flex-col gap-7">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-4xl">{t('title')}</h1>
+          <p className="mt-1.5 text-lg text-muted">{t('subtitle')}</p>
+        </div>
         {badges ? (
-          <p className="mt-2 font-semibold text-brand-700">
+          <p className="flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 font-bold text-brand-800">
+            <Icon name="award" />
             {t('progress', { earned: String(earned), total: String(badges.length) })}
           </p>
         ) : null}
@@ -70,23 +66,23 @@ export function BadgesPage() {
             if (inCategory.length === 0) return null;
             return (
               <section key={category} aria-labelledby={`badges-${category}`}>
-                <h2 id={`badges-${category}`} className="text-xl font-bold">
+                <h2 id={`badges-${category}`} className="text-2xl">
                   {t(`category${category}`)}
                 </h2>
-                <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <ul className="mt-3.5 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
                   {inCategory.map((badge) => (
                     <li
                       key={badge.key}
                       className={clsx(
-                        'flex items-start gap-4 rounded-[var(--radius-card)] border p-4',
-                        badge.earned ? 'border-accent/50 bg-surface' : 'border-line bg-canvas',
+                        'flex items-start gap-4 rounded-inner p-4.5',
+                        badge.earned ? 'bg-surface' : 'border-2 border-dashed border-line',
                       )}
                     >
                       <span
                         aria-hidden="true"
                         className={clsx(
                           'grid size-14 shrink-0 place-items-center rounded-full text-3xl',
-                          badge.earned ? 'bg-accent/25' : 'bg-line/50 opacity-50 grayscale',
+                          badge.earned ? 'bg-brand-100' : 'bg-sand-200 opacity-55 grayscale',
                         )}
                       >
                         {badgeIcon(badge.key)}
@@ -96,10 +92,11 @@ export function BadgesPage() {
                         <p className="text-sm text-muted">{description(badge.key)}</p>
                         <p
                           className={clsx(
-                            'mt-1 text-xs font-semibold',
-                            badge.earned ? 'text-success' : 'text-muted',
+                            'mt-1.5 flex items-center gap-1.5 text-xs font-bold',
+                            badge.earned ? 'text-sage-text' : 'text-muted',
                           )}
                         >
+                          <Icon name={badge.earned ? 'check' : 'lock'} />
                           {badge.earned && badge.awardedAt
                             ? t('earnedOn', {
                                 date: format.dateTime(new Date(badge.awardedAt), {

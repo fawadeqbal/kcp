@@ -1,0 +1,36 @@
+id: builder-m02-l03-q3
+order: 3
+kind: choice
+xp: 5
+language: python
+prompt:
+  en: Why do the two print lines start with 4 spaces?
+  ar: لماذا يبدأ سطرا print بأربع مسافات؟
+  ur: دونوں print والی سطریں 4 اسپیس سے کیوں شروع ہوتی ہیں؟
+code:
+  - 'guess = 7'
+  - 'if guess == 7:'
+  - '    print("You got it!")'
+  - 'else:'
+  - '    print("Try again!")'
+options:
+  - id: a
+    text:
+      en: To make the program run faster.
+      ar: ليعمل البرنامج بسرعة أكبر.
+      ur: تاکہ پروگرام تیز چلے۔
+  - id: b
+    text:
+      en: So Python knows which line belongs to the if and which to the else.
+      ar: ليعرف بايثون أي سطر يتبع if وأي سطر يتبع else.
+      ur: تاکہ پائتھن کو پتا چلے کہ کون سی سطر if کی ہے اور کون سی else کی۔
+  - id: c
+    text:
+      en: Because every line in Python must start with 4 spaces.
+      ar: لأن كل سطر في بايثون يجب أن يبدأ بأربع مسافات.
+      ur: کیونکہ پائتھن میں ہر سطر 4 اسپیس سے شروع ہونی چاہیے۔
+answer: b
+explanation:
+  en: The 4 spaces show which lines are inside the if and which are inside the else. The if and else lines themselves start at the very beginning of the line.
+  ar: المسافات الأربع تبيّن أي الأسطر داخل if وأيها داخل else. أما سطرا if وelse نفساهما فيبدآن من أول السطر.
+  ur: یہ 4 اسپیس بتاتے ہیں کہ کون سی سطریں if کے اندر ہیں اور کون سی else کے اندر۔ خود if اور else والی سطریں بالکل شروع سے لکھی جاتی ہیں۔

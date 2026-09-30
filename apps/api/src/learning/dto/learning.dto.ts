@@ -10,6 +10,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { QuizDto } from './quiz.dto.js';
 
 export class LanguageQueryDto {
   /** Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
@@ -87,6 +88,8 @@ export class LessonSummaryDto {
   /** Premium, and the student has no premium now (no trial, plan or grant). */
   locked!: boolean;
   challengeCount!: number;
+  /** Quizzes the lesson has (short questions that work on a phone). */
+  quizCount!: number;
   /** Always NOT_STARTED for accounts that aren't students. */
   status!: LessonStatusValue;
 }
@@ -155,6 +158,11 @@ export class ChallengeDto {
   checks!: Record<string, unknown>[];
   /** Hint texts by key, in the requested language with English filling gaps. */
   hints!: Record<string, string>;
+  /**
+   * What each check looks at, by check ID ("The heading has a colour"), in the
+   * requested language with English filling gaps: the checklist beside the editor.
+   */
+  checkLabels!: Record<string, string>;
   /** The student's saved code, if any. */
   draft!: CodeFilesDto | null;
   /** Whether the student has passed this challenge before. */
@@ -182,6 +190,8 @@ export class LessonDto {
   previousLessonId!: string | null;
   nextLessonId!: string | null;
   challenges!: ChallengeDto[];
+  /** Short questions about the lesson (graded by the server). */
+  quizzes!: QuizDto[];
 }
 
 export class LessonProgressDto {

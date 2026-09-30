@@ -41,23 +41,23 @@ const NUMBERS: { key: NumberKey; label: string; help: string; period: 'sum' | 'l
   {
     key: 'payingParents',
     label: 'Paying parents',
-    help: 'On the last day. Counted once payments arrive (Sprint 6)',
+    help: 'Parents with a paid plan on the last day',
     period: 'last',
   },
   {
     key: 'cancellations',
     label: 'Cancellations',
-    help: 'Counted once payments arrive (Sprint 6)',
+    help: 'Plans cancelled by parents',
     period: 'sum',
   },
 ];
 
 function Stat({ label, value, help }: { label: string; value: number; help: string }) {
   return (
-    <div className="rounded-[var(--radius-card)] border border-line bg-surface p-5">
-      <p className="text-sm font-medium text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-bold">{value.toLocaleString('en')}</p>
-      <p className="mt-1 text-sm text-muted">{help}</p>
+    <div className="flex flex-col gap-0.5 rounded-inner bg-surface px-5 py-4.5">
+      <p className="text-sm font-semibold text-muted">{label}</p>
+      <p className="font-display text-[2.125rem] leading-tight">{value.toLocaleString('en')}</p>
+      <p className="text-xs text-muted">{help}</p>
     </div>
   );
 }

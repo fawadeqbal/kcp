@@ -142,13 +142,17 @@ test('in Urdu, a parent changes a child’s password and deletes the account', a
   // A new password signs the child out everywhere.
   const card = page.getByRole('article', { name: child, exact: true });
   await card.getByRole('button', { name: m.dashboard.manage }).click();
+  await card.getByRole('button', { name: m.dashboard.passwordTitle }).click();
+  const passwordDialog = page.getByRole('dialog', { name: m.dashboard.passwordTitle });
   const newPassword = 'new kid pass 9';
-  await card.getByLabel(m.addChild.password, { exact: true }).fill(newPassword);
-  await card.getByRole('button', { name: m.dashboard.passwordSubmit }).click();
+  await passwordDialog.getByLabel(m.addChild.password, { exact: true }).fill(newPassword);
+  await passwordDialog.getByRole('button', { name: m.dashboard.passwordSubmit }).click();
   await expect(
-    card.getByText(m.dashboard.passwordChanged.replace('{nickname}', isolate(child))),
+    passwordDialog.getByText(m.dashboard.passwordChanged.replace('{nickname}', isolate(child))),
   ).toBeVisible();
   await page.screenshot({ path: 'test-results/screens/dashboard-manage-ur.png', fullPage: true });
+  await passwordDialog.getByRole('button', { name: m.dashboard.close }).click();
+  await expect(passwordDialog).toBeHidden();
 
   // The child, on their own device: the old password no longer works.
   const kid = await browser.newContext({ baseURL: WEB_URL });

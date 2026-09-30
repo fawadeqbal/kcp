@@ -72,7 +72,7 @@ export function CertificatesSection() {
           {list.modules.map((module) => (
             <li
               key={module.moduleId}
-              className="flex flex-wrap items-center gap-3 rounded-xl border border-line p-3"
+              className="flex flex-wrap items-center gap-3 rounded-row bg-raised p-3"
             >
               <span aria-hidden="true" className="text-2xl">
                 {module.certificate ? '🎓' : module.finished ? '🏁' : '📜'}

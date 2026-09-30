@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@kcp/database';
+import { Prisma, type PrismaClient } from '@kcp/database';
 import type { LoadedTrack } from './load.js';
 
 export interface ImportSummary {
@@ -6,6 +6,7 @@ export interface ImportSummary {
   modules: number;
   lessons: number;
   challenges: number;
+  quizzes: number;
   projects: number;
   /** Items in the database that are no longer in content/ and were switched off. */
   deactivated: number;
@@ -15,6 +16,38 @@ export interface ImportSummary {
 
 const upper = (type: 'html' | 'css' | 'js' | 'python') =>
   type.toUpperCase() as 'HTML' | 'CSS' | 'JS' | 'PYTHON';
+
+type QuizData = LoadedTrack['modules'][number]['lessons'][number]['quizzes'][number]['data'];
+
+/** The quiz's texts by language: { en: { prompt, explanation, options: { a: … } } }. */
+export function quizTexts(quiz: QuizData): Record<string, unknown> {
+  const languages = new Set([
+    ...Object.keys(quiz.prompt),
+    ...Object.keys(quiz.explanation),
+    ...(quiz.options ?? []).flatMap((o) => Object.keys(o.text ?? {})),
+  ]);
+  const texts: Record<string, unknown> = {};
+  for (const language of languages) {
+    const options: Record<string, string> = {};
+    for (const option of quiz.options ?? []) {
+      const text = option.text?.[language];
+      if (text) options[option.id] = text;
+    }
+    texts[language] = {
+      ...(quiz.prompt[language] ? { prompt: quiz.prompt[language] } : {}),
+      ...(quiz.explanation[language] ? { explanation: quiz.explanation[language] } : {}),
+      options,
+    };
+  }
+  return texts;
+}
+
+/** What the server grades against; never sent to students. */
+export function quizAnswer(quiz: QuizData): Record<string, unknown> {
+  if (quiz.kind === 'bug') return { line: quiz.bugLine };
+  if (quiz.kind === 'output' || quiz.kind === 'choice') return { option: quiz.answer };
+  return {};
+}
 
 export interface ImportOptions {
   /**
@@ -51,6 +84,10 @@ export async function importContent(
           for (const code of Object.keys(challenge.texts))
             if (!languages.has(code)) unknown.add(code);
         }
+        for (const quiz of lesson.quizzes) {
+          for (const code of Object.keys(quizTexts(quiz.data)))
+            if (!languages.has(code)) unknown.add(code);
+        }
       }
     }
   }
@@ -63,6 +100,7 @@ export async function importContent(
     modules: 0,
     lessons: 0,
     challenges: 0,
+    quizzes: 0,
     projects: 0,
     deactivated: 0,
     newModules: [],
@@ -72,6 +110,7 @@ export async function importContent(
     modules: [] as string[],
     lessons: [] as string[],
     challenges: [] as string[],
+    quizzes: [] as string[],
     projects: [] as string[],
   };
 
@@ -196,6 +235,30 @@ export async function importContent(
                 });
               }
             }
+
+            for (const quiz of lesson.quizzes) {
+              const q = quiz.data;
+              const quizData = {
+                lessonId: l.id,
+                sortOrder: q.order,
+                kind: q.kind.toUpperCase() as 'ORDER' | 'BUG' | 'OUTPUT' | 'CHOICE',
+                xp: q.xp,
+                codeLanguage: q.language ?? null,
+                // A quiz edited to drop its code or options loses them here too.
+                code: q.code ?? Prisma.DbNull,
+                options:
+                  q.options?.map((o) => (o.code === undefined ? { id: o.id } : o)) ?? Prisma.DbNull,
+                answer: quizAnswer(q) as object,
+                texts: quizTexts(q) as object,
+                isActive: true,
+              };
+              await tx.quiz.upsert({
+                where: { id: q.id },
+                create: { id: q.id, ...quizData },
+                update: quizData,
+              });
+              seen.quizzes.push(q.id);
+            }
           }
         }
       }
@@ -206,6 +269,7 @@ export async function importContent(
           where: { id: { notIn: seen.challenges }, isActive: true },
           data: off,
         }),
+        tx.quiz.updateMany({ where: { id: { notIn: seen.quizzes }, isActive: true }, data: off }),
         tx.projectBrief.updateMany({
           where: { id: { notIn: seen.projects }, isActive: true },
           data: off,
@@ -223,6 +287,7 @@ export async function importContent(
   summary.modules = seen.modules.length;
   summary.lessons = seen.lessons.length;
   summary.challenges = seen.challenges.length;
+  summary.quizzes = seen.quizzes.length;
   summary.projects = seen.projects.length;
   return summary;
 }

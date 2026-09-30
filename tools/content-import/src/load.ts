@@ -14,6 +14,8 @@ import {
   moduleSchema,
   type ProjectFile,
   projectFrontMatter,
+  type QuizFile,
+  quizSchema,
   projectSchema,
   type TrackFile,
   trackSchema,
@@ -36,6 +38,8 @@ export interface ChallengeText {
   title: string;
   instructions: string;
   hints: Record<string, string>;
+  /** What each check looks at, by check ID (the "checks" of the front matter). */
+  checkLabels: Record<string, string>;
 }
 
 export interface LoadedChallenge {
@@ -44,12 +48,19 @@ export interface LoadedChallenge {
   texts: Record<string, ChallengeText>;
 }
 
+export interface LoadedQuiz {
+  file: string;
+  data: QuizFile;
+}
+
 export interface LoadedLesson {
   dir: string;
   slug: string;
   data: LessonFile;
   texts: Record<string, LessonText>;
   challenges: LoadedChallenge[];
+  /** Short questions for phones (and the web lesson page); optional. */
+  quizzes: LoadedQuiz[];
 }
 
 export interface ProjectText {
@@ -57,6 +68,7 @@ export interface ProjectText {
   summary: string;
   body: string;
   hints: Record<string, string>;
+  checkLabels: Record<string, string>;
 }
 
 export interface LoadedProject {
@@ -252,11 +264,13 @@ class Loader {
           "HTML tags outside `code` don't show on the page — wrap them in backticks",
         );
       }
-      texts[language] = { ...front.data, body: split.body };
+      const { checks, ...words } = front.data;
+      texts[language] = { ...words, checkLabels: checks, body: split.body };
     }
     if (!texts['en']) this.error(file, 'needs project.en.md');
     this.checkLanguages(Object.keys(texts), file, 'project brief');
     this.checkHints(data.checks, texts, file, 'project');
+    this.checkLabels(data.checks, texts, file, 'project');
     this.checkFiles(data, file);
     return { file, data, texts };
   }
@@ -274,6 +288,31 @@ class Loader {
         if (text.hints[key]) continue;
         if (language === 'en') this.error(file, `hint "${key}" is missing from ${base}.en.md`);
         else this.warn(file, `hint "${key}" is missing in ${language} — the English hint is shown`);
+      }
+    }
+  }
+
+  /**
+   * Every check needs a label in English (the checklist beside the editor), and labels
+   * must belong to real checks. Other languages fall back to English.
+   */
+  private checkLabels(
+    checks: { id: string }[],
+    texts: Record<string, { checkLabels: Record<string, string> }>,
+    file: string,
+    base: string,
+  ) {
+    const ids = new Set(checks.map((check) => check.id));
+    for (const [language, text] of Object.entries(texts)) {
+      for (const key of Object.keys(text.checkLabels)) {
+        if (!ids.has(key))
+          this.error(file, `"checks" in ${base}.${language}.md names no check "${key}"`);
+      }
+      for (const id of ids) {
+        if (text.checkLabels[id]) continue;
+        if (language === 'en')
+          this.error(file, `check "${id}" has no label in ${base}.en.md ("checks")`);
+        else this.warn(file, `check "${id}" has no ${language} label — the English one is shown`);
       }
     }
   }
@@ -326,7 +365,40 @@ class Loader {
     this.checkOrder(challenges, file, 'challenges');
     if (challenges.length === 0)
       this.error(file, 'a lesson needs at least one challenge (a "try it" step)');
-    return { dir, slug, data, texts, challenges: byOrder(challenges) };
+
+    const quizzes: LoadedQuiz[] = [];
+    const quizDir = path.join(dir, 'quizzes');
+    for (const name of await files(quizDir)) {
+      if (!name.endsWith('.yaml')) continue;
+      const quizFile = path.join(quizDir, name);
+      const quiz = await this.yaml(quizFile, quizSchema);
+      if (!quiz) continue;
+      this.claimId(quiz.id, quizFile, data.id);
+      this.checkQuizLanguages(quiz, quizFile);
+      quizzes.push({ file: quizFile, data: quiz });
+    }
+    this.checkOrder(quizzes, file, 'quizzes');
+    if (quizzes.length === 0)
+      this.warn(file, 'no quizzes yet (quizzes/*.yaml): the app has nothing to practise');
+    return { dir, slug, data, texts, challenges: byOrder(challenges), quizzes: byOrder(quizzes) };
+  }
+
+  /** Every text of a quiz in every launch language (English is required by the schema). */
+  private checkQuizLanguages(quiz: QuizFile, file: string) {
+    const texts: [string, Record<string, string>][] = [
+      ['prompt', quiz.prompt],
+      ['explanation', quiz.explanation],
+      ...(quiz.options ?? []).flatMap((o): [string, Record<string, string>][] =>
+        o.text ? [[`option ${o.id}`, o.text]] : [],
+      ),
+    ];
+    for (const [what, byLanguage] of texts) {
+      for (const language of LAUNCH_LANGUAGES) {
+        if (!byLanguage[language]) {
+          this.warn(file, `no ${language} ${what} yet — students see the English one`);
+        }
+      }
+    }
   }
 
   private async loadChallenge(dir: string, base: string, lessonId: string) {
@@ -353,6 +425,7 @@ class Loader {
       texts[language] = {
         title: front.data.title,
         hints: front.data.hints,
+        checkLabels: front.data.checks,
         instructions: split.body,
       };
     }
@@ -360,6 +433,7 @@ class Loader {
     this.checkLanguages(Object.keys(texts), file, 'instructions');
 
     this.checkHints(data.checks, texts, file, base);
+    this.checkLabels(data.checks, texts, file, base);
     this.checkFiles(data, file);
     return { file, data, texts };
   }

@@ -1,0 +1,18 @@
+id: builder-m01-l05-q3
+order: 3
+kind: order
+xp: 5
+language: html
+prompt:
+  en: 'Put the lines in order to make a card: the heading at the top, then the paragraph.'
+  ar: 'رتّب الأسطر لتصنع بطاقة: العنوان في الأعلى، ثم الفقرة.'
+  ur: 'سطروں کو ترتیب سے لگائیں تاکہ ایک کارڈ بنے: اوپر سرخی، پھر پیراگراف۔'
+code:
+  - '<div class="card">'
+  - '  <h2>Football</h2>'
+  - '  <p>I play every Friday.</p>'
+  - '</div>'
+explanation:
+  en: The <div> opens first and closes last. The heading and the paragraph go in between, so they are inside the card's box.
+  ar: يُفتح ‎<div>‎ أولًا ويُغلق في النهاية. يوضع العنوان والفقرة بينهما، فيكونان داخل صندوق البطاقة.
+  ur: سب سے پہلے ‎<div>‎ کھلتا ہے اور سب سے آخر میں بند ہوتا ہے۔ سرخی اور پیراگراف ان دونوں کے درمیان آتے ہیں، اس لیے وہ کارڈ کے باکس کے اندر ہوتے ہیں۔

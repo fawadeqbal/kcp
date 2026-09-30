@@ -1,0 +1,34 @@
+id: builder-m01-l04-q3
+order: 3
+kind: choice
+xp: 5
+language: css
+prompt:
+  en: In this rule, what is color?
+  ar: في هذه القاعدة، ما هو color؟
+  ur: اس رول میں color کیا ہے؟
+code:
+  - 'h1 {'
+  - '  color: navy;'
+  - '}'
+options:
+  - id: a
+    text:
+      en: The selector. It picks the elements to style.
+      ar: المحدِّد. يختار العناصر التي نريد تنسيقها.
+      ur: سلیکٹر۔ یہ ان عناصر کو چنتا ہے جنہیں اسٹائل دینا ہے۔
+  - id: b
+    text:
+      en: The property. It is the thing you want to change.
+      ar: الخاصية. هي الشيء الذي تريد تغييره.
+      ur: پراپرٹی۔ یہ وہ چیز ہے جو آپ بدلنا چاہتے ہیں۔
+  - id: c
+    text:
+      en: The value. It is what you change the thing to.
+      ar: القيمة. هي ما تريد أن تغيّر الشيء إليه.
+      ur: ویلیو۔ یعنی آپ اس چیز کو کیا بنانا چاہتے ہیں۔
+answer: b
+explanation:
+  en: In this rule, h1 is the selector, color is the property and navy is the value. So every h1 heading turns navy.
+  ar: في هذه القاعدة، h1 هو المحدِّد، وcolor هي الخاصية، وnavy هي القيمة. لذلك يصبح لون كل عناوين h1 كحليًا (navy).
+  ur: اس رول میں h1 سلیکٹر ہے، color پراپرٹی ہے اور navy ویلیو ہے۔ اس لیے ہر h1 سرخی کا رنگ گہرا نیلا (navy) ہو جاتا ہے۔

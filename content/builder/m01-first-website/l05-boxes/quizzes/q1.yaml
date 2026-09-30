@@ -1,0 +1,29 @@
+id: builder-m01-l05-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: Two cards are stuck together. Which property adds space between them?
+  ar: بطاقتان ملتصقتان ببعضهما. أي خاصية تضيف مسافة بينهما؟
+  ur: دو کارڈ آپس میں چپکے ہوئے ہیں۔ کون سی پراپرٹی ان کے درمیان جگہ بناتی ہے؟
+options:
+  - id: a
+    text:
+      en: padding
+      ar: الحشو (padding)
+      ur: پیڈنگ (padding)
+  - id: b
+    text:
+      en: border
+      ar: الحدود (border)
+      ur: بارڈر (border)
+  - id: c
+    text:
+      en: margin
+      ar: الهامش (margin)
+      ur: مارجن (margin)
+answer: c
+explanation:
+  en: The margin is the space outside a box, between it and its neighbours. Padding is the space inside the box, and the border is its edge.
+  ar: الهامش (margin) هو المسافة خارج الصندوق، بينه وبين جيرانه. أما الحشو (padding) فهو المسافة داخل الصندوق، والحدود (border) هي حافّته.
+  ur: مارجن (margin) باکس کے باہر کی جگہ ہے، اس کے اور اس کے پڑوسیوں کے درمیان۔ پیڈنگ (padding) باکس کے اندر کی جگہ ہے، اور بارڈر (border) اس کا کنارہ ہے۔

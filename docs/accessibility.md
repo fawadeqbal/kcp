@@ -9,8 +9,17 @@ The goal is WCAG 2.1 level AA in English, Arabic and Urdu, on phones, tablets an
 - **axe-core** (WCAG 2.1 A and AA rules) on 18 pages in each of the three languages: home, both logins, sign-up, safety, terms, privacy and the "page not found" page; the parent dashboard, adding a child, plans and payments, and account; the lesson map, a lesson, a project, the portfolio, leaderboards and badges. The code preview and videos are left out: they are separate documents (the sandbox, YouTube).
 - **Right to left on a 360-pixel phone** (Arabic and Urdu): 11 main pages (home, login, sign-up, terms, the parent's four pages, the lesson map, portfolio and leaderboards) are mirrored (`dir="rtl"`) and never scroll sideways.
 - **Nastaliq line height:** Urdu paragraphs have at least 1.9 times their font size between lines, so the tall letters don't collide.
+- **Dark mode:** the apps follow the device's light or dark setting, so axe also checks every English page with the dark colours.
+
+`apps/mobile/test/accessibility_test.dart` does the same for the phone app: tap-target size, labels and text contrast (Flutter's checks) on the welcome, sign-in, today, practice and parent screens in all three languages, and no layout overflow with text at twice its size.
 
 The other browser tests find elements by their accessible role and name (for example `getByRole('button', { name: … })`), which also checks that controls are labelled in every language.
+
+## The Organic revamp (October 2026)
+
+- **Buttons:** the design's terracotta with cream text is 3.5:1, so buttons and other filled controls use a deeper terracotta (`primary`, 5.25:1). See [the design system](design-system.md).
+- **Code colours** were darkened again for the cream code well (line numbers and comments at 4.5:1 or more), light and dark.
+- **Icons** are decorative everywhere: each icon-only button has a label (the notifications bell, the password eye, closing the practice).
 
 ## Fixed in this review
 

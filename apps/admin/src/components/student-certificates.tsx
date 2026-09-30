@@ -49,7 +49,7 @@ export function StudentCertificatesCard({
                     href={`${WEB_APP_URL}/en/certificates/${c.code}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-latin text-brand-700 underline-offset-4 hover:underline"
+                    className="font-latin text-brand-text underline-offset-4 hover:underline"
                   >
                     {c.code}
                   </a>{' '}

@@ -1,0 +1,18 @@
+id: builder-m02-l02-q2
+order: 2
+kind: bug
+xp: 5
+language: python
+prompt:
+  en: One line has a mistake. Tap it.
+  ar: في أحد الأسطر خطأ. اضغط عليه.
+  ur: ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - 'nickname = "Rocket"'
+  - 'favourite food = "pizza"'
+  - 'print(nickname + " loves " + favourite_food)'
+bugLine: 2
+explanation:
+  en: "A variable name can't have spaces. Use _ instead: favourite_food, like in the last line."
+  ar: 'لا يمكن أن يحتوي اسم المتغيّر على مسافات. استخدم _ بدلًا منها: ‎favourite_food‎، كما في السطر الأخير.'
+  ur: 'ویری ایبل کے نام میں اسپیس نہیں ہو سکتی۔ اس کی جگہ _ استعمال کریں: ‎favourite_food‎، جیسے آخری سطر میں ہے۔'

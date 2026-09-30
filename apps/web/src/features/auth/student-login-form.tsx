@@ -2,7 +2,15 @@
 
 import { useTranslations } from 'next-intl';
 import { type FormEvent, useState } from 'react';
-import { Alert, AuthCard, Button, PasswordField, TextField } from '@/components/ui';
+import {
+  Alert,
+  AuthCard,
+  Button,
+  Icon,
+  IconBubble,
+  PasswordField,
+  TextField,
+} from '@/components/ui';
 import { Link, useRouter } from '@/i18n/navigation';
 import { homePath, useAuth } from '@/lib/auth-provider';
 import { errorMessageKey } from '@/lib/errors';
@@ -47,7 +55,9 @@ export function StudentLoginForm() {
     return (
       <AuthCard title={t('auth.student.title')}>
         <Alert>{t('auth.student.someoneSignedIn', { name: state.user.displayName ?? '' })}</Alert>
-        <Button onClick={() => void logout()}>{t('auth.student.logOutFirst')}</Button>
+        <Button size="lg" onClick={() => void logout()}>
+          {t('auth.student.logOutFirst')}
+        </Button>
       </AuthCard>
     );
   }
@@ -78,16 +88,22 @@ export function StudentLoginForm() {
           error={errors.password}
         />
         {formError ? <Alert tone="error">{formError}</Alert> : null}
-        <Button type="submit" loading={submitting}>
+        <Button type="submit" size="lg" loading={submitting}>
           {t('auth.student.submit')}
+          <Icon name="arrow" />
         </Button>
       </form>
-      <p className="text-center text-muted">{t('auth.student.forgot')}</p>
+      <p className="flex gap-2.5 rounded-row bg-raised px-4 py-3 text-sm text-muted">
+        <Icon name="key" className="mt-0.5 shrink-0 text-base" />
+        {t('auth.student.forgot')}
+      </p>
       <Link
         href="/login"
-        className="text-center font-semibold text-brand-700 underline-offset-4 hover:underline"
+        className="flex items-center gap-3.5 rounded-row bg-sage-100 px-4.5 py-3.5 font-bold text-sage-900 transition-colors hover:bg-sage-200"
       >
-        {t('auth.student.parentLink')}
+        <IconBubble icon="users" tone="sageSolid" size="sm" />
+        <span className="flex-1">{t('auth.student.parentLink')}</span>
+        <Icon name="arrow" className="text-lg text-sage-text" />
       </Link>
     </AuthCard>
   );

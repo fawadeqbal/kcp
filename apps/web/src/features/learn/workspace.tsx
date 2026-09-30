@@ -3,8 +3,8 @@
 import type { CodeError, CodeFileKey, CodeFiles, PreviewLabels } from '@kcp/checks';
 import { clsx } from 'clsx';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Alert, Button } from '@/components/ui';
+import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Alert, Button, Icon, textareaClass } from '@/components/ui';
 import { CodeEditor } from './code-editor';
 import { loadPython, type PythonLoad, usePythonRuntime } from './python-runtime';
 import { onTabKeyDown } from './tabs';
@@ -184,15 +184,15 @@ export function PythonControls({
   const mb = (bytes: number) =>
     format.number(bytes / 1_000_000, { maximumFractionDigits: 1, minimumFractionDigits: 1 });
   return (
-    <div className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4">
+    <div className="flex flex-col gap-3">
       {load.status === 'loading' ? (
-        <div role="status" className="flex flex-col gap-1 text-sm">
+        <div role="status" className="flex flex-col gap-1.5 text-sm">
           <label htmlFor={`${id}-progress`} className="font-semibold">
             {t('pythonDownloading')}
           </label>
           <progress
             id={`${id}-progress`}
-            className="h-3 w-full accent-brand-600"
+            className="h-3 w-full overflow-hidden rounded-full accent-brand"
             value={load.total ? load.loaded : undefined}
             max={load.total || undefined}
           />
@@ -206,7 +206,7 @@ export function PythonControls({
       {load.status === 'failed' ? (
         <Alert tone="error">
           <p>{t('pythonDownloadFailed')}</p>
-          <Button variant="secondary" className="mt-2" onClick={() => loadPython(true)}>
+          <Button variant="secondary" size="sm" className="mt-2" onClick={() => loadPython(true)}>
             {t('tryAgain')}
           </Button>
         </Alert>
@@ -222,7 +222,7 @@ export function PythonControls({
           rows={2}
           value={stdin}
           onChange={(event) => setStdin(event.target.value)}
-          className="rounded-lg border border-line bg-canvas px-3 py-2 font-mono text-sm"
+          className={clsx(textareaClass(), 'min-h-0 font-mono text-sm')}
         />
         <p id={`${id}-stdin-help`} className="text-xs text-muted">
           {t('pythonInputHelp')}
@@ -230,11 +230,12 @@ export function PythonControls({
       </div>
       <div>
         <Button
-          variant="secondary"
+          variant="sage"
           onClick={() => canRun && onRun(stdin)}
           aria-disabled={!canRun}
-          className={clsx(!canRun && 'cursor-not-allowed opacity-60')}
+          className={clsx(!canRun && 'cursor-not-allowed opacity-45')}
         >
+          <Icon name="play" className="text-sm" />
           {t('run')}
         </Button>
       </div>
@@ -242,13 +243,8 @@ export function PythonControls({
   );
 }
 
-export function ProblemList({
-  errors,
-  console: lines,
-}: {
-  errors: CodeError[];
-  console: { level: string; text: string }[];
-}) {
+/** Mistakes the page or program made (with a friendly note for Python's errors). */
+export function ProblemList({ errors }: { errors: CodeError[] }) {
   const t = useTranslations('lesson');
   const describe = (error: CodeError) => {
     if (error.kind === 'loop') return t('loopError');
@@ -263,53 +259,63 @@ export function ProblemList({
     error.name && (EXPLAINED_ERRORS as readonly string[]).includes(error.name)
       ? t(`pythonErrors.${error.name as (typeof EXPLAINED_ERRORS)[number]}`)
       : null;
-  if (errors.length === 0 && lines.length === 0) return null;
+  if (errors.length === 0) return null;
   return (
     <div className="flex flex-col gap-2 text-sm">
-      {errors.length ? (
-        <div>
-          <h4 className="font-semibold text-danger">{t('problems')}</h4>
-          <ul className="mt-1 flex flex-col gap-1">
-            {errors.map((error, index) => (
-              <li key={index} className="rounded-lg bg-danger/10 px-3 py-1.5 text-danger">
-                <bdi dir={error.name ? 'ltr' : undefined}>{describe(error)}</bdi>
-                {explain(error) ? <p className="mt-1 text-ink">{explain(error)}</p> : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      {lines.length ? (
-        <div>
-          <h4 className="font-semibold">{t('console')}</h4>
-          <pre
-            dir="ltr"
-            className="mt-1 max-h-40 overflow-auto rounded-lg bg-ink p-3 text-start font-mono text-xs text-white"
-          >
-            {lines
-              .map((line) => `${line.level === 'log' ? '' : `[${line.level}] `}${line.text}`)
-              .join('\n')}
-          </pre>
-        </div>
-      ) : null}
+      <h4 className="flex items-center gap-2 font-sans font-bold text-danger">
+        <Icon name="alert" />
+        {t('problems')}
+      </h4>
+      <ul className="flex flex-col gap-1.5">
+        {errors.map((error, index) => (
+          <li key={index} className="rounded-row bg-danger-soft px-3.5 py-2 text-danger-text">
+            <bdi dir={error.name ? 'ltr' : undefined}>{describe(error)}</bdi>
+            {explain(error) ? <p className="mt-1 text-ink">{explain(error)}</p> : null}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-/** The files as tabs, with a code editor for the selected one. */
+/** What the page wrote to the console (console.log and friends). */
+export function ConsoleOutput({ lines }: { lines: { level: string; text: string }[] }) {
+  const t = useTranslations('lesson');
+  return lines.length ? (
+    <pre
+      dir="ltr"
+      className="h-full overflow-auto rounded-well bg-code-bg p-4 text-start font-mono text-xs leading-relaxed text-ink"
+    >
+      {lines
+        .map((line) => `${line.level === 'log' ? '' : `[${line.level}] `}${line.text}`)
+        .join('\n')}
+    </pre>
+  ) : (
+    <p className="grid h-full place-items-center rounded-well bg-code-bg p-4 text-center text-sm text-muted">
+      {t('consoleEmpty')}
+    </p>
+  );
+}
+
+/** The files as pill tabs, with a code editor for the selected one and the actions below. */
 export function FilesEditor({
   fileKeys,
   labelFor,
+  fileNameFor,
   files,
-  saveText,
   onChange,
+  actions,
+  className,
 }: {
   fileKeys: CodeFileKey[];
   labelFor: (key: CodeFileKey) => string;
+  /** The file's real name, shown beside the tabs ("style.css"). */
+  fileNameFor?: (key: CodeFileKey) => string;
   files: CodeFiles;
-  /** "Saving…" / "Saved", announced politely. */
-  saveText: string;
   onChange: (key: CodeFileKey, value: string) => void;
+  /** "Start again" and "Check my code", under the editor. */
+  actions?: ReactNode;
+  className?: string;
 }) {
   const t = useTranslations('lesson');
   const baseId = useId();
@@ -320,9 +326,14 @@ export function FilesEditor({
   const handle = useCallback((next: string) => onChange(active, next), [active, onChange]);
 
   return (
-    <div className="flex min-w-0 flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface">
-      <div className="flex items-center justify-between gap-2 border-b border-line px-2">
-        <div role="tablist" aria-label={t('files')} className="flex">
+    <div
+      className={clsx(
+        'elev-sm flex min-w-0 flex-col overflow-hidden rounded-panel bg-code-bg',
+        className,
+      )}
+    >
+      <div className="flex items-center gap-2 px-3 pt-3 pb-1.5">
+        <div role="tablist" aria-label={t('files')} className="flex flex-wrap gap-1">
           {fileKeys.map((file, index) => (
             <button
               key={file}
@@ -337,25 +348,27 @@ export function FilesEditor({
                 onTabKeyDown(event, fileKeys.length, index, (i) => setActive(fileKeys[i]!))
               }
               className={clsx(
-                'font-latin -mb-px border-b-2 px-3 py-2 text-sm font-semibold',
+                'font-latin min-h-9 rounded-full px-3.5 text-sm transition-colors',
                 active === file
-                  ? 'border-brand-600 text-brand-700'
-                  : 'border-transparent text-muted hover:text-ink',
+                  ? 'bg-brand-100 font-bold text-brand-800'
+                  : 'font-semibold text-muted hover:bg-ink/7 hover:text-ink',
               )}
             >
               <bdi>{labelFor(file)}</bdi>
             </button>
           ))}
         </div>
-        <span className="text-xs text-muted" aria-live="polite">
-          {saveText}
-        </span>
+        {fileNameFor ? (
+          <span className="font-latin ms-auto truncate text-xs text-muted" dir="ltr">
+            {fileNameFor(active)}
+          </span>
+        ) : null}
       </div>
       <div
         id={panelId}
         role="tabpanel"
         aria-labelledby={tabId(active)}
-        className="h-72 overflow-auto md:h-96"
+        className="min-h-72 flex-1 overflow-auto"
       >
         <CodeEditor
           key={active}
@@ -366,6 +379,7 @@ export function FilesEditor({
           onChange={handle}
         />
       </div>
+      {actions ? <div className="flex flex-wrap items-center gap-2.5 p-3.5">{actions}</div> : null}
       <p id={helpId} className="sr-only">
         {t('editorHelp')}
       </p>
@@ -373,30 +387,89 @@ export function FilesEditor({
   );
 }
 
-/** The sandbox iframe showing the student's page (or, for Python, what the program printed). */
+/**
+ * The student's page (or, for Python, what the program printed) in the sandbox, with a
+ * second tab for the console. The frame stays on the page while the console shows, so
+ * the page keeps running.
+ */
 export function PreviewPane({
   sandbox,
   title,
   python = false,
+  console: lines = [],
+  footer,
+  className,
 }: {
   sandbox: ReturnType<typeof useSandbox>;
   title: string;
   python?: boolean;
+  /** Console lines (web pages only). */
+  console?: { level: string; text: string }[];
+  /** Python's controls, under the output. */
+  footer?: ReactNode;
+  className?: string;
 }) {
   const t = useTranslations('lesson');
+  const baseId = useId();
+  const [tab, setTab] = useState<'preview' | 'console'>('preview');
+  const tabs = python ? (['preview'] as const) : (['preview', 'console'] as const);
+  const label = (key: 'preview' | 'console') =>
+    key === 'console' ? t('console') : python ? t('output') : t('preview');
   return (
-    <div className="flex min-w-0 flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface">
-      <div className="border-b border-line px-3 py-2 text-sm font-semibold">
-        {python ? t('output') : t('preview')}
+    <div
+      className={clsx(
+        'flex min-w-0 flex-col gap-3 overflow-hidden rounded-panel bg-surface p-3',
+        className,
+      )}
+    >
+      <div role="tablist" aria-label={title} className="flex gap-1">
+        {tabs.map((key, index) => (
+          <button
+            key={key}
+            id={`${baseId}-${key}`}
+            type="button"
+            role="tab"
+            aria-selected={tab === key}
+            aria-controls={`${baseId}-panel`}
+            tabIndex={tab === key ? 0 : -1}
+            onClick={() => setTab(key)}
+            onKeyDown={(event) => onTabKeyDown(event, tabs.length, index, (i) => setTab(tabs[i]!))}
+            className={clsx(
+              'flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-sm transition-colors',
+              tab === key
+                ? 'elev-sm bg-canvas font-bold'
+                : 'font-semibold text-muted hover:text-ink',
+            )}
+          >
+            <Icon name={key === 'console' ? 'terminal' : python ? 'terminal' : 'eye'} />
+            {label(key)}
+            {key === 'console' && lines.length ? (
+              <span className="size-2 rounded-full bg-brand" aria-hidden="true" />
+            ) : null}
+          </button>
+        ))}
       </div>
-      <iframe
-        key={sandbox.frameKey}
-        ref={sandbox.frame}
-        src={`${SANDBOX_URL}/`}
-        sandbox="allow-scripts"
-        title={title}
-        className="h-72 w-full bg-white md:h-96"
-      />
+      <div
+        id={`${baseId}-panel`}
+        role="tabpanel"
+        aria-labelledby={`${baseId}-${tab}`}
+        className="relative min-h-72 flex-1"
+      >
+        <iframe
+          key={sandbox.frameKey}
+          ref={sandbox.frame}
+          src={`${SANDBOX_URL}/`}
+          sandbox="allow-scripts"
+          title={title}
+          className="absolute inset-0 size-full rounded-well bg-white"
+        />
+        {tab === 'console' ? (
+          <div className="absolute inset-0 bg-surface">
+            <ConsoleOutput lines={lines} />
+          </div>
+        ) : null}
+      </div>
+      {footer}
     </div>
   );
 }
@@ -405,4 +478,53 @@ export function PreviewPane({
 export function useSaveText(state: SaveState) {
   const t = useTranslations('lesson');
   return { idle: '', saving: t('saving'), saved: t('saved'), failed: t('saveFailed') }[state];
+}
+
+/** The checklist beside the editor: each check with its label, ticked once it passes. */
+export function CheckList({
+  checks,
+  labels,
+  hints,
+  passed,
+  title,
+  help,
+}: {
+  checks: { id: string; hint?: string }[];
+  labels: Record<string, string>;
+  hints: Record<string, string>;
+  /** The IDs that passed on the last check (null before the first). */
+  passed: ReadonlySet<string> | null;
+  title: string;
+  help?: string;
+}) {
+  const t = useTranslations('project');
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="font-sans text-sm font-bold text-muted">{title}</h4>
+      {help ? <p className="-mt-1 text-xs text-muted">{help}</p> : null}
+      <ul className="flex flex-col gap-2">
+        {checks.map((check) => {
+          const met = passed?.has(check.id) ?? false;
+          const text = labels[check.id] || (check.hint && hints[check.hint]) || check.id;
+          return (
+            <li key={check.id} className="flex items-start gap-2.5 text-sm">
+              <span
+                aria-hidden="true"
+                className={clsx(
+                  'mt-px grid size-5.5 shrink-0 place-items-center rounded-full text-xs',
+                  met ? 'bg-sage text-on-primary' : 'border-2 border-dashed border-brand-400',
+                )}
+              >
+                {met ? <Icon name="check" /> : null}
+              </span>
+              <span className={clsx(met && 'text-muted')}>
+                <span className="sr-only">{met ? `${t('requirementMet')}: ` : ''}</span>
+                <bdi>{text}</bdi>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }

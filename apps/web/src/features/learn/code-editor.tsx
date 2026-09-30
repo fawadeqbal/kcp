@@ -33,43 +33,64 @@ import { useEffect, useRef } from 'react';
 const LANGUAGES = { html, css, js: javascript, py: python } as const;
 
 /**
- * Code colours, each readable on the editor's white background and on the active
- * line (at least 4.5:1, WCAG AA). CodeMirror's default style has a few lighter ones.
+ * Code colours from the design system's code tokens: each at least 4.5:1 (WCAG AA) on
+ * the editor's ground and its active line, in light and dark.
  */
+const code = (name: string) => `var(--color-code-${name})`;
 const highlightStyle = HighlightStyle.define([
-  { tag: t.meta, color: '#404740' },
+  { tag: t.meta, color: code('com') },
   { tag: t.link, textDecoration: 'underline' },
   { tag: t.heading, textDecoration: 'underline', fontWeight: 'bold' },
   { tag: t.emphasis, fontStyle: 'italic' },
   { tag: t.strong, fontWeight: 'bold' },
   { tag: t.strikethrough, textDecoration: 'line-through' },
-  { tag: t.keyword, color: '#7a1fa2' },
-  { tag: [t.atom, t.bool, t.url, t.contentSeparator, t.labelName], color: '#1a4aa8' },
-  { tag: [t.literal, t.inserted], color: '#116644' },
-  { tag: [t.string, t.deleted], color: '#a11111' },
-  { tag: [t.regexp, t.escape, t.special(t.string)], color: '#a63a00' },
-  { tag: t.definition(t.variableName), color: '#0000cc' },
-  { tag: t.local(t.variableName), color: '#3300aa' },
-  { tag: [t.typeName, t.namespace], color: '#00704a' },
-  { tag: t.className, color: '#116677' },
-  { tag: [t.special(t.variableName), t.macroName], color: '#225566' },
-  { tag: t.definition(t.propertyName), color: '#0000cc' },
-  { tag: t.tagName, color: '#116644' },
-  { tag: t.attributeName, color: '#7a4a00' },
-  { tag: t.comment, color: '#6b5a00' },
-  { tag: t.invalid, color: '#c00000' },
+  { tag: [t.keyword, t.operatorKeyword, t.controlKeyword], color: code('tag'), fontWeight: '600' },
+  { tag: [t.atom, t.bool, t.url, t.contentSeparator, t.labelName, t.number], color: code('str') },
+  { tag: [t.literal, t.inserted], color: code('str') },
+  { tag: [t.string, t.deleted], color: code('str') },
+  { tag: [t.regexp, t.escape, t.special(t.string)], color: code('str') },
+  { tag: [t.typeName, t.namespace, t.className], color: code('attr') },
+  { tag: [t.special(t.variableName), t.macroName], color: code('attr') },
+  { tag: [t.propertyName, t.definition(t.propertyName)], color: code('attr') },
+  { tag: t.tagName, color: code('tag') },
+  { tag: t.attributeName, color: code('attr') },
+  { tag: t.comment, color: code('com'), fontStyle: 'italic' },
+  { tag: t.invalid, color: 'var(--color-danger)' },
 ]);
 
 const theme = EditorView.theme({
-  '&': { fontSize: '15px', height: '100%', backgroundColor: 'var(--color-surface)' },
+  '&': {
+    fontSize: '14px',
+    height: '100%',
+    backgroundColor: 'var(--color-code-bg)',
+    color: 'var(--color-ink)',
+  },
   '.cm-scroller': {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
-    lineHeight: '1.6',
+    lineHeight: '1.85',
   },
-  '.cm-content': { paddingBlock: '8px' },
+  '.cm-content': { paddingBlock: '6px', caretColor: 'var(--color-brand)' },
+  '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--color-brand)', borderLeftWidth: '2px' },
   '.cm-gutters': {
-    backgroundColor: 'var(--color-canvas)',
-    borderInlineEnd: '1px solid var(--color-line)',
+    backgroundColor: 'var(--color-code-bg)',
+    color: 'var(--color-code-gutter)',
+    border: 'none',
+  },
+  '.cm-lineNumbers .cm-gutterElement': { minWidth: '2.5em', paddingInline: '0 0.9em' },
+  '.cm-activeLine': { backgroundColor: 'color-mix(in srgb, var(--color-brand) 9%, transparent)' },
+  '.cm-activeLineGutter': { backgroundColor: 'transparent', color: 'var(--color-ink)' },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
+    backgroundColor: 'color-mix(in srgb, var(--color-brand) 28%, transparent) !important',
+  },
+  '.cm-tooltip': {
+    backgroundColor: 'var(--color-surface)',
+    color: 'var(--color-ink)',
+    border: '1px solid var(--color-line)',
+    borderRadius: '12px',
+  },
+  '.cm-tooltip-autocomplete > ul > li[aria-selected]': {
+    backgroundColor: 'var(--color-brand-100)',
+    color: 'var(--color-brand-800)',
   },
   '&.cm-focused': { outline: 'none' },
 });

@@ -25,11 +25,11 @@ export default async function WaitlistPage({ params }: LocaleParams) {
     <>
       <PageIntro title={t('title')} subtitle={t('subtitle')} />
       <Container className="grid gap-12 py-12 sm:py-16 lg:grid-cols-[1fr_1fr]">
-        <div className="self-start rounded-[var(--radius-card)] border border-line bg-surface p-6 shadow-sm sm:p-8">
+        <div className="self-start rounded-hero bg-surface p-6 sm:p-8">
           <WaitlistForm />
         </div>
         <section aria-labelledby="promises-title">
-          <h2 id="promises-title" className="text-xl font-bold">
+          <h2 id="promises-title" className="text-2xl">
             {home('safetyTitle')}
           </h2>
           <div className="mt-5">

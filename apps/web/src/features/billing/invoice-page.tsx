@@ -3,8 +3,8 @@
 import type { components } from '@kcp/api-client-ts';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { BackLink } from '@/components/back-link';
 import { Alert, Button, PageSpinner } from '@/components/ui';
-import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { formatMoney } from '@/lib/money';
 import { useAccount } from '@/lib/use-account';
@@ -41,20 +41,16 @@ export function InvoicePage({ invoiceId }: { invoiceId: string }) {
         aria-label={t('breadcrumb')}
         className="flex flex-wrap justify-between gap-3 print:hidden"
       >
-        <Link href="/billing" className="font-semibold text-brand-700 underline underline-offset-4">
-          {t('backToBilling')}
-        </Link>
+        <BackLink href="/billing">{t('backToBilling')}</BackLink>
         <Button variant="secondary" onClick={() => window.print()}>
           {t('print')}
         </Button>
       </nav>
-      <article className="flex flex-col gap-6 rounded-[var(--radius-card)] border border-line bg-surface p-6">
+      <article className="flex flex-col gap-6 rounded-card bg-surface p-6">
         <header className="flex flex-wrap justify-between gap-4">
           <div>
-            <p className="text-lg font-bold text-brand-700">{t('seller')}</p>
-            <h1 className="mt-1 text-2xl font-bold">
-              {t('invoiceTitle', { number: invoice.number })}
-            </h1>
+            <p className="text-lg font-bold text-brand-text">{t('seller')}</p>
+            <h1 className="mt-1 text-3xl">{t('invoiceTitle', { number: invoice.number })}</h1>
           </div>
           <dl className="text-sm">
             <dt className="text-muted">{t('invoiceDate')}</dt>

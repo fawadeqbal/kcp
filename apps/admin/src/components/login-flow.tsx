@@ -178,7 +178,7 @@ function SecondStep({
                 alt="QR code for your authenticator app"
                 width={220}
                 height={220}
-                className="self-center rounded-lg border border-line"
+                className="self-center rounded-well border border-line bg-white"
               />
               <p className="text-sm text-muted">
                 Can’t scan it? Type this key instead:{' '}

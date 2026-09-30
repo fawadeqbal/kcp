@@ -25,7 +25,7 @@ The test measures time in a shared CI machine, so a slow run can fail it; CI ret
 
 - **Python (Pyodide, about 13 MB)** downloads only on Python lessons, with a progress bar. The files are versioned and cached for a year, so later visits start from the cache.
 - **Lesson videos** are embedded from YouTube (the privacy-enhanced `youtube-nocookie.com`) or Cloudflare Stream. Both stream adaptively, picking a lower quality on slow connections, and the player loads lazily (`loading="lazy"`). A lesson works without its video: the explainer and "try it" steps are text.
-- **Fonts:** Noto Sans Arabic and Noto Nastaliq Urdu are only named in the Arabic and Urdu styles, so browsers download them only on pages in those languages.
+- **Fonts** are self-hosted and split by script (`unicode-range`): a browser downloads Caprasimo and Figtree for Latin letters, and Noto Sans Arabic, Baloo Bhaijaan 2 or Noto Nastaliq Urdu only when a page has Arabic or Urdu letters. See [the design system](design-system.md).
 - **The code sandbox** is a few small static files on its own domain, cached by the browser.
 
 ## API speed

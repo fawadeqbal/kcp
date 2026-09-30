@@ -8,10 +8,12 @@ import {
   isPythonCheck,
   type PyodideLike,
   runPythonChecks,
+  runPythonProgram,
   windowTestRunner,
 } from '@kcp/checks';
+import { runInNewContext } from 'node:vm';
 import { Window } from 'happy-dom';
-import type { Issue, LoadedTrack } from './load.js';
+import type { Issue, LoadedQuiz, LoadedTrack } from './load.js';
 
 let pyodide: Promise<PyodideLike> | null = null;
 
@@ -127,6 +129,62 @@ async function verifyWork(
   }
 }
 
+/** What a JavaScript program prints with console.log (our own content, not students'). */
+export function runJavaScript(code: string): string {
+  const lines: string[] = [];
+  const log = (...values: unknown[]) => lines.push(values.map(String).join(' '));
+  runInNewContext(code, { console: { log, info: log } }, { timeout: 1000 });
+  return lines.join('\n');
+}
+
+const normalise = (text: string) => text.trim().replace(/\s+/g, ' ').toLowerCase();
+
+/**
+ * "What does this print?" quizzes in Python or JavaScript: run the code and prove the
+ * answer is the output, and that no other option is.
+ */
+async function verifyQuiz(quiz: LoadedQuiz, file: string, issues: Issue[]) {
+  const q = quiz.data;
+  if (q.kind !== 'output' || (q.language !== 'python' && q.language !== 'js')) return;
+  const program = (q.code ?? []).join('\n');
+  let printed: string;
+  try {
+    printed = q.language === 'js' ? runJavaScript(program) : await pythonOutput(program);
+  } catch (error) {
+    issues.push({
+      level: 'error',
+      file,
+      message: `the code doesn't run: ${(error as Error).message}`,
+    });
+    return;
+  }
+  for (const option of q.options ?? []) {
+    if (option.code === undefined) continue;
+    const matches = normalise(option.code) === normalise(printed);
+    if (option.id === q.answer && !matches) {
+      issues.push({
+        level: 'error',
+        file,
+        message: `the answer "${option.id}" isn't what the code prints (${JSON.stringify(printed)})`,
+      });
+    }
+    if (option.id !== q.answer && matches) {
+      issues.push({
+        level: 'error',
+        file,
+        message: `option "${option.id}" is also what the code prints`,
+      });
+    }
+  }
+}
+
+/** The output of a Python program, with the same Pyodide the sandbox runs. */
+async function pythonOutput(program: string): Promise<string> {
+  const { run } = runPythonProgram(await python(), program);
+  if (run.error) throw new Error(run.error.message);
+  return run.output;
+}
+
 /**
  * Proves every challenge and project works: its solution passes all checks, and its
  * starter code does not (otherwise students would pass without doing anything).
@@ -144,6 +202,7 @@ export async function verifyContent(tracks: LoadedTrack[], root: string): Promis
         for (const challenge of lesson.challenges) {
           await verifyWork(challenge.data, rel(challenge.file), issues);
         }
+        for (const quiz of lesson.quizzes) await verifyQuiz(quiz, rel(quiz.file), issues);
       }
       if (mod.project) await verifyWork(mod.project.data, rel(mod.project.file), issues);
     }

@@ -13,3 +13,11 @@ Demo Parent (Urdu)         parent.ur@demo.test  demo password 123
   MoonMaker (child, ur)    brave-eagle-7195     kid pass 42        new
 
 Parents log in at http://localhost:3001/en/login, children at http://localhost:3001/en/login/student.
+
+
+pnpm db:generate
+pnpm install
+pnpm db:deploy
+pnpm build
+pnpm content:import
+pnpm dev

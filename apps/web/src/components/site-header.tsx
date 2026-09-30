@@ -1,69 +1,177 @@
 'use client';
 
+import { type IconName, Popover } from '@kcp/ui';
+import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { isolate } from '@/features/auth/validation';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/auth-provider';
 import { LanguageSwitcher } from './language-switcher';
 import { NotificationBell } from './notification-bell';
-import { Avatar } from './ui';
+import { Avatar, buttonClass, Icon, LogoMark } from './ui';
+
+type NavItem = { href: string; label: string; icon: IconName; current: boolean };
+
+/** The logo and the product's name, leading home. */
+export function Brand() {
+  const t = useTranslations('meta');
+  return (
+    <Link href="/" className="flex shrink-0 items-center gap-2.5 rounded-full">
+      <LogoMark />
+      <span className="font-display text-xl whitespace-nowrap">{t('title')}</span>
+    </Link>
+  );
+}
+
+/** The pill of main sections: the current one sits on a raised ground. */
+function PillNav({ label, items }: { label: string; items: NavItem[] }) {
+  return (
+    <nav aria-label={label} className="min-w-0">
+      <ul className="flex w-max gap-1 rounded-full bg-surface p-1.25">
+        {items.map((item) => (
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              aria-current={item.current ? 'page' : undefined}
+              className={clsx(
+                'flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors',
+                item.current ? 'elev-sm bg-canvas text-ink' : 'text-muted hover:text-ink',
+              )}
+            >
+              <Icon name={item.icon} className={clsx('text-base', item.current && 'text-brand')} />
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
 export function SiteHeader() {
   const t = useTranslations();
   const { state, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const is = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
+  const logOut = async () => {
+    await logout();
+    router.replace('/');
+  };
+
+  let nav: NavItem[] | null = null;
+  if (state.status === 'authenticated' && state.user.kind === 'STUDENT') {
+    const other = ['/learn/leaderboard', '/learn/badges', '/learn/portfolio'].some(is);
+    nav = [
+      { href: '/learn', label: t('nav.learn'), icon: 'book', current: is('/learn') && !other },
+      {
+        href: '/learn/leaderboard',
+        label: t('nav.leaderboard'),
+        icon: 'trophy',
+        current: is('/learn/leaderboard'),
+      },
+      {
+        href: '/learn/badges',
+        label: t('nav.badges'),
+        icon: 'award',
+        current: is('/learn/badges'),
+      },
+      {
+        href: '/learn/portfolio',
+        label: t('nav.portfolio'),
+        icon: 'rocket',
+        current: is('/learn/portfolio'),
+      },
+    ];
+  } else if (state.status === 'authenticated') {
+    nav = [
+      {
+        href: '/dashboard',
+        label: t('nav.dashboard'),
+        icon: 'grid',
+        current: is('/dashboard') || is('/children'),
+      },
+      { href: '/billing', label: t('nav.billing'), icon: 'card', current: is('/billing') },
+    ];
+  }
 
   return (
-    <header className="print-hidden border-b border-line bg-surface">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="text-lg font-bold text-brand-700">
-          {t('meta.title')}
-        </Link>
-        <div className="flex flex-wrap items-center gap-3">
+    <header className="print-hidden">
+      <div className="mx-auto flex max-w-320 flex-wrap items-center gap-x-7 gap-y-3 px-4 py-4.5 sm:px-6 lg:px-10">
+        <Brand />
+        {nav ? (
+          // On phones the sections get a row of their own, which scrolls sideways.
+          <div className="order-last -mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4 lg:order-none lg:mx-0 lg:w-auto lg:px-0">
+            <PillNav label={t('nav.main')} items={nav} />
+          </div>
+        ) : null}
+        <div className="ms-auto flex items-center gap-2.5">
           <Suspense>
             <LanguageSwitcher />
           </Suspense>
           {state.status === 'authenticated' ? (
             <>
-              {state.user.kind === 'STUDENT' ? (
-                <Link
-                  href="/learn"
-                  className="flex items-center gap-2 font-medium hover:text-brand-700"
-                >
-                  <Avatar avatarKey={state.user.student?.avatarKey ?? 'rocket'} size="sm" />
-                  {t('nav.learn')}
-                </Link>
-              ) : (
-                <>
-                  <Link href="/dashboard" className="font-medium hover:text-brand-700">
-                    {t('nav.dashboard')}
-                  </Link>
-                  <Link href="/billing" className="font-medium hover:text-brand-700">
-                    {t('nav.billing')}
-                  </Link>
-                </>
-              )}
               <NotificationBell />
-              <button
-                type="button"
-                className="font-medium text-muted hover:text-ink"
-                onClick={async () => {
-                  await logout();
-                  router.replace('/');
-                }}
-              >
-                {t('nav.logOut')}
-              </button>
+              {state.user.kind === 'STUDENT' ? (
+                <Popover
+                  label={t('nav.studentMenu', {
+                    nickname: isolate(state.user.student?.nickname ?? ''),
+                  })}
+                  panelClassName="w-56"
+                  buttonClassName="flex min-h-10 items-center gap-2.5 rounded-full bg-surface p-1 pe-3.5 text-sm font-semibold hover:bg-sand-300"
+                  button={
+                    <>
+                      <Avatar avatarKey={state.user.student?.avatarKey ?? 'rocket'} size="sm" />
+                      <bdi className="font-latin max-w-32 truncate max-sm:sr-only">
+                        {state.user.student?.nickname}
+                      </bdi>
+                    </>
+                  }
+                >
+                  <ul className="flex flex-col gap-0.5">
+                    <li>
+                      <Link
+                        href="/learn/portfolio"
+                        className="flex min-h-11 items-center gap-3 rounded-full px-4 font-semibold hover:bg-ink/7"
+                      >
+                        <Icon name="rocket" className="text-muted" />
+                        {t('nav.portfolio')}
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => void logOut()}
+                        className="flex min-h-11 w-full items-center gap-3 rounded-full px-4 font-semibold hover:bg-ink/7"
+                      >
+                        <Icon name="logout" className="text-muted" />
+                        {t('nav.logOut')}
+                      </button>
+                    </li>
+                  </ul>
+                </Popover>
+              ) : (
+                <button
+                  type="button"
+                  className="flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-muted hover:bg-ink/7 hover:text-ink"
+                  onClick={() => void logOut()}
+                >
+                  <Icon name="logout" className="text-base" />
+                  <span className="max-sm:sr-only">{t('nav.logOut')}</span>
+                </button>
+              )}
             </>
           ) : state.status === 'anonymous' ? (
             <>
-              <Link href="/login" className="font-medium hover:text-brand-700">
+              <Link
+                href="/login"
+                className="flex min-h-10 items-center rounded-full px-3 text-sm font-semibold hover:bg-ink/7"
+              >
                 {t('nav.logIn')}
               </Link>
-              <Link
-                href="/sign-up"
-                className="rounded-xl bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700"
-              >
+              <Link href="/sign-up" className={clsx(buttonClass('primary', 'sm'), 'max-sm:hidden')}>
                 {t('nav.signUp')}
               </Link>
             </>

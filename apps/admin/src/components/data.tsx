@@ -12,21 +12,24 @@ export function Table({
   children,
   empty,
   emptyText = 'Nothing matches these filters.',
+  bare = false,
 }: {
   caption: string;
   columns: string[];
   children: ReactNode;
   empty?: boolean;
   emptyText?: string;
+  /** Inside a card already: no panel of its own. */
+  bare?: boolean;
 }) {
   return (
-    <div className="overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface">
+    <div className={clsx('overflow-x-auto', !bare && 'rounded-card bg-surface px-3 py-2 sm:px-4')}>
       <table className="w-full min-w-[40rem] border-collapse text-start text-sm">
         <caption className="sr-only">{caption}</caption>
-        <thead className="bg-canvas text-muted">
+        <thead className="border-b border-line text-xs tracking-[0.08em] text-muted uppercase">
           <tr>
             {columns.map((column) => (
-              <th key={column} scope="col" className="px-4 py-3 text-start font-semibold">
+              <th key={column} scope="col" className="px-2 py-2.5 text-start font-bold">
                 {column}
               </th>
             ))}
@@ -35,7 +38,7 @@ export function Table({
         <tbody className="divide-y divide-line">
           {empty ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-10 text-center text-muted">
+              <td colSpan={columns.length} className="px-2 py-10 text-center text-muted">
                 {emptyText}
               </td>
             </tr>
@@ -49,7 +52,7 @@ export function Table({
 }
 
 export function Cell({ children, className }: { children: ReactNode; className?: string }) {
-  return <td className={clsx('px-4 py-3 align-top', className)}>{children}</td>;
+  return <td className={clsx('px-2 py-3 align-top', className)}>{children}</td>;
 }
 
 export function Pagination({
@@ -103,7 +106,7 @@ export function FilterBar({
   return (
     <form
       role="search"
-      className="flex flex-wrap items-end gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+      className="flex flex-wrap items-end gap-4 rounded-card bg-surface p-5"
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
@@ -126,7 +129,7 @@ export function Details({ items }: { items: [string, ReactNode][] }) {
     <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-[auto_1fr]">
       {items.map(([label, value]) => (
         <div key={label} className="contents">
-          <dt className="text-muted">{label}</dt>
+          <dt className="text-sm font-semibold text-muted">{label}</dt>
           <dd className="min-w-0 break-words">{value}</dd>
         </div>
       ))}

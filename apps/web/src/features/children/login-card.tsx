@@ -23,14 +23,14 @@ export function LoginCard({ child }: { child: Child }) {
   return (
     <section
       aria-label={t('cardTitle')}
-      className="rounded-[var(--radius-card)] border-2 border-dashed border-brand-500 bg-surface p-6 sm:p-8"
+      className="rounded-card border-2 border-dashed border-brand bg-surface p-6 sm:p-8"
     >
-      <p className="text-sm font-semibold tracking-wide text-brand-700 uppercase">
+      <p className="text-sm font-semibold tracking-wide text-brand-text uppercase">
         {t('cardTitle')}
       </p>
       <div className="mt-4 flex items-center gap-4">
         <Avatar avatarKey={child.avatarKey} size="lg" />
-        <p className="font-latin text-2xl font-bold">
+        <p className="font-latin text-3xl">
           <bdi>{child.nickname}</bdi>
         </p>
       </div>

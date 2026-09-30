@@ -34,8 +34,9 @@ test('a student gets a certificate, the family hears about it, and anyone can ch
   await expect(section.getByText(code!, { exact: false })).toBeVisible();
   await expect(section.getByRole('button', { name: m.certificates.download })).toBeVisible();
 
-  // The bell says so.
-  const bell = page.getByRole('button', { name: fill(m.notifications.bellUnread, { count: '1' }) });
+  // The bell says so (with the badges the finished module earned, too).
+  const [before, after] = m.notifications.bellUnread.split('{count}') as [string, string];
+  const bell = page.getByRole('button', { name: new RegExp(`^${before}\\d+${after}$`) });
   await expect(bell).toBeVisible();
   await bell.click();
   const panel = page.getByRole('region', { name: m.notifications.title });

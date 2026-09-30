@@ -25,6 +25,9 @@ export const TERMS_UPDATED = '2026-10-01';
 // ── Children ─────────────────────────────────────────────────────────────────
 
 /** Ages the platform is for (scope: 9–16). */
+/** A family can have up to this many child accounts. */
+export const MAX_CHILDREN_PER_PARENT = 10;
+
 export const CHILD_MIN_AGE = 9;
 export const CHILD_MAX_AGE = 16;
 /**

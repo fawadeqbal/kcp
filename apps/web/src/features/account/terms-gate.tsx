@@ -3,7 +3,7 @@
 import { TERMS_VERSION } from '@kcp/shared';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
-import { Alert, Button } from '@/components/ui';
+import { Alert, Button, Icon, IconBubble } from '@/components/ui';
 import { Link, usePathname } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-provider';
@@ -42,19 +42,24 @@ export function TermsGate({ children }: { children: ReactNode }) {
     }
   }
 
-  const link = 'font-semibold text-brand-700 underline underline-offset-4';
+  const link = 'font-semibold text-brand-text underline underline-offset-4';
+  const document =
+    'flex min-h-12 items-center gap-3 rounded-full bg-raised px-4.5 font-semibold hover:bg-sand-200';
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-6">
-      <h1 className="text-2xl font-bold">{t('account.termsTitle')}</h1>
+    <div className="mx-auto flex max-w-2xl flex-col gap-5 rounded-card bg-surface p-7 sm:p-9">
+      <IconBubble icon="file" tone="brand" size="lg" />
+      <h1 className="text-4xl">{t('account.termsTitle')}</h1>
       <p>{t('account.termsBody', { version: TERMS_VERSION })}</p>
-      <ul className="flex flex-wrap gap-x-6 gap-y-2">
+      <ul className="flex flex-wrap gap-3">
         <li>
-          <Link href="/terms" className={link}>
+          <Link href="/terms" className={document}>
+            <Icon name="file" className="text-muted" />
             {t('legal.termsTitle')}
           </Link>
         </li>
         <li>
-          <Link href="/privacy" className={link}>
+          <Link href="/privacy" className={document}>
+            <Icon name="shield" className="text-muted" />
             {t('legal.privacyTitle')}
           </Link>
         </li>
@@ -66,10 +71,10 @@ export function TermsGate({ children }: { children: ReactNode }) {
       </p>
       {failed ? <Alert tone="error">{t('account.termsFailed')}</Alert> : null}
       <div className="flex flex-wrap gap-3">
-        <Button loading={busy} onClick={() => void accept()}>
+        <Button size="lg" loading={busy} onClick={() => void accept()}>
           {t('account.termsAccept')}
         </Button>
-        <Button variant="secondary" onClick={() => void logout()}>
+        <Button size="lg" variant="secondary" onClick={() => void logout()}>
           {t('nav.logOut')}
         </Button>
       </div>

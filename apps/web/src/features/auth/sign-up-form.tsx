@@ -149,7 +149,7 @@ export function SignUpForm() {
               <Link
                 href="/terms"
                 target="_blank"
-                className="font-semibold text-brand-700 underline"
+                className="font-semibold text-brand-text underline"
               >
                 {chunks}
               </Link>
@@ -158,7 +158,7 @@ export function SignUpForm() {
               <Link
                 href="/privacy"
                 target="_blank"
-                className="font-semibold text-brand-700 underline"
+                className="font-semibold text-brand-text underline"
               >
                 {chunks}
               </Link>
@@ -174,7 +174,7 @@ export function SignUpForm() {
         {t('auth.signUp.haveAccount')}{' '}
         <Link
           href="/login"
-          className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+          className="font-semibold text-brand-text underline-offset-4 hover:underline"
         >
           {t('nav.logIn')}
         </Link>

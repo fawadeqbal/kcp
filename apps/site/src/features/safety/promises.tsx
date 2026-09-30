@@ -2,22 +2,22 @@ import { clsx } from 'clsx';
 import { getTranslations } from 'next-intl/server';
 import {
   BanIcon,
-  BoxIcon,
   LockIcon,
   MaskIcon,
   NoChatIcon,
   ShieldIcon,
   TrophyIcon,
+  UsersIcon,
 } from '@/components/icons';
 import { IconBadge } from '@/components/layout';
 
 /** Our promises to parents, in the order the safety page lists them. */
 export const PROMISES = {
-  parents: ShieldIcon,
+  parents: UsersIcon,
   anonymous: MaskIcon,
   noChat: NoChatIcon,
   boards: TrophyIcon,
-  sandbox: BoxIcon,
+  sandbox: ShieldIcon,
   data: LockIcon,
   noAds: BanIcon,
 } as const;
@@ -42,7 +42,7 @@ export async function SafetyPromises({
   const featureFirst = keys.length === 7;
 
   return (
-    <ul className={clsx('grid gap-5 sm:grid-cols-2', !narrow && 'lg:grid-cols-4')}>
+    <ul className={clsx('grid gap-4 sm:grid-cols-2', !narrow && 'lg:grid-cols-4')}>
       {keys.map((key, index) => {
         const Icon = PROMISES[key];
         const featured = featureFirst && index === 0;
@@ -50,15 +50,40 @@ export async function SafetyPromises({
           <li
             key={key}
             className={clsx(
-              'flex flex-col gap-3 rounded-[var(--radius-card)] border bg-surface p-6',
-              featured ? 'border-brand-500 sm:col-span-2' : 'border-line',
+              'flex flex-col gap-3 rounded-hero p-7',
+              featured ? 'bg-sage-100 sm:col-span-2' : 'bg-surface',
             )}
           >
-            <IconBadge>
+            <IconBadge tone={featured ? 'sageSolid' : 'sage'} size="lg">
               <Icon />
             </IconBadge>
-            <Heading className="text-lg font-bold">{t(`${key}Title`)}</Heading>
-            <p className="text-muted">{t(key)}</p>
+            <Heading className="text-xl">{t(`${key}Title`)}</Heading>
+            <p className={featured ? 'text-sage-800' : 'text-muted'}>{t(key)}</p>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+const HOME_PROMISES = ['parents', 'anonymous', 'noChat', 'sandbox'] as const;
+
+/** The home page's four promises, in a few words each, on its sage band. */
+export async function HomePromises() {
+  const t = await getTranslations('home.promises');
+  return (
+    <ul className="grid gap-3.5 sm:grid-cols-2">
+      {HOME_PROMISES.map((key) => {
+        const Icon = PROMISES[key];
+        return (
+          <li key={key} className="flex gap-3.5 rounded-panel bg-canvas p-5.5">
+            <IconBadge tone="sageSolid">
+              <Icon />
+            </IconBadge>
+            <div>
+              <h3 className="font-sans text-base font-bold">{t(`${key}Title`)}</h3>
+              <p className="mt-0.5 text-sm text-muted">{t(key)}</p>
+            </div>
           </li>
         );
       })}

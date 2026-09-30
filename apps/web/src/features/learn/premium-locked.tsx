@@ -9,11 +9,11 @@ import { Link } from '@/i18n/navigation';
 export function PremiumLocked({ kind }: { kind: 'lesson' | 'project' }) {
   const t = useTranslations('learn');
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-8 text-center">
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-card bg-surface p-8 text-center">
       <span aria-hidden="true" className="text-5xl">
         🔒
       </span>
-      <h1 className="text-2xl font-bold">
+      <h1 className="text-3xl">
         {kind === 'lesson' ? t('lockedLessonTitle') : t('lockedProjectTitle')}
       </h1>
       <p className="text-muted">{t('lockedBody')}</p>

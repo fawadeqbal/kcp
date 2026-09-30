@@ -26,6 +26,14 @@ const SESSION_FIELDS = {
   userAgent: true,
 } as const;
 
+/** Phones registered for notifications (the token itself stays out of the export). */
+const DEVICE_FIELDS = {
+  platform: true,
+  languageCode: true,
+  createdAt: true,
+  lastSeenAt: true,
+} as const;
+
 @Injectable()
 export class AccountService {
   private readonly logger = new Logger(AccountService.name);
@@ -74,6 +82,7 @@ export class AccountService {
         monthlySummaryEmails: true,
         childLinks: { select: { childId: true } },
         sessions: { select: SESSION_FIELDS, orderBy: { createdAt: 'desc' } },
+        deviceTokens: { select: DEVICE_FIELDS },
       },
     });
     const childIds = parent.childLinks.map((link) => link.childId);
@@ -97,6 +106,7 @@ export class AccountService {
                 publicPortfolio: true,
                 xpTotal: true,
                 trialEndsAt: true,
+                streakReminders: true,
               },
             },
             lessonProgress: { select: { lessonId: true, status: true, completedAt: true } },
@@ -128,8 +138,18 @@ export class AccountService {
                 freezes: true,
               },
             },
+            // Quiz answers (right or wrong, not what was chosen) and daily practice.
+            quizAttempts: {
+              select: { quizId: true, correct: true, createdAt: true },
+              orderBy: { createdAt: 'asc' },
+            },
+            practiceSessions: {
+              select: { day: true, quizIds: true, completedAt: true },
+              orderBy: { day: 'asc' },
+            },
             notifications: { select: { type: true, createdAt: true, readAt: true } },
             sessions: { select: SESSION_FIELDS, orderBy: { createdAt: 'desc' } },
+            deviceTokens: { select: DEVICE_FIELDS },
           },
         }),
         this.prisma.consentRecord.findMany({

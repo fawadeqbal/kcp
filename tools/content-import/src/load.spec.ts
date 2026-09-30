@@ -43,7 +43,7 @@ async function writeValidContent() {
   );
   await put(
     `${LESSON}/challenges/c1.en.md`,
-    '---\ntitle: Say hi\nhints:\n  add_h1: Use h1\n---\nWrite a heading.\n',
+    '---\ntitle: Say hi\nhints:\n  add_h1: Use h1\nchecks:\n  has-h1: There is a heading\n---\nWrite a heading.\n',
   );
 }
 
@@ -68,6 +68,27 @@ describe('loadContent', () => {
     expect(lesson?.data.id).toBe('t-m01-l01');
     expect(lesson?.texts['en']?.title).toBe('Hello');
     expect(lesson?.challenges[0]?.texts['en']?.hints).toEqual({ add_h1: 'Use h1' });
+    expect(lesson?.challenges[0]?.texts['en']?.checkLabels).toEqual({
+      'has-h1': 'There is a heading',
+    });
+  });
+
+  it('needs an English label for every check, and only for real checks', async () => {
+    await put(
+      `${LESSON}/challenges/c1.en.md`,
+      '---\ntitle: Say hi\nhints:\n  add_h1: Use h1\nchecks:\n  has-p: A paragraph\n---\nWrite a heading.\n',
+    );
+    await put(
+      `${LESSON}/challenges/c1.ar.md`,
+      '---\ntitle: قل مرحبًا\nhints:\n  add_h1: استخدم h1\n---\nاكتب عنوانًا.\n',
+    );
+    const { issues } = await loadContent(root);
+    const messages = errors(issues);
+    expect(messages).toContain('"checks" in c1.en.md names no check "has-p"');
+    expect(messages).toContain('check "has-h1" has no label in c1.en.md ("checks")');
+    expect(issues.some((i) => i.message.includes('no ar label — the English one is shown'))).toBe(
+      true,
+    );
   });
 
   it('reports broken files instead of throwing', async () => {
@@ -135,7 +156,7 @@ describe('module projects', () => {
     await put('t/m01-x/project.yaml', PROJECT_YAML);
     await put(
       't/m01-x/project.en.md',
-      '---\ntitle: My page\nsummary: S\nhints:\n  add_p: Use p\n---\nBuild it.\n',
+      '---\ntitle: My page\nsummary: S\nhints:\n  add_p: Use p\nchecks:\n  has-p: A paragraph\n---\nBuild it.\n',
     );
     const { tracks, issues } = await loadContent(root);
     expect(errors(issues)).toEqual([]);
@@ -145,6 +166,7 @@ describe('module projects', () => {
       title: 'My page',
       summary: 'S',
       hints: { add_p: 'Use p' },
+      checkLabels: { 'has-p': 'A paragraph' },
       body: 'Build it.',
     });
     expect(errors(await verifyContent(tracks, root))).toEqual([]);

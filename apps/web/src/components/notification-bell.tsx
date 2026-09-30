@@ -3,8 +3,9 @@
 import type { components } from '@kcp/api-client-ts';
 import { clsx } from 'clsx';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { isolate } from '@/features/auth/validation';
+import { Icon, Popover } from '@kcp/ui';
 import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 
@@ -97,10 +98,6 @@ export function NotificationBell() {
   const format = useFormatter();
   const describe = useDescribe();
   const [list, setList] = useState<NotificationList | null>(null);
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
-  const wrapper = useRef<HTMLDivElement>(null);
-  const button = useRef<HTMLButtonElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -127,26 +124,6 @@ export function NotificationBell() {
     };
   }, [load]);
 
-  // Closes on Escape (focus back on the bell) and on a click outside.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-        button.current?.focus();
-      }
-    };
-    const onClick = (event: MouseEvent) => {
-      if (!wrapper.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener('keydown', onKey);
-    document.addEventListener('mousedown', onClick);
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.removeEventListener('mousedown', onClick);
-    };
-  }, [open]);
-
   async function markAllRead() {
     await api.POST('/v1/notifications/read', { body: { all: true } }).catch(() => undefined);
     await load();
@@ -154,49 +131,33 @@ export function NotificationBell() {
 
   const unread = list?.unread ?? 0;
   return (
-    <div ref={wrapper} className="relative">
-      <button
-        ref={button}
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        aria-label={unread ? t('bellUnread', { count: String(unread) }) : t('bell')}
-        onClick={() => setOpen((o) => !o)}
-        className="relative grid size-10 place-items-center rounded-full hover:bg-brand-50"
-      >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          className="size-6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-        </svg>
-        {unread ? (
-          <span
-            aria-hidden="true"
-            className="absolute -end-0.5 -top-0.5 grid min-w-5 place-items-center rounded-full bg-danger px-1 text-xs font-bold text-white"
-          >
-            {unread > 9 ? '9+' : unread}
-          </span>
-        ) : null}
-      </button>
-      {open ? (
-        <div
-          id={panelId}
-          role="region"
-          aria-label={t('title')}
-          className="absolute end-0 z-20 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-[var(--radius-card)] border border-line bg-surface p-3 shadow-lg"
-        >
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <h2 className="font-bold">{t('title')}</h2>
+    <Popover
+      label={unread ? t('bellUnread', { count: String(unread) }) : t('bell')}
+      panelLabel={t('title')}
+      panelClassName="w-80 max-w-[calc(100vw-2rem)] p-3"
+      buttonClassName="relative grid size-10 place-items-center rounded-full bg-surface text-lg hover:bg-sand-300"
+      button={
+        <>
+          <Icon name="bell" />
+          {unread ? (
+            <span
+              aria-hidden="true"
+              className="absolute -end-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[0.7rem] font-bold text-on-primary ring-2 ring-canvas"
+            >
+              {unread > 9 ? '9+' : unread}
+            </span>
+          ) : null}
+        </>
+      }
+    >
+      {(close) => (
+        <>
+          <div className="mb-2 flex items-center justify-between gap-2 px-1">
+            <h2 className="text-lg">{t('title')}</h2>
             {unread ? (
               <button
                 type="button"
-                className="text-sm font-semibold text-brand-700 underline-offset-4 hover:underline"
+                className="rounded-full px-2 py-1 text-sm font-bold text-brand-text hover:bg-brand/10"
                 onClick={() => void markAllRead()}
               >
                 {t('markAllRead')}
@@ -214,7 +175,7 @@ export function NotificationBell() {
                     <Link
                       href={href}
                       onClick={() => {
-                        setOpen(false);
+                        close();
                         if (!item.read) {
                           void api
                             .POST('/v1/notifications/read', { body: { ids: [item.id] } })
@@ -223,13 +184,22 @@ export function NotificationBell() {
                         }
                       }}
                       className={clsx(
-                        'block rounded-lg px-3 py-2 text-sm hover:bg-brand-50',
-                        !item.read && 'bg-brand-50/60 font-semibold',
+                        'flex gap-3 rounded-row px-3 py-2.5 text-sm hover:bg-raised',
+                        !item.read && 'bg-raised font-semibold',
                       )}
                     >
-                      <bdi>{text}</bdi>
-                      <span className="mt-0.5 block text-xs font-normal text-muted">
-                        {format.relativeTime(new Date(item.createdAt))}
+                      <span
+                        aria-hidden="true"
+                        className={clsx(
+                          'mt-1.5 size-2 shrink-0 rounded-full',
+                          item.read ? 'bg-transparent' : 'bg-brand',
+                        )}
+                      />
+                      <span className="min-w-0">
+                        <bdi>{text}</bdi>
+                        <span className="mt-0.5 block text-xs font-normal text-muted">
+                          {format.relativeTime(new Date(item.createdAt))}
+                        </span>
                       </span>
                     </Link>
                   </li>
@@ -237,8 +207,8 @@ export function NotificationBell() {
               })}
             </ul>
           )}
-        </div>
-      ) : null}
-    </div>
+        </>
+      )}
+    </Popover>
   );
 }

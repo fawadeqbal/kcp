@@ -9,6 +9,6 @@ export default defineConfig({
     fileParallelism: false,
     testTimeout: 20_000,
     hookTimeout: 30_000,
-    env: { LOG_LEVEL: 'warn', MAIL_TRANSPORT: 'memory' },
+    env: { LOG_LEVEL: 'warn', MAIL_TRANSPORT: 'memory', PUSH_TRANSPORT: 'memory' },
   },
 });

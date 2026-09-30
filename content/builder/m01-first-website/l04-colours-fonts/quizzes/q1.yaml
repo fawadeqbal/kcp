@@ -1,0 +1,19 @@
+id: builder-m01-l04-q1
+order: 1
+kind: bug
+xp: 5
+language: css
+prompt:
+  en: One line of this CSS has a mistake. Tap it.
+  ar: في أحد أسطر كود CSS هذا خطأ. اضغط عليه.
+  ur: اس CSS کی ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - 'h1 {'
+  - '  color tomato;'
+  - '  font-family: Georgia, serif;'
+  - '}'
+bugLine: 2
+explanation:
+  en: 'A colon goes between the property and its value, so the line should be color: tomato;'
+  ar: 'يجب أن توجد نقطتان (:) بين الخاصية وقيمتها، لذلك يكون السطر الصحيح ‎color: tomato;‎'
+  ur: 'پراپرٹی اور اس کی ویلیو کے درمیان کولن (:) آتا ہے، اس لیے درست سطر ‎color: tomato;‎ ہے۔'

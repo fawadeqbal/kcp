@@ -5,15 +5,15 @@ import ReactMarkdown, { type Components } from 'react-markdown';
  * shows as text), and code is always left-to-right, even in Arabic and Urdu.
  */
 const components: Components = {
-  h2: ({ children }) => <h3 className="mt-6 text-xl font-bold">{children}</h3>,
-  h3: ({ children }) => <h3 className="mt-6 text-lg font-bold">{children}</h3>,
+  h2: ({ children }) => <h3 className="mt-6 text-2xl">{children}</h3>,
+  h3: ({ children }) => <h3 className="mt-6 text-xl">{children}</h3>,
   p: ({ children }) => <p className="mt-3">{children}</p>,
   ul: ({ children }) => <ul className="mt-3 list-disc space-y-1 ps-6">{children}</ul>,
   ol: ({ children }) => <ol className="mt-3 list-decimal space-y-1 ps-6">{children}</ol>,
   pre: ({ children }) => (
     <pre
       dir="ltr"
-      className="mt-3 overflow-x-auto font-mono rounded-xl bg-ink p-4 text-start text-sm text-white [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit"
+      className="elev-sm mt-3 overflow-x-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm leading-relaxed text-ink [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit"
     >
       {children}
     </pre>
@@ -21,7 +21,7 @@ const components: Components = {
   code: ({ children }) => (
     <code
       dir="ltr"
-      className="rounded font-mono bg-brand-50 px-1.5 py-0.5 text-[0.9em] text-brand-700"
+      className="rounded-full bg-raised px-2 py-0.5 font-mono text-[0.85em] text-code-tag"
     >
       {children}
     </code>
@@ -33,7 +33,7 @@ const components: Components = {
       {...(/^[a-z][a-z\d+.-]*:/i.test(href ?? '')
         ? { target: '_blank', rel: 'noopener noreferrer' }
         : {})}
-      className="font-semibold text-brand-700 underline underline-offset-4"
+      className="font-semibold text-brand-text underline underline-offset-4"
     >
       {children}
     </a>
@@ -43,7 +43,7 @@ const components: Components = {
 /** For pages where the text's "##" sections sit right under the page's h1. */
 const pageComponents: Components = {
   ...components,
-  h2: ({ children }) => <h2 className="mt-8 text-2xl font-bold">{children}</h2>,
+  h2: ({ children }) => <h2 className="mt-8 text-3xl">{children}</h2>,
 };
 
 export function Markdown({

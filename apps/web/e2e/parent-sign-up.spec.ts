@@ -131,6 +131,7 @@ test('a parent resets a forgotten password (ur)', async ({ page, request }) => {
 
 test('the language switcher keeps the page and mirrors the layout', async ({ page }) => {
   await page.goto('/en/login');
+  await page.getByRole('button', { name: `${MESSAGES.en.nav.language}: English` }).click();
   await page.getByRole('link', { name: 'اردو' }).click();
   await expect(page).toHaveURL(/\/ur\/login$/);
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');

@@ -92,6 +92,11 @@ export class UpdateChildDto {
   @IsOptional()
   @IsUUID()
   cityId?: string;
+
+  /** Evening reminders on the child's phone when their streak is about to end. */
+  @IsOptional()
+  @IsBoolean()
+  streakReminders?: boolean;
 }
 
 export class ResetChildPasswordDto {
@@ -138,6 +143,8 @@ export class ChildDto {
   streak!: number;
   /** Badges earned. */
   badges!: number;
+  /** Evening reminders in the mobile app when the streak is about to end. */
+  streakReminders!: boolean;
 }
 
 export class ChildRulesDto {

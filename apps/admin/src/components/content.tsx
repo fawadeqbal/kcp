@@ -45,6 +45,7 @@ export function ContentList() {
             title={`${titleOf(track.titles)} track${track.isActive ? '' : ' (removed)'}`}
           >
             <Table
+              bare
               caption={`${titleOf(track.titles)} modules`}
               columns={['Module', 'Students see it', 'Lessons', 'Challenges', 'Languages', '']}
               empty={track.modules.length === 0}
@@ -77,7 +78,7 @@ export function ContentList() {
                   <Cell>
                     <Link
                       href={`/content/${module.id}`}
-                      className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+                      className="font-semibold text-brand-text underline-offset-4 hover:underline"
                     >
                       Preview
                     </Link>
@@ -176,7 +177,7 @@ function Text({ language, children }: { language: string; children: string }) {
     <div
       lang={language}
       dir={RTL.has(language) ? 'rtl' : 'ltr'}
-      className="leading-relaxed [&:lang(ur)]:leading-[2.2] [&_code]:rounded [&_code]:bg-brand-50 [&_code]:px-1 [&_li]:ms-6 [&_li]:list-disc [&_p]:mt-2 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-ink [&_pre]:p-3 [&_pre]:text-white"
+      className="leading-relaxed [&:lang(ur)]:leading-[2.2] [&_code]:rounded [&_code]:bg-brand-100 [&_code]:px-1 [&_li]:ms-6 [&_li]:list-disc [&_p]:mt-2 [&_pre]:overflow-x-auto [&_pre]:rounded-row [&_pre]:bg-code-bg [&_pre]:p-3 [&_pre]:text-ink"
     >
       <ReactMarkdown skipHtml>{children}</ReactMarkdown>
     </div>
@@ -191,7 +192,7 @@ function Code({ files }: { files: Record<string, string> }) {
       {entries.map(([name, code]) => (
         <div key={name}>
           <p className="text-sm font-semibold">{name}</p>
-          <pre dir="ltr" className="overflow-x-auto rounded-xl bg-ink p-3 text-sm text-white">
+          <pre dir="ltr" className="overflow-x-auto rounded-well bg-code-bg p-3 text-sm text-ink">
             {code}
           </pre>
         </div>
@@ -232,7 +233,7 @@ function LessonPreview({
           </div>
         </details>
         {lesson.challenges.map((challenge, i) => (
-          <section key={challenge.id} className="rounded-xl border border-line p-4">
+          <section key={challenge.id} className="rounded-row bg-raised p-4">
             <h3 className="font-semibold">
               Challenge {i + 1}: {challenge.title}{' '}
               <span className="text-sm font-normal text-muted">

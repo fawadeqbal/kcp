@@ -1,6 +1,6 @@
 import { AxeBuilder } from '@axe-core/playwright';
 import type { Locale } from '@kcp/i18n';
-import { type Page } from '@playwright/test';
+import { type APIRequestContext, type Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 import { createStudent, logInAsParent, logInAsStudent, MESSAGES } from './helpers';
 
@@ -50,31 +50,50 @@ async function audit(page: Page, path: string) {
   return serious;
 }
 
+/** Every public, parent and student page in one language, as a new family would see it. */
+async function auditAll(page: Page, request: APIRequestContext, locale: Locale) {
+  const problems: string[] = [];
+  for (const path of PUBLIC_PAGES) {
+    await page.goto(`/${locale}${path}`);
+    problems.push(...(await audit(page, `${locale}${path}`)));
+  }
+
+  const student = await createStudent(request, { locale });
+  await logInAsParent(page, locale, student.email);
+  for (const path of PARENT_PAGES) {
+    await page.goto(`/${locale}${path}`);
+    problems.push(...(await audit(page, `${locale}${path}`)));
+  }
+
+  await page.context().clearCookies();
+  await logInAsStudent(page, locale, student.username);
+  for (const path of STUDENT_PAGES) {
+    await page.goto(`/${locale}${path}`);
+    problems.push(...(await audit(page, `${locale}${path}`)));
+  }
+  return problems;
+}
+
 for (const locale of LOCALES) {
   test(`pages pass automated accessibility checks (${locale})`, async ({ page, request }) => {
     test.setTimeout(180_000);
-    const problems: string[] = [];
-    for (const path of PUBLIC_PAGES) {
-      await page.goto(`/${locale}${path}`);
-      problems.push(...(await audit(page, `${locale}${path}`)));
-    }
-
-    const student = await createStudent(request, { locale });
-    await logInAsParent(page, locale, student.email);
-    for (const path of PARENT_PAGES) {
-      await page.goto(`/${locale}${path}`);
-      problems.push(...(await audit(page, `${locale}${path}`)));
-    }
-
-    await page.context().clearCookies();
-    await logInAsStudent(page, locale, student.username);
-    for (const path of STUDENT_PAGES) {
-      await page.goto(`/${locale}${path}`);
-      problems.push(...(await audit(page, `${locale}${path}`)));
-    }
-    expect(problems).toEqual([]);
+    expect(await auditAll(page, request, locale)).toEqual([]);
   });
 }
+
+// The colours follow the device's light or dark setting: the dark ones must pass too.
+test.describe('dark mode', () => {
+  test.use({ colorScheme: 'dark' });
+
+  test('pages pass automated accessibility checks (en, dark)', async ({ page, request }) => {
+    test.setTimeout(180_000);
+    await page.goto('/en');
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(
+      'rgb(245, 234, 216)',
+    );
+    expect(await auditAll(page, request, 'en')).toEqual([]);
+  });
+});
 
 test.describe('right to left, on a small phone', () => {
   test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });

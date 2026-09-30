@@ -1,0 +1,29 @@
+id: builder-m01-l03-q3
+order: 3
+kind: choice
+xp: 5
+prompt:
+  en: Why should every <img> have alt text?
+  ar: لماذا يجب أن يكون لكل ‎<img>‎ نص alt؟
+  ur: ہر ‎<img>‎ میں alt متن کیوں ہونا چاہیے؟
+options:
+  - id: a
+    text:
+      en: It describes the picture in words, for people who can't see it and for when it doesn't load.
+      ar: يصف الصورة بالكلمات، لمن لا يستطيع رؤيتها، وعندما لا تُحمَّل الصورة.
+      ur: یہ تصویر کو الفاظ میں بیان کرتا ہے، ان لوگوں کے لیے جو اسے دیکھ نہیں سکتے، اور جب تصویر لوڈ نہ ہو۔
+  - id: b
+    text:
+      en: It tells the browser where to find the picture.
+      ar: يخبر المتصفح أين يجد الصورة.
+      ur: یہ براؤزر کو بتاتا ہے کہ تصویر کہاں سے ملے گی۔
+  - id: c
+    text:
+      en: It makes the picture bigger and brighter.
+      ar: يجعل الصورة أكبر وأكثر إشراقًا.
+      ur: یہ تصویر کو بڑا اور زیادہ روشن کر دیتا ہے۔
+answer: a
+explanation:
+  en: Screen readers read the alt text aloud, and the browser shows it if the picture doesn't load. The address of the picture goes in src.
+  ar: تقرأ برامج قراءة الشاشة نص alt بصوت عالٍ، ويعرضه المتصفح إذا لم تُحمَّل الصورة. أما عنوان الصورة فيُكتب في src.
+  ur: اسکرین ریڈر alt متن بلند آواز میں پڑھتے ہیں، اور اگر تصویر لوڈ نہ ہو تو براؤزر اسے دکھاتا ہے۔ تصویر کا پتا src میں لکھا جاتا ہے۔

@@ -91,10 +91,11 @@ export class PaymentsPublicController {
     res.type('html').send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Test checkout</title>
-<style>body{font-family:system-ui,sans-serif;max-width:28rem;margin:3rem auto;padding:0 1rem;color:#111827}
-.note{background:#fef3c7;padding:.75rem 1rem;border-radius:.75rem}
-button{font:inherit;padding:.75rem 1.25rem;border-radius:.75rem;border:1px solid #4f46e5;margin-top:1rem;cursor:pointer}
-.pay{background:#4f46e5;color:#fff}.cancel{background:#fff;color:#4f46e5}</style></head>
+<style>html{background:#f5ead8}body{font-family:system-ui,sans-serif;max-width:28rem;margin:3rem auto;padding:0 1rem;color:#201e1d}
+h1{font-family:Georgia,serif}
+.note{background:#fbe8c4;color:#6b4508;padding:.75rem 1rem;border-radius:1.375rem}
+button{font:inherit;font-weight:700;padding:.8rem 1.4rem;border-radius:999px;border:1px solid #a05626;margin-top:1rem;cursor:pointer}
+.pay{background:#a05626;color:#fffaf3}.cancel{background:transparent;color:#8c491a}</style></head>
 <body><main>
 <p class="note"><strong>Test mode.</strong> This is the development stand-in for Stripe Checkout. No card is charged.</p>
 <h1>Kids Coding Platform Premium</h1>

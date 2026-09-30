@@ -47,6 +47,7 @@ export function Countries() {
         {notice ? <Alert tone="success">{notice}</Alert> : null}
         <Card title="Countries and prices">
           <Table
+            bare
             caption="Countries and prices"
             columns={[
               'Country',
@@ -289,7 +290,11 @@ function Languages({ onDone }: { onDone: (message: string) => void }) {
         Only languages the apps are translated into can be switched on. English always stays on:
         every text falls back to it.
       </p>
-      <Table caption="Languages" columns={['Language', 'On', 'Accounts', 'Lessons written in it']}>
+      <Table
+        bare
+        caption="Languages"
+        columns={['Language', 'On', 'Accounts', 'Lessons written in it']}
+      >
         {list.data.languages.map((language) => (
           <LanguageRow
             key={language.code}

@@ -1,0 +1,17 @@
+id: builder-m01-l01-q1
+order: 1
+kind: order
+xp: 5
+language: html
+prompt:
+  en: Put the lines in order to make a page with a big heading.
+  ar: رتّب الأسطر لتصنع صفحة فيها عنوان كبير.
+  ur: سطروں کو ترتیب سے لگائیں تاکہ ایک بڑی سرخی والا صفحہ بنے۔
+code:
+  - '<body>'
+  - '  <h1>Hello, world!</h1>'
+  - '</body>'
+explanation:
+  en: The heading goes inside the body, and every opening tag comes before its closing tag.
+  ar: يوضع العنوان داخل body، ويأتي كل وسم فتح قبل وسم الإغلاق الخاص به.
+  ur: سرخی body کے اندر آتی ہے، اور ہر کھلنے والا ٹیگ اپنے بند ہونے والے ٹیگ سے پہلے آتا ہے۔

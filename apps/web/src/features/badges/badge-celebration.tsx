@@ -41,13 +41,13 @@ export function BadgeCelebration({ keys }: { keys: string[] }) {
         <div className="flex flex-col items-center gap-3 text-center">
           <span
             aria-hidden="true"
-            className="grid size-24 place-items-center rounded-full bg-accent/25 text-5xl motion-safe:animate-[kcp-pop_400ms_ease-out]"
+            className="grid size-26 place-items-center rounded-full bg-brand-100 text-5xl ring-8 ring-brand-200/60 motion-safe:animate-[kcp-pop_400ms_ease-out]"
           >
             {badgeIcon(current)}
           </span>
-          <p className="text-2xl font-bold">{t(`${current}.name` as 'first-steps.name')}</p>
+          <p className="font-display text-3xl">{t(`${current}.name` as 'first-steps.name')}</p>
           <p className="text-muted">{t(`${current}.description` as 'first-steps.description')}</p>
-          <Button onClick={next} className="mt-2 self-stretch sm:self-center">
+          <Button onClick={next} size="lg" className="mt-2 self-stretch sm:self-center">
             {t('celebrateClose')}
           </Button>
         </div>

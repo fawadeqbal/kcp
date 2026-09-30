@@ -213,3 +213,56 @@ jobs:
             apps/site/playwright-report
             apps/site/test-results
           retention-days: 7
+
+  mobile:
+    name: Mobile app (Dart client, analyze, tests, Android build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FLUTTER_VERSION: 3.47.5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      # Flutter from its own repository at a fixed release (no third-party action).
+      - name: Install Flutter
+        run: |
+          git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Get the Dart packages
+        run: |
+          flutter --version
+          flutter pub get
+
+      - name: Check the shared design tokens and badge texts
+        run: node apps/mobile/tool/shared.mjs --check
+
+      - name: Check the Dart API client is up to date (and only what the app may call)
+        run: |
+          node --test packages/api-client-dart/tool/*.test.mjs
+          node packages/api-client-dart/tool/generate.mjs
+          if [ -n "$(git status --porcelain -- packages/api-client-dart)" ]; then
+            git status --short -- packages/api-client-dart
+            echo "::error::The Dart API client is out of date. Run 'pnpm api:client:dart' and commit the result."
+            exit 1
+          fi
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed apps/mobile/lib apps/mobile/test
+
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze --fatal-infos
+
+      - name: Unit and widget tests (English, Arabic, Urdu; accessibility checks)
+        working-directory: apps/mobile
+        run: flutter test
+
+      - name: Build the Android app (dev flavour)
+        working-directory: apps/mobile
+        run: flutter build apk --debug --flavor dev --dart-define-from-file=config/dev.json

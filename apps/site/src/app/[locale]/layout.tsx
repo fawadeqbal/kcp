@@ -1,4 +1,7 @@
-import '@fontsource-variable/noto-sans/index.css';
+import '@fontsource/caprasimo/latin-400.css';
+import '@fontsource/caprasimo/latin-ext-400.css';
+import '@fontsource-variable/figtree/index.css';
+import '@fontsource-variable/baloo-bhaijaan-2/index.css';
 import '@fontsource-variable/noto-sans-arabic/index.css';
 import '@fontsource/noto-nastaliq-urdu/arabic-400.css';
 import '@fontsource/noto-nastaliq-urdu/arabic-700.css';
@@ -21,8 +24,12 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// The browser's bar takes the page's ground, light or dark (packages/ui/src/theme.css).
 export const viewport: Viewport = {
-  themeColor: '#4f46e5',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5ead8' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a1815' },
+  ],
 };
 
 export async function generateMetadata({ params }: Omit<Props, 'children'>): Promise<Metadata> {
@@ -45,18 +52,18 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('nav');
   // Only the texts that client components use travel to the browser.
-  const { nav, waitlist, confirm } = await getMessages();
+  const { nav, cta, waitlist, confirm } = await getMessages();
 
   return (
     <html lang={locale} dir={directionOf(locale)}>
       <body className="flex min-h-dvh flex-col antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:font-semibold focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-surface focus:px-4 focus:py-2 focus:font-semibold focus:elev-lg"
         >
           {t('skipToContent')}
         </a>
-        <NextIntlClientProvider messages={{ nav, waitlist, confirm }}>
+        <NextIntlClientProvider messages={{ nav, cta, waitlist, confirm }}>
           <SiteHeader brand={BRAND_NAME} />
           <main id="main" className="flex-1">
             {children}

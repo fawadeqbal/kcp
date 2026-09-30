@@ -43,7 +43,8 @@
       },
       "seed": {
         "dependsOn": [
-          "^build"
+          "^build",
+          "generate"
         ],
         "cache": false
       }

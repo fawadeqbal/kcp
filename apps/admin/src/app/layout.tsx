@@ -1,4 +1,7 @@
-import '@fontsource-variable/noto-sans/index.css';
+import '@fontsource/caprasimo/latin-400.css';
+import '@fontsource/caprasimo/latin-ext-400.css';
+import '@fontsource-variable/figtree/index.css';
+import '@fontsource-variable/baloo-bhaijaan-2/index.css';
 import '@fontsource-variable/noto-sans-arabic/index.css';
 import './globals.css';
 import type { Metadata } from 'next';

@@ -1,0 +1,18 @@
+id: builder-m02-l01-q2
+order: 2
+kind: bug
+xp: 5
+language: python
+prompt:
+  en: One line has a mistake. Tap it.
+  ar: في أحد الأسطر خطأ. اضغط عليه.
+  ur: ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - 'print("Hello, world!")'
+  - 'print(I love Python)'
+  - 'print("My age is", 13)'
+bugLine: 2
+explanation:
+  en: Text needs quote marks around it. The line should be print("I love Python").
+  ar: يحتاج النص إلى علامتي تنصيص حوله. يجب أن يكون السطر ‎print("I love Python")‎.
+  ur: متن کے گرد کوٹیشن مارکس ضروری ہیں۔ یہ سطر ‎print("I love Python")‎ ہونی چاہیے۔

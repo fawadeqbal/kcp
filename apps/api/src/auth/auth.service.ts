@@ -278,6 +278,12 @@ export class AuthService {
         message: 'The admin panel is for staff accounts only.',
       });
     }
+    if (app === 'mobile' && user.role.key !== ROLE_KEYS.PARENT) {
+      throw new ForbiddenException({
+        error: 'NOT_FAMILY',
+        message: 'The app is for students and parents. Staff use the admin panel.',
+      });
+    }
 
     if (user.role.isStaff) {
       const stage: MfaStage = user.totpEnabledAt ? 'verify' : 'setup';

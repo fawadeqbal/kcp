@@ -1,0 +1,50 @@
+# The Dart side of the monorepo: a pub workspace, with scripts run by Melos
+# (dart pub global activate melos). The JavaScript side uses pnpm and Nx.
+#
+#   melos bootstrap           # pub get for the whole workspace
+#   melos run analyze         # flutter analyze (the app) and dart analyze (the client)
+#   melos run test            # the app's tests
+#   melos run shared          # design tokens and badge texts from the web packages → Dart
+#   melos run api             # the Dart API client (after `pnpm api:client`)
+name: kcp_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+workspace:
+  - apps/mobile
+  - packages/api-client-dart
+
+dev_dependencies:
+  melos: ^8.9.0
+
+melos:
+  scripts:
+    analyze:
+      description: Analyse the app (strictly) and the generated API client.
+      steps:
+        - melos exec --scope=kcp_app -- flutter analyze --fatal-infos
+        - melos exec --scope=kcp_api -- dart analyze --no-fatal-warnings
+    test:
+      description: The app's tests (unit and widget tests; no device needed).
+      exec:
+        command: flutter test
+        concurrency: 1
+      packageFilters:
+        scope: kcp_app
+    l10n:
+      description: Regenerate the app's translations from lib/l10n/*.arb.
+      exec:
+        command: flutter gen-l10n
+      packageFilters:
+        scope: kcp_app
+    shared:
+      description: Write what the app shares with the web apps as Dart (design tokens, badge texts).
+      run: node apps/mobile/tool/shared.mjs
+    shared:check:
+      description: Fail when the shared Dart files are out of date.
+      run: node apps/mobile/tool/shared.mjs --check
+    api:
+      description: Regenerate the Dart API client from packages/api-client-ts/openapi.json.
+      run: node packages/api-client-dart/tool/generate.mjs

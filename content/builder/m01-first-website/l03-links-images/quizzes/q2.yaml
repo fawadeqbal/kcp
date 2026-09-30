@@ -1,0 +1,19 @@
+id: builder-m01-l03-q2
+order: 2
+kind: order
+xp: 5
+language: html
+prompt:
+  en: Put the lines in order to make a list with a link inside it.
+  ar: رتّب الأسطر لتصنع قائمة بداخلها رابط.
+  ur: سطروں کو ترتیب سے لگائیں تاکہ ایک فہرست بنے جس کے اندر لنک ہو۔
+code:
+  - '<ul>'
+  - '  <li>'
+  - '    <a href="https://en.wikipedia.org/wiki/Moon">Moon</a>'
+  - '  </li>'
+  - '</ul>'
+explanation:
+  en: The link goes inside the <li>, and the <li> goes inside the <ul>. Each tag closes after everything that is inside it.
+  ar: يوضع الرابط داخل ‎<li>‎، ويوضع ‎<li>‎ داخل ‎<ul>‎. يُغلق كل وسم بعد كل ما بداخله.
+  ur: لنک ‎<li>‎ کے اندر آتا ہے، اور ‎<li>‎ خود ‎<ul>‎ کے اندر۔ ہر ٹیگ اپنے اندر کی ساری چیزوں کے بعد بند ہوتا ہے۔

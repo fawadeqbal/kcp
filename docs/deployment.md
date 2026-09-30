@@ -29,30 +29,31 @@ Tags: `sha-<7 chars>` for pushes to `main`, the tag name (for example `v0.1.0`) 
    - a pull credential for GitHub Container Registry (a GitHub token with `read:packages`), because the images are private;
    - environment variables:
 
-     | Variable                | Staging value                                                                                           |
-     | ----------------------- | ------------------------------------------------------------------------------------------------------- |
-     | `NODE_ENV`              | `production`                                                                                            |
-     | `DATABASE_URL`          | the staging PostgreSQL URL                                                                              |
-     | `REDIS_URL`             | the staging Redis URL                                                                                   |
-     | `CORS_ORIGINS`          | the staging web app and admin panel URLs, comma-separated                                               |
-     | `LOG_LEVEL`             | `info`                                                                                                  |
-     | `SWAGGER_ENABLED`       | `true` (keep API docs on in staging only)                                                               |
-     | `JWT_ACCESS_SECRET`     | a new random value: `openssl rand -base64 48`                                                           |
-     | `ENCRYPTION_KEY`        | a new random value: `openssl rand -base64 32` (keep it safe: it decrypts staff two-factor secrets)      |
-     | `SMTP_URL`              | your email provider's SMTP URL, e.g. `smtps://user:pass@smtp.provider.com:465`                          |
-     | `MAIL_FROM`             | e.g. `Kids Coding Platform <no-reply@yourdomain>`                                                       |
-     | `WEB_APP_URL`           | the web app's public URL (used in email links)                                                          |
-     | `COOKIE_DOMAIN`         | leave empty unless the API and web app need a shared parent domain                                      |
-     | `S3_ENDPOINT`           | the R2 S3 endpoint, `https://<account id>.r2.cloudflarestorage.com`                                     |
-     | `S3_BUCKET`             | the bucket from step 3, e.g. `kcp-files-staging`                                                        |
-     | `S3_ACCESS_KEY_ID`      | the R2 token's access key ID                                                                            |
-     | `S3_SECRET_ACCESS_KEY`  | the R2 token's secret access key                                                                        |
-     | `S3_REGION`             | `auto` (the default; R2 ignores regions)                                                                |
-     | `API_PUBLIC_URL`        | the API's public URL, e.g. `https://api.yourdomain.com` (https switches on secure cookies)              |
-     | `SITE_URL`              | the marketing site's public URL (waitlist emails link to it)                                            |
-     | `TRUST_PROXY_HOPS`      | how many proxies add to `X-Forwarded-For`: `2` for Cloudflare plus the host's load balancer (see below) |
-     | `STRIPE_SECRET_KEY`     | optional: turns on card payments (see "Card payments")                                                  |
-     | `STRIPE_WEBHOOK_SECRET` | with `STRIPE_SECRET_KEY`: the webhook endpoint's signing secret                                         |
+     | Variable                   | Staging value                                                                                                             |
+     | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+     | `NODE_ENV`                 | `production`                                                                                                              |
+     | `DATABASE_URL`             | the staging PostgreSQL URL                                                                                                |
+     | `REDIS_URL`                | the staging Redis URL                                                                                                     |
+     | `CORS_ORIGINS`             | the staging web app and admin panel URLs, comma-separated                                                                 |
+     | `LOG_LEVEL`                | `info`                                                                                                                    |
+     | `SWAGGER_ENABLED`          | `true` (keep API docs on in staging only)                                                                                 |
+     | `JWT_ACCESS_SECRET`        | a new random value: `openssl rand -base64 48`                                                                             |
+     | `ENCRYPTION_KEY`           | a new random value: `openssl rand -base64 32` (keep it safe: it decrypts staff two-factor secrets)                        |
+     | `SMTP_URL`                 | your email provider's SMTP URL, e.g. `smtps://user:pass@smtp.provider.com:465`                                            |
+     | `MAIL_FROM`                | e.g. `Kids Coding Platform <no-reply@yourdomain>`                                                                         |
+     | `WEB_APP_URL`              | the web app's public URL (used in email links)                                                                            |
+     | `COOKIE_DOMAIN`            | leave empty unless the API and web app need a shared parent domain                                                        |
+     | `S3_ENDPOINT`              | the R2 S3 endpoint, `https://<account id>.r2.cloudflarestorage.com`                                                       |
+     | `S3_BUCKET`                | the bucket from step 3, e.g. `kcp-files-staging`                                                                          |
+     | `S3_ACCESS_KEY_ID`         | the R2 token's access key ID                                                                                              |
+     | `S3_SECRET_ACCESS_KEY`     | the R2 token's secret access key                                                                                          |
+     | `S3_REGION`                | `auto` (the default; R2 ignores regions)                                                                                  |
+     | `API_PUBLIC_URL`           | the API's public URL, e.g. `https://api.yourdomain.com` (https switches on secure cookies)                                |
+     | `SITE_URL`                 | the marketing site's public URL (waitlist emails link to it)                                                              |
+     | `TRUST_PROXY_HOPS`         | how many proxies add to `X-Forwarded-For`: `2` for Cloudflare plus the host's load balancer (see below)                   |
+     | `STRIPE_SECRET_KEY`        | optional: turns on card payments (see "Card payments")                                                                    |
+     | `STRIPE_WEBHOOK_SECRET`    | with `STRIPE_SECRET_KEY`: the webhook endpoint's signing secret                                                           |
+     | `FIREBASE_SERVICE_ACCOUNT` | optional: push notifications for the mobile app ([mobile-release.md](mobile-release.md)); without it they are only logged |
 
      Optional: `STAFF_SESSION_HOURS` (default 12) and `REFRESH_TOKEN_TTL_DAYS` (default 30) set how long staff and families stay signed in before typing their password again.
 
@@ -71,7 +72,7 @@ Merging to `main` now builds the images, applies migrations to staging, imports 
 
 ## The web app (`apps/web`)
 
-The web app is a standard Next.js app. The simplest host is Vercel: import the repository, set the root directory to `apps/web`, and add three environment variables: `NEXT_PUBLIC_API_URL` (the API's public URL), `NEXT_PUBLIC_SANDBOX_URL` (the code sandbox's URL, below) and `NEXT_PUBLIC_BILLING_EMAIL` (where parents write about payments). It also builds as a self-contained Node server (`output: 'standalone'`) for any container host.
+The web app is a standard Next.js app. The simplest host is Vercel: import the repository, set the root directory to `apps/web`, and add three environment variables: `NEXT_PUBLIC_API_URL` (the API's public URL), `NEXT_PUBLIC_SANDBOX_URL` (the code sandbox's URL, below) and `NEXT_PUBLIC_BILLING_EMAIL` (where parents write about payments). Once the mobile app is in the stores, also `APP_ANDROID_PACKAGE`, `APP_ANDROID_SHA256` and `APP_IOS_APP_ID`: lesson and dashboard links then open the app ([mobile-release.md](mobile-release.md)). It also builds as a self-contained Node server (`output: 'standalone'`) for any container host.
 
 Its Content-Security-Policy is built from those URLs at build time (`src/lib/security-headers.ts`): the page may only call the API, frame the sandbox and the two video players, and load nothing from other sites. It also sends HSTS.
 

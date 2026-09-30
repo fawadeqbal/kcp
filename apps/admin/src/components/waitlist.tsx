@@ -30,6 +30,7 @@ export function WaitlistSummary() {
       <div className="flex flex-col gap-6">
         <Card title={`By country · ${confirmed.toLocaleString('en')} confirmed`}>
           <Table
+            bare
             caption="Waitlist by country"
             columns={['Country', 'Confirmed', 'Waiting for confirmation']}
             empty={data.countries.length === 0}
@@ -48,6 +49,7 @@ export function WaitlistSummary() {
         </Card>
         <Card title="Latest confirmed (50)">
           <Table
+            bare
             caption="Latest confirmed addresses"
             columns={['Email', 'Country', 'Child’s age', 'Language', 'Confirmed']}
             empty={data.latest.length === 0}

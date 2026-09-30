@@ -1,0 +1,17 @@
+id: builder-m01-l04-q2
+order: 2
+kind: order
+xp: 5
+language: css
+prompt:
+  en: Put the lines in order to make the page background light yellow.
+  ar: رتّب الأسطر لتجعل خلفية الصفحة صفراء فاتحة.
+  ur: سطروں کو ترتیب سے لگائیں تاکہ صفحے کا پس منظر ہلکا پیلا ہو جائے۔
+code:
+  - 'body {'
+  - '  background-color: lightyellow;'
+  - '}'
+explanation:
+  en: 'A rule starts with the selector and {, then comes the property and its value, and } closes it.'
+  ar: 'تبدأ القاعدة بالمحدِّد و‎{‎، ثم تأتي الخاصية وقيمتها، ثم تُغلق بـ ‎}‎.'
+  ur: 'رول سلیکٹر اور ‎{‎ سے شروع ہوتا ہے، پھر پراپرٹی اور اس کی ویلیو آتی ہے، اور ‎}‎ اسے بند کرتا ہے۔'

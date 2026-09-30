@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From the design tokens (packages/ui/src/theme.css): the terracotta brand, and
+         the cream page the app opens on. -->
+    <color name="notification_color">#C67139</color>
+    <color name="launch_background">#F5EAD8</color>
+</resources>

@@ -101,6 +101,28 @@ describe('validateEnv', () => {
     );
   });
 
+  it('only logs push notifications until Firebase is set up', () => {
+    expect(validateEnv(base).PUSH_TRANSPORT).toBe('log');
+    const account = JSON.stringify({
+      project_id: 'kcp',
+      client_email: 'push@kcp.iam.gserviceaccount.com',
+      private_key: '-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----\n',
+    });
+    expect(validateEnv({ ...base, FIREBASE_SERVICE_ACCOUNT: account }).PUSH_TRANSPORT).toBe('fcm');
+    expect(
+      validateEnv({
+        ...base,
+        FIREBASE_SERVICE_ACCOUNT: Buffer.from(account).toString('base64'),
+      }).PUSH_TRANSPORT,
+    ).toBe('fcm');
+    expect(() => validateEnv({ ...base, FIREBASE_SERVICE_ACCOUNT: '{"project_id":"x"}' })).toThrow(
+      /FIREBASE_SERVICE_ACCOUNT/,
+    );
+    expect(() => validateEnv({ ...base, PUSH_TRANSPORT: 'fcm' })).toThrow(
+      /FIREBASE_SERVICE_ACCOUNT/,
+    );
+  });
+
   it('refuses a deployment that forgot NODE_ENV=production', () => {
     expect(() => validateEnv({ ...base, WEB_APP_URL: 'https://app.example.com' })).toThrow(
       /NODE_ENV must be production/,

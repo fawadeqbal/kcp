@@ -34,6 +34,7 @@ test('a student runs and checks Python programs (en)', async ({ page, request })
   if (!lesson1 || !lesson2) throw new Error('The Python module needs two lessons');
 
   await page.goto(`/en/learn/${lesson1.id}`);
+  await page.getByRole('button', { name: m.lesson.startSteps }).click();
   await expect(page.getByRole('tab', { name: m.lesson.filePy, exact: true })).toBeVisible();
   // Python code stays left-to-right, and gets Python highlighting.
   await expect(page.getByTestId('editor-py')).toHaveAttribute('dir', 'ltr');

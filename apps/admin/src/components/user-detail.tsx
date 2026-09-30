@@ -1,7 +1,17 @@
 'use client';
 
 import type { components } from '@kcp/api-client-ts';
-import { Alert, Badge, Button, Card, Dialog, PageSpinner, SelectField, TextField } from '@kcp/ui';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Dialog,
+  Icon,
+  PageSpinner,
+  SelectField,
+  TextField,
+} from '@kcp/ui';
 import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
 import { userSubject } from '@/lib/ability';
@@ -72,8 +82,12 @@ export function UserDetail({ id }: { id: string }) {
 
   return (
     <>
-      <nav aria-label="Breadcrumb" className="text-sm">
-        <Link href="/users" className="text-brand-700 underline-offset-4 hover:underline">
+      <nav aria-label="Breadcrumb">
+        <Link
+          href="/users"
+          className="flex min-h-9 w-fit items-center gap-1.5 rounded-full bg-surface ps-2.5 pe-3.5 text-sm font-semibold hover:bg-sand-300"
+        >
+          <Icon name="chevL" className="text-base" />
           Users
         </Link>
       </nav>
@@ -144,6 +158,7 @@ export function UserDetail({ id }: { id: string }) {
               entries={history.data.items}
               caption="Audit entries about this account"
               showEntity={false}
+              bare
             />
           ) : (
             <p className="text-muted">{history.error ?? 'Loading…'}</p>
@@ -152,7 +167,7 @@ export function UserDetail({ id }: { id: string }) {
             <p className="mt-4 text-sm">
               <Link
                 href={`/audit?actorId=${account.id}`}
-                className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+                className="font-semibold text-brand-text underline-offset-4 hover:underline"
               >
                 Actions taken by this staff member
               </Link>
@@ -173,7 +188,7 @@ function FamilyList({ parents, childAccounts }: { parents: Person[]; childAccoun
       <Badge>{label}</Badge>
       <Link
         href={`/users/${person.id}`}
-        className="font-semibold break-all text-brand-700 underline-offset-4 hover:underline"
+        className="font-semibold break-all text-brand-text underline-offset-4 hover:underline"
       >
         {person.displayName ?? person.email ?? person.username}
       </Link>

@@ -1,0 +1,31 @@
+id: builder-m02-l02-q3
+order: 3
+kind: output
+xp: 5
+language: python
+prompt:
+  en: The variable answer holds text, just like an answer from input(). What does this program print?
+  ar: المتغيّر answer يحمل نصًا، تمامًا مثل الإجابة التي تعطيها ‎input()‎. ماذا يطبع هذا البرنامج؟
+  ur: ویری ایبل answer میں متن ہے، بالکل ‎input()‎ کے جواب کی طرح۔ یہ پروگرام کیا دکھائے گا؟
+code:
+  - 'answer = "12"'
+  - 'print(answer + "1")'
+  - 'print(int(answer) + 1)'
+options:
+  - id: a
+    code: |-
+      13
+      13
+  - id: b
+    code: |-
+      121
+      121
+  - id: c
+    code: |-
+      121
+      13
+answer: c
+explanation:
+  en: The variable answer is text, so + joins "12" and "1" into 121. int() turns the text into the number 12, and 12 + 1 is 13.
+  ar: المتغيّر answer نص، لذلك تصل علامة ‎+‎ بين ‎"12"‎ و‎"1"‎ فتصبح 121. أما ‎int()‎ فتحوّل النص إلى الرقم 12، و‎12 + 1‎ تساوي 13.
+  ur: ویری ایبل answer متن ہے، اس لیے ‎+‎ کا نشان ‎"12"‎ اور ‎"1"‎ کو جوڑ کر 121 بنا دیتا ہے۔ ‎int()‎ متن کو نمبر 12 میں بدل دیتا ہے، اور ‎12 + 1‎ کا جواب 13 ہے۔

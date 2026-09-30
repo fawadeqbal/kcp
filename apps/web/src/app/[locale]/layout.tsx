@@ -1,4 +1,7 @@
-import '@fontsource-variable/noto-sans/index.css';
+import '@fontsource/caprasimo/latin-400.css';
+import '@fontsource/caprasimo/latin-ext-400.css';
+import '@fontsource-variable/figtree/index.css';
+import '@fontsource-variable/baloo-bhaijaan-2/index.css';
 import '@fontsource-variable/noto-sans-arabic/index.css';
 import '@fontsource/noto-nastaliq-urdu/arabic-400.css';
 import '@fontsource/noto-nastaliq-urdu/arabic-700.css';
@@ -9,7 +12,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { FeedbackButton } from '@/components/feedback-button';
+import { AppFrame } from '@/components/app-frame';
 import { SiteHeader } from '@/components/site-header';
 import { TermsGate } from '@/features/account/terms-gate';
 import { Link } from '@/i18n/navigation';
@@ -46,34 +49,36 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="flex min-h-dvh flex-col antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-10 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2"
+          className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-40 focus:rounded-full focus:bg-surface focus:px-4 focus:py-2 focus:font-semibold"
         >
           {t('nav.skipToContent')}
         </a>
         <NextIntlClientProvider>
           <AuthProvider>
-            <SiteHeader />
-            <main id="main" className="flex-1 px-4 py-10">
+            <AppFrame
+              header={<SiteHeader />}
+              footer={
+                <footer className="print-hidden px-4 pt-6 pb-24 text-center text-sm text-muted">
+                  <p>{t('meta.description')}</p>
+                  <nav aria-label={t('nav.footer')} className="mt-3">
+                    <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                      {(['safety', 'terms', 'privacy'] as const).map((page) => (
+                        <li key={page}>
+                          <Link
+                            href={`/${page}`}
+                            className="font-semibold text-ink underline-offset-4 hover:text-brand-text hover:underline"
+                          >
+                            {t(`nav.${page}`)}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                </footer>
+              }
+            >
               <TermsGate>{children}</TermsGate>
-            </main>
-            <footer className="print-hidden border-t border-line px-4 py-6 pb-20 text-center text-sm text-muted">
-              <p>{t('meta.description')}</p>
-              <nav aria-label={t('nav.footer')} className="mt-3">
-                <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-                  {(['safety', 'terms', 'privacy'] as const).map((page) => (
-                    <li key={page}>
-                      <Link
-                        href={`/${page}`}
-                        className="font-medium text-ink underline-offset-4 hover:underline"
-                      >
-                        {t(`nav.${page}`)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </footer>
-            <FeedbackButton />
+            </AppFrame>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

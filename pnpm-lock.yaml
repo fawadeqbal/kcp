@@ -219,10 +219,16 @@ importers:
       '@casl/ability':
         specifier: ^7.0.1
         version: 7.0.1
-      '@fontsource-variable/noto-sans':
+      '@fontsource-variable/baloo-bhaijaan-2':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/figtree':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource-variable/noto-sans-arabic':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/caprasimo':
         specifier: ^5.3.0
         version: 5.3.0
       '@kcp/api-client-ts':
@@ -438,10 +444,16 @@ importers:
 
   apps/site:
     dependencies:
-      '@fontsource-variable/noto-sans':
+      '@fontsource-variable/baloo-bhaijaan-2':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/figtree':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource-variable/noto-sans-arabic':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/caprasimo':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/noto-nastaliq-urdu':
@@ -523,10 +535,16 @@ importers:
       '@codemirror/view':
         specifier: ^6.43.13
         version: 6.43.13
-      '@fontsource-variable/noto-sans':
+      '@fontsource-variable/baloo-bhaijaan-2':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/figtree':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource-variable/noto-sans-arabic':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/caprasimo':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/noto-nastaliq-urdu':
@@ -1094,11 +1112,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fontsource-variable/baloo-bhaijaan-2@5.3.0':
+    resolution: {integrity: sha512-StJtquhPlMmOyv/wUN7lATgXSG56gJfG3YQ5fltULrgydL4DqgW5/3vJX9ArWyanjN/V6ShoGKwjjlP+fSTIOQ==}
+
+  '@fontsource-variable/figtree@5.3.0':
+    resolution: {integrity: sha512-VRVodD7OiG7apQwE8/2fMjaqpY/a0qRJqL5HtYj8CKIVps+9amaFcdfKmDIf7iqYQx6iPLlArVXAfKeIZmVcNQ==}
+
   '@fontsource-variable/noto-sans-arabic@5.3.0':
     resolution: {integrity: sha512-Rz8+DBzza3//cmN+DBQajJhx3x+Dx12eUgnQsTOgPWbOT0+In6APmE8z4I/QQnUWfAx+s8l93+60qDT5vJH1sA==}
 
-  '@fontsource-variable/noto-sans@5.3.0':
-    resolution: {integrity: sha512-e3ZuxzY9AL2psXPZlhwhnYrHUHv6PMoyK9MQ7croF0CUgURLqu9EMjW7q2FgVLwij1tjLsIHQrnwQ8aUcg4BiA==}
+  '@fontsource/caprasimo@5.3.0':
+    resolution: {integrity: sha512-cJGLwG71NFriSJZjsFkv+7/Hdev+vMoCaZIf5TLKS41aGSRuLTgh8Uul5vF+YKX4S89FtwLtOOD8HJV1+0NDjQ==}
 
   '@fontsource/noto-nastaliq-urdu@5.3.0':
     resolution: {integrity: sha512-rhozTu22mlnDp5R8A4gGeNJvoLroHEV0TytCwly20w1LMA+VXs/MyhORGJu3i3SWZFdyeCFe5EF5xzraq6zd6A==}
@@ -5722,9 +5746,13 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@fontsource-variable/baloo-bhaijaan-2@5.3.0': {}
+
+  '@fontsource-variable/figtree@5.3.0': {}
+
   '@fontsource-variable/noto-sans-arabic@5.3.0': {}
 
-  '@fontsource-variable/noto-sans@5.3.0': {}
+  '@fontsource/caprasimo@5.3.0': {}
 
   '@fontsource/noto-nastaliq-urdu@5.3.0': {}
 

@@ -29,12 +29,12 @@ function Plan({
   return (
     <div
       className={clsx(
-        'flex flex-col gap-6 rounded-[var(--radius-card)] border bg-surface p-6 sm:p-8',
-        highlighted ? 'border-brand-500 shadow-xl shadow-brand-600/10' : 'border-line',
+        'flex flex-col gap-6 rounded-hero p-6 sm:p-8',
+        highlighted ? 'bg-brand-100' : 'bg-surface',
       )}
     >
       <div>
-        <h3 className="text-2xl font-bold">{name}</h3>
+        <h3 className="text-3xl">{name}</h3>
         <p className="mt-1 text-muted">{tagline}</p>
       </div>
       <div>{price}</div>
@@ -80,8 +80,8 @@ export async function PricingView({
                     className={clsx(
                       'inline-flex min-h-11 items-center rounded-full border px-4 font-semibold transition-colors',
                       selected
-                        ? 'border-brand-600 bg-brand-600 text-white'
-                        : 'border-line bg-surface text-ink hover:border-brand-500 hover:bg-brand-50',
+                        ? 'border-primary bg-primary text-on-primary'
+                        : 'border-line bg-surface text-ink hover:border-brand hover:bg-ink/7',
                     )}
                   >
                     {priceFor(pricing, code).names[locale]}
@@ -94,12 +94,12 @@ export async function PricingView({
       </PageIntro>
 
       <Container className="py-12 sm:py-16">
-        <h2 className="text-2xl font-bold">{t('showing', { country: countryName })}</h2>
+        <h2 className="text-3xl">{t('showing', { country: countryName })}</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <Plan
             name={t('free')}
             tagline={t('freeTagline')}
-            price={<p className="text-4xl font-bold">{t('freePrice')}</p>}
+            price={<p className="font-display text-4xl">{t('freePrice')}</p>}
             features={[t('freeIntro'), t('freeChecks'), t('freePortfolio')]}
             action={
               <SignUpLink locale={locale} variant="secondary">
@@ -114,7 +114,7 @@ export async function PricingView({
             price={
               <>
                 <p className="flex flex-wrap items-baseline gap-x-2">
-                  <bdi className="text-4xl font-bold" data-testid="monthly-price">
+                  <bdi className="font-display text-4xl" data-testid="monthly-price">
                     {formatPrice(price.monthlyMinor, price.currency, locale)}
                   </bdi>
                   <span className="text-muted">{t('perMonth')}</span>
@@ -154,10 +154,7 @@ export async function PricingView({
             },
             { icon: <CardIcon />, title: t('paymentTitle'), body: t('payment') },
           ].map((item) => (
-            <li
-              key={item.title}
-              className="flex gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-5"
-            >
+            <li key={item.title} className="flex gap-4 rounded-panel bg-surface p-5">
               <IconBadge>{item.icon}</IconBadge>
               <div>
                 <h3 className="font-bold">{item.title}</h3>

@@ -1,22 +1,23 @@
 import type { AvatarKey } from '@kcp/shared';
 
 /**
- * Background colour of each preset avatar. The icon on top is white, so every colour
- * must keep at least 4.5:1 contrast with white (checked in avatar-colors.spec.ts).
+ * Background colour of each preset avatar: deep, warm tones from the Organic palette.
+ * The icon on top is white, so every colour must keep at least 4.5:1 contrast with
+ * white (checked in avatar-colors.spec.ts).
  */
 export const AVATAR_COLORS: Record<AvatarKey, string> = {
-  rocket: '#4f46e5',
-  star: '#b45309',
-  bolt: '#7c3aed',
-  planet: '#0e7490',
-  robot: '#475569',
-  leaf: '#15803d',
-  moon: '#1e3a8a',
-  sun: '#c2410c',
-  cube: '#be185d',
-  gamepad: '#0f766e',
-  music: '#9333ea',
-  code: '#1d4ed8',
+  rocket: '#8c491a',
+  star: '#8a5a14',
+  bolt: '#6b4a7a',
+  planet: '#2f6068',
+  robot: '#5b5347',
+  leaf: '#56633f',
+  moon: '#3f4a6b',
+  sun: '#a0501a',
+  cube: '#8e3d55',
+  gamepad: '#3d6655',
+  music: '#7b4668',
+  code: '#34506e',
 };
 
 function luminance(hex: string): number {

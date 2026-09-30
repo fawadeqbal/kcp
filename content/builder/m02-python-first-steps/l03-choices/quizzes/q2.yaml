@@ -1,0 +1,21 @@
+id: builder-m02-l03-q2
+order: 2
+kind: bug
+xp: 5
+language: python
+prompt:
+  en: One line has a mistake. Tap it.
+  ar: في أحد الأسطر خطأ. اضغط عليه.
+  ur: ایک سطر میں غلطی ہے۔ اس پر ٹیپ کریں۔
+code:
+  - 'secret = 7'
+  - 'guess = 3'
+  - 'if guess = secret:'
+  - '    print("You got it!")'
+  - 'else:'
+  - '    print("Try again!")'
+bugLine: 3
+explanation:
+  en: 'One = puts a value in a variable. To check if two values are equal, use two = signs: if guess == secret:'
+  ar: 'علامة ‎=‎ واحدة تضع قيمة في متغيّر. لتفحص هل القيمتان متساويتان، استخدم علامتي ‎=‎ هكذا: ‎if guess == secret:‎'
+  ur: 'ایک ‎=‎ ویری ایبل میں ویلیو رکھتا ہے۔ یہ چیک کرنے کے لیے کہ دو ویلیوز برابر ہیں یا نہیں، دو ‎=‎ لگائیں، ایسے: ‎if guess == secret:‎'

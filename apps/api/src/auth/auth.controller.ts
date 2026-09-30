@@ -160,7 +160,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
     const result = await this.auth.login(dto.email, dto.password, ctx, dto.app);
-    return this.deliver(result, dto.tokenDelivery, res, dto.app);
+    return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
   }
 
   /** Student login with the username and password their parent set. */
@@ -184,7 +184,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
     const result = await this.auth.loginStudent(dto.username, dto.password, ctx, dto.app);
-    return this.deliver(result, dto.tokenDelivery, res, dto.app);
+    return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
   }
 
   /** Staff without two-factor yet: returns a secret to add to an authenticator app. */
@@ -212,7 +212,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
     const result = await this.auth.verifyMfa(dto.mfaToken, dto.code, ctx);
-    return this.deliver(result, dto.tokenDelivery, res, dto.app);
+    return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
   }
 
   /** Swaps the refresh token (cookie or body) for a new access token and refresh token. */

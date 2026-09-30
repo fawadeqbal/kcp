@@ -5,8 +5,7 @@ import { BOARD_PERIODS, BOARD_SCOPES, type BoardPeriod, type BoardScope } from '
 import { clsx } from 'clsx';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Alert, Avatar, PageSpinner } from '@/components/ui';
-import { Link } from '@/i18n/navigation';
+import { Alert, Avatar, Icon, PageSpinner } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { onTabKeyDown } from '../learn/tabs';
@@ -36,7 +35,11 @@ function PillTabs<T extends string>({
   idPrefix: string;
 }) {
   return (
-    <div role="tablist" aria-label={label} className="flex flex-wrap gap-2">
+    <div
+      role="tablist"
+      aria-label={label}
+      className="flex w-fit max-w-full flex-wrap gap-1 rounded-[1.6rem] bg-surface p-1.25"
+    >
       {options.map((option, index) => (
         <button
           key={option}
@@ -51,10 +54,8 @@ function PillTabs<T extends string>({
             onTabKeyDown(event, options.length, index, (i) => onChange(options[i]!))
           }
           className={clsx(
-            'min-h-11 rounded-full border px-5 font-semibold',
-            value === option
-              ? 'border-brand-600 bg-brand-600 text-white'
-              : 'border-line bg-surface hover:border-brand-600',
+            'min-h-10 rounded-full px-4.5 text-sm font-semibold transition-colors',
+            value === option ? 'elev-sm bg-canvas text-ink' : 'text-muted hover:text-ink',
           )}
         >
           {text(option)}
@@ -67,7 +68,6 @@ function PillTabs<T extends string>({
 /** Leaderboards: this week, the season or all time; the world, country, region or city. */
 export function LeaderboardPage() {
   const t = useTranslations('leaderboard');
-  const tl = useTranslations('lesson');
   const format = useFormatter();
   const locale = useLocale();
   const user = useAccount('STUDENT');
@@ -114,14 +114,9 @@ export function LeaderboardPage() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <nav aria-label={tl('backToLearning')} className="text-sm">
-        <Link href="/learn" className="font-semibold text-brand-700 underline underline-offset-4">
-          {tl('backToLearning')}
-        </Link>
-      </nav>
       <header>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="mt-1 text-muted">
+        <h1 className="text-4xl">{t('title')}</h1>
+        <p className="mt-1.5 text-lg text-muted">
           {period === 'season' && board?.season
             ? t('subtitleSeason', { name: board.season.name })
             : period === 'all'
@@ -153,7 +148,7 @@ export function LeaderboardPage() {
         {failed ? <Alert tone="error">{t('loadFailed')}</Alert> : null}
         {!failed && !board ? <PageSpinner /> : null}
         {board && unavailable ? (
-          <p className="rounded-xl border border-dashed border-line px-4 py-8 text-center text-muted">
+          <p className="rounded-card border-2 border-dashed border-line px-6 py-10 text-center text-muted">
             {unavailable}
           </p>
         ) : null}
@@ -161,10 +156,13 @@ export function LeaderboardPage() {
           <div className="flex flex-col gap-4">
             <p
               className={clsx(
-                'rounded-xl px-4 py-3',
-                board.me.hidden ? 'bg-line/40 text-ink' : 'bg-brand-50 font-semibold',
+                'flex items-center gap-3 rounded-row px-4.5 py-3.5',
+                board.me.hidden
+                  ? 'bg-sand-200 text-ink'
+                  : 'bg-brand-100 font-semibold text-brand-800',
               )}
             >
+              <Icon name={board.me.hidden ? 'shield' : 'trophy'} className="text-lg" />
               {board.me.hidden
                 ? t('hidden', { xp: String(board.me.xp) })
                 : board.me.rank
@@ -173,11 +171,11 @@ export function LeaderboardPage() {
             </p>
 
             {board.entries.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-line px-4 py-8 text-center text-muted">
+              <p className="rounded-card border-2 border-dashed border-line px-6 py-10 text-center text-muted">
                 {t('empty')}
               </p>
             ) : (
-              <table className="w-full border-separate border-spacing-y-1 text-start">
+              <table className="w-full border-separate border-spacing-y-1.5 text-start">
                 <thead className="text-sm text-muted">
                   <tr>
                     <th scope="col" className="w-16 px-3 text-start font-semibold">
@@ -195,10 +193,21 @@ export function LeaderboardPage() {
                   {board.entries.map((entry) => (
                     <tr
                       key={`${entry.rank}-${entry.nickname}`}
-                      className={clsx(entry.isMe ? 'bg-brand-50' : 'bg-surface')}
+                      className={clsx(entry.isMe ? 'bg-brand-100' : 'bg-surface')}
                       aria-current={entry.isMe ? 'true' : undefined}
                     >
-                      <td className="rounded-s-xl px-3 py-2 text-lg font-bold">{entry.rank}</td>
+                      <td className="rounded-s-full py-2 ps-4 pe-3">
+                        <span
+                          className={clsx(
+                            'grid size-9 place-items-center rounded-full font-display text-lg',
+                            entry.rank === 1 && 'bg-primary text-on-primary',
+                            entry.rank === 2 && 'bg-sage-700 text-sage-100',
+                            entry.rank === 3 && 'bg-brand-300 text-brand-900',
+                          )}
+                        >
+                          {entry.rank}
+                        </span>
+                      </td>
                       <td className="px-3 py-2">
                         <span className="flex items-center gap-3">
                           <Avatar avatarKey={entry.avatarKey} size="sm" />
@@ -206,13 +215,15 @@ export function LeaderboardPage() {
                             <bdi>{entry.nickname}</bdi>
                           </span>
                           {entry.isMe ? (
-                            <span className="rounded-full bg-brand-600 px-2 py-0.5 text-xs font-semibold text-white">
+                            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-on-primary">
                               {t('you')}
                             </span>
                           ) : null}
                         </span>
                       </td>
-                      <td className="rounded-e-xl px-3 py-2 text-end font-semibold">{entry.xp}</td>
+                      <td className="rounded-e-full py-2 ps-3 pe-5 text-end font-bold">
+                        {entry.xp}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -15,7 +15,7 @@ import { Container, IconBadge, Section } from '@/components/layout';
 import { MoreLink, SignUpLink, WaitlistLink } from '@/components/links';
 import { FaqList } from '@/features/faq/faq-list';
 import { LessonDemo } from '@/features/home/lesson-demo';
-import { SafetyPromises } from '@/features/safety/promises';
+import { HomePromises } from '@/features/safety/promises';
 import { TrackCards } from '@/features/tracks/track-cards';
 import { Link } from '@/i18n/navigation';
 import { COUNTRY_CODES, countrySlug } from '@/lib/countries';
@@ -51,35 +51,38 @@ export default async function HomePage({ params }: LocaleParams) {
     { icon: <BookIcon />, tone: 'brand' as const, text: t('pricingFree') },
     {
       icon: <CalendarIcon />,
-      tone: 'success' as const,
+      tone: 'sage' as const,
       text: tPricing('trial', { days: pricing.trialDays }),
     },
     {
       icon: <HeartIcon />,
-      tone: 'accent' as const,
+      tone: 'brand' as const,
       text: tPricing('family', { percent: pricing.familyDiscountPercent }),
     },
   ];
 
   return (
     <>
-      <section aria-labelledby="hero-title" className="bg-linear-to-b from-brand-50 to-canvas">
-        <Container className="grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.1fr_1fr]">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-brand-100 bg-surface px-3.5 py-1 text-sm font-semibold text-brand-700 shadow-sm">
-              <span className="size-2 rounded-full bg-success" aria-hidden="true" />
+      <section aria-labelledby="hero-title" className="overflow-x-clip">
+        <Container className="grid items-center gap-12 pt-8 pb-16 sm:pt-10 sm:pb-20 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
+          <div className="flex flex-col items-start gap-5.5">
+            <p className="inline-flex items-center gap-2 rounded-full bg-sage-100 px-3.5 py-1.5 text-[0.8rem] font-bold text-sage-800">
+              <span className="size-2 rounded-full bg-sage" aria-hidden="true" />
               {t('badge')}
             </p>
-            <h1 id="hero-title" className="mt-5 text-4xl font-bold text-balance sm:text-5xl">
+            <h1
+              id="hero-title"
+              className="text-[2.5rem] leading-[1.04] text-balance sm:text-5xl lg:text-[3.75rem]"
+            >
               {t('title')}
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted">{t('subtitle')}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <SignUpLink locale={locale} />
-              <WaitlistLink />
+            <p className="max-w-xl text-lg text-muted sm:text-[1.2rem]">{t('subtitle')}</p>
+            <div className="mt-1.5 flex flex-wrap gap-3">
+              <SignUpLink locale={locale} size="lg" arrow />
+              <WaitlistLink size="lg" />
             </div>
-            <p className="mt-6 flex items-center gap-2 text-sm font-medium text-muted">
-              <ShieldIcon className="text-success" />
+            <p className="flex items-center gap-2 text-sm font-semibold text-sage-text">
+              <ShieldIcon className="size-4.5" />
               {t('noAds')}
             </p>
           </div>
@@ -87,71 +90,93 @@ export default async function HomePage({ params }: LocaleParams) {
         </Container>
       </section>
 
-      <Section id="steps" title={t('steps.title')} subtitle={t('steps.subtitle')}>
-        <ol className="grid gap-5 md:grid-cols-3">
+      <Section
+        id="steps"
+        title={t('steps.title')}
+        subtitle={t('steps.subtitle')}
+        aside={<MoreLink href="/how-it-works">{t('steps.more')}</MoreLink>}
+      >
+        <ol className="grid gap-4.5 md:grid-cols-3">
           {steps.map((step, index) => (
-            <li
-              key={step.title}
-              className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-6"
-            >
+            <li key={step.title} className="flex flex-col gap-3 rounded-hero bg-surface p-7">
               <div className="flex items-center justify-between">
-                <IconBadge>{step.icon}</IconBadge>
-                <span className="font-latin text-4xl font-bold text-brand-100" aria-hidden="true">
+                <IconBadge size="lg">{step.icon}</IconBadge>
+                <span
+                  className="font-display text-[3.5rem] leading-none text-brand-300"
+                  aria-hidden="true"
+                >
                   {index + 1}
                 </span>
               </div>
-              <h3 className="text-lg font-bold">{step.title}</h3>
-              <p className="text-muted">{step.body}</p>
+              <h3 className="text-[1.375rem]">{step.title}</h3>
+              <p className="text-[0.95rem] text-muted">{step.body}</p>
             </li>
           ))}
         </ol>
-        <p className="mt-8">
-          <MoreLink href="/how-it-works">{t('steps.more')}</MoreLink>
-        </p>
       </Section>
 
-      <Section id="tracks" tone="surface" title={t('tracksTitle')} subtitle={t('tracksSubtitle')}>
+      <section aria-labelledby="safety-title" className="px-2 py-6 sm:px-4 sm:py-8">
+        <div className="mx-auto grid max-w-[80rem] gap-10 rounded-[2.5rem] bg-sage-100 px-6 py-12 sm:rounded-[3rem] sm:px-14 sm:py-16 lg:grid-cols-[0.9fr_1.3fr] lg:gap-12">
+          <div className="flex flex-col items-start gap-3">
+            <h2 id="safety-title" className="text-4xl text-sage-900 sm:text-[2.5rem]">
+              {t('safetyTitle')}
+            </h2>
+            <p className="text-lg text-sage-800">{t('safetySubtitle')}</p>
+            <p className="mt-2">
+              <MoreLink href="/safety" tone="sage">
+                {t('safetyMore')}
+              </MoreLink>
+            </p>
+          </div>
+          <HomePromises />
+        </div>
+      </section>
+
+      <Section
+        id="tracks"
+        title={t('tracksTitle')}
+        subtitle={t('tracksSubtitle')}
+        aside={<MoreLink href="/tracks">{t('tracksMore')}</MoreLink>}
+      >
         <TrackCards />
-        <p className="mt-8">
-          <MoreLink href="/tracks">{t('tracksMore')}</MoreLink>
-        </p>
       </Section>
 
-      <Section id="safety" title={t('safetyTitle')} subtitle={t('safetySubtitle')}>
-        <SafetyPromises only={['parents', 'anonymous', 'noChat', 'sandbox']} />
-        <p className="mt-8">
-          <MoreLink href="/safety">{t('safetyMore')}</MoreLink>
-        </p>
-      </Section>
-
-      <Section id="pricing" tone="surface" title={t('pricingTitle')} subtitle={t('pricingBody')}>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <ul className="flex flex-col gap-4">
-            {facts.map((fact) => (
-              <li
-                key={fact.text}
-                className="flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-canvas p-5"
-              >
-                <IconBadge tone={fact.tone}>{fact.icon}</IconBadge>
-                <p className="font-medium">{fact.text}</p>
-              </li>
-            ))}
-          </ul>
-          <div className="rounded-[var(--radius-card)] border border-brand-500 bg-surface p-6">
-            <h3 className="font-bold">{t('pricingPerMonth')}</h3>
-            <ul className="mt-3 divide-y divide-line">
+      <section aria-labelledby="pricing-title" className="py-12 sm:py-18">
+        <Container className="grid items-start gap-10 lg:grid-cols-2">
+          <div className="flex flex-col gap-3.5">
+            <h2 id="pricing-title" className="text-4xl text-balance sm:text-[2.5rem]">
+              {t('pricingTitle')}
+            </h2>
+            <p className="text-muted">{t('pricingBody')}</p>
+            <ul className="mt-2 flex flex-col gap-2.5">
+              {facts.map((fact) => (
+                <li key={fact.text} className="flex items-center gap-3 font-semibold">
+                  <IconBadge tone={fact.tone} size="sm">
+                    {fact.icon}
+                  </IconBadge>
+                  {fact.text}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3">
+              <MoreLink href="/pricing">{t('pricingMore')}</MoreLink>
+            </p>
+          </div>
+          <div className="rounded-hero bg-surface px-7 py-6.5">
+            <h3 className="text-xl">{t('pricingPerMonth')}</h3>
+            <ul className="mt-2.5 divide-y divide-line">
               {COUNTRY_CODES.map((code) => {
                 const price = priceFor(pricing, code);
                 return (
                   <li key={code}>
                     <Link
                       href={`/pricing/${countrySlug(code)}`}
-                      className="group flex min-h-12 items-center justify-between gap-4 py-2 hover:text-brand-700"
+                      className="group flex min-h-13 items-center justify-between gap-4 py-2 hover:text-brand-text"
                     >
                       <span>{price.names[locale]}</span>
-                      <span className="flex items-center gap-2 font-semibold">
+                      <span className="flex items-center gap-2.5 font-bold">
                         <bdi>{formatPrice(price.monthlyMinor, price.currency, locale)}</bdi>
-                        <ArrowIcon className="size-4 text-brand-600" />
+                        <ArrowIcon className="size-4 text-brand" />
                       </span>
                     </Link>
                   </li>
@@ -159,19 +184,19 @@ export default async function HomePage({ params }: LocaleParams) {
               })}
             </ul>
           </div>
-        </div>
-        <p className="mt-8">
-          <MoreLink href="/pricing">{t('pricingMore')}</MoreLink>
-        </p>
+        </Container>
+      </section>
+
+      <Section
+        id="faq"
+        tone="surface"
+        title={t('faqTitle')}
+        aside={<MoreLink href="/faq">{t('faqMore')}</MoreLink>}
+      >
+        <FaqList ids={['ages', 'lessons', 'signUp', 'devices']} pricing={pricing} onSurface />
       </Section>
 
-      <Section id="faq" title={t('faqTitle')}>
-        <FaqList ids={['ages', 'lessons', 'signUp', 'devices']} pricing={pricing} />
-        <p className="mt-8">
-          <MoreLink href="/faq">{t('faqMore')}</MoreLink>
-        </p>
-      </Section>
-
+      <div className="h-6 sm:h-8" />
       <FinalCallToAction title={t('finalTitle')} body={t('finalBody')} locale={locale} />
     </>
   );

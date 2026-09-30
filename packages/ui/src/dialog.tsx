@@ -32,11 +32,11 @@ export function Dialog({
       ref={ref}
       aria-labelledby={titleId}
       onClose={onClose}
-      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-[var(--radius-card)] border border-line bg-surface p-0 text-ink shadow-xl"
+      className="elev-lg m-auto w-[min(30rem,calc(100vw-2rem))] rounded-[2rem] bg-surface p-0 text-ink"
     >
       {open ? (
-        <div className="flex flex-col gap-4 p-6">
-          <h2 id={titleId} className="text-xl font-bold">
+        <div className="flex flex-col gap-4 p-6 sm:p-7">
+          <h2 id={titleId} className="text-2xl">
             {title}
           </h2>
           {children}

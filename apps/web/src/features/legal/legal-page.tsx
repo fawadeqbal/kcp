@@ -4,6 +4,7 @@ import { hasLocale } from 'next-intl';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { LEGAL_UPDATED, type LegalDoc, legalTexts } from '@/content/legal';
+import { Alert } from '@/components/ui';
 import { routing } from '@/i18n/routing';
 import { Markdown } from '../learn/markdown';
 
@@ -37,15 +38,15 @@ export function legalPage(doc: LegalDoc) {
     });
     return (
       <article className="mx-auto flex max-w-3xl flex-col gap-4">
-        <h1 className="text-3xl font-bold">{t(TITLES[doc])}</h1>
+        <h1 className="text-4xl">{t(TITLES[doc])}</h1>
         <p className="text-sm text-muted">
           {doc === 'safety' ? null : `${t('version', { version: TERMS_VERSION })} · `}
           {t('lastUpdated', { date: updated })}
         </p>
         {doc === 'safety' ? null : (
-          <p className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
-            {t('draft')}
-          </p>
+          <Alert tone="warning" live={false}>
+            <p className="text-sm">{t('draft')}</p>
+          </Alert>
         )}
         <Markdown sections="h2">{legalTexts[doc][locale]}</Markdown>
       </article>

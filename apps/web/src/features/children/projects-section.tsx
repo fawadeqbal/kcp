@@ -3,7 +3,7 @@
 import type { components } from '@kcp/api-client-ts';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
-import { Alert, Button, Card } from '@/components/ui';
+import { Alert, Button, Icon } from '@/components/ui';
 import { api } from '@/lib/api';
 import { isolate } from '../auth/validation';
 import { PortfolioItems } from '../portfolio/portfolio-items';
@@ -103,20 +103,23 @@ export function ProjectsSection({ child }: { child: Child }) {
   }
 
   return (
-    <Card title={t('projectsTitle')} headingLevel={3}>
+    <>
       {failed ? <Alert tone="error">{t('projectsFailed')}</Alert> : null}
       {portfolio && portfolio.items.length === 0 ? (
-        <p className="text-muted">{t('projectsEmpty', { nickname })}</p>
+        <p className="text-sm text-muted">{t('projectsEmpty', { nickname })}</p>
       ) : null}
       {portfolio && portfolio.items.length > 0 ? (
-        <PortfolioItems items={portfolio.items} headingLevel={4} />
+        <PortfolioItems items={portfolio.items} headingLevel={5} compact />
       ) : null}
 
       {portfolio ? (
-        <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-          <h4 className="font-semibold">{t('shareTitle')}</h4>
+        <div className="flex flex-col gap-3">
+          <h5 className="font-sans text-sm font-bold">{t('shareTitle')}</h5>
           {!allowed ? (
-            <p className="text-sm text-muted">{t('shareOff', { nickname })}</p>
+            <p className="flex gap-2.5 rounded-row border-2 border-dashed border-line p-3.5 text-sm text-muted">
+              <Icon name="share" className="mt-0.5 shrink-0 text-base" />
+              {t('shareOff', { nickname })}
+            </p>
           ) : link ? (
             <>
               <label htmlFor={inputId} className="text-sm font-semibold">
@@ -128,7 +131,7 @@ export function ProjectsSection({ child }: { child: Child }) {
                 dir="ltr"
                 value={link}
                 onFocus={(event) => event.currentTarget.select()}
-                className="font-latin w-full rounded-xl border border-line bg-canvas px-3 py-2 text-start text-sm"
+                className="font-latin w-full rounded-full border border-line bg-canvas px-4 py-2 text-start text-sm"
               />
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" onClick={() => void copy()}>
@@ -168,12 +171,12 @@ export function ProjectsSection({ child }: { child: Child }) {
           )}
           <p
             aria-live="polite"
-            className={status?.tone === 'error' ? 'text-sm text-danger' : 'text-sm text-success'}
+            className={status?.tone === 'error' ? 'text-sm text-danger' : 'text-sm text-sage-text'}
           >
             {status?.text}
           </p>
         </div>
       ) : null}
-    </Card>
+    </>
   );
 }

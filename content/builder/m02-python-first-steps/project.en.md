@@ -7,6 +7,12 @@ hints:
   story: 'Tell your story with at least three print( ) lines.'
   use_if: 'Use if and else (and elif if you like) to react to the choice.'
   endings: 'Different choices need different endings: print something different for "left" and "right".'
+checks:
+  asks-name: 'It asks at least 2 questions'
+  uses-name: 'It uses the player’s name'
+  tells-story: 'The story has at least 3 lines'
+  uses-if: 'It uses if and else'
+  different-endings: 'Different choices, different endings'
 ---
 
 Time to make a game! A **text adventure** is a story where the player decides what happens. Your program tells the story, asks the player what to do, and each choice leads to a different ending.

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './admin/admin.module.js';
+import { AppCrashesModule } from './app-crashes/app-crashes.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { BillingModule } from './billing/billing.module.js';
 import { AuthGuard } from './auth/auth.guard.js';
@@ -18,6 +19,7 @@ import { FeatureFlagsModule } from './feature-flags/feature-flags.module.js';
 import { HealthModule } from './health/health.module.js';
 import { LearningModule } from './learning/learning.module.js';
 import { ProgressModule } from './progress/progress.module.js';
+import { PushModule } from './push/push.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { FeedbackModule } from './feedback/feedback.module.js';
 import { MetricsModule } from './metrics/metrics.module.js';
@@ -51,6 +53,7 @@ import { SettingsAdminModule } from './settings-admin/settings-admin.module.js';
     PermissionsModule,
     FeatureFlagsModule,
     NotificationsModule,
+    PushModule,
     // Features
     HealthModule,
     AuthModule,
@@ -71,6 +74,7 @@ import { SettingsAdminModule } from './settings-admin/settings-admin.module.js';
     ContentAdminModule,
     SettingsAdminModule,
     AccountModule,
+    AppCrashesModule,
   ],
   providers: [
     // Global guards run in this order on every request:

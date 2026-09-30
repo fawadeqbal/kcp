@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
-import { Alert, AuthCard, Button, PasswordField } from '@/components/ui';
+import { Alert, AuthCard, Button, buttonClass, PasswordField } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { errorMessageKey } from '@/lib/errors';
@@ -45,10 +45,7 @@ export function ResetPasswordForm() {
   }
 
   const loginLink = (
-    <Link
-      href="/login"
-      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-5 font-semibold text-white hover:bg-brand-700"
-    >
+    <Link href="/login" className={buttonClass('primary')}>
       {t('nav.logIn')}
     </Link>
   );
@@ -59,7 +56,7 @@ export function ResetPasswordForm() {
         <Alert tone="error">{t('auth.reset.missingToken')}</Alert>
         <Link
           href="/forgot-password"
-          className="text-center font-semibold text-brand-700 underline"
+          className="text-center font-semibold text-brand-text underline"
         >
           {t('auth.verify.requestNew')}
         </Link>

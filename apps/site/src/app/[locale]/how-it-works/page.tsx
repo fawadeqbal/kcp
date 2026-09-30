@@ -57,19 +57,16 @@ export default async function HowItWorksPage({ params }: LocaleParams) {
       <Container className="py-14 sm:py-20">
         <ol className="relative flex flex-col gap-6">
           {steps.map((step, index) => (
-            <li
-              key={step.title}
-              className="flex gap-5 rounded-[var(--radius-card)] border border-line bg-surface p-6 sm:p-8"
-            >
+            <li key={step.title} className="flex gap-5 rounded-card bg-surface p-6 sm:p-8">
               <span
-                className="font-latin inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white"
+                className="font-latin inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-on-primary"
                 aria-hidden="true"
               >
                 {index + 1}
               </span>
               <div className="flex-1">
-                <h2 className="flex items-center gap-2 text-xl font-bold">
-                  <span className="text-brand-600">{step.icon}</span>
+                <h2 className="flex items-center gap-2 text-2xl">
+                  <span className="text-brand">{step.icon}</span>
                   {step.title}
                 </h2>
                 <p className="mt-2 max-w-3xl text-muted">{step.body}</p>
@@ -82,10 +79,7 @@ export default async function HowItWorksPage({ params }: LocaleParams) {
       <Section id="anatomy" tone="surface" title={t('anatomyTitle')}>
         <ul className="grid gap-5 md:grid-cols-3">
           {anatomy.map((part) => (
-            <li
-              key={part.title}
-              className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-canvas p-6"
-            >
+            <li key={part.title} className="flex flex-col gap-3 rounded-card bg-raised p-6">
               <IconBadge>{part.icon}</IconBadge>
               <h3 className="text-lg font-bold">{part.title}</h3>
               <p className="text-muted">{part.body}</p>
@@ -97,10 +91,7 @@ export default async function HowItWorksPage({ params }: LocaleParams) {
       <Section id="motivation" title={t('motivationTitle')} subtitle={t('motivation')}>
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {motivation.map((item) => (
-            <li
-              key={item.text}
-              className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-6"
-            >
+            <li key={item.text} className="flex flex-col gap-3 rounded-card bg-surface p-6">
               <IconBadge tone="accent">{item.icon}</IconBadge>
               <p className="font-medium">{item.text}</p>
             </li>
@@ -114,10 +105,7 @@ export default async function HowItWorksPage({ params }: LocaleParams) {
             { icon: <ChartIcon />, title: t('dashboardTitle'), body: t('parents') },
             { icon: <GlobeIcon />, title: t('languagesTitle'), body: t('languages') },
           ].map((card) => (
-            <div
-              key={card.title}
-              className="flex gap-4 rounded-[var(--radius-card)] border border-line bg-canvas p-6"
-            >
+            <div key={card.title} className="flex gap-4 rounded-card bg-raised p-6">
               <IconBadge>{card.icon}</IconBadge>
               <div>
                 <h3 className="font-bold">{card.title}</h3>

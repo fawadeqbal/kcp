@@ -71,7 +71,9 @@ export class SessionService {
 
   /**
    * Swaps a refresh token for a new one. Presenting an already-rotated token is a
-   * sign it was stolen, so every session of that user is revoked.
+   * sign it was stolen, so every session of that user is revoked, unless its
+   * replacement was never used: then the answer most likely got lost on the way
+   * (a phone losing its connection), and only that sign-in ends.
    */
   async rotate(
     refreshToken: string,
@@ -90,10 +92,23 @@ export class SessionService {
     if (session.revokedAt) {
       const secondsSinceRevoked = (Date.now() - session.revokedAt.getTime()) / 1000;
       if (session.replacedById && secondsSinceRevoked > REFRESH_REUSE_GRACE_SECONDS) {
-        this.logger.warn(
-          `Refresh token reuse detected for user ${session.userId}; revoking all sessions`,
-        );
-        await this.revokeAllForUser(session.userId);
+        const replacement = await this.prisma.session.findUnique({
+          where: { id: session.replacedById },
+          select: { revokedAt: true },
+        });
+        if (replacement && !replacement.revokedAt) {
+          // The new token hasn't been used yet: most likely its answer never arrived
+          // (a phone on a bad network). End that sign-in only, not every device.
+          this.logger.warn(
+            `Refresh token presented again before its replacement was used (user ${session.userId}); ending that session`,
+          );
+          await this.revoke(session.replacedById);
+        } else {
+          this.logger.warn(
+            `Refresh token reuse detected for user ${session.userId}; revoking all sessions`,
+          );
+          await this.revokeAllForUser(session.userId);
+        }
       }
       throw invalid;
     }
@@ -119,6 +134,11 @@ export class SessionService {
       await this.revoke(next.sessionId);
       throw invalid;
     }
+    // The phone registered for notifications keeps them under its new session.
+    await this.prisma.deviceToken.updateMany({
+      where: { sessionId: session.id },
+      data: { sessionId: next.sessionId },
+    });
     await this.forget(session.id);
     return { userId: session.userId, ...next };
   }
@@ -154,8 +174,8 @@ export class SessionService {
   }
 
   /**
-   * Removes every session of an account, with the IP addresses and devices they hold.
-   * Used when a child's account is deleted.
+   * Removes every session of an account, with the IP addresses and devices they hold,
+   * and the phones registered for notifications. Used when an account is deleted.
    */
   async deleteAllForUser(userId: string): Promise<void> {
     const sessions = await this.prisma.session.findMany({
@@ -163,6 +183,7 @@ export class SessionService {
       select: { id: true },
     });
     await this.prisma.session.deleteMany({ where: { userId } });
+    await this.prisma.deviceToken.deleteMany({ where: { userId } });
     await Promise.all(sessions.map((s) => this.forget(s.id)));
   }
 

@@ -193,16 +193,28 @@ describe('auth (e2e)', () => {
     });
 
     it('treats a reused old refresh token as theft and signs out every session', async () => {
-      const { cookie, user } = await signUpAndLogin(t);
-      const refreshed = await t
+      const { cookie, user, email } = await signUpAndLogin(t);
+      const other = await t
+        .http()
+        .post('/v1/auth/login')
+        .send({ email, password: PASSWORD, tokenDelivery: 'body' })
+        .expect(200);
+      const first = await t
         .http()
         .post('/v1/auth/refresh')
         .set('Cookie', cookie)
         .send({})
         .expect(200);
-      const liveAccess = refreshed.body.accessToken as string;
+      // The rightful browser has moved on to a newer token since.
+      const second = await t
+        .http()
+        .post('/v1/auth/refresh')
+        .set('Cookie', refreshCookie(first.headers['set-cookie']))
+        .send({})
+        .expect(200);
+      const liveAccess = second.body.accessToken as string;
 
-      // Pretend the rotation happened a while ago (outside the tab-race grace period).
+      // Pretend the rotations happened a while ago (outside the tab-race grace period).
       await t.prisma.session.updateMany({
         where: { userId: user.id, replacedById: { not: null } },
         data: { revokedAt: new Date(Date.now() - 60_000) },
@@ -212,6 +224,44 @@ describe('auth (e2e)', () => {
       const open = await t.prisma.session.count({ where: { userId: user.id, revokedAt: null } });
       expect(open).toBe(0);
       await t.http().get('/v1/auth/me').set('Authorization', `Bearer ${liveAccess}`).expect(401);
+      await t
+        .http()
+        .get('/v1/auth/me')
+        .set('Authorization', `Bearer ${other.body.accessToken as string}`)
+        .expect(401);
+    });
+
+    it('ends only that sign-in when a lost answer made a phone reuse its old token', async () => {
+      const { user, email } = await signUpAndLogin(t);
+      const phone = await t
+        .http()
+        .post('/v1/auth/login')
+        .send({ email, password: PASSWORD, tokenDelivery: 'body' })
+        .expect(200);
+      // The server rotated the token, but the answer never reached the phone.
+      const lost = await t
+        .http()
+        .post('/v1/auth/refresh')
+        .send({ refreshToken: phone.body.refreshToken })
+        .expect(200);
+      await t.prisma.session.updateMany({
+        where: { userId: user.id, replacedById: { not: null } },
+        data: { revokedAt: new Date(Date.now() - 60_000) },
+      });
+      await t
+        .http()
+        .post('/v1/auth/refresh')
+        .send({ refreshToken: phone.body.refreshToken })
+        .expect(401);
+
+      // The lost token is dead too; the browser session carries on.
+      await t
+        .http()
+        .post('/v1/auth/refresh')
+        .send({ refreshToken: lost.body.refreshToken })
+        .expect(401);
+      const open = await t.prisma.session.count({ where: { userId: user.id, revokedAt: null } });
+      expect(open).toBe(1);
     });
 
     it('supports token delivery in the body for the mobile app', async () => {

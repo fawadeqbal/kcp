@@ -25,8 +25,8 @@ export default async function ConfirmPage({ params }: LocaleParams) {
 
   return (
     <Container width="narrow" className="py-14 sm:py-20">
-      <div className="rounded-[var(--radius-card)] border border-line bg-surface p-6 shadow-sm sm:p-10">
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
+      <div className="rounded-card bg-surface p-6 elev-sm sm:p-10">
+        <h1 className="text-4xl">{t('title')}</h1>
         <div className="mt-6">
           {/* The token is in the address (?token=…), which a static page reads in the browser. */}
           <Suspense fallback={<ConfirmChecking />}>

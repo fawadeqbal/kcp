@@ -26,6 +26,8 @@ content/
           c1.en.md                      its title, instructions and hints per language
           c1.ar.md
           c1.ur.md
+        quizzes/
+          q1.yaml                       a quick question, all languages in one file
 ```
 
 Folder names only keep things tidy; the **IDs inside the files** are what count. IDs use lowercase letters, digits and dashes, start with their parent's ID (`builder` → `builder-m01` → `builder-m01-l01` → `builder-m01-l01-c1`), and **never change once a lesson is live**: progress, drafts and submissions point at them. The `order` numbers decide the sequence and must be unique among siblings.
@@ -96,12 +98,14 @@ checks:
 title: Say hello
 hints:
   add_h1: Start with <h1> and finish with </h1>.
+checks:
+  has-h1: 'The page has a heading'
 ---
 
 Write a big heading that says **Hello, world!**
 ```
 
-Hints are plain text (tags are fine there). Missing hints in a language fall back to English.
+Hints are plain text (tags are fine there). `checks` names what each check looks at, by the check's `id` in the YAML: the lesson screen lists these beside the editor and ticks them off as they pass. Write them as short statements about the student's page ("The heading has a colour"), not instructions. Missing hints and check names in a language fall back to English. `content:check` fails when a check has no English name, and warns when another language lacks one.
 
 ### `project.yaml` and `project.<lang>.md`
 
@@ -121,7 +125,41 @@ checks:
     hint: list
 ```
 
-`project.<lang>.md` has `title`, `summary` and `hints` in its front matter and the brief as its body. Name the button students press ("Ship it" / "انشر المشروع" / "پروجیکٹ شائع کریں") exactly as the app does.
+`project.<lang>.md` has `title`, `summary`, `hints` and `checks` (the names of the requirements) in its front matter and the brief as its body. Name the button students press ("Ship it" / "انشر المشروع" / "پروجیکٹ شائع کریں") exactly as the app does.
+
+### `quizzes/<name>.yaml`
+
+Quick questions that work on a phone: they sit under the lesson on the web ("Check yourself") and make up the mobile app's **daily practice** (5 a day from the lessons the student is on; finishing them earns 20 XP, the default daily goal, so a streak can be kept from the phone). Aim for **3 per lesson**. The server grades them; answers never reach the apps.
+
+| `kind`   | The student…                        | Needs                                      |
+| -------- | ----------------------------------- | ------------------------------------------ |
+| `order`  | puts shuffled lines in order        | `code` (3+ lines, in the right order)      |
+| `bug`    | taps the line with the mistake      | `code` and `bugLine` (from 1)              |
+| `output` | picks what the code prints or shows | `code`, `options` (with `code`), `answer`  |
+| `choice` | picks the right answer              | `options` (with `code` or texts), `answer` |
+
+```yaml
+id: builder-m02-l01-q3 # starts with the lesson's ID
+order: 3
+kind: output
+xp: 5 # the first right answer earns it
+language: python # html, css, js or python: how the code is coloured
+prompt: { en: What does this program print?, ar: …, ur: … }
+code:
+  - '# print("Hello!")'
+  - 'print("My age is", 13)'
+options:
+  - id: a
+    code: |- # an option can span lines
+      Hello!
+      My age is 13
+  - id: c
+    code: 'My age is 13'
+answer: c
+explanation: { en: Python skips a line that starts with #…, ar: …, ur: … }
+```
+
+Text options have their words per language instead: `options: [{ id: a, text: { en: …, ar: …, ur: … } }]`. Keep code to **14 lines of up to 120 characters** (phones are narrow), the prompt short, and the explanation to one or two sentences: it shows once the student gets it right, or after two wrong tries together with the right answer (the quiz then earns no XP, but still counts for the day's practice). `pnpm content:check` runs every Python and JavaScript `output` quiz and checks that the answer is what the code really prints.
 
 ## Checks
 

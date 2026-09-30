@@ -146,7 +146,7 @@ export function AddChildForm() {
     return (
       <div className="mx-auto flex max-w-2xl flex-col gap-6">
         <div className="print-hidden">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-4xl">
             {t('addChild.createdTitle', { nickname: isolate(created.nickname) })}
           </h1>
           <p className="mt-2 text-muted">{t('addChild.createdBody')}</p>
@@ -172,7 +172,7 @@ export function AddChildForm() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('addChild.title')}</h1>
+        <h1 className="text-4xl">{t('addChild.title')}</h1>
         <p className="mt-2 text-muted">{t('addChild.subtitle')}</p>
       </div>
       <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
@@ -207,7 +207,7 @@ export function AddChildForm() {
                     type="button"
                     aria-pressed={form.nickname === name}
                     onClick={() => update('nickname', name)}
-                    className="font-latin rounded-full border border-line px-3 py-1 text-sm hover:bg-brand-50 aria-pressed:border-brand-600 aria-pressed:bg-brand-50"
+                    className="font-latin rounded-full border border-line px-3 py-1 text-sm hover:bg-ink/7 aria-pressed:border-primary aria-pressed:bg-brand-100"
                     dir="ltr"
                   >
                     {name}

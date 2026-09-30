@@ -2,6 +2,7 @@
 
 import type { components } from '@kcp/api-client-ts';
 import type { CodeFiles } from '@kcp/checks';
+import { clsx } from 'clsx';
 import { useFormatter, useTranslations } from 'next-intl';
 import { ProjectPreview } from './project-preview';
 
@@ -11,22 +12,28 @@ export type PortfolioItem = components['schemas']['PortfolioItemDto'];
 export function PortfolioItems({
   items,
   headingLevel = 2,
+  compact = false,
 }: {
   items: PortfolioItem[];
-  headingLevel?: 2 | 3 | 4;
+  headingLevel?: 2 | 3 | 4 | 5;
+  /** One column, on a light well (inside a parent's panel). */
+  compact?: boolean;
 }) {
   const t = useTranslations('portfolio');
   const format = useFormatter();
   const Heading = `h${headingLevel}` as const;
   return (
-    <ul className="grid gap-6 md:grid-cols-2">
+    <ul className={clsx('grid gap-5', !compact && 'md:grid-cols-2')}>
       {items.map((item) => (
         <li
           key={item.id}
-          className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+          className={clsx(
+            'flex flex-col gap-3.5',
+            compact ? 'rounded-row bg-canvas p-3.5' : 'rounded-card bg-surface p-5',
+          )}
         >
           <div>
-            <Heading className="text-lg font-bold">{item.title}</Heading>
+            <Heading className={compact ? 'text-lg' : 'text-xl'}>{item.title}</Heading>
             <p className="text-sm text-muted">
               {item.moduleTitle} · {t('version', { version: String(item.version) })} ·{' '}
               {t('shippedOn', {

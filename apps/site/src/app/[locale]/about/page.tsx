@@ -38,13 +38,10 @@ export default async function AboutPage({ params }: LocaleParams) {
           <p>{t('story2')}</p>
           <p>{t('story3')}</p>
           <p>{t('story4')}</p>
-          <p className="font-semibold text-brand-700">— {t('signature')}</p>
+          <p className="font-semibold text-brand-text">— {t('signature')}</p>
         </article>
-        <aside
-          aria-labelledby="values-title"
-          className="h-fit rounded-[var(--radius-card)] border border-line bg-surface p-6"
-        >
-          <h2 id="values-title" className="text-xl font-bold">
+        <aside aria-labelledby="values-title" className="h-fit rounded-card bg-surface p-6">
+          <h2 id="values-title" className="text-2xl">
             {t('valuesTitle')}
           </h2>
           <CheckList

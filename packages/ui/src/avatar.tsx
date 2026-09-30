@@ -123,7 +123,13 @@ function art(key: AvatarKey, bg: string): ReactNode {
   }
 }
 
-const SIZES = { sm: 'size-8', md: 'size-12', lg: 'size-16', xl: 'size-24' } as const;
+const SIZES = {
+  sm: 'size-8',
+  md: 'size-12',
+  lg: 'size-16',
+  xl: 'size-18',
+  hero: 'size-21',
+} as const;
 
 /**
  * A child's avatar. Decorative by default (the nickname is always shown next to it);
@@ -178,16 +184,14 @@ export function AvatarPicker({
 }) {
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1.5 font-medium">{legend}</legend>
+      <legend className="mb-1.5 text-sm font-semibold">{legend}</legend>
       <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
         {AVATAR_KEYS.map((key) => (
           <label
             key={key}
             className={clsx(
-              'relative flex cursor-pointer flex-col items-center gap-1 rounded-2xl border-2 p-2 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand-500',
-              value === key
-                ? 'border-brand-600 bg-brand-50'
-                : 'border-transparent hover:bg-brand-50',
+              'relative flex cursor-pointer flex-col items-center gap-1 rounded-row border-2 p-2 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand has-[:focus-visible]:outline-solid',
+              value === key ? 'border-primary bg-brand-100' : 'border-transparent hover:bg-raised',
             )}
           >
             <input
@@ -205,7 +209,7 @@ export function AvatarPicker({
         ))}
       </div>
       {error ? (
-        <p className="text-sm text-danger" role="alert">
+        <p className="text-sm font-semibold text-danger-text" role="alert">
           {error}
         </p>
       ) : null}

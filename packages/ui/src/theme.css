@@ -1,77 +1,289 @@
 /*
- * Design tokens and base styles shared by every web app. Import it right after Tailwind:
+ * The Organic design system (Meray's KCP revamp): design tokens and base styles shared
+ * by every web app. Import it right after Tailwind:
  *
  *   @import 'tailwindcss';
  *   @import '@kcp/ui/theme.css';
  *
- * Placeholder values until the design system from Meray lands. Components use these
- * names (bg-brand-600, text-muted…), so swapping the values here restyles every app.
+ * Warm and rounded: a cream-and-sand ground, a terracotta accent (`brand`) and a sage
+ * second voice (`sage`), Caprasimo headings over Figtree text, big radii and pills.
+ * Every colour below has a dark twin further down; the apps follow the device's
+ * light/dark setting (there is no switch in the apps).
+ *
+ * The mobile app reads this file too (apps/mobile/tool/shared.mjs writes
+ * lib/theme/tokens.g.dart), so keep colours as #rrggbb or
+ * `color-mix(in srgb, #rrggbb N%, transparent)`.
  */
 
 /* Let Tailwind find the class names used by the shared components. */
 @source './';
 
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-surface: #ffffff;
-  --color-canvas: #f6f7fb;
-  --color-ink: #1d1d27;
-  --color-muted: #5b5f73;
-  --color-line: #e3e5ee;
-  --color-success: #0f7b4b;
-  --color-warning: #92400e;
-  --color-danger: #b42318;
-  /* The energetic accent: XP, streaks, projects to build. Text on it uses ink. */
-  --color-accent: #f59e0b;
+  /* — Grounds — */
+  --color-canvas: #f5ead8; /* the page */
+  --color-surface: #ebddc5; /* cards on the page */
+  --color-raised: #f9f4ed; /* rows and wells inside a card */
+  --color-ink: #201e1d; /* text */
+  --color-muted: #645c50; /* secondary text, at least 4.5:1 on canvas, surface and raised */
+  --color-line: color-mix(in srgb, #201e1d 14%, transparent); /* dividers, outlines */
+  --color-track: color-mix(in srgb, #201e1d 10%, transparent); /* empty part of a meter */
 
-  --font-sans: 'Noto Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --radius-card: 1rem;
+  /* — Terracotta: the accent. `brand` itself is decoration (bars, icons, shapes,
+     large text): 3:1 on the ground. Text in the accent uses brand-text. — */
+  --color-brand: #c67139;
+  --color-brand-100: #fff2eb;
+  --color-brand-200: #ffe1d0;
+  --color-brand-300: #ffc6a5;
+  --color-brand-400: #f6a06b;
+  --color-brand-500: #d67f48;
+  --color-brand-600: #b2622d;
+  --color-brand-700: #8c491a;
+  --color-brand-800: #643312;
+  --color-brand-900: #402310;
+  --color-brand-text: #8c491a;
+
+  /* Solid fills that carry text (buttons, the current step): a deeper terracotta, so
+     their labels reach 4.5:1 (5.25:1), and the fill itself stands out from the
+     cream page (4.58:1). */
+  --color-primary: #a05626;
+  --color-primary-hover: #944d1f;
+  --color-primary-active: #8c491a;
+  --color-on-primary: #fffaf3;
+
+  /* — Sage: the second voice (done, correct, safety, parents). — */
+  --color-sage: #7a8a5e;
+  --color-sage-100: #f0fae1;
+  --color-sage-200: #e1eecc;
+  --color-sage-300: #ccdbb2;
+  --color-sage-400: #aebf92;
+  --color-sage-500: #8fa073;
+  --color-sage-600: #728157;
+  --color-sage-700: #56633f;
+  --color-sage-800: #3d472b;
+  --color-sage-900: #272e1b;
+  --color-sage-text: #56633f;
+
+  /* — Sand: the neutral ramp. — */
+  --color-sand-100: #f9f4ed;
+  --color-sand-200: #eee7db;
+  --color-sand-300: #dcd3c4;
+  --color-sand-400: #c0b6a5;
+  --color-sand-500: #a19786;
+  --color-sand-600: #82796a;
+  --color-sand-700: #645c50;
+  --color-sand-800: #474238;
+  --color-sand-900: #2e2b25;
+
+  /* — Messages — */
+  --color-danger: #b3261e;
+  --color-danger-soft: #fbe3dc;
+  --color-danger-text: #7f1d16;
+  --color-on-danger: #fffaf3;
+  --color-warn-soft: #fbe8c4;
+  --color-warn-text: #6b4508;
+
+  /* — Code — */
+  --color-code-bg: #fbf6ee;
+  --color-code-gutter: #6f6659;
+  --color-code-tag: #8c491a;
+  --color-code-attr: #56633f;
+  --color-code-str: #7a4f8a;
+  --color-code-com: #645c50;
+
+  /* — Type: Caprasimo headings over Figtree text. Arabic and Urdu letters fall through
+     to their own fonts (see :lang below). — */
+  --font-sans:
+    'Figtree Variable', 'Noto Sans Arabic Variable', system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-display:
+    'Caprasimo', 'Baloo Bhaijaan 2 Variable', 'Figtree Variable', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* — Shape: over-rounded containers, pills for controls. — */
+  --radius-card: 2rem; /* cards and panels (32px) */
+  --radius-panel: 1.75rem; /* big panels, dialogs (28px) */
+  --radius-inner: 1.625rem; /* a card inside a card (26px) */
+  --radius-row: 1.375rem; /* list rows, options (22px) */
+  --radius-well: 1.25rem; /* code wells, previews (20px) */
+  --radius-hero: 2.25rem; /* the big "continue" card (36px) */
 }
 
-/* Scripts: Arabic in Noto Sans Arabic, Urdu in Nastaliq (tall — it needs more line height). */
+/* Elevation, tuned to the ground (utilities elev-sm, elev-md, elev-lg). */
+:root {
+  --elev-sm: 0 1px 2px color-mix(in srgb, #2e2b25 14%, transparent);
+  --elev-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+  --elev-lg: 0 12px 32px color-mix(in srgb, #2e2b25 22%, transparent);
+}
+@utility elev-sm {
+  box-shadow: var(--elev-sm);
+}
+@utility elev-md {
+  box-shadow: var(--elev-md);
+}
+@utility elev-lg {
+  box-shadow: var(--elev-lg);
+}
+
+/*
+ * Dark: the same names. Every 100–900 ramp flips (100↔900, 200↔800…), so "tinted fill
+ * = 100, text on it = 800" reads well in both.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #1a1815;
+    --color-surface: #25221e;
+    --color-raised: #2e2a25;
+    --color-ink: #f2e8d8;
+    --color-muted: #b9ae9c;
+    --color-line: color-mix(in srgb, #f2e8d8 13%, transparent);
+    --color-track: color-mix(in srgb, #f2e8d8 12%, transparent);
+
+    --color-brand: #e08d55;
+    --color-brand-100: #3a2213;
+    --color-brand-200: #4d2c16;
+    --color-brand-300: #6b3a1a;
+    --color-brand-400: #b2622d;
+    --color-brand-500: #d67f48;
+    --color-brand-600: #f6a06b;
+    --color-brand-700: #ffc6a5;
+    --color-brand-800: #ffe1d0;
+    --color-brand-900: #fff2eb;
+    --color-brand-text: #f6a06b;
+
+    --color-primary: #e08d55;
+    --color-primary-hover: #f6a06b;
+    --color-primary-active: #ffc6a5;
+    --color-on-primary: #1a1815;
+
+    --color-sage: #a3b485;
+    --color-sage-100: #242b1a;
+    --color-sage-200: #2f3822;
+    --color-sage-300: #3d472b;
+    --color-sage-400: #56633f;
+    --color-sage-500: #8fa073;
+    --color-sage-600: #aebf92;
+    --color-sage-700: #ccdbb2;
+    --color-sage-800: #e1eecc;
+    --color-sage-900: #f0fae1;
+    --color-sage-text: #c2d2a6;
+
+    --color-sand-100: #2e2b25;
+    --color-sand-200: #3a362f;
+    --color-sand-300: #474238;
+    --color-sand-400: #645c50;
+    --color-sand-500: #82796a;
+    --color-sand-600: #a19786;
+    --color-sand-700: #c0b6a5;
+    --color-sand-800: #dcd3c4;
+    --color-sand-900: #f9f4ed;
+
+    --color-danger: #f08a7e;
+    --color-danger-soft: #3d1f1b;
+    --color-danger-text: #ffc9c1;
+    --color-on-danger: #1a1815;
+    --color-warn-soft: #3a2e14;
+    --color-warn-text: #f3d08c;
+
+    --color-code-bg: #14120f;
+    --color-code-gutter: #948b7c;
+    --color-code-tag: #f6a06b;
+    --color-code-attr: #b9cb98;
+    --color-code-str: #d6b3e0;
+    --color-code-com: #a19786;
+
+    --elev-sm: 0 0 0 1px color-mix(in srgb, #f2e8d8 6%, transparent), 0 1px 2px rgb(0 0 0 / 0.4);
+    --elev-md: 0 0 0 1px color-mix(in srgb, #f2e8d8 7%, transparent), 0 4px 14px rgb(0 0 0 / 0.45);
+    --elev-lg: 0 0 0 1px color-mix(in srgb, #f2e8d8 8%, transparent), 0 16px 40px rgb(0 0 0 / 0.55);
+  }
+}
+
+/*
+ * Scripts. Latin letters (nicknames, usernames, code) keep Figtree and Caprasimo in
+ * every language; Arabic letters use Noto Sans Arabic, with rounded Baloo Bhaijaan 2
+ * for headings; Urdu uses Nastaliq throughout (tall: it needs more line height).
+ */
+:root {
+  --display-weight: 400;
+  --display-tracking: -0.015em;
+}
 :lang(ar) {
-  --font-sans: 'Noto Sans Arabic Variable', 'Noto Sans Variable', system-ui, sans-serif;
+  --display-weight: 700;
+  --display-tracking: normal;
 }
 :lang(ur) {
   --font-sans:
-    'Noto Nastaliq Urdu', 'Noto Sans Arabic Variable', 'Noto Sans Variable', system-ui, sans-serif;
+    'Figtree Variable', 'Noto Nastaliq Urdu', 'Noto Sans Arabic Variable', system-ui, sans-serif;
+  --font-display: 'Caprasimo', 'Noto Nastaliq Urdu', 'Figtree Variable', system-ui, sans-serif;
+  --display-weight: 700;
+  --display-tracking: normal;
 }
 
-html {
-  font-family: var(--font-sans);
-  color: var(--color-ink);
-  background: var(--color-canvas);
-  -webkit-text-size-adjust: 100%;
-}
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
 
-body {
-  line-height: 1.6;
-}
-:lang(ur) body,
-:lang(ur) input,
-:lang(ur) button,
-:lang(ur) select {
-  line-height: 2.2;
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    line-height: 1.55;
+  }
+  :lang(ur) body,
+  :lang(ur) input,
+  :lang(ur) button,
+  :lang(ur) select,
+  :lang(ur) textarea {
+    line-height: 2.2;
+  }
+
+  /* Headings speak in the display face. Caprasimo has one weight, so it is never
+     faked bolder; Baloo and Nastaliq use their real bold. */
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-synthesis: none;
+    letter-spacing: var(--display-tracking);
+    line-height: 1.15;
+  }
+  :lang(ur) :is(h1, h2, h3, h4, .font-display) {
+    line-height: 1.9;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand) 30%, transparent);
+  }
+
+  /* Keyboard focus: the accent ring, never the browser's default. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: color-mix(in srgb, #2e2b25 50%, transparent);
+  }
 }
 
 /* Usernames, emails and codes stay in a Latin font, even inside Urdu text. */
 .font-latin {
-  font-family: 'Noto Sans Variable', system-ui, sans-serif;
-  line-height: 1.6;
-}
-
-/* Visible keyboard focus everywhere. */
-:focus-visible {
-  outline: 3px solid var(--color-brand-500);
-  outline-offset: 2px;
-}
-
-dialog::backdrop {
-  background: rgb(29 29 39 / 0.45);
+  font-family: 'Figtree Variable', system-ui, sans-serif;
+  line-height: 1.55;
 }
 
 @media (prefers-reduced-motion: reduce) {

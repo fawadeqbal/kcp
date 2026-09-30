@@ -121,7 +121,7 @@ export function FeedbackList() {
             empty={feedback.data.items.length === 0}
           >
             {feedback.data.items.map((item) => (
-              <tr key={item.id} className={item.status === 'NEW' ? 'bg-warning/5' : undefined}>
+              <tr key={item.id} className={item.status === 'NEW' ? 'bg-warn-soft/40' : undefined}>
                 <Cell className="whitespace-nowrap">{formatDateTime(item.createdAt)}</Cell>
                 <Cell>
                   <Badge tone={KIND_TONES[item.kind]}>{KIND_LABELS[item.kind]}</Badge>
@@ -150,7 +150,7 @@ export function FeedbackList() {
                       {canOpenUsers ? (
                         <Link
                           href={`/users/${item.sender.id}`}
-                          className="font-semibold text-brand-700 underline-offset-4 hover:underline"
+                          className="font-semibold text-brand-text underline-offset-4 hover:underline"
                         >
                           {item.sender.name ?? 'Unnamed'}
                         </Link>

@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { BackLink } from '@/components/back-link';
 import { Alert, Avatar, Badge, Button, Card, Dialog, PageSpinner } from '@/components/ui';
 import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
@@ -152,15 +153,10 @@ export function BillingPage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8">
       <nav aria-label={t('breadcrumb')} className="text-sm">
-        <Link
-          href="/dashboard"
-          className="font-semibold text-brand-700 underline underline-offset-4"
-        >
-          {t('backToDashboard')}
-        </Link>
+        <BackLink href="/dashboard">{t('backToDashboard')}</BackLink>
       </nav>
       <header>
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <h1 className="text-4xl">{t('title')}</h1>
         <p className="mt-2 max-w-2xl text-muted">{t('subtitle')}</p>
       </header>
 
@@ -173,23 +169,20 @@ export function BillingPage() {
       </div>
 
       <section aria-labelledby="kids-heading" className="flex flex-col gap-3">
-        <h2 id="kids-heading" className="text-xl font-bold">
+        <h2 id="kids-heading" className="text-2xl">
           {t('childrenTitle')}
         </h2>
         {billing.children.length === 0 ? (
           <p className="text-muted">
             {t('noChildren')}{' '}
-            <Link href="/children/new" className="font-semibold text-brand-700 underline">
+            <Link href="/children/new" className="font-semibold text-brand-text underline">
               {t('addChild')}
             </Link>
           </p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {billing.children.map((child) => (
-              <li
-                key={child.id}
-                className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3"
-              >
+              <li key={child.id} className="flex items-center gap-3 rounded-row bg-surface p-3">
                 <Avatar avatarKey={child.avatarKey} size="sm" />
                 <span className="font-latin font-semibold">
                   <bdi>{child.nickname}</bdi>
@@ -224,7 +217,7 @@ export function BillingPage() {
         />
       ) : (
         <section aria-labelledby="plans-heading" className="flex flex-col gap-4">
-          <h2 id="plans-heading" className="text-xl font-bold">
+          <h2 id="plans-heading" className="text-2xl">
             {t('plansTitle')}
           </h2>
           <p className="text-muted">{t('trialNote', { days: String(billing.trialDays) })}</p>
@@ -253,7 +246,7 @@ export function BillingPage() {
               {t('otherWaysBody', { email: BILLING_EMAIL })}{' '}
               <a
                 href={`mailto:${BILLING_EMAIL}`}
-                className="font-latin font-semibold text-brand-700 underline"
+                className="font-latin font-semibold text-brand-text underline"
               >
                 <bdi>{BILLING_EMAIL}</bdi>
               </a>
@@ -263,13 +256,13 @@ export function BillingPage() {
       )}
 
       <section aria-labelledby="invoices-heading" className="flex flex-col gap-3">
-        <h2 id="invoices-heading" className="text-xl font-bold">
+        <h2 id="invoices-heading" className="text-2xl">
           {t('invoicesTitle')}
         </h2>
         {billing.invoices.length === 0 ? (
           <p className="text-muted">{t('invoicesEmpty')}</p>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+          <div className="overflow-x-auto rounded-row bg-surface">
             <table className="w-full min-w-[32rem] text-start text-sm">
               <caption className="sr-only">{t('invoicesTitle')}</caption>
               <thead className="bg-canvas text-muted">
@@ -294,7 +287,7 @@ export function BillingPage() {
                     <td className="px-4 py-2">
                       <Link
                         href={`/billing/invoices/${invoice.id}`}
-                        className="font-latin font-semibold text-brand-700 underline"
+                        className="font-latin font-semibold text-brand-text underline"
                       >
                         <bdi>{invoice.number}</bdi>
                       </Link>
@@ -394,16 +387,16 @@ function PlanCard({
   return (
     <div
       className={clsx(
-        'flex flex-col gap-3 rounded-[var(--radius-card)] border bg-surface p-5',
-        yearly ? 'border-brand-600' : 'border-line',
+        'flex flex-col gap-3 rounded-card border bg-surface p-5',
+        yearly ? 'border-primary' : 'border-line',
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-lg font-bold">{t(plan.key)}</h3>
+        <h3 className="text-xl">{t(plan.key)}</h3>
         {yearly ? <Badge tone="brand">{t('yearlySaving')}</Badge> : null}
       </div>
       <p>
-        <span className="text-3xl font-bold">
+        <span className="font-display text-4xl">
           <bdi>{money(plan.totalMinor)}</bdi>
         </span>{' '}
         <span className="text-muted">{yearly ? t('perYear') : t('perMonth')}</span>

@@ -33,20 +33,20 @@ export default async function BlogPage({ params }: LocaleParams) {
           <ul className="flex flex-col gap-6">
             {posts.map((post) => (
               <li key={post.slug}>
-                <article className="group relative flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-6 transition-colors hover:border-brand-500 sm:p-8">
+                <article className="group relative flex flex-col gap-3 rounded-hero bg-surface p-6 transition-colors hover:bg-sand-300 sm:p-8">
                   <p className="text-sm text-muted">
                     <time dateTime={post.date}>{formatDate(post.date, locale)}</time>
                   </p>
-                  <h2 className="text-2xl font-bold">
+                  <h2 className="text-3xl">
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] group-hover:text-brand-700"
+                      className="after:absolute after:inset-0 after:rounded-hero group-hover:text-brand-text"
                     >
                       {post.title}
                     </Link>
                   </h2>
                   <p className="text-muted">{post.summary}</p>
-                  <ArrowIcon className="text-brand-600" />
+                  <ArrowIcon className="text-brand" />
                 </article>
               </li>
             ))}

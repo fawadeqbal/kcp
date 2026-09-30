@@ -114,6 +114,8 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'update', subject: 'Language', fields: ['isActive'] },
     { action: 'read', subject: 'Content' },
     { action: 'update', subject: 'Content' },
+    // Crash reports from the mobile app.
+    { action: 'read', subject: 'AppCrash' },
     { action: 'read', subject: 'Feedback' },
     { action: 'update', subject: 'Feedback', fields: ['status'] },
     // Pilot families get premium by hand (with a reason, in the audit log).

@@ -3,7 +3,7 @@
 import type { components } from '@kcp/api-client-ts';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Alert, PageSpinner } from '@/components/ui';
+import { Alert, IconBubble, PageSpinner } from '@/components/ui';
 import { api } from '@/lib/api';
 import { isolate } from '../auth/validation';
 
@@ -32,12 +32,23 @@ export function CertificateVerify({ code }: { code: string }) {
   if (result === 'notFound') return <Alert tone="error">{t('verifyNotFound', { code })}</Alert>;
   if (result === 'failed') return <Alert tone="error">{t('verifyFailed')}</Alert>;
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-8 text-center">
-      <span aria-hidden="true" className="text-5xl">
-        {result.valid ? '✅' : '⚠️'}
-      </span>
-      <h1 className="text-2xl font-bold">{result.valid ? t('verifyValid') : t('verifyRevoked')}</h1>
-      <p className="text-lg">
+    <div className="relative mx-auto flex w-full max-w-2xl flex-col items-center gap-4 overflow-hidden rounded-hero bg-surface px-6 py-10 text-center sm:px-10">
+      <span
+        aria-hidden="true"
+        className="absolute -end-12 -top-14 size-40 rounded-full bg-brand-200"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute -start-10 -bottom-12 size-32 rounded-full bg-sage-200"
+      />
+      <IconBubble
+        icon={result.valid ? 'award' : 'alert'}
+        tone={result.valid ? 'sageSolid' : 'brand'}
+        size="lg"
+        className="relative"
+      />
+      <h1 className="relative text-4xl">{result.valid ? t('verifyValid') : t('verifyRevoked')}</h1>
+      <p className="relative text-lg">
         {t('verifyBody', {
           nickname: isolate(result.nickname),
           module: titleIn(result.moduleTitles, locale),
@@ -45,10 +56,10 @@ export function CertificateVerify({ code }: { code: string }) {
           date: format.dateTime(new Date(result.issuedAt), { dateStyle: 'long' }),
         })}
       </p>
-      <p className="font-latin text-muted">
+      <p className="relative rounded-full bg-raised px-4 py-1.5 font-mono text-sm font-semibold">
         <bdi>{result.code}</bdi>
       </p>
-      <p className="text-sm text-muted">{t('verifyPrivacy')}</p>
+      <p className="relative text-sm text-muted">{t('verifyPrivacy')}</p>
     </div>
   );
 }

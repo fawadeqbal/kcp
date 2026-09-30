@@ -14,7 +14,7 @@ export function ConfirmChecking() {
   const t = useTranslations('confirm');
   return (
     <p role="status" className="flex items-center gap-3 text-lg">
-      <Spinner className="size-5 text-brand-600" />
+      <Spinner className="size-5 text-brand" />
       {t('checking')}
     </p>
   );
