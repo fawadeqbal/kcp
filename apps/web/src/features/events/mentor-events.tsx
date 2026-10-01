@@ -237,7 +237,7 @@ export function MentorPullPage({ teamId, number }: { teamId: string; number: num
   if (!user) return <PageSpinner />;
   return (
     <PullRequestView
-      teamId={teamId}
+      source={{ kind: 'team', id: teamId }}
       number={number}
       backHref={`/mentor/teams/${teamId}`}
       backLabel={t('backToTeam')}

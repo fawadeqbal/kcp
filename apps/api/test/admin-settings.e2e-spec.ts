@@ -201,6 +201,7 @@ describe('admin settings, content publishing and account data (e2e)', () => {
     it('switches a flag for some countries, with a reason, and it applies at once', async () => {
       const list = await t.http().get('/v1/admin/feature-flags').set(auth(admin.token)).expect(200);
       expect(list.body.flags.map((f: { key: string }) => f.key)).toEqual([
+        'hub_payouts',
         'mentor_approval_for_certificates',
         'payments',
         'under_13_accounts',

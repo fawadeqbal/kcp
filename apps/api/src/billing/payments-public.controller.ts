@@ -98,7 +98,7 @@ button{font:inherit;font-weight:700;padding:.8rem 1.4rem;border-radius:999px;bor
 .pay{background:#a05626;color:#fffaf3}.cancel{background:transparent;color:#8c491a}</style></head>
 <body><main>
 <p class="note"><strong>Test mode.</strong> This is the development stand-in for Stripe Checkout. No card is charged.</p>
-<h1>${session.mode === 'setup' ? 'Confirm a card' : 'Kids Coding Platform Premium'}</h1>
+<h1>${session.mode === 'setup' ? 'Confirm a card' : escapeHtml(session.product_name ?? 'Kids Coding Platform Premium')}</h1>
 <p>${escapeHtml(session.status !== 'open' ? `This checkout is ${session.status}.` : session.mode === 'setup' ? 'Your bank checks the card. Nothing is charged.' : `Total today: ${amount}`)}</p>
 ${
   session.status === 'open'

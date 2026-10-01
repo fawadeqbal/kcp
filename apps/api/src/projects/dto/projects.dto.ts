@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { ReviewSummaryDto } from '../../reviews/reviews.dto.js';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, IsArray, ValidateNested } from 'class-validator';
@@ -86,8 +87,22 @@ export class PortfolioItemDto {
   review!: ReviewSummaryDto | null;
 }
 
+/** A client project from the hub (the client allowed it): no client name, money or files. */
+export class HubPortfolioItemDto {
+  projectId!: string;
+  title!: string;
+  /** When the client accepted the work. */
+  finishedAt!: Date | null;
+  /** The student's finished tasks. */
+  tasks!: string[];
+  skills!: string[];
+}
+
 export class PortfolioDto {
   items!: PortfolioItemDto[];
+  /** Real-world hub projects (ages 15+). */
+  @ApiProperty({ type: [HubPortfolioItemDto] })
+  hubWork!: HubPortfolioItemDto[];
 }
 
 export class PortfolioShareDto {
@@ -101,7 +116,12 @@ export class ChildPortfolioDto extends PortfolioDto {
   share!: PortfolioShareDto;
 }
 
-export class SharedPortfolioDto extends PortfolioDto {
+/**
+ * A portfolio opened with its share link. No hub work: a client who came across the
+ * link could tell which of their projects' pseudonyms is this child.
+ */
+export class SharedPortfolioDto {
+  items!: PortfolioItemDto[];
   nickname!: string;
   avatarKey!: string;
 }

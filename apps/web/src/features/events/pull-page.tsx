@@ -111,37 +111,45 @@ function AuthorName({ author }: { author: Author }) {
  * the team and its mentor — commenting, approving or asking for changes, and merging
  * into main once someone other than its author approved.
  */
+/** Whose pull request: a hackathon team's, or a hub project's (reviews carry a score). */
+export type PullSource = { kind: 'team'; id: string } | { kind: 'hub'; id: string };
+
 export function PullRequestView({
-  teamId,
+  source,
   number,
   backHref,
   backLabel,
 }: {
-  teamId: string;
+  source: PullSource;
   number: number;
   backHref: string;
   backLabel: string;
 }) {
+  const hub = source.kind === 'hub';
+  const id = source.id;
   const t = useTranslations('pulls');
   const te = useTranslations('errors');
   const format = useFormatter();
   const [pull, setPull] = useState<Pull | null>(null);
   const [failed, setFailed] = useState(false);
   const [comment, setComment] = useState('');
+  const [score, setScore] = useState(4);
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const { data } = await api.GET('/v1/teams/{id}/pulls/{number}', {
-        params: { path: { id: teamId, number } },
-      });
+      const { data } = hub
+        ? await api.GET('/v1/hub/projects/{id}/pulls/{number}', {
+            params: { path: { id, number } },
+          })
+        : await api.GET('/v1/teams/{id}/pulls/{number}', { params: { path: { id, number } } });
       if (data) setPull(data);
       else setFailed(true);
     } catch {
       setFailed(true);
     }
-  }, [teamId, number]);
+  }, [hub, id, number]);
 
   useEffect(() => {
     void load();
@@ -186,10 +194,15 @@ export function PullRequestView({
     const ok = await run(
       'comment',
       () =>
-        api.POST('/v1/teams/{id}/pulls/{number}/comments', {
-          params: { path: { id: teamId, number } },
-          body: { body },
-        }),
+        hub
+          ? api.POST('/v1/hub/projects/{id}/pulls/{number}/comments', {
+              params: { path: { id, number } },
+              body: { body },
+            })
+          : api.POST('/v1/teams/{id}/pulls/{number}/comments', {
+              params: { path: { id, number } },
+              body: { body },
+            }),
       t('commented'),
     );
     if (ok) setComment('');
@@ -199,10 +212,19 @@ export function PullRequestView({
     run(
       event,
       () =>
-        api.POST('/v1/teams/{id}/pulls/{number}/reviews', {
-          params: { path: { id: teamId, number } },
-          body: { event, ...(comment.trim() ? { body: comment.trim() } : {}) },
-        }),
+        hub
+          ? api.POST('/v1/hub/projects/{id}/pulls/{number}/review', {
+              params: { path: { id, number } },
+              body: {
+                decision: event === 'APPROVED' ? 'APPROVED' : 'CHANGES_REQUESTED',
+                score,
+                ...(comment.trim() ? { body: comment.trim() } : {}),
+              },
+            })
+          : api.POST('/v1/teams/{id}/pulls/{number}/reviews', {
+              params: { path: { id, number } },
+              body: { event, ...(comment.trim() ? { body: comment.trim() } : {}) },
+            }),
       event === 'APPROVED' ? t('approvedDone') : t('changesDone'),
     ).then((ok) => ok && setComment(''));
 
@@ -261,9 +283,13 @@ export function PullRequestView({
                 void run(
                   'merge',
                   () =>
-                    api.POST('/v1/teams/{id}/pulls/{number}/merge', {
-                      params: { path: { id: teamId, number } },
-                    }),
+                    hub
+                      ? api.POST('/v1/hub/projects/{id}/pulls/{number}/merge', {
+                          params: { path: { id, number } },
+                        })
+                      : api.POST('/v1/teams/{id}/pulls/{number}/merge', {
+                          params: { path: { id, number } },
+                        }),
                   t('merged'),
                 )
               }
@@ -274,7 +300,7 @@ export function PullRequestView({
           ) : (
             <p className="font-semibold">
               {t(
-                `blockedReason.${pull.mergeBlocked ?? 'APPROVAL_NEEDED'}` as 'blockedReason.APPROVAL_NEEDED',
+                `${hub ? 'hubBlocked' : 'blockedReason'}.${pull.mergeBlocked ?? 'APPROVAL_NEEDED'}` as 'blockedReason.APPROVAL_NEEDED',
               )}
             </p>
           )}
@@ -335,6 +361,22 @@ export function PullRequestView({
             </Button>
             {pull.canReview ? (
               <>
+                {hub ? (
+                  <label className="flex items-center gap-2">
+                    <span className="font-bold">{t('score')}</span>
+                    <select
+                      className="rounded-full border-2 border-line bg-surface px-3 py-1.5"
+                      value={score}
+                      onChange={(e) => setScore(Number(e.target.value))}
+                    >
+                      {[5, 4, 3, 2, 1].map((value) => (
+                        <option key={value} value={value}>
+                          {t(`scores.${value}` as 'scores.5')}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
                 <Button
                   type="button"
                   loading={busy === 'APPROVED'}
@@ -378,7 +420,7 @@ export function StudentPullPage({ slug, number }: { slug: string; number: number
   if (!teamId) return <PageSpinner />;
   return (
     <PullRequestView
-      teamId={teamId}
+      source={{ kind: 'team', id: teamId }}
       number={number}
       backHref={`/learn/events/${slug}`}
       backLabel={t('back')}

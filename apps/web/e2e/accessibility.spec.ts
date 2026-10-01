@@ -23,7 +23,7 @@ const PUBLIC_PAGES = [
   '/privacy',
   '/no-such-page',
 ];
-const PARENT_PAGES = ['/dashboard', '/children/new', '/billing', '/account'];
+const PARENT_PAGES = ['/dashboard', '/children/new', '/billing', '/account', '/hub', '/payouts'];
 const STUDENT_PAGES = [
   '/learn',
   '/learn/builder-m01-l01',
@@ -38,6 +38,7 @@ const STUDENT_PAGES = [
   '/learn/rooms',
   '/learn/classes',
   '/learn/readiness',
+  '/learn/hub',
   '/learn/badges',
 ];
 

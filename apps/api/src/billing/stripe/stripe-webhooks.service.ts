@@ -65,7 +65,7 @@ const SUMMARY_FIELDS = [
   'created',
 ] as const;
 
-const OUR_METADATA = new Set(['parentId', 'planKey', 'countryCode']);
+const OUR_METADATA = new Set(['parentId', 'planKey', 'countryCode', 'purpose', 'hubInvoiceId']);
 
 export function stripeSummary(object: unknown): Prisma.InputJsonValue {
   const source = (object ?? {}) as Record<string, unknown>;
@@ -124,6 +124,20 @@ export class StripeWebhooksService {
     this.setupHandlers.set(purpose, handler);
   }
 
+  /** One-off payments (Checkout in payment mode), by the `purpose` in their metadata. */
+  private readonly paymentHandlers = new Map<
+    string,
+    (session: StripeCheckoutSession) => Promise<{ parentId?: string }>
+  >();
+
+  /** Other modules act on completed one-off payments (e.g. a hub client's invoice). */
+  onPaymentCompleted(
+    purpose: string,
+    handler: (session: StripeCheckoutSession) => Promise<{ parentId?: string }>,
+  ) {
+    this.paymentHandlers.set(purpose, handler);
+  }
+
   async handle(rawBody: Buffer | undefined, signature: string | undefined): Promise<void> {
     if (!rawBody?.length || !signature) {
       throw new BadRequestException({
@@ -173,6 +187,10 @@ export class StripeWebhooksService {
         const session = object as StripeCheckoutSession;
         if (session.mode === 'setup') {
           const handler = this.setupHandlers.get(session.metadata?.['purpose'] ?? '');
+          return handler ? handler(session) : {};
+        }
+        if (session.mode === 'payment') {
+          const handler = this.paymentHandlers.get(session.metadata?.['purpose'] ?? '');
           return handler ? handler(session) : {};
         }
         const subscriptionId = idOf(session.subscription);

@@ -37,6 +37,12 @@ const NAV: {
     allowed: (a) => canOnAll(a, 'read', 'EventTeam'),
   },
   {
+    href: '/hub',
+    label: 'Hub',
+    icon: 'zap',
+    allowed: (a) => canOnAll(a, 'read', 'Hub'),
+  },
+  {
     href: '/schools',
     label: 'Schools',
     icon: 'graduation',

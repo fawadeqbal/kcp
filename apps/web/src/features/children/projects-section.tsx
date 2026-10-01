@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Alert, Button, Icon } from '@/components/ui';
 import { api } from '@/lib/api';
 import { isolate } from '../auth/validation';
+import { HubWork } from '../portfolio/hub-work';
 import { PortfolioItems } from '../portfolio/portfolio-items';
 import { sharedPortfolioUrl } from '../portfolio/shared-portfolio';
 
@@ -105,12 +106,13 @@ export function ProjectsSection({ child }: { child: Child }) {
   return (
     <>
       {failed ? <Alert tone="error">{t('projectsFailed')}</Alert> : null}
-      {portfolio && portfolio.items.length === 0 ? (
+      {portfolio && portfolio.items.length === 0 && portfolio.hubWork.length === 0 ? (
         <p className="text-sm text-muted">{t('projectsEmpty', { nickname })}</p>
       ) : null}
       {portfolio && portfolio.items.length > 0 ? (
         <PortfolioItems items={portfolio.items} headingLevel={5} compact />
       ) : null}
+      {portfolio ? <HubWork items={portfolio.hubWork} headingLevel={5} compact /> : null}
 
       {portfolio ? (
         <div className="flex flex-col gap-3">

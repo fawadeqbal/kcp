@@ -59,6 +59,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
               {page('/about', nav('about'))}
               {page('/blog', nav('blog'))}
               {page('/waitlist', nav('waitlist'))}
+              {page('/hire', t('hire'))}
               {app('/login', t('logIn'))}
             </Column>
             <Column title={t('trust')}>

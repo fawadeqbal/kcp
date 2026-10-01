@@ -250,6 +250,8 @@ export class AdminMentorDto {
   languages!: string[];
   capacity!: number;
   isActive!: boolean;
+  /** A lead developer: signs students off for the hub and leads client projects. */
+  isLead!: boolean;
   ready!: boolean;
   open!: number;
   decidedLast30Days!: number;
@@ -334,6 +336,11 @@ export class UpdateMentorDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  /** A lead developer (hub sign-offs and client projects). */
+  @IsOptional()
+  @IsBoolean()
+  isLead?: boolean;
 
   @IsString()
   @MinLength(3)

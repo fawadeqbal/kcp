@@ -265,6 +265,26 @@ export class AccountService {
     for (const { childId } of parent.childLinks) {
       await this.children.remove(childId, user, ctx);
     }
+    // Hub payouts: the payout account goes (its details wiped); payouts not yet sent stop
+    // (those of a batch already sent are left for staff to record or cancel).
+    await this.prisma.$transaction(async (tx) => {
+      const accounts = await tx.payoutAccount.findMany({
+        where: { parentId: user.id },
+        select: { id: true },
+      });
+      await tx.payout.updateMany({
+        where: {
+          accountId: { in: accounts.map((a) => a.id) },
+          status: { in: ['AWAITING_PARENT', 'CONFIRMED'] },
+          batch: { status: { in: ['DRAFT', 'APPROVED'] } },
+        },
+        data: { status: 'CANCELLED', failureReason: 'ACCOUNT_DELETED' },
+      });
+      await tx.payoutAccount.updateMany({
+        where: { parentId: user.id },
+        data: { removedAt: new Date(), detailsCipher: '', providerRecipientId: null },
+      });
+    });
     await this.billing.endForDeletedAccount(user.id);
 
     // Tell them before the address is gone.

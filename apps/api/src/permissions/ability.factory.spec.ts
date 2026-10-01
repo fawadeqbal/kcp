@@ -654,3 +654,109 @@ describe('canOnAll', () => {
     expect(canOnAll(ability, 'read', 'User')).toBe(false);
   });
 });
+
+describe('the hub', () => {
+  const mine = subject('HubEligibility', { studentId: ME, parentIds: [] });
+  const childs = subject('HubEligibility', { studentId: 'child-1', parentIds: [ME] });
+  const others = subject('HubEligibility', { studentId: 'child-2', parentIds: [OTHER_PARENT] });
+
+  it('shows students their own steps, and lets only their parents consent', () => {
+    const student = abilityFor(ROLE_KEYS.STUDENT);
+    expect(student.can('read', mine)).toBe(true);
+    expect(student.can('update', mine)).toBe(false);
+    expect(student.can('read', others)).toBe(false);
+    const parent = abilityFor(ROLE_KEYS.PARENT);
+    expect(parent.can('update', childs)).toBe(true);
+    expect(parent.can('read', others)).toBe(false);
+    expect(parent.can('update', others)).toBe(false);
+  });
+
+  it('lets mentors sign off (the service checks they lead), and staff pause; nobody edits the ledger', () => {
+    expect(abilityFor(ROLE_KEYS.MENTOR).can('update', others)).toBe(true);
+    expect(abilityFor(ROLE_KEYS.TEACHER).can('read', others)).toBe(false);
+    expect(abilityFor(ROLE_KEYS.MODERATOR).can('update', others)).toBe(false);
+    expect(abilityFor(ROLE_KEYS.ADMIN).can('update', others)).toBe(false);
+    expect(abilityFor(ROLE_KEYS.ADMIN).can('update', 'Hub')).toBe(true);
+    expect(abilityFor(ROLE_KEYS.MENTOR).can('update', 'Hub')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.MODERATOR).can('read', 'Hub')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.ADMIN).can('read', 'Ledger')).toBe(true);
+    expect(abilityFor(ROLE_KEYS.ADMIN).can('update', 'Ledger')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.MODERATOR).can('read', 'Ledger')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.CLIENT).can('read', 'Ledger')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.ADMIN).can('update', 'Country', 'hubRules')).toBe(true);
+  });
+});
+
+describe('hub clients, projects and money', () => {
+  const ourProject = subject('HubProject', {
+    clientIds: [ME],
+    leadId: 'lead-1',
+    memberIds: ['child-1'],
+    parentIds: ['parent-1'],
+  });
+  const theirProject = subject('HubProject', {
+    clientIds: ['client-2'],
+    leadId: 'lead-2',
+    memberIds: ['child-2'],
+    parentIds: [OTHER_PARENT],
+  });
+
+  it('gives clients their organisation, requests, projects and invoices — and no student', () => {
+    const client = abilityFor(ROLE_KEYS.CLIENT);
+    expect(client.can('read', subject('ClientOrg', { memberIds: [ME] }))).toBe(true);
+    expect(client.can('read', subject('ClientOrg', { memberIds: ['client-2'] }))).toBe(false);
+    expect(client.can('create', 'HubIntake')).toBe(true);
+    expect(client.can('read', ourProject)).toBe(true);
+    expect(client.can('read', theirProject)).toBe(false);
+    expect(client.can('update', subject('HubInvoice', { clientIds: [ME] }))).toBe(true);
+    for (const forbidden of ['Child', 'Chat', 'HubEarnings', 'Payout', 'HubEligibility'] as const) {
+      expect(client.can('read', forbidden)).toBe(false);
+    }
+    expect(client.can('read', myChild)).toBe(false);
+    expect(client.can('read', otherChild)).toBe(false);
+  });
+
+  it('shows a project to its lead, its students and their parents only', () => {
+    const lead = abilityFor(ROLE_KEYS.MENTOR, 'lead-1');
+    expect(lead.can('update', ourProject)).toBe(true);
+    expect(lead.can('read', theirProject)).toBe(false);
+    expect(abilityFor(ROLE_KEYS.STUDENT, 'child-1').can('update', ourProject)).toBe(true);
+    expect(abilityFor(ROLE_KEYS.STUDENT, 'child-1').can('read', theirProject)).toBe(false);
+    expect(abilityFor(ROLE_KEYS.PARENT, 'parent-1').can('update', ourProject)).toBe(true);
+    expect(abilityFor(ROLE_KEYS.PARENT, 'parent-1').can('read', theirProject)).toBe(false);
+    expect(abilityFor(ROLE_KEYS.TEACHER).can('read', ourProject)).toBe(false);
+  });
+
+  it('keeps earnings and payouts to the family, and payout approvals to staff', () => {
+    const parent = abilityFor(ROLE_KEYS.PARENT);
+    expect(
+      parent.can('read', subject('HubEarnings', { studentId: 'child-1', parentIds: [ME] })),
+    ).toBe(true);
+    expect(
+      parent.can(
+        'read',
+        subject('HubEarnings', { studentId: 'child-2', parentIds: [OTHER_PARENT] }),
+      ),
+    ).toBe(false);
+    expect(parent.can('update', subject('Payout', { parentId: ME }))).toBe(true);
+    expect(parent.can('update', subject('Payout', { parentId: OTHER_PARENT }))).toBe(false);
+    expect(parent.can('create', 'PayoutAccount')).toBe(true);
+    expect(parent.can('read', subject('PayoutAccount', { parentId: OTHER_PARENT }))).toBe(false);
+    const student = abilityFor(ROLE_KEYS.STUDENT);
+    expect(student.can('read', subject('HubEarnings', { studentId: ME, parentIds: [] }))).toBe(
+      true,
+    );
+    expect(student.can('read', subject('Payout', { parentId: ME }))).toBe(false);
+    const admin = abilityFor(ROLE_KEYS.ADMIN);
+    expect(admin.can('create', 'Payout')).toBe(true);
+    expect(admin.can('update', 'PayoutAccount', 'verified')).toBe(true);
+    expect(admin.can('update', 'PayoutAccount', 'details')).toBe(false);
+    // Staff pages (every account, every batch) need rules on all rows.
+    expect(canOnAll(admin, 'read', 'PayoutAccount')).toBe(true);
+    expect(canOnAll(admin, 'read', 'Ledger')).toBe(true);
+    expect(canOnAll(parent, 'read', 'PayoutAccount')).toBe(false);
+    expect(canOnAll(parent, 'read', 'Payout')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.MODERATOR).can('read', 'Payout')).toBe(false);
+    expect(abilityFor(ROLE_KEYS.MENTOR).can('read', 'HubInvoice')).toBe(false);
+  });
+});

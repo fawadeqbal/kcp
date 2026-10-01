@@ -72,13 +72,21 @@ test('the sitemap lists every page in every language, and robots.txt points to i
 }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text();
   for (const locale of LOCALES) {
-    for (const path of ['/how-it-works', '/pricing/eg', '/blog/first-website', '/waitlist']) {
+    for (const path of [
+      '/how-it-works',
+      '/pricing/eg',
+      '/blog/first-website',
+      '/waitlist',
+      '/hire',
+    ]) {
       expect(sitemap).toContain(`/${locale}${path}</loc>`);
     }
   }
   expect(sitemap).toContain('hreflang="x-default"');
   expect(sitemap).not.toContain('/waitlist/confirm');
+  expect(sitemap).not.toContain('/hire/confirm');
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('Sitemap: ');
   expect(robots).toContain('Disallow: /*/waitlist/confirm');
+  expect(robots).toContain('Disallow: /*/hire/confirm');
 });

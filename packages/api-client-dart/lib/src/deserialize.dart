@@ -21,6 +21,9 @@ import 'package:kcp_api/src/model/class_decision_result_dto.dart';
 import 'package:kcp_api/src/model/code_files_dto.dart';
 import 'package:kcp_api/src/model/consent_record_dto.dart';
 import 'package:kcp_api/src/model/create_feedback_dto.dart';
+import 'package:kcp_api/src/model/earning_dto.dart';
+import 'package:kcp_api/src/model/earnings_statement_dto.dart';
+import 'package:kcp_api/src/model/earnings_total_dto.dart';
 import 'package:kcp_api/src/model/email_preferences_dto.dart';
 import 'package:kcp_api/src/model/event_decision_dto.dart';
 import 'package:kcp_api/src/model/event_decision_result_dto.dart';
@@ -65,7 +68,9 @@ import 'package:kcp_api/src/model/pairing_info_dto.dart';
 import 'package:kcp_api/src/model/pairing_start_dto.dart';
 import 'package:kcp_api/src/model/pairing_started_dto.dart';
 import 'package:kcp_api/src/model/pairing_status_dto.dart';
+import 'package:kcp_api/src/model/parent_approval_dto.dart';
 import 'package:kcp_api/src/model/parent_class_request_dto.dart';
+import 'package:kcp_api/src/model/parent_decision_dto.dart';
 import 'package:kcp_api/src/model/parent_event_request_dto.dart';
 import 'package:kcp_api/src/model/parent_event_request_dto_child.dart';
 import 'package:kcp_api/src/model/parent_event_request_dto_event.dart';
@@ -75,6 +80,7 @@ import 'package:kcp_api/src/model/parent_friend_request_dto.dart';
 import 'package:kcp_api/src/model/parent_report_dto.dart';
 import 'package:kcp_api/src/model/parent_reports_dto.dart';
 import 'package:kcp_api/src/model/parental_consent_status_dto.dart';
+import 'package:kcp_api/src/model/payout_dto.dart';
 import 'package:kcp_api/src/model/picture_login_dto.dart';
 import 'package:kcp_api/src/model/picture_password_dto.dart';
 import 'package:kcp_api/src/model/plan_option_dto.dart';
@@ -206,6 +212,14 @@ ReturnType deserialize<ReturnType, BaseType>(
     case 'CreateFeedbackDto':
       return CreateFeedbackDto.fromJson(value as Map<String, dynamic>)
           as ReturnType;
+    case 'EarningDto':
+      return EarningDto.fromJson(value as Map<String, dynamic>) as ReturnType;
+    case 'EarningsStatementDto':
+      return EarningsStatementDto.fromJson(value as Map<String, dynamic>)
+          as ReturnType;
+    case 'EarningsTotalDto':
+      return EarningsTotalDto.fromJson(value as Map<String, dynamic>)
+          as ReturnType;
     case 'EmailPreferencesDto':
       return EmailPreferencesDto.fromJson(value as Map<String, dynamic>)
           as ReturnType;
@@ -327,8 +341,14 @@ ReturnType deserialize<ReturnType, BaseType>(
     case 'PairingStatusDto':
       return PairingStatusDto.fromJson(value as Map<String, dynamic>)
           as ReturnType;
+    case 'ParentApprovalDto':
+      return ParentApprovalDto.fromJson(value as Map<String, dynamic>)
+          as ReturnType;
     case 'ParentClassRequestDto':
       return ParentClassRequestDto.fromJson(value as Map<String, dynamic>)
+          as ReturnType;
+    case 'ParentDecisionDto':
+      return ParentDecisionDto.fromJson(value as Map<String, dynamic>)
           as ReturnType;
     case 'ParentEventRequestDto':
       return ParentEventRequestDto.fromJson(value as Map<String, dynamic>)
@@ -359,6 +379,8 @@ ReturnType deserialize<ReturnType, BaseType>(
     case 'ParentalConsentStatusDto':
       return ParentalConsentStatusDto.fromJson(value as Map<String, dynamic>)
           as ReturnType;
+    case 'PayoutDto':
+      return PayoutDto.fromJson(value as Map<String, dynamic>) as ReturnType;
     case 'PictureLoginDto':
       return PictureLoginDto.fromJson(value as Map<String, dynamic>)
           as ReturnType;

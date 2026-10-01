@@ -38,7 +38,7 @@ Tags: `sha-<7 chars>` for pushes to `main`, the tag name (for example `v0.1.0`) 
      | `LOG_LEVEL`                | `info`                                                                                                                    |
      | `SWAGGER_ENABLED`          | `true` (keep API docs on in staging only)                                                                                 |
      | `JWT_ACCESS_SECRET`        | a new random value: `openssl rand -base64 48`                                                                             |
-     | `ENCRYPTION_KEY`           | a new random value: `openssl rand -base64 32` (keep it safe: it decrypts staff two-factor secrets)                        |
+     | `ENCRYPTION_KEY`           | a new random value: `openssl rand -base64 32` (keep it safe: it decrypts two-factor secrets and parents' payout accounts) |
      | `SMTP_URL`                 | your email provider's SMTP URL, e.g. `smtps://user:pass@smtp.provider.com:465`                                            |
      | `MAIL_FROM`                | e.g. `Kids Coding Platform <no-reply@yourdomain>`                                                                         |
      | `WEB_APP_URL`              | the web app's public URL (used in email links)                                                                            |
@@ -56,6 +56,10 @@ Tags: `sha-<7 chars>` for pushes to `main`, the tag name (for example `v0.1.0`) 
      | `FIREBASE_SERVICE_ACCOUNT` | optional: push notifications for the mobile app ([mobile-release.md](mobile-release.md)); without it they are only logged |
      | `FORGEJO_URL`              | optional: the private git server for hackathon teams (see "Team repositories"); without it teams can't use git            |
      | `FORGEJO_TOKEN`            | with `FORGEJO_URL`: the Forgejo admin account's access token                                                              |
+     | `WISE_API_TOKEN`           | optional: hub payouts through Wise ([runbooks/hub-payouts.md](runbooks/hub-payouts.md)); without it payouts are by hand   |
+     | `WISE_PROFILE_ID`          | with `WISE_API_TOKEN`: the Wise business profile that pays                                                                |
+     | `WISE_WEBHOOK_PUBLIC_KEY`  | with `WISE_API_TOKEN`: Wise's webhook public key (PEM; `\n` for line breaks)                                              |
+     | `WISE_API_URL`             | Wise's sandbox by default; `https://api.wise.com` for live                                                                |
 
      Optional: `STAFF_SESSION_HOURS` (default 12) and `REFRESH_TOKEN_TTL_DAYS` (default 30) set how long staff and families stay signed in before typing their password again.
 
@@ -87,7 +91,7 @@ Students' code runs in the sandbox, never on the main site. It is a few static f
    - build command: `pnpm install --frozen-lockfile && pnpm nx run @kcp/sandbox:build`
    - output folder: `apps/sandbox/dist`
    - environment variable `SANDBOX_FRAME_ANCESTORS`: the web app's origin, e.g. `https://app.yourdomain.com` (several are space-separated). It is written into the `Content-Security-Policy` at build time, so only the web app can embed the sandbox.
-   - environment variables `SANDBOX_API_URL` (the API) and `SANDBOX_WEB_URL` (the web app), for the public portfolio page (`/portfolio/#<link>`), which lives on the sandbox domain so shared projects never run on the main site.
+   - environment variables `SANDBOX_API_URL` (the API) and `SANDBOX_WEB_URL` (the web app), for the public portfolio page (`/portfolio/#<link>`) and the hub's milestone previews (`/preview/#<link>`), which live on the sandbox domain so shared projects and client sites never run on the main site.
 3. Set the web app's `NEXT_PUBLIC_SANDBOX_URL` to the sandbox's URL (for example `https://yourdomain-code.net`) and redeploy the web app.
 4. Check the headers: `curl -sI https://yourdomain-code.net/` must show `Content-Security-Policy` with `connect-src blob:` (only files the page made itself, for Python) and your `frame-ancestors`. A host that ignores `_headers` must be given the same headers in its own settings — copy them from `apps/sandbox/dist/_headers`.
 
@@ -198,6 +202,7 @@ The migrate step runs on GitHub's servers, so the database must accept TLS conne
 - **Email is sent through SMTP** (any provider, for example Resend or Amazon SES, both offer SMTP), so the provider can change without a code change.
 - **Python (Pyodide) is downloaded by the web app**, not by the sandbox, because browsers don't cache what a sandboxed page downloads. The web app never runs it: it hands the files to the sandbox.
 - **Public portfolios live on the sandbox domain** with the link in the URL fragment, so shared projects never run on the main site and links don't reach server logs.
+- **Hub previews are built in the browser:** the preview page reads the milestone's files from the API and inlines each page's stylesheets, scripts and pictures (as `data:` URLs) into one document, shown in a sandboxed frame (`/preview-frame.html`, the runner's policy: no network, no forms). Previews are static: anything that needs a server, or a JavaScript module importing another file, doesn't work there.
 - **The development mock of Stripe** starts a new period and charges it in full when a family switches between monthly and yearly; the real Stripe prorates. Adding children is prorated in both; the credit for a removed child only exists at the real Stripe.
 - **Trials:** each new child gets 14 days of premium, at most 4 trials per family, so deleting and re-adding children can't renew them.
 - **The web app's Content-Security-Policy allows inline scripts** (a nonce would make every page dynamic); the admin panel uses a strict nonce policy. See [security-review.md](security-review.md#decisions).

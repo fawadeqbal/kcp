@@ -47,7 +47,13 @@ function RoomList({
           >
             <Icon
               name={
-                room.kind === 'CLASS' ? 'graduation' : room.kind === 'EVENT' ? 'trophy' : 'users'
+                room.kind === 'CLASS'
+                  ? 'graduation'
+                  : room.kind === 'EVENT'
+                    ? 'trophy'
+                    : room.kind === 'HUB'
+                      ? 'rocket'
+                      : 'users'
               }
             />
             <span className="flex min-w-0 flex-1 flex-col">

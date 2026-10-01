@@ -54,7 +54,25 @@ export type NotificationType =
   /** The student's readiness check was graded: { reviewId, passed }. */
   | 'readiness_result'
   /** The same, for the parents: { reviewId, childId, nickname, passed }. */
-  | 'child_readiness';
+  | 'child_readiness'
+  /** A lead developer signed the student off for the hub: {}. */
+  | 'hub_signed_off'
+  /** The same, for the parents (their consent is next): { childId, nickname }. */
+  | 'child_hub_signed_off'
+  /** Every step is done: the student can be invited to hub projects: {}. */
+  | 'hub_eligible'
+  /** Staff paused the student's hub work: {}. */
+  | 'hub_paused'
+  /** The same, for the parents: { childId, nickname }. */
+  | 'child_hub_paused'
+  /** A lead developer invited the student to a project: { projectId, title }. */
+  | 'hub_invite'
+  /** The student said yes: the parent approves the project: { memberId, childId, nickname, title }. */
+  | 'child_hub_invite'
+  /** Another parent agreed to the hub agreement (earnings go to them): { childId, nickname, by }. */
+  | 'child_hub_consent'
+  /** A parent approved: the student is on the team: { projectId, title }. */
+  | 'hub_joined';
 
 /** Kept per account; older ones go (nightly). */
 const KEEP_DAYS = 90;

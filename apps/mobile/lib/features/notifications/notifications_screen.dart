@@ -190,6 +190,24 @@ String describeNotification(BuildContext context, String language, NotificationD
       return d['passed'] == true
           ? t.notificationChildReadinessPassed(_str(d['nickname']))
           : t.notificationChildReadinessNotYet(_str(d['nickname']));
+    case 'hub_eligible':
+      return t.notificationHubEligible;
+    case 'hub_signed_off':
+      return t.notificationHubSignedOff;
+    case 'hub_paused':
+      return t.notificationHubPaused;
+    case 'hub_invite':
+      return t.notificationHubInvite(_str(d['title']));
+    case 'hub_joined':
+      return t.notificationHubJoined(_str(d['title']));
+    case 'child_hub_signed_off':
+      return t.notificationChildHubSignedOff(_str(d['nickname']));
+    case 'child_hub_paused':
+      return t.notificationChildHubPaused(_str(d['nickname']));
+    case 'child_hub_consent':
+      return t.notificationChildHubConsent(_str(d['by']), _str(d['nickname']));
+    case 'child_hub_invite':
+      return t.notificationChildHubInvite(_str(d['nickname']), _str(d['title']));
     default:
       return t.notificationOther;
   }

@@ -52,6 +52,11 @@ export interface StripeCheckoutSession {
   subscription: string | { id: string } | null;
   client_reference_id: string | null;
   metadata: Metadata | null;
+  /** Payment mode: what was charged, and its payment intent once paid. */
+  amount_total?: number | null;
+  currency?: string | null;
+  payment_status?: 'paid' | 'unpaid' | 'no_payment_required';
+  payment_intent?: string | { id: string } | null;
 }
 
 export interface StripeInvoice {
@@ -111,6 +116,24 @@ export interface SetupSessionParams {
   locale?: 'auto' | 'en';
 }
 
+/** A one-off payment (Checkout in payment mode): a hub client's invoice. */
+export interface PaymentSessionParams {
+  mode: 'payment';
+  /** Cards only: paid at once (bank debits and other delayed methods aren't handled). */
+  payment_method_types: ['card'];
+  line_items: {
+    price_data: { currency: string; unit_amount: number; product_data: { name: string } };
+    quantity: 1;
+  }[];
+  customer_email?: string;
+  success_url: string;
+  cancel_url: string;
+  client_reference_id: string;
+  metadata: Metadata;
+  payment_intent_data: { metadata: Metadata };
+  locale?: 'auto' | 'en';
+}
+
 export interface SubscriptionUpdateParams {
   cancel_at_period_end?: boolean;
   /** Replace or change items: an `id` updates that item, `deleted` removes it. */
@@ -139,7 +162,7 @@ export interface StripeApi {
   checkout: {
     sessions: {
       create(
-        params: CheckoutSessionParams | SetupSessionParams,
+        params: CheckoutSessionParams | SetupSessionParams | PaymentSessionParams,
         options?: { idempotencyKey?: string },
       ): Promise<StripeCheckoutSession>;
       /** Closes an open checkout page (fails if it was completed or expired already). */

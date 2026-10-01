@@ -10,6 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import {
+  SITE_PAGE_PATHS,
   frameAncestorsFromEnv,
   originFromEnv,
   portfolioHeaders,
@@ -99,6 +100,21 @@ async function portfolioMessages() {
   return result;
 }
 
+/** The hub preview page's texts (en, ar, ur). */
+async function previewMessages() {
+  const dir = path.resolve(root, '../../packages/i18n/messages');
+  const result = {};
+  for (const language of ['en', 'ar', 'ur']) {
+    const all = JSON.parse(await readFile(path.join(dir, `${language}.json`), 'utf8'));
+    result[language] = {
+      ...all.hubPreview,
+      fullScreen: all.lesson.fullScreen,
+      exitFullScreen: all.lesson.exitFullScreen,
+    };
+  }
+  return result;
+}
+
 export async function buildSandbox({ minify = true } = {}) {
   const common = { bundle: true, format: 'iife', target: 'es2020', minify, legalComments: 'none' };
   const agent = await build({
@@ -145,6 +161,20 @@ export async function buildSandbox({ minify = true } = {}) {
       PORTFOLIO_MESSAGES: JSON.stringify(await portfolioMessages()),
     },
   });
+  await build({
+    ...common,
+    entryPoints: [path.join(root, 'src/preview.ts')],
+    outfile: path.join(dist, 'preview.js'),
+    define: {
+      PREVIEW_API_URL: JSON.stringify(apiOrigin),
+      PREVIEW_MESSAGES: JSON.stringify(await previewMessages()),
+    },
+  });
+  await build({
+    ...common,
+    entryPoints: [path.join(root, 'src/preview-frame.ts')],
+    outfile: path.join(dist, 'preview-frame.js'),
+  });
   await cp(path.join(root, 'public'), dist, { recursive: true });
   const pyodideVersion = await copyPyodide();
 
@@ -152,10 +182,16 @@ export async function buildSandbox({ minify = true } = {}) {
   const sandbox = sandboxHeaders(frameAncestorsFromEnv());
   const portfolio = portfolioHeaders(apiOrigin);
   const lines = [
-    ...['/', '/index.html', '/runner.js', '/robots.txt', '/images/*'].flatMap((p) =>
-      block(p, sandbox),
-    ),
-    ...['/portfolio', '/portfolio/*', '/portfolio.js'].flatMap((p) => block(p, portfolio)),
+    ...[
+      '/',
+      '/index.html',
+      '/runner.js',
+      '/robots.txt',
+      '/images/*',
+      '/preview-frame.html',
+      '/preview-frame.js',
+    ].flatMap((p) => block(p, sandbox)),
+    ...SITE_PAGE_PATHS.flatMap((p) => block(p, portfolio)),
     ...block('/pyodide/manifest.json', { ...sandbox, ...pyodideHeaders(false) }),
     ...block(`/pyodide/${pyodideVersion}/*`, { ...sandbox, ...pyodideHeaders(true) }),
   ];

@@ -33,8 +33,30 @@ export function sandboxHeaders(frameAncestors = 'http://localhost:3001') {
 }
 
 /**
- * The public portfolio page (/portfolio/): reads the portfolio from the API, shows
- * each project in the runner (frame-src 'self'), and can't be embedded anywhere.
+ * The sandbox's own pages (patterns of a _headers file): the public portfolio and the
+ * hub preview, with the stylesheet they share. They get portfolioHeaders.
+ */
+export const SITE_PAGE_PATHS = [
+  '/portfolio',
+  '/portfolio/*',
+  '/portfolio.js',
+  '/preview',
+  '/preview/*',
+  '/preview.js',
+  '/pages.css',
+];
+
+/** Whether a request path is one of SITE_PAGE_PATHS. */
+export function isSitePage(pathname) {
+  return SITE_PAGE_PATHS.some((pattern) =>
+    pattern.endsWith('/*') ? pathname.startsWith(pattern.slice(0, -1)) : pathname === pattern,
+  );
+}
+
+/**
+ * The sandbox's own pages: the public portfolio (/portfolio/) and the hub preview
+ * (/preview/). They read from the API, show code in a sandboxed frame from this domain
+ * (frame-src 'self': the runner, the preview frame), and can't be embedded anywhere.
  */
 export function portfolioHeaders(apiOrigin = 'http://localhost:3000') {
   const policy = [

@@ -3,7 +3,15 @@
 import type { components } from '@kcp/api-client-ts';
 import { clsx } from 'clsx';
 import { useFormatter, useTranslations } from 'next-intl';
-import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type FormEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { BackLink } from '@/components/back-link';
 import {
   Alert,
@@ -30,20 +38,44 @@ type Workspace = components['schemas']['WorkspaceDto'];
 const SAVE_DELAY_MS = 400;
 
 /**
- * The team's repository in the browser: edit the files on your own branch, see the
- * page, commit, send the branch to the team, get the team's latest, and open a pull
- * request so a teammate or the mentor can review it before it goes into main.
+ * A repository in the browser: edit the files on your own branch, see the page, commit,
+ * send the branch, get the latest main, and open a pull request for review. Used by
+ * hackathon teams and hub projects (which add their timer above it).
  */
-export function TeamWorkspacePage({ slug }: { slug: string }) {
+export function GitWorkspace({
+  workspace,
+  title,
+  backHref,
+  backLabel,
+  pullsHref,
+  pullsLabel,
+  openPull,
+  readOnlyText,
+  readOnlyBadge,
+  extra,
+  pullExtra,
+}: {
+  workspace: Workspace;
+  title: string;
+  backHref: string;
+  backLabel: string;
+  pullsHref: string;
+  pullsLabel?: string;
+  /** Opens the pull request; returns where to go next, or the API's error. */
+  openPull: (title: string, body: string) => Promise<{ href?: string; error?: unknown }>;
+  /** What to say when the server refuses a push (the event isn't running, no timer…). */
+  readOnlyText?: string;
+  readOnlyBadge?: string;
+  extra?: ReactNode;
+  /** More fields for the pull request (the hub's task). */
+  pullExtra?: ReactNode;
+}) {
   const t = useTranslations('workspace');
   const te = useTranslations('errors');
-  const user = useAccount('STUDENT');
   const router = useRouter();
   const format = useFormatter();
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [teamName, setTeamName] = useState('');
   const [repo, setRepo] = useState<TeamRepo | null>(null);
-  const [failed, setFailed] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [files, setFiles] = useState<string[]>([]);
   const [contents, setContents] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
@@ -74,38 +106,28 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
     );
   }, []);
 
+  // The repository is opened once per workspace (its files live in the browser).
+  const { teamId } = workspace;
+  const opened = useRef<string | null>(null);
   useEffect(() => {
-    if (!user) return;
+    if (opened.current === teamId) return;
+    opened.current = teamId;
     let cancelled = false;
     void (async () => {
       try {
-        const event = await api.GET('/v1/events/{slug}', { params: { path: { slug } } });
-        const team = event.data?.team;
-        if (!team?.approved) {
-          router.replace(`/learn/events/${slug}`);
-          return;
-        }
-        setTeamName(team.name);
-        const { data, error } = await api.GET('/v1/teams/{id}/workspace', {
-          params: { path: { id: team.id } },
-        });
-        if (!data) {
-          if (!cancelled) setFailed(errorMessageKey(errorCode(error)));
-          return;
-        }
-        setWorkspace(data);
-        const opened = await openTeamRepo(data);
+        const made = await openTeamRepo(workspace);
         if (cancelled) return;
-        setRepo(opened);
-        await refresh(opened);
+        setRepo(made);
+        await refresh(made);
       } catch {
-        if (!cancelled) setFailed('network');
+        if (!cancelled) setFailed(true);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, slug, router, refresh]);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once per repository
+  }, [teamId, refresh]);
 
   const preview = useMemo(() => pageFiles(contents), [contents]);
 
@@ -145,7 +167,7 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
       const status = (error as { data?: { statusCode?: number } }).data?.statusCode;
       setNotice({
         tone: 'error',
-        text: status === 409 || status === 403 ? t('readOnly') : te('network'),
+        text: status === 409 || status === 403 ? (readOnlyText ?? t('readOnly')) : te('network'),
       });
     } finally {
       setBusy(null);
@@ -163,23 +185,17 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
     });
   }
 
-  async function openPull(event: FormEvent) {
+  async function submitPull(event: FormEvent) {
     event.preventDefault();
-    if (!workspace || busy) return;
+    if (busy) return;
     setBusy('pull');
     setNotice(null);
-    const { data, error } = await api
-      .POST('/v1/teams/{id}/pulls', {
-        params: { path: { id: workspace.teamId } },
-        body: {
-          branch: workspace.branch,
-          title: pullTitle,
-          ...(pullBody.trim() ? { body: pullBody } : {}),
-        },
-      })
-      .catch((e: unknown) => ({ data: undefined, error: e }));
+    const { href, error } = await openPull(pullTitle, pullBody).catch((e: unknown) => ({
+      href: undefined,
+      error: e,
+    }));
     setBusy(null);
-    if (data) router.push(`/learn/events/${slug}/pulls/${data.number}`);
+    if (href) router.push(href);
     else {
       const code = errorCode(error);
       setNotice({
@@ -194,7 +210,7 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
     }
   }
 
-  if (!user || (!repo && !failed)) {
+  if (!repo && !failed) {
     return (
       <div className="grid min-h-80 place-items-center">
         <div className="flex flex-col items-center gap-3">
@@ -204,15 +220,11 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
       </div>
     );
   }
-  if (failed || !workspace) {
+  if (failed) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col gap-4">
-        <BackLink href={`/learn/events/${slug}`}>{t('back')}</BackLink>
-        <Alert tone="error">
-          {failed === 'GIT_NOT_SET_UP'
-            ? t('notSetUp')
-            : te(failed === 'network' ? 'network' : 'generic')}
-        </Alert>
+        <BackLink href={backHref}>{backLabel}</BackLink>
+        <Alert tone="error">{te('network')}</Alert>
       </div>
     );
   }
@@ -220,13 +232,16 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-5">
       <header className="flex flex-wrap items-center gap-3">
-        <BackLink href={`/learn/events/${slug}`}>{t('back')}</BackLink>
-        <h1 className="text-3xl">{t('title', { team: isolate(teamName) })}</h1>
+        <BackLink href={backHref}>{backLabel}</BackLink>
+        <h1 className="text-3xl">{title}</h1>
         <Badge tone="brand">
           <span dir="ltr">{t('branch', { branch: workspace.branch })}</span>
         </Badge>
-        {!workspace.canPush ? <Badge tone="warning">{t('readOnlyBadge')}</Badge> : null}
+        {!workspace.canPush ? (
+          <Badge tone="warning">{readOnlyBadge ?? t('readOnlyBadge')}</Badge>
+        ) : null}
       </header>
+      {extra}
       <div aria-live="polite">
         {notice ? (
           <Alert tone={notice.tone} live={false}>
@@ -234,7 +249,6 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
           </Alert>
         ) : null}
       </div>
-
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <section
           aria-label={t('filesLabel')}
@@ -350,7 +364,7 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
         <Card>
           <h2 className="text-xl">{t('pullTitle')}</h2>
           <p className="mt-1 text-sm text-muted">{t('pullHelp')}</p>
-          <form onSubmit={openPull} className="mt-4 flex flex-col gap-3">
+          <form onSubmit={submitPull} className="mt-4 flex flex-col gap-3">
             <TextField
               label={t('pullName')}
               value={pullTitle}
@@ -366,6 +380,7 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
                 onChange={(e) => setPullBody(e.target.value)}
               />
             </label>
+            {pullExtra}
             <Button
               type="submit"
               loading={busy === 'pull'}
@@ -387,7 +402,7 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
                     </code>
                     <span className="font-semibold">{entry.message}</span>
                     <span className="text-muted">
-                      {isolate(entry.author)} · {format.relativeTime(entry.at)}
+                      {isolate(entry.author)} · {format.relativeTime(entry.at, new Date())}
                     </span>
                   </li>
                 ))}
@@ -395,15 +410,89 @@ export function TeamWorkspacePage({ slug }: { slug: string }) {
             </div>
           ) : null}
           <p className="mt-4 text-sm">
-            <Link
-              href={`/learn/events/${slug}`}
-              className="font-bold text-brand-text hover:underline"
-            >
-              {t('seePulls')}
+            <Link href={pullsHref} className="font-bold text-brand-text hover:underline">
+              {pullsLabel ?? t('seePulls')}
             </Link>
           </p>
         </Card>
       </div>
     </div>
+  );
+}
+
+/** A hackathon team's repository (the event page links here). */
+export function TeamWorkspacePage({ slug }: { slug: string }) {
+  const t = useTranslations('workspace');
+  const te = useTranslations('errors');
+  const user = useAccount('STUDENT');
+  const router = useRouter();
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [teamName, setTeamName] = useState('');
+  const [failed, setFailed] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const event = await api.GET('/v1/events/{slug}', { params: { path: { slug } } });
+        const team = event.data?.team;
+        if (!team?.approved) {
+          router.replace(`/learn/events/${slug}`);
+          return;
+        }
+        const { data, error } = await api.GET('/v1/teams/{id}/workspace', {
+          params: { path: { id: team.id } },
+        });
+        if (cancelled) return;
+        setTeamName(team.name);
+        if (data) setWorkspace(data);
+        else setFailed(errorMessageKey(errorCode(error)));
+      } catch {
+        if (!cancelled) setFailed('network');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, slug, router]);
+
+  if (failed) {
+    return (
+      <div className="mx-auto flex max-w-3xl flex-col gap-4">
+        <BackLink href={`/learn/events/${slug}`}>{t('back')}</BackLink>
+        <Alert tone="error">
+          {failed === 'GIT_NOT_SET_UP'
+            ? t('notSetUp')
+            : te(failed === 'network' ? 'network' : 'generic')}
+        </Alert>
+      </div>
+    );
+  }
+  if (!user || !workspace) {
+    return (
+      <div className="grid min-h-80 place-items-center">
+        <div className="flex flex-col items-center gap-3">
+          <Spinner />
+          <p className="text-muted">{t('loading')}</p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <GitWorkspace
+      workspace={workspace}
+      title={t('title', { team: isolate(teamName) })}
+      backHref={`/learn/events/${slug}`}
+      backLabel={t('back')}
+      pullsHref={`/learn/events/${slug}`}
+      openPull={async (title, body) => {
+        const { data, error } = await api.POST('/v1/teams/{id}/pulls', {
+          params: { path: { id: workspace.teamId } },
+          body: { branch: workspace.branch, title, ...(body.trim() ? { body } : {}) },
+        });
+        return data ? { href: `/learn/events/${slug}/pulls/${data.number}` } : { error };
+      }}
+    />
   );
 }

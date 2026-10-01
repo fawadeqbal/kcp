@@ -7,6 +7,7 @@ import { Alert, EmptyState, PageSpinner } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { CertificatesSection } from '../certificates/certificates-section';
+import { HubWork } from './hub-work';
 import { PortfolioItems } from './portfolio-items';
 
 type Portfolio = components['schemas']['PortfolioDto'];
@@ -47,10 +48,11 @@ export function PortfolioPage() {
       </header>
       {failed ? <Alert tone="error">{t('loadFailed')}</Alert> : null}
       {!failed && !portfolio ? <PageSpinner /> : null}
-      {portfolio && portfolio.items.length === 0 ? (
+      {portfolio && portfolio.items.length === 0 && portfolio.hubWork.length === 0 ? (
         <EmptyState icon="rocket" title={t('empty')} />
       ) : null}
       {portfolio && portfolio.items.length > 0 ? <PortfolioItems items={portfolio.items} /> : null}
+      {portfolio ? <HubWork items={portfolio.hubWork} /> : null}
       <CertificatesSection />
     </div>
   );

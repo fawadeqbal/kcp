@@ -36,6 +36,10 @@ const EXPECTED_PUBLIC_ROUTES = [
   'GET /countries/:code/regions',
   // A portfolio opened with the link a parent shared (only while "Public projects" is on).
   'GET /shared/portfolios/:token',
+  'GET /shared/previews/:token',
+  'POST /payouts/webhooks/wise',
+  'GET /public/hub/stories',
+  'GET /public/hub/stats',
   // Prices for the marketing site; Stripe's webhooks (signed); the mock of Stripe
   // Checkout (404 unless the mock is on, never in production).
   'GET /public/pricing',
@@ -54,6 +58,11 @@ const EXPECTED_PUBLIC_ROUTES = [
   // off notifications to a phone at logout (the push token itself is the proof).
   'POST /app/crashes',
   'POST /devices/remove',
+  // The hub's agreements (parents and clients read them before agreeing).
+  'GET /hub/contracts/:kind',
+  // "Hire our students" on the marketing site: a request, confirmed by email.
+  'POST /public/hub/intake',
+  'POST /public/hub/intake/confirm',
 ].toSorted();
 
 interface Route {

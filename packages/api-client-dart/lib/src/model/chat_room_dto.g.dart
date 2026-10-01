@@ -193,5 +193,6 @@ const _$ChatRoomDtoKindEnumEnumMap = {
   ChatRoomDtoKindEnum.TEAM: 'TEAM',
   ChatRoomDtoKindEnum.CLASS: 'CLASS',
   ChatRoomDtoKindEnum.EVENT: 'EVENT',
+  ChatRoomDtoKindEnum.HUB: 'HUB',
   ChatRoomDtoKindEnum.unknownDefaultOpenApi: 'unknown_default_open_api',
 };

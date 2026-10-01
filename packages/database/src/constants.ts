@@ -25,13 +25,15 @@ export const STAFF_ROLE_KEYS: readonly RoleKey[] = [
 ];
 
 /**
- * Accounts that sign in with a two-factor code: staff (in the admin panel), and the
- * adults who see children's work in the web app (mentors and teachers).
+ * Accounts that sign in with a two-factor code: staff (in the admin panel), the adults
+ * who see children's work in the web app (mentors and teachers), and clients (they pay
+ * and approve the hub's work).
  */
 export const TWO_FACTOR_ROLE_KEYS: readonly RoleKey[] = [
   ...STAFF_ROLE_KEYS,
   ROLE_KEYS.MENTOR,
   ROLE_KEYS.TEACHER,
+  ROLE_KEYS.CLIENT,
 ];
 
 export const requiresTwoFactor = (roleKey: string): boolean =>
@@ -127,6 +129,32 @@ export const SUBJECTS = [
   'MentorProfile',
   /** Verified parental consent for children under 13 (signed forms staff check). */
   'ParentalConsent',
+  /** A student's way into paid hub work: the steps, a lead's sign-off, the parent's consent. */
+  'HubEligibility',
+  /** The hub's double-entry ledger (staff read it; nobody edits it). */
+  'Ledger',
+  /** Running the hub (staff): intake, clients, projects, and who may do paid work. */
+  'Hub',
+  /** A client organisation: its details, the client agreement, its people (`memberIds`). */
+  'ClientOrg',
+  /** A project request from a client (`clientIds`: the organisation's people). */
+  'HubIntake',
+  /**
+   * A client project: its quote, tasks, team, board, deliveries and messages. Clients
+   * (`clientIds`), the lead (`leadId`), team students (`memberIds`) and their parents
+   * (`parentIds`) each see their own part of it.
+   */
+  'HubProject',
+  /** A client's invoices for a project, and paying them (`clientIds`). */
+  'HubInvoice',
+  /** A student's hub earnings: held, payable and paid (`studentId`, `parentIds`). */
+  'HubEarnings',
+  /** Where a parent's payouts go: a bank or wallet account in their name (`parentId`). */
+  'PayoutAccount',
+  /** Payouts to parents, in batches two super admins approve (`parentId`). */
+  'Payout',
+  /** A short earnings story for the marketing site, with the parent's consent (`parentId`). */
+  'HubStory',
 ] as const;
 export type Subject = (typeof SUBJECTS)[number];
 

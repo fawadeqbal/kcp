@@ -94,3 +94,13 @@ export async function readyMentor(email: string) {
     [email, CODE_OF_CONDUCT_VERSION],
   );
 }
+
+/** A ready mentor who is also a lead developer (they run hub projects). */
+export async function readyLead(email: string) {
+  await readyMentor(email);
+  await run(
+    `UPDATE mentor_profiles SET is_lead = true
+     WHERE user_id = (SELECT id FROM users WHERE email = $1)`,
+    [email],
+  );
+}

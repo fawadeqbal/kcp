@@ -18,6 +18,12 @@ export interface CountrySeed {
   timezone: string;
   defaultLanguageCode: string;
   isActive: boolean;
+  /**
+   * School days for the hub's working hours (0 = Sunday … 6 = Saturday): no hub work
+   * in school hours on these days. Set when the country is first made; staff change it
+   * in the admin panel after that.
+   */
+  hubSchoolDays: number[];
   regions: RegionSeed[];
 }
 
@@ -32,6 +38,7 @@ export const countries: CountrySeed[] = [
     timezone: 'Asia/Karachi',
     defaultLanguageCode: 'ur',
     isActive: true,
+    hubSchoolDays: [1, 2, 3, 4, 5, 6],
     regions: [
       {
         slug: 'punjab',
@@ -71,6 +78,7 @@ export const countries: CountrySeed[] = [
     timezone: 'Africa/Cairo',
     defaultLanguageCode: 'ar',
     isActive: true,
+    hubSchoolDays: [0, 1, 2, 3, 4],
     regions: [
       {
         slug: 'cairo',
@@ -98,6 +106,7 @@ export const countries: CountrySeed[] = [
     timezone: 'Asia/Dubai',
     defaultLanguageCode: 'ar',
     isActive: false,
+    hubSchoolDays: [1, 2, 3, 4, 5],
     regions: [
       {
         slug: 'dubai',
@@ -118,6 +127,7 @@ export const countries: CountrySeed[] = [
     timezone: 'Asia/Riyadh',
     defaultLanguageCode: 'ar',
     isActive: false,
+    hubSchoolDays: [0, 1, 2, 3, 4],
     regions: [
       {
         slug: 'riyadh',

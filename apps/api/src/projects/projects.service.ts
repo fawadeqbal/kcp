@@ -42,6 +42,7 @@ import type {
   ProjectStatusValue,
   SharedPortfolioDto,
   ShipResultDto,
+  HubPortfolioItemDto,
 } from './dto/projects.dto.js';
 import { confirmResults, isUnchanged } from '../learning/server-checks.js';
 import { ReferralsService } from '../referrals/referrals.service.js';
@@ -459,7 +460,7 @@ export class ProjectsService {
   /** The student's own portfolio. */
   async portfolio(user: AuthUser, language: string) {
     this.assertStudent(user);
-    return { items: await this.items(user.id, language) };
+    return { items: await this.items(user.id, language), hubWork: await this.hubWork(user.id) };
   }
 
   /** A child's portfolio for their parent (the caller has been checked as the parent). */
@@ -470,6 +471,7 @@ export class ProjectsService {
     });
     return {
       items: await this.items(childId, language),
+      hubWork: await this.hubWork(childId),
       share: {
         allowed: profile.publicPortfolio,
         token: profile.publicPortfolio ? profile.portfolioShareToken : null,
@@ -537,8 +539,44 @@ export class ProjectsService {
   }
 
   /**
+   * Client projects the student worked on, once the client accepted the work and
+   * allowed portfolios: the project's title and the student's finished tasks. Never
+   * the client's name, the money, or the files (they're the client's).
+   */
+  async hubWork(studentId: string): Promise<HubPortfolioItemDto[]> {
+    const projects = await this.prisma.hubProject.findMany({
+      where: {
+        portfolioAllowed: true,
+        status: { in: ['DELIVERED', 'COMPLETED'] },
+        tasks: { some: { assigneeId: studentId, status: 'DONE' } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        id: true,
+        title: true,
+        completedAt: true,
+        quotes: { where: { kind: 'MAIN', status: 'APPROVED' }, select: { acceptedAt: true } },
+        tasks: {
+          where: { assigneeId: studentId, status: 'DONE' },
+          orderBy: { number: 'asc' },
+          select: { title: true, skillTags: true },
+        },
+      },
+    });
+    return projects.map((project) => ({
+      projectId: project.id,
+      title: project.title,
+      finishedAt: project.quotes[0]?.acceptedAt ?? project.completedAt,
+      tasks: project.tasks.map((task) => task.title),
+      skills: [...new Set(project.tasks.flatMap((task) => task.skillTags))],
+    }));
+  }
+
+  /**
    * A portfolio opened with its share link: nickname, avatar and shipped projects,
-   * nothing else. Works only while "Public projects" is on and the link is current.
+   * nothing else (no hub work). Works only while "Public projects" is on and the link
+   * is current.
    */
   async shared(token: string, language: string): Promise<SharedPortfolioDto> {
     const profile = await this.prisma.studentProfile.findFirst({

@@ -29,7 +29,23 @@ export type MailTemplate =
   | 'referralRewarded'
   | 'weeklyReport'
   | 'eventJoin'
-  | 'classJoin';
+  | 'classJoin'
+  | 'hubConsent'
+  | 'clientInvite'
+  | 'hubIntakeConfirm'
+  | 'hubIntakeAccepted'
+  | 'hubIntakeDeclined'
+  | 'hubQuoteSent'
+  | 'hubInvoiceIssued'
+  | 'hubInvoicePaid'
+  | 'hubProjectApproval'
+  | 'hubDeliveryReady'
+  | 'hubMessage'
+  | 'hubPayoutConfirm'
+  | 'hubPayoutPaid'
+  | 'hubPayoutFailed'
+  | 'hubPayoutAccountChanged'
+  | 'hubStoryConsent';
 
 /** Values a template fills in, e.g. { nickname: "Rocket", date: "14 October 2026" }. */
 export type MailVars = Record<string, string>;
@@ -224,6 +240,125 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
         outro:
           'If you do nothing, the request expires in 14 days. You can end a friendship at any time.',
       },
+      hubConsent: {
+        subject: (v) => `${v['nickname']} can join paid projects — with your consent`,
+        intro: (v) =>
+          `A lead developer signed ${v['nickname']} off for the hub: small, supervised projects for real clients, paid to you. Before your child can be invited to a project, read the parent agreement and give your consent. You approve each project separately, and you can take your consent back at any time.`,
+        button: 'Read and decide',
+        outro:
+          'Clients never see who your child is, and never talk to them. Hours are limited by the platform.',
+      },
+      clientInvite: {
+        subject: 'Your client account on the hub',
+        intro: (v) =>
+          `We made a client account for you at ${v['org']}: you can follow your projects, approve quotes, see previews and pay invoices. Choose a password to start; you will also set up two-factor login.`,
+        button: 'Choose your password',
+        outro:
+          "This link expires in 3 days. If you weren't expecting this email, you can ignore it.",
+      },
+      hubIntakeConfirm: {
+        subject: 'Confirm your project request',
+        intro: (v) =>
+          `Thank you for your request "${v['title']}". Confirm your email address and it goes to our team, who will reply within two working days.`,
+        button: 'Confirm my request',
+        outro: "If you didn't send this request, ignore this email and nothing happens.",
+      },
+      hubIntakeAccepted: {
+        subject: (v) => `Your project "${v['title']}" is accepted`,
+        intro: (v) =>
+          `Good news: we can take on "${v['title']}". Our lead developer ${v['lead']} is planning the work now; you will get a quote to approve in the client portal.`,
+        button: 'Open the client portal',
+        outro:
+          'Your team will be students supervised by our lead developer, who reviews every change before it reaches you.',
+      },
+      hubIntakeDeclined: {
+        subject: (v) => `About your project request "${v['title']}"`,
+        intro: (v) =>
+          `Thank you for thinking of us for "${v['title']}". We can't take it on this time: ${v['reason']}`,
+        button: 'Visit our website',
+        outro: "You're welcome to send another request whenever it suits you.",
+      },
+      hubQuoteSent: {
+        subject: (v) => `A quote for "${v['project']}" is ready`,
+        intro: (v) =>
+          `Our lead developer has planned "${v['project']}": the deliverables, the price and the deposit are in the quote, with its statement of work. Read it in the client portal and approve it, or tell us what to change.`,
+        button: 'See the quote',
+        outro: 'Work starts once the quote is approved and the deposit is paid.',
+      },
+      hubInvoiceIssued: {
+        subject: (v) => `Invoice ${v['invoice']} for "${v['project']}"`,
+        intro: (v) =>
+          `Invoice ${v['invoice']} for "${v['project']}" is ready: ${v['amount']}, due in 14 days. Pay by card in the client portal, or by bank transfer quoting the invoice number.`,
+        button: 'See the invoice',
+        outro: 'Questions about an invoice? Reply to this email.',
+      },
+      hubInvoicePaid: {
+        subject: (v) => `Thank you: invoice ${v['invoice']} is paid`,
+        intro: (v) =>
+          `We received ${v['amount']} for invoice ${v['invoice']} ("${v['project']}"). Thank you.`,
+        button: 'See the invoice',
+        outro:
+          'Keep this email as your receipt; the invoice in the client portal shows the payment too.',
+      },
+      hubProjectApproval: {
+        subject: (v) => `${v['nickname']} wants to join a paid project: "${v['project']}"`,
+        intro: (v) =>
+          `${v['nickname']} was invited to the hub project "${v['project']}" and said yes. Before they join, see what it is: the work, about how many hours it takes, and their share. The client never sees who your child is; the lead developer reviews all their work.`,
+        button: 'Approve or decline',
+        outro:
+          'Your child joins only once you approve. Hours are limited by the platform, and earnings are paid only to you.',
+      },
+      hubDeliveryReady: {
+        subject: (v) => `New work to review on ${v['project']} (${v['reference']})`,
+        intro: (v) =>
+          `Your team shared a milestone on ${v['project']}: "${v['title']}". Open the preview, try it, and accept it or tell the lead what to change.`,
+        button: 'Review the milestone',
+        outro: 'The preview link is private to your organisation. Please don’t share it.',
+      },
+      hubMessage: {
+        subject: (v) => `New message on ${v['project']} (${v['reference']})`,
+        intro: (v) => `There’s a new message for you on ${v['project']}.`,
+        button: 'Read it',
+        outro: 'You’re getting this because you’re on this project’s client team.',
+      },
+      hubPayoutConfirm: {
+        subject: (v) => `Please confirm a payout of ${v['amount']} for ${v['child']}`,
+        intro: (v) =>
+          `${v['child']}’s hub earnings are ready to be paid: ${v['amount']} to your account ending ${v['last4']}. Please check the account is still right and confirm, so we can send it.`,
+        button: 'Confirm the payout',
+        outro:
+          'Nothing is sent until you confirm. If the account isn’t right, change it first: the payout then waits for the next round.',
+      },
+      hubPayoutPaid: {
+        subject: (v) => `${v['amount']} for ${v['child']} is on its way`,
+        intro: (v) =>
+          `We sent ${v['amount']} of ${v['child']}’s hub earnings to your account ending ${v['last4']}. Banks can take a few working days to show it.`,
+        button: 'See the payout',
+        outro: 'Keep this email for your records. Your statement shows every payout.',
+      },
+      hubPayoutFailed: {
+        subject: (v) => `We couldn’t pay ${v['child']}’s earnings to your account`,
+        intro: (v) =>
+          `The bank sent back the payout of ${v['child']}’s hub earnings to your account ending ${v['last4']}. The money is safe and waits for the next round. Please check your payout account details.`,
+        button: 'Check your payout account',
+        outro: 'If the details are right, reply to this email and we’ll look into it.',
+      },
+      hubPayoutAccountChanged: {
+        subject: 'Your payout account was changed',
+        intro: (v) =>
+          `The account that receives your children’s hub earnings was just changed (now ending ${v['last4']}). For your safety, it can be paid only after 48 hours and once our team has checked it, and payouts waiting for the old account were stopped.`,
+        button: 'See your payout account',
+        outro:
+          'If you didn’t make this change, change your password now and contact us straight away.',
+      },
+      hubStoryConsent: {
+        subject: (v) => `May we share ${v['child']}’s hub story?`,
+        intro: (v) =>
+          `We’d like to tell ${v['child']}’s story on our website, to encourage other families: what they built for a real client. It would show their first name only — no photo, surname, school or city. Please read it and say yes or no.`,
+        button: 'Read the story',
+        outro:
+          'Nothing is shown without your yes, and you can take it back at any time: it comes off the site straight away.',
+      },
       classJoin: {
         subject: (v) => `${v['nickname']} wants to join a class at ${v['school']}`,
         intro: (v) =>
@@ -405,6 +540,118 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
           `يريد ${v['nickname']} و${v['friend']} أن يصبحا صديقين على المنصة. يرى الأصدقاء الاسم المستعار والصورة الرمزية ونقاط الخبرة الأسبوعية لبعضهم فقط، ولا شيء غير ذلك. لا يصبحان صديقين إلا بعد موافقة وليّ أمر كل منهما.`,
         button: 'وافق أو ارفض',
         outro: 'إن لم تفعل شيئًا، ينتهي الطلب بعد 14 يومًا. يمكنك إنهاء الصداقة في أي وقت.',
+      },
+      hubConsent: {
+        subject: (v) => `يمكن لـ ${v['nickname']} الانضمام إلى مشاريع مدفوعة — بموافقتك`,
+        intro: (v) =>
+          `اعتمد أحد المطورين الرئيسيين ${v['nickname']} للعمل في المركز: مشاريع صغيرة تحت إشراف لعملاء حقيقيين، تُدفع أرباحها لك. قبل أن يُدعى طفلك إلى أي مشروع، اقرأ اتفاقية ولي الأمر وأعطِ موافقتك. توافق على كل مشروع على حدة، ويمكنك سحب موافقتك في أي وقت.`,
+        button: 'اقرأ وقرّر',
+        outro: 'لا يعرف العملاء من هو طفلك، ولا يتحدثون معه أبدًا. والساعات محدودة من المنصة.',
+      },
+      clientInvite: {
+        subject: 'حساب العميل الخاص بك في المركز',
+        intro: (v) =>
+          `أنشأنا لك حساب عميل لدى ${v['org']}: يمكنك متابعة مشاريعك والموافقة على عروض الأسعار ومشاهدة المعاينات ودفع الفواتير. اختر كلمة مرور للبدء، وستفعّل أيضًا التحقق بخطوتين.`,
+        button: 'اختر كلمة المرور',
+        outro: 'تنتهي صلاحية هذا الرابط بعد 3 أيام. إذا لم تكن تتوقع هذه الرسالة، يمكنك تجاهلها.',
+      },
+      hubIntakeConfirm: {
+        subject: 'أكّد طلب مشروعك',
+        intro: (v) =>
+          `شكرًا على طلبك "${v['title']}". أكّد عنوان بريدك الإلكتروني ليصل الطلب إلى فريقنا، الذي سيرد خلال يومَي عمل.`,
+        button: 'أكّد طلبي',
+        outro: 'إذا لم ترسل هذا الطلب، تجاهل هذه الرسالة ولن يحدث شيء.',
+      },
+      hubIntakeAccepted: {
+        subject: (v) => `تم قبول مشروعك "${v['title']}"`,
+        intro: (v) =>
+          `أخبار سارة: يمكننا تنفيذ "${v['title']}". يخطط مطوّرنا الرئيسي ${v['lead']} للعمل الآن، وستصلك عرض سعر للموافقة عليه في بوابة العملاء.`,
+        button: 'افتح بوابة العملاء',
+        outro: 'فريقك من الطلاب تحت إشراف مطوّرنا الرئيسي، الذي يراجع كل تغيير قبل وصوله إليك.',
+      },
+      hubIntakeDeclined: {
+        subject: (v) => `بخصوص طلب مشروعك "${v['title']}"`,
+        intro: (v) =>
+          `شكرًا لتفكيرك بنا لـ "${v['title']}". لا يمكننا تنفيذه هذه المرة: ${v['reason']}`,
+        button: 'زر موقعنا',
+        outro: 'يسعدنا استقبال طلب آخر منك متى شئت.',
+      },
+      hubQuoteSent: {
+        subject: (v) => `عرض سعر لـ "${v['project']}" جاهز`,
+        intro: (v) =>
+          `خطط مطوّرنا الرئيسي لـ "${v['project']}": المخرجات والسعر والدفعة المقدمة في عرض السعر، مع بيان العمل. اقرأه في بوابة العملاء ووافق عليه، أو أخبرنا بما تريد تغييره.`,
+        button: 'شاهد عرض السعر',
+        outro: 'يبدأ العمل بعد الموافقة على عرض السعر ودفع الدفعة المقدمة.',
+      },
+      hubInvoiceIssued: {
+        subject: (v) => `الفاتورة ${v['invoice']} لـ "${v['project']}"`,
+        intro: (v) =>
+          `الفاتورة ${v['invoice']} لـ "${v['project']}" جاهزة: ${v['amount']}، مستحقة خلال 14 يومًا. ادفع بالبطاقة في بوابة العملاء، أو بتحويل بنكي مع ذكر رقم الفاتورة.`,
+        button: 'شاهد الفاتورة',
+        outro: 'لديك سؤال عن فاتورة؟ رد على هذه الرسالة.',
+      },
+      hubInvoicePaid: {
+        subject: (v) => `شكرًا لك: تم دفع الفاتورة ${v['invoice']}`,
+        intro: (v) =>
+          `استلمنا ${v['amount']} للفاتورة ${v['invoice']} ("${v['project']}"). شكرًا لك.`,
+        button: 'شاهد الفاتورة',
+        outro: 'احتفظ بهذه الرسالة كإيصال؛ تظهر الدفعة أيضًا في الفاتورة في بوابة العملاء.',
+      },
+      hubProjectApproval: {
+        subject: (v) => `يريد ${v['nickname']} الانضمام إلى مشروع مدفوع: "${v['project']}"`,
+        intro: (v) =>
+          `دُعي ${v['nickname']} إلى مشروع المركز "${v['project']}" ووافق. قبل أن ينضم، اطّلع عليه: العمل، وعدد الساعات التقريبي، وحصته. لا يعرف العميل من هو طفلك أبدًا؛ ويراجع المطوّر الرئيسي كل عمله.`,
+        button: 'وافق أو ارفض',
+        outro: 'لا ينضم طفلك إلا بعد موافقتك. الساعات محدودة من المنصة، والأرباح تُدفع لك فقط.',
+      },
+      hubDeliveryReady: {
+        subject: (v) => `عمل جديد للمراجعة في ${v['project']} (${v['reference']})`,
+        intro: (v) =>
+          `شارك فريقك مرحلة في ${v['project']}: "${v['title']}". افتح المعاينة وجرّبها، ثم اقبلها أو أخبر المطوّر الرئيسي بما يجب تغييره.`,
+        button: 'راجع المرحلة',
+        outro: 'رابط المعاينة خاص بمؤسستك. يُرجى عدم مشاركته.',
+      },
+      hubMessage: {
+        subject: (v) => `رسالة جديدة في ${v['project']} (${v['reference']})`,
+        intro: (v) => `هناك رسالة جديدة لك في ${v['project']}.`,
+        button: 'اقرأها',
+        outro: 'تصلك هذه الرسالة لأنك ضمن فريق العميل في هذا المشروع.',
+      },
+      hubPayoutConfirm: {
+        subject: (v) => `يُرجى تأكيد دفعة بقيمة ${v['amount']} لـ ${v['child']}`,
+        intro: (v) =>
+          `أرباح ${v['child']} من المركز جاهزة للدفع: ${v['amount']} إلى حسابك المنتهي بـ ${v['last4']}. يُرجى التأكد من أن الحساب ما زال صحيحًا ثم التأكيد لنرسلها.`,
+        button: 'أكّد الدفعة',
+        outro:
+          'لا يُرسل شيء قبل تأكيدك. إذا لم يكن الحساب صحيحًا فغيّره أولًا، وستنتظر الدفعة الجولة التالية.',
+      },
+      hubPayoutPaid: {
+        subject: (v) => `${v['amount']} لـ ${v['child']} في طريقها إليك`,
+        intro: (v) =>
+          `أرسلنا ${v['amount']} من أرباح ${v['child']} في المركز إلى حسابك المنتهي بـ ${v['last4']}. قد يستغرق ظهورها في البنك بضعة أيام عمل.`,
+        button: 'اعرض الدفعة',
+        outro: 'احتفظ بهذه الرسالة لسجلاتك. يعرض كشف حسابك كل الدفعات.',
+      },
+      hubPayoutFailed: {
+        subject: (v) => `تعذّر دفع أرباح ${v['child']} إلى حسابك`,
+        intro: (v) =>
+          `أعاد البنك دفعة أرباح ${v['child']} في المركز إلى حسابك المنتهي بـ ${v['last4']}. المال في أمان وينتظر الجولة التالية. يُرجى التحقق من بيانات حساب الدفع.`,
+        button: 'تحقّق من حساب الدفع',
+        outro: 'إذا كانت البيانات صحيحة فردّ على هذه الرسالة وسنتابع الأمر.',
+      },
+      hubPayoutAccountChanged: {
+        subject: 'تم تغيير حساب الدفع الخاص بك',
+        intro: (v) =>
+          `تم للتو تغيير الحساب الذي يستلم أرباح أطفالك من المركز (ينتهي الآن بـ ${v['last4']}). حفاظًا على أمانك، لا يُدفع إليه إلا بعد 48 ساعة وبعد أن يتحقق منه فريقنا، وأُوقفت الدفعات التي كانت تنتظر الحساب القديم.`,
+        button: 'اعرض حساب الدفع',
+        outro: 'إذا لم تُجرِ هذا التغيير، فغيّر كلمة المرور الآن وتواصل معنا فورًا.',
+      },
+      hubStoryConsent: {
+        subject: (v) => `هل يمكننا مشاركة قصة ${v['child']} في المركز؟`,
+        intro: (v) =>
+          `نودّ أن نروي قصة ${v['child']} على موقعنا لتشجيع العائلات الأخرى: ما بناه لعميل حقيقي. ستظهر باسمه الأول فقط، دون صورة أو اسم عائلة أو مدرسة أو مدينة. يُرجى قراءتها والموافقة أو الرفض.`,
+        button: 'اقرأ القصة',
+        outro: 'لا يُعرض شيء دون موافقتك، ويمكنك سحبها في أي وقت فتُزال من الموقع فورًا.',
       },
       classJoin: {
         subject: (v) => `${v['nickname']} يريد الانضمام إلى صف في ${v['school']}`,
@@ -590,6 +837,126 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
         button: 'منظور کریں یا انکار کریں',
         outro:
           'اگر آپ کچھ نہ کریں تو درخواست 14 دن بعد ختم ہو جائے گی۔ آپ کسی بھی وقت دوستی ختم کر سکتے ہیں۔',
+      },
+      hubConsent: {
+        subject: (v) =>
+          `${v['nickname']} معاوضے والے پروجیکٹس میں شامل ہو سکتا ہے — آپ کی رضامندی سے`,
+        intro: (v) =>
+          `ایک لیڈ ڈیولپر نے ${v['nickname']} کو ہب کے لیے منظور کیا ہے: حقیقی کلائنٹس کے لیے نگرانی میں چھوٹے پروجیکٹس، جن کا معاوضہ آپ کو ملتا ہے۔ کسی پروجیکٹ میں دعوت سے پہلے والدین کا معاہدہ پڑھیں اور اپنی رضامندی دیں۔ آپ ہر پروجیکٹ کی الگ منظوری دیتے ہیں، اور کسی بھی وقت اپنی رضامندی واپس لے سکتے ہیں۔`,
+        button: 'پڑھیں اور فیصلہ کریں',
+        outro:
+          'کلائنٹ کبھی نہیں جانتے کہ آپ کا بچہ کون ہے، اور اس سے بات نہیں کرتے۔ اوقات پلیٹ فارم محدود کرتا ہے۔',
+      },
+      clientInvite: {
+        subject: 'ہب پر آپ کا کلائنٹ اکاؤنٹ',
+        intro: (v) =>
+          `ہم نے ${v['org']} کے لیے آپ کا کلائنٹ اکاؤنٹ بنایا ہے: آپ اپنے پروجیکٹس دیکھ سکتے ہیں، کوٹیشن منظور کر سکتے ہیں، پیش نظارے دیکھ سکتے ہیں اور انوائس ادا کر سکتے ہیں۔ شروع کرنے کے لیے پاس ورڈ چنیں؛ آپ دو مرحلوں والا لاگ اِن بھی سیٹ کریں گے۔`,
+        button: 'اپنا پاس ورڈ چنیں',
+        outro:
+          'یہ لنک 3 دن میں ختم ہو جاتا ہے۔ اگر آپ کو اس ای میل کی توقع نہیں تھی تو اسے نظر انداز کر دیں۔',
+      },
+      hubIntakeConfirm: {
+        subject: 'اپنی پروجیکٹ درخواست کی تصدیق کریں',
+        intro: (v) =>
+          `آپ کی درخواست "${v['title']}" کا شکریہ۔ اپنا ای میل ایڈریس تصدیق کریں تو یہ ہماری ٹیم تک پہنچ جائے گی، جو دو کاروباری دنوں میں جواب دے گی۔`,
+        button: 'میری درخواست کی تصدیق کریں',
+        outro: 'اگر آپ نے یہ درخواست نہیں بھیجی تو اس ای میل کو نظر انداز کریں، کچھ نہیں ہوگا۔',
+      },
+      hubIntakeAccepted: {
+        subject: (v) => `آپ کا پروجیکٹ "${v['title']}" منظور ہو گیا`,
+        intro: (v) =>
+          `خوشخبری: ہم "${v['title']}" پر کام کر سکتے ہیں۔ ہمارا لیڈ ڈیولپر ${v['lead']} اب کام کی منصوبہ بندی کر رہا ہے؛ آپ کو کلائنٹ پورٹل میں منظوری کے لیے کوٹیشن ملے گی۔`,
+        button: 'کلائنٹ پورٹل کھولیں',
+        outro:
+          'آپ کی ٹیم ہمارے لیڈ ڈیولپر کی نگرانی میں طلبہ پر مشتمل ہوگی، جو ہر تبدیلی کو آپ تک پہنچنے سے پہلے جانچتا ہے۔',
+      },
+      hubIntakeDeclined: {
+        subject: (v) => `آپ کی پروجیکٹ درخواست "${v['title']}" کے بارے میں`,
+        intro: (v) =>
+          `"${v['title']}" کے لیے ہمیں یاد رکھنے کا شکریہ۔ اس بار ہم یہ کام نہیں لے سکتے: ${v['reason']}`,
+        button: 'ہماری ویب سائٹ دیکھیں',
+        outro: 'جب چاہیں دوسری درخواست بھیج سکتے ہیں۔',
+      },
+      hubQuoteSent: {
+        subject: (v) => `"${v['project']}" کی کوٹیشن تیار ہے`,
+        intro: (v) =>
+          `ہمارے لیڈ ڈیولپر نے "${v['project']}" کی منصوبہ بندی کر لی ہے: ڈیلیوریبلز، قیمت اور پیشگی رقم کوٹیشن میں ہیں، کام کے بیان کے ساتھ۔ اسے کلائنٹ پورٹل میں پڑھیں اور منظور کریں، یا بتائیں کہ کیا بدلنا ہے۔`,
+        button: 'کوٹیشن دیکھیں',
+        outro: 'کوٹیشن منظور ہونے اور پیشگی رقم ادا ہونے کے بعد کام شروع ہوتا ہے۔',
+      },
+      hubInvoiceIssued: {
+        subject: (v) => `"${v['project']}" کے لیے انوائس ${v['invoice']}`,
+        intro: (v) =>
+          `"${v['project']}" کے لیے انوائس ${v['invoice']} تیار ہے: ${v['amount']}، 14 دن میں واجب الادا۔ کلائنٹ پورٹل میں کارڈ سے ادا کریں، یا انوائس نمبر کے حوالے سے بینک ٹرانسفر کریں۔`,
+        button: 'انوائس دیکھیں',
+        outro: 'انوائس کے بارے میں سوال؟ اس ای میل کا جواب دیں۔',
+      },
+      hubInvoicePaid: {
+        subject: (v) => `شکریہ: انوائس ${v['invoice']} ادا ہو گئی`,
+        intro: (v) =>
+          `ہمیں انوائس ${v['invoice']} ("${v['project']}") کے لیے ${v['amount']} موصول ہو گئے۔ شکریہ۔`,
+        button: 'انوائس دیکھیں',
+        outro:
+          'اس ای میل کو رسید کے طور پر رکھیں؛ کلائنٹ پورٹل میں انوائس پر بھی ادائیگی نظر آتی ہے۔',
+      },
+      hubProjectApproval: {
+        subject: (v) =>
+          `${v['nickname']} ایک معاوضے والے پروجیکٹ میں شامل ہونا چاہتا ہے: "${v['project']}"`,
+        intro: (v) =>
+          `${v['nickname']} کو ہب پروجیکٹ "${v['project']}" میں دعوت ملی اور اس نے ہاں کی۔ شامل ہونے سے پہلے دیکھیں کہ یہ کیا ہے: کام، اندازاً کتنے گھنٹے، اور اس کا حصہ۔ کلائنٹ کبھی نہیں جانتا کہ آپ کا بچہ کون ہے؛ لیڈ ڈیولپر اس کا سارا کام جانچتا ہے۔`,
+        button: 'منظور یا مسترد کریں',
+        outro:
+          'آپ کا بچہ صرف آپ کی منظوری کے بعد شامل ہوتا ہے۔ اوقات پلیٹ فارم محدود کرتا ہے، اور آمدنی صرف آپ کو ادا ہوتی ہے۔',
+      },
+      hubDeliveryReady: {
+        subject: (v) => `${v['project']} (${v['reference']}) میں جائزے کے لیے نیا کام`,
+        intro: (v) =>
+          `آپ کی ٹیم نے ${v['project']} پر ایک مرحلہ شیئر کیا: "${v['title']}"۔ پیش نظارہ کھولیں، آزمائیں، اور اسے قبول کریں یا لیڈ کو بتائیں کہ کیا بدلنا ہے۔`,
+        button: 'مرحلے کا جائزہ لیں',
+        outro: 'پیش نظارے کا لنک صرف آپ کی تنظیم کے لیے ہے۔ براہ کرم اسے شیئر نہ کریں۔',
+      },
+      hubMessage: {
+        subject: (v) => `${v['project']} (${v['reference']}) پر نیا پیغام`,
+        intro: (v) => `${v['project']} پر آپ کے لیے ایک نیا پیغام ہے۔`,
+        button: 'پڑھیں',
+        outro: 'آپ کو یہ اس لیے مل رہا ہے کہ آپ اس پروجیکٹ کی کلائنٹ ٹیم میں ہیں۔',
+      },
+      hubPayoutConfirm: {
+        subject: (v) => `براہ کرم ${v['child']} کے لیے ${v['amount']} کی ادائیگی کی تصدیق کریں`,
+        intro: (v) =>
+          `${v['child']} کی ہب آمدنی ادائیگی کے لیے تیار ہے: ${v['amount']} آپ کے اس اکاؤنٹ میں جس کے آخر میں ${v['last4']} ہے۔ براہ کرم دیکھ لیں کہ اکاؤنٹ اب بھی درست ہے اور تصدیق کریں تاکہ ہم اسے بھیج سکیں۔`,
+        button: 'ادائیگی کی تصدیق کریں',
+        outro:
+          'آپ کی تصدیق کے بغیر کچھ نہیں بھیجا جاتا۔ اگر اکاؤنٹ درست نہیں تو پہلے اسے بدلیں؛ پھر ادائیگی اگلے دور کا انتظار کرے گی۔',
+      },
+      hubPayoutPaid: {
+        subject: (v) => `${v['child']} کے ${v['amount']} آپ کی طرف روانہ ہیں`,
+        intro: (v) =>
+          `ہم نے ${v['child']} کی ہب آمدنی میں سے ${v['amount']} آپ کے اس اکاؤنٹ میں بھیج دیے جس کے آخر میں ${v['last4']} ہے۔ بینک میں ظاہر ہونے میں چند کاروباری دن لگ سکتے ہیں۔`,
+        button: 'ادائیگی دیکھیں',
+        outro: 'یہ ای میل اپنے ریکارڈ کے لیے رکھیں۔ آپ کے گوشوارے میں ہر ادائیگی درج ہے۔',
+      },
+      hubPayoutFailed: {
+        subject: (v) => `ہم ${v['child']} کی آمدنی آپ کے اکاؤنٹ میں ادا نہیں کر سکے`,
+        intro: (v) =>
+          `بینک نے ${v['child']} کی ہب آمدنی کی ادائیگی واپس کر دی جو آپ کے اس اکاؤنٹ میں تھی جس کے آخر میں ${v['last4']} ہے۔ رقم محفوظ ہے اور اگلے دور کا انتظار کر رہی ہے۔ براہ کرم اپنے ادائیگی اکاؤنٹ کی تفصیلات دیکھیں۔`,
+        button: 'ادائیگی اکاؤنٹ دیکھیں',
+        outro: 'اگر تفصیلات درست ہیں تو اس ای میل کا جواب دیں، ہم دیکھ لیں گے۔',
+      },
+      hubPayoutAccountChanged: {
+        subject: 'آپ کا ادائیگی اکاؤنٹ بدل دیا گیا',
+        intro: (v) =>
+          `وہ اکاؤنٹ جس میں آپ کے بچوں کی ہب آمدنی آتی ہے ابھی بدلا گیا ہے (اب اس کے آخر میں ${v['last4']} ہے)۔ آپ کی حفاظت کے لیے اس میں ادائیگی 48 گھنٹے بعد اور ہماری ٹیم کی جانچ کے بعد ہی ہو سکتی ہے، اور پرانے اکاؤنٹ کی منتظر ادائیگیاں روک دی گئی ہیں۔`,
+        button: 'ادائیگی اکاؤنٹ دیکھیں',
+        outro: 'اگر یہ تبدیلی آپ نے نہیں کی تو ابھی اپنا پاس ورڈ بدلیں اور فوراً ہم سے رابطہ کریں۔',
+      },
+      hubStoryConsent: {
+        subject: (v) => `کیا ہم ${v['child']} کی ہب کہانی شیئر کر سکتے ہیں؟`,
+        intro: (v) =>
+          `ہم دوسرے خاندانوں کی حوصلہ افزائی کے لیے اپنی ویب سائٹ پر ${v['child']} کی کہانی سنانا چاہتے ہیں: اس نے ایک حقیقی کلائنٹ کے لیے کیا بنایا۔ اس میں صرف پہلا نام ہوگا — کوئی تصویر، خاندانی نام، اسکول یا شہر نہیں۔ براہ کرم اسے پڑھیں اور ہاں یا نہ کہیں۔`,
+        button: 'کہانی پڑھیں',
+        outro:
+          'آپ کی ہاں کے بغیر کچھ نہیں دکھایا جاتا، اور آپ کسی بھی وقت اسے واپس لے سکتے ہیں: یہ فوراً سائٹ سے ہٹ جاتی ہے۔',
       },
       classJoin: {
         subject: (v) => `${v['nickname']} ${v['school']} کی ایک کلاس میں شامل ہونا چاہتا ہے`,

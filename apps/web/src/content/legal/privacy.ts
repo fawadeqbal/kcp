@@ -55,6 +55,18 @@ We don't show advertising, we don't use trackers or third-party analytics, and w
 - **Service providers** that host the site, store files, send emails and take card payments (Stripe) for us, only to do that job for us and under contract.
 - **Authorities**, only when the law requires it.
 
+## The real-world hub (ages 15 and up)
+
+Students of 15 and older can work on paid projects for real clients, only with a parent's agreement for each project. For this we also keep:
+
+- **the parent's agreement** (to paid work and to receiving the earnings) and its version, the lead developer's sign-off, and the parent's approval of each project;
+- **the work:** tasks, the time a student's timer ran (the platform limits the hours), code in the project's private repository, reviews and scores from the lead developer;
+- **money:** what each student earned on each project, payouts to the parent, and our accounting records;
+- **the parent's payout account:** the account holder's name and the IBAN (or other account details), stored encrypted. Only the last four characters are shown; staff look at the full details only to check them, and each look is recorded. Changes need the parent's password and can be paid only after 48 hours;
+- **clients:** the business's name and country, and its people's names and emails, their project requests and files, messages with our team, and invoices.
+
+**Clients never see who a student is:** they see "Developer A", "Developer B" and the work, never a nickname, name, age, country or photo, and they can't message students. Payouts go through our payout provider (Wise) or our bank, which receive the parent's name and account details and the amount, only to send the money. A short story about a student's hub work appears on our website only if a parent says yes (first name only), and the parent can take it back at any time. We keep earnings, payout and accounting records for as long as tax and accounting law requires, tied to an anonymous account if the family's account is deleted; payout account details are deleted when the parent's account is.
+
 ## Cookies
 
 We use only the cookies the site needs to work: one to keep you signed in and one to remember your language. No advertising or tracking cookies.
@@ -126,6 +138,18 @@ If we change this policy in an important way, we will email parents before the c
 - **مزوّدو الخدمات** الذين يستضيفون الموقع ويحفظون الملفات ويرسلون الرسائل ويحصّلون المدفوعات بالبطاقة (Stripe) نيابةً عنا، فقط لأداء هذا العمل لنا وبموجب عقد.
 - **الجهات الرسمية**، فقط عندما يفرض القانون ذلك.
 
+## مركز المشاريع الحقيقية (من 15 عامًا فما فوق)
+
+يمكن للطلاب من عمر 15 عامًا فما فوق العمل في مشاريع مدفوعة لعملاء حقيقيين، وذلك فقط بموافقة أحد الوالدين على كل مشروع. لهذا نحتفظ أيضًا بما يلي:
+
+- **موافقة الوالد** (على العمل المدفوع وعلى استلام الأرباح) ونسختها، وتزكية المطوّر الرئيسي، وموافقة الوالد على كل مشروع؛
+- **العمل:** المهام، والوقت الذي عمل فيه مؤقّت الطالب (المنصة تحدّد الساعات)، والكود في المستودع الخاص بالمشروع، ومراجعات المطوّر الرئيسي وتقييماته؛
+- **المال:** ما ربحه كل طالب في كل مشروع، والدفعات إلى الوالد، وسجلاتنا المحاسبية؛
+- **حساب الدفع الخاص بالوالد:** اسم صاحب الحساب ورقم IBAN (أو بيانات الحساب الأخرى)، مخزّنة مشفّرة. لا تظهر إلا آخر أربعة أحرف؛ ولا يطّلع فريقنا على البيانات كاملة إلا للتحقق منها، ويُسجَّل كل اطّلاع. يتطلب التغيير كلمة مرور الوالد، ولا يُدفع إلى الحساب الجديد إلا بعد 48 ساعة؛
+- **العملاء:** اسم الشركة وبلدها، وأسماء أفرادها وبريدهم الإلكتروني، وطلبات مشاريعهم وملفاتهم، والرسائل مع فريقنا، والفواتير.
+
+**لا يعرف العملاء أبدًا هوية الطالب:** يرون "المطوّر A" و"المطوّر B" والعمل، ولا يرون أبدًا اسمًا مستعارًا أو اسمًا أو عمرًا أو بلدًا أو صورة، ولا يمكنهم مراسلة الطلاب. تتم الدفعات عبر مزوّد الدفع لدينا (Wise) أو عبر بنكنا، اللذين يتلقيان اسم الوالد وبيانات حسابه والمبلغ فقط لإرسال المال. لا تظهر قصة قصيرة عن عمل طالب في المركز على موقعنا إلا إذا وافق أحد الوالدين (بالاسم الأول فقط)، ويمكنه سحبها في أي وقت. نحتفظ بسجلات الأرباح والدفعات والمحاسبة طوال المدة التي تفرضها قوانين الضرائب والمحاسبة، مرتبطة بحساب مجهول الهوية إذا حُذف حساب العائلة؛ وتُحذف بيانات حساب الدفع عند حذف حساب الوالد.
+
 ## ملفات تعريف الارتباط
 
 نستخدم فقط ملفات تعريف الارتباط التي يحتاجها الموقع ليعمل: واحد يبقيك مسجّل الدخول وآخر يتذكّر لغتك. لا ملفات للإعلانات أو التتبّع.
@@ -196,6 +220,18 @@ If we change this policy in an important way, we will email parents before the c
 - **ہماری ٹیم**: صرف وہ لوگ جنہیں سروس چلانے اور محفوظ رکھنے کے لیے اس کی ضرورت ہے، اور ان کا ہر کام ریکارڈ ہوتا ہے۔
 - **سروس فراہم کرنے والے** جو ہمارے لیے سائٹ ہوسٹ کرتے، فائلیں محفوظ کرتے، ای میلز بھیجتے اور کارڈ سے ادائیگی وصول کرتے ہیں (Stripe)، صرف یہ کام کرنے کے لیے اور معاہدے کے تحت۔
 - **سرکاری ادارے**، صرف جب قانون اس کا تقاضا کرے۔
+
+## حقیقی دنیا کا ہب (15 سال اور اس سے زیادہ)
+
+15 سال یا اس سے بڑے طلبہ حقیقی کلائنٹس کے معاوضے والے پروجیکٹس پر کام کر سکتے ہیں، اور ہر پروجیکٹ کے لیے صرف والدین کی منظوری سے۔ اس کے لیے ہم یہ بھی رکھتے ہیں:
+
+- **والدین کی رضامندی** (معاوضے والے کام اور آمدنی وصول کرنے کے لیے) اور اس کا ورژن، لیڈ ڈیولپر کی منظوری، اور ہر پروجیکٹ پر والدین کی منظوری؛
+- **کام:** ٹاسکس، طالب علم کا ٹائمر کتنا وقت چلا (پلیٹ فارم اوقات محدود رکھتا ہے)، پروجیکٹ کی نجی ریپوزٹری میں کوڈ، لیڈ ڈیولپر کے جائزے اور اسکور؛
+- **رقم:** ہر طالب علم نے ہر پروجیکٹ پر کیا کمایا، والدین کو ادائیگیاں، اور ہمارے حساب کتاب کے ریکارڈ؛
+- **والدین کا ادائیگی اکاؤنٹ:** اکاؤنٹ ہولڈر کا نام اور IBAN (یا دیگر اکاؤنٹ تفصیلات)، خفیہ (انکرپٹڈ) شکل میں محفوظ۔ صرف آخری چار حروف دکھائے جاتے ہیں؛ عملہ مکمل تفصیلات صرف جانچ کے لیے دیکھتا ہے اور ہر بار دیکھنا ریکارڈ ہوتا ہے۔ تبدیلی کے لیے والدین کا پاس ورڈ چاہیے، اور نئے اکاؤنٹ میں ادائیگی 48 گھنٹے بعد ہی ہو سکتی ہے؛
+- **کلائنٹس:** کاروبار کا نام اور ملک، اس کے لوگوں کے نام اور ای میل، ان کی پروجیکٹ درخواستیں اور فائلیں، ہماری ٹیم کے ساتھ پیغامات، اور انوائسز۔
+
+**کلائنٹس کبھی نہیں جانتے کہ طالب علم کون ہے:** وہ "ڈیولپر A"، "ڈیولپر B" اور کام دیکھتے ہیں، کبھی کوئی نک نیم، نام، عمر، ملک یا تصویر نہیں، اور وہ طلبہ کو پیغام نہیں بھیج سکتے۔ ادائیگیاں ہمارے ادائیگی فراہم کنندہ (Wise) یا ہمارے بینک کے ذریعے ہوتی ہیں، جنہیں والدین کا نام، اکاؤنٹ کی تفصیلات اور رقم صرف رقم بھیجنے کے لیے ملتی ہے۔ کسی طالب علم کے ہب کام کی مختصر کہانی ہماری ویب سائٹ پر صرف اس صورت میں آتی ہے جب والدین ہاں کہیں (صرف پہلا نام)، اور والدین اسے کسی بھی وقت واپس لے سکتے ہیں۔ ہم آمدنی، ادائیگی اور حساب کتاب کے ریکارڈ اتنی مدت تک رکھتے ہیں جتنی ٹیکس اور اکاؤنٹنگ کے قوانین تقاضا کرتے ہیں، اور اگر خاندان کا اکاؤنٹ حذف ہو تو یہ ایک گمنام اکاؤنٹ سے منسلک رہتے ہیں؛ ادائیگی اکاؤنٹ کی تفصیلات والدین کا اکاؤنٹ حذف ہونے پر حذف کر دی جاتی ہیں۔
 
 ## کوکیز
 

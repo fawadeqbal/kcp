@@ -97,6 +97,7 @@ export class MentorsAdminService {
           languages: profile?.languages ?? [],
           capacity: profile?.capacity ?? 5,
           isActive: profile?.isActive ?? true,
+          isLead: profile?.isLead ?? false,
           ready: Boolean(
             profile?.isActive &&
             profile.backgroundCheck === 'PASSED' &&
@@ -167,6 +168,7 @@ export class MentorsAdminService {
           ...(dto.languages !== undefined ? { languages: [...new Set(dto.languages)] } : {}),
           ...(dto.capacity !== undefined ? { capacity: dto.capacity } : {}),
           ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
+          ...(dto.isLead !== undefined ? { isLead: dto.isLead } : {}),
         },
       });
       // A mentor who stops (or whose check failed) hands their open reviews back, and
@@ -183,6 +185,11 @@ export class MentorsAdminService {
           data: { status: 'WAITING', mentorId: null, claimedAt: null, scores: {}, summary: null },
         });
       }
+      // Hub teams' rooms are for their lead developer only: a mentor who stops, fails
+      // the check or stops being a lead leaves them (staff give the projects a new lead).
+      if (!after.isActive || after.backgroundCheck === 'FAILED' || !after.isLead) {
+        await tx.chatMember.deleteMany({ where: { userId: id, room: { kind: 'HUB' } } });
+      }
       await this.audit.record(
         {
           actor: { id: staff.id, roleKey: staff.roleKey },
@@ -194,12 +201,14 @@ export class MentorsAdminService {
             languages: before.languages,
             capacity: before.capacity,
             isActive: before.isActive,
+            isLead: before.isLead,
           },
           after: {
             backgroundCheck: after.backgroundCheck,
             languages: after.languages,
             capacity: after.capacity,
             isActive: after.isActive,
+            isLead: after.isLead,
             reason: dto.reason.trim(),
           },
           context: ctx,

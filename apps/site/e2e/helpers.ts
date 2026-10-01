@@ -22,6 +22,8 @@ export const PAGES = [
   '/blog/parents-first',
   '/waitlist',
   '/waitlist/confirm',
+  '/hire',
+  '/hire/confirm',
 ] as const;
 
 /**
@@ -49,7 +51,11 @@ const CORS = {
  */
 export async function mockApi(
   page: Page,
-  path: '/v1/waitlist' | '/v1/waitlist/confirm',
+  path:
+    | '/v1/waitlist'
+    | '/v1/waitlist/confirm'
+    | '/v1/public/hub/intake'
+    | '/v1/public/hub/intake/confirm',
   answer: (body: unknown) => number,
 ) {
   await page.route(`**${path}`, async (route: Route) => {

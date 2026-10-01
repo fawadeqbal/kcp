@@ -52,7 +52,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('nav');
   // Only the texts that client components use travel to the browser.
-  const { nav, cta, waitlist, confirm } = await getMessages();
+  const { nav, cta, waitlist, confirm, hire } = await getMessages();
 
   return (
     <html lang={locale} dir={directionOf(locale)}>
@@ -63,7 +63,15 @@ export default async function LocaleLayout({ children, params }: Props) {
         >
           {t('skipToContent')}
         </a>
-        <NextIntlClientProvider messages={{ nav, cta, waitlist, confirm }}>
+        <NextIntlClientProvider
+          messages={{
+            nav,
+            cta,
+            waitlist,
+            confirm,
+            hire: { form: hire.form, confirm: hire.confirm },
+          }}
+        >
           <SiteHeader brand={BRAND_NAME} />
           <main id="main" className="flex-1">
             {children}

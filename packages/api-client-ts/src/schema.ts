@@ -3440,6 +3440,1991 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/hub/contracts/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubContracts_contract"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubEligibility_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Each of the parent's children and their way into the hub. */
+        get: operations["HubEligibility_family"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{childId}/hub": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubEligibility_child"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{childId}/hub/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The parent agrees to the parent agreement (paid work and earnings). */
+        post: operations["HubEligibility_consent"];
+        /** The parent takes the consent back: the child's hub work stops. */
+        delete: operations["HubEligibility_withdraw"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Students who passed the readiness check, for lead developers to sign off. */
+        get: operations["HubEligibility_candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/candidates/{studentId}/sign-off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubEligibility_signOff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubEligibility_students"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/students/{studentId}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubEligibility_pause"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/students/{studentId}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubEligibility_resume"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubEligibility_countries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/countries/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** A country's hub rules: open or closed, ages, hours, the split, holds. */
+        put: operations["HubEligibility_updateRules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/hub/intake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A project request. Always 202: an email asks the contact to confirm it. */
+        post: operations["PublicIntake_intake"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/hub/intake/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The link in the email. 404 unknown or used, 410 expired. */
+        post: operations["PublicIntake_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientPortal_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/agreement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The owner signs the client agreement (its current version). */
+        post: operations["ClientPortal_sign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/org": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["ClientPortal_updateOrg"];
+        trace?: never;
+    };
+    "/v1/client/colleagues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ClientPortal_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/intakes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientPortal_intakes"];
+        put?: never;
+        post: operations["ClientPortal_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/intakes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientPortal_intake"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/intakes/{id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Adds a file to a request waiting in the queue: the file itself as the body
+         *     (application/octet-stream; PDF, PNG, JPEG or text, up to 10 MB), its name in
+         *     X-File-Name (URL-encoded).
+         */
+        post: operations["ClientPortal_addFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/intakes/{id}/files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientPortal_file"];
+        put?: never;
+        post?: never;
+        delete: operations["ClientPortal_removeFile"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/intakes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubIntakeAdmin_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/intakes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubIntakeAdmin_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/intakes/{id}/files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubIntakeAdmin_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/intakes/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accepts a request: a project for a lead developer (and a client account if needed). */
+        post: operations["HubIntakeAdmin_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/intakes/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Declines a request; the reason is emailed to the client. */
+        post: operations["HubIntakeAdmin_decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/clients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubIntakeAdmin_clientList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubIntakeAdmin_leads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeadProjects_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeadProjects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["LeadProjects_update"];
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/quotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LeadProjects_createQuote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/quotes/{quoteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["LeadProjects_updateQuote"];
+        trace?: never;
+    };
+    "/v1/mentor/hub/quotes/{quoteId}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LeadProjects_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/quotes/{quoteId}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LeadProjects_withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/quotes/{quoteId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LeadProjects_addTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/quotes/{quoteId}/shares": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["LeadProjects_shares"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/tasks/{taskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Removes a draft's task, or cancels an approved quote's task that isn't done. */
+        delete: operations["LeadProjects_removeTask"];
+        options?: never;
+        head?: never;
+        patch: operations["LeadProjects_updateTask"];
+        trace?: never;
+    };
+    "/v1/client/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientProjects_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientProjects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/quotes/{quoteId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The owner approves a quote and its statement of work. */
+        post: operations["ClientProjects_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/quotes/{quoteId}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ClientProjects_decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientProjects_invoiceList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/invoices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientProjects_invoice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/invoices/{id}/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A card checkout page for an open invoice. */
+        post: operations["ClientProjects_checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubProjectsAdmin_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubProjectsAdmin_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["HubProjectsAdmin_update"];
+        trace?: never;
+    };
+    "/v1/admin/hub/projects/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubProjectsAdmin_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubProjectsAdmin_invoiceList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/invoices/{id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records a bank transfer that paid an invoice in full. */
+        post: operations["HubProjectsAdmin_pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/invoices/{id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubProjectsAdmin_void"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/team": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeadTeam_members"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/tasks/{taskId}/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hub-eligible students for a task, best first, with why. */
+        get: operations["LeadTeam_suggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invites a student (their parent approves once they say yes). */
+        post: operations["LeadTeam_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/members/{memberId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["LeadTeam_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/tasks/{taskId}/assignee": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["LeadTeam_assign"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/tasks/{taskId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["LeadTeam_move"];
+        trace?: never;
+    };
+    "/v1/hub/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentHub_invites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/invites/{memberId}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The student says yes (a parent approves next) or no. */
+        post: operations["StudentHub_answer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentHub_projects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentHub_project"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/tasks/{taskId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["StudentHub_move"];
+        trace?: never;
+    };
+    "/v1/hub/time": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** This week's hub time: the cap, what's left, the allowed hours, the running timer. */
+        get: operations["StudentHub_usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/tasks/{taskId}/timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StudentHub_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/timer/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StudentHub_stop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}/workspace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubGit_workspace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}/pulls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubGit_pulls"];
+        put?: never;
+        post: operations["HubGit_open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}/pulls/{number}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubGit_pull"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}/pulls/{number}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubGit_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}/pulls/{number}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The lead's review, with a score for the student (counts for the latest commit only). */
+        post: operations["HubGit_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/projects/{id}/pulls/{number}/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HubGit_merge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentHub_approvals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/approvals/{memberId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentHub_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{childId}/hub/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentHub_childProjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/team": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientTeam_anonymousTeam"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeadDeliveries_list"];
+        put?: never;
+        post: operations["LeadDeliveries_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/deliveries/{deliveryId}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LeadDeliveries_withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeadDeliveries_comments"];
+        put?: never;
+        post: operations["LeadDeliveries_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/projects/{id}/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeadDeliveries_changes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/changes/{changeId}/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LeadDeliveries_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientDeliveries_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/deliveries/{deliveryId}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ClientDeliveries_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/deliveries/{deliveryId}/request-changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ClientDeliveries_requestChanges"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientDeliveries_comments"];
+        put?: never;
+        post: operations["ClientDeliveries_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/client/projects/{id}/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClientDeliveries_changes"];
+        put?: never;
+        post: operations["ClientDeliveries_addChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/projects/{id}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubDeliveriesAdmin_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/projects/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubDeliveriesAdmin_comments"];
+        put?: never;
+        post: operations["HubDeliveriesAdmin_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/projects/{id}/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HubDeliveriesAdmin_changes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/shared/previews/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SharedPreview_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/earnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's own earnings (paid to their parent). */
+        get: operations["Earnings_mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{childId}/hub/earnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A child's statement, for their parent. */
+        get: operations["Earnings_child"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/hub/earnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Earnings_lead"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payout-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Earnings_account"];
+        /** Sets or changes the parent's payout account (password needed; 48 hours before use). */
+        put: operations["Earnings_setAccount"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payout-account/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Earnings_removeAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Earnings_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payouts/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Earnings_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payouts/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Earnings_decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_ready"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_batches"];
+        put?: never;
+        post: operations["PayoutsAdmin_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/batches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_batch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/batches/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Super admins only: two different ones approve a batch. */
+        post: operations["PayoutsAdmin_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/batches/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Super admins only, with the hub_payouts flag on. */
+        post: operations["PayoutsAdmin_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/batches/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PayoutsAdmin_cancelBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/{id}/record": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Manual batches: a payout staff paid outside the platform. */
+        post: operations["PayoutsAdmin_record"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/{id}/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A payout stuck in "sending": a super admin says what Wise shows for it. */
+        post: operations["PayoutsAdmin_settle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payouts/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PayoutsAdmin_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payout-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_accountList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payout-accounts/{id}/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The full account details (each look is in the audit log). */
+        get: operations["PayoutsAdmin_reveal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/payout-accounts/{id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PayoutsAdmin_verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/leads/payable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_leads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/leads/{leadId}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A lead developer was paid by hand (with the hub_payouts flag on). */
+        post: operations["PayoutsAdmin_payLead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/ledger/trial-balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_trialBalance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/ledger/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PayoutsAdmin_transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentStories_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/stories/{id}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentStories_answer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hub/stories/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentStories_withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StoriesAdmin_list"];
+        put?: never;
+        post: operations["StoriesAdmin_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/stories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["StoriesAdmin_update"];
+        trace?: never;
+    };
+    "/v1/admin/hub/stories/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StoriesAdmin_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/hub/stories/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StoriesAdmin_unpublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/hub/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PublicHub_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/hub/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PublicHub_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/friends": {
         parameters: {
             query?: never;
@@ -4637,6 +6622,18 @@ export interface components {
             /** Format: date-time */
             revokedAt: string | null;
         };
+        HubPortfolioItemDto: {
+            projectId: string;
+            title: string;
+            /**
+             * Format: date-time
+             * @description When the client accepted the work.
+             */
+            finishedAt: string | null;
+            /** @description The student's finished tasks. */
+            tasks: string[];
+            skills: string[];
+        };
         PortfolioShareDto: {
             /** @description True while "Public projects" is on: only then can the portfolio be shared. */
             allowed: boolean;
@@ -4694,6 +6691,8 @@ export interface components {
             review: components["schemas"]["ReviewSummaryDto"] | null;
         };
         ChildPortfolioDto: {
+            /** @description Real-world hub projects (ages 15+). */
+            hubWork: components["schemas"]["HubPortfolioItemDto"][];
             share: components["schemas"]["PortfolioShareDto"];
             items: components["schemas"]["PortfolioItemDto"][];
         };
@@ -4773,6 +6772,8 @@ export interface components {
             version: number | null;
         };
         PortfolioDto: {
+            /** @description Real-world hub projects (ages 15+). */
+            hubWork: components["schemas"]["HubPortfolioItemDto"][];
             items: components["schemas"]["PortfolioItemDto"][];
         };
         SharedPortfolioDto: {
@@ -5278,6 +7279,8 @@ export interface components {
             languages: string[];
             capacity: number;
             isActive: boolean;
+            /** @description A lead developer: signs students off for the hub and leads client projects. */
+            isLead: boolean;
             ready: boolean;
             open: number;
             decidedLast30Days: number;
@@ -5324,6 +7327,8 @@ export interface components {
             languages?: string[];
             capacity?: number;
             isActive?: boolean;
+            /** @description A lead developer (hub sign-offs and client projects). */
+            isLead?: boolean;
             reason: string;
         };
         CertificateDto: {
@@ -6192,7 +8197,7 @@ export interface components {
         };
         ChatRoomDto: {
             /** @enum {string} */
-            kind: "TEAM" | "CLASS" | "EVENT";
+            kind: "TEAM" | "CLASS" | "EVENT" | "HUB";
             id: string;
             name: string;
             /** @description Messages since the member last read the room. */
@@ -6274,7 +8279,7 @@ export interface components {
         };
         ModerationRoomDto: {
             /** @enum {string} */
-            kind: "TEAM" | "CLASS" | "EVENT";
+            kind: "TEAM" | "CLASS" | "EVENT" | "HUB";
             id: string;
             name: string;
         };
@@ -6728,7 +8733,6 @@ export interface components {
             mentorId: string | null;
         };
         RemoveMemberDto: {
-            /** @description Why (kept in the audit log). */
             reason: string;
         };
         NamedDto: {
@@ -7051,6 +9055,1269 @@ export interface components {
         ReadinessSavedDto: {
             /** Format: date-time */
             savedAt: string;
+        };
+        ContractDto: {
+            /** @enum {string} */
+            kind: "parent" | "client";
+            /** @enum {string} */
+            language: "en" | "ar" | "ur";
+            version: string;
+            title: string;
+            /** @description Markdown. */
+            body: string;
+        };
+        HubStepDto: {
+            /** @enum {string} */
+            key: "PRO_TRACK" | "READINESS" | "SIGN_OFF" | "PARENT_CONSENT" | "AGE" | "PREMIUM" | "COUNTRY";
+            done: boolean;
+        };
+        HubRulesDto: {
+            countryCode: string;
+            timeZone: string;
+            /** @description The hub is open in this country (after the lawyer's review). */
+            enabled: boolean;
+            minAge: number;
+            weeklyMinutes: number;
+            dayStartMinute: number;
+            dayEndMinute: number;
+            /** @description 0 = Sunday … 6 = Saturday. */
+            schoolDays: number[];
+            schoolStartMinute: number;
+            schoolEndMinute: number;
+            studentPercent: number;
+            leadPercent: number;
+            platformPercent: number;
+            holdDays: number;
+            /** @description Basis points (100 = 1%). */
+            withholdingBp: number;
+        };
+        HubEligibilityDto: {
+            steps: components["schemas"]["HubStepDto"][];
+            /** @description Every step done, and not paused by staff: the student may be invited to projects. */
+            eligible: boolean;
+            /**
+             * Format: date-time
+             * @description The first time every step was done.
+             */
+            eligibleAt: string | null;
+            /** @description Staff paused the student's hub work. */
+            paused: boolean;
+            /** Format: date-time */
+            pausedAt: string | null;
+            /** @description Null when the student has no country set. */
+            rules: components["schemas"]["HubRulesDto"] | null;
+            /** @description The parent agreement's version a consent must be for. */
+            agreementVersion: string;
+        };
+        HubConsentDto: {
+            /** Format: date-time */
+            grantedAt: string;
+            /** @description The parent agreement's version. */
+            version: string;
+        };
+        HubFamilyChildDto: {
+            childId: string;
+            nickname: string;
+            avatarKey: string;
+            /** @description Passed the readiness check: the parent may consent now. */
+            readinessPassed: boolean;
+            /** @description A lead developer signed the child off for paid work. */
+            signedOff: boolean;
+            /** @description Null when not given (or taken back). */
+            consent: components["schemas"]["HubConsentDto"] | null;
+            eligibility: components["schemas"]["HubEligibilityDto"];
+        };
+        HubConsentRequestDto: {
+            /** @description The parent agreement's version, as shown to the parent. */
+            version: string;
+            /** @description Ticked "I agree" (for my child to do paid work, and to receive the earnings). */
+            agree: boolean;
+        };
+        HubCandidateDto: {
+            studentId: string;
+            nickname: string;
+            avatarKey: string;
+            countryCode: string | null;
+            /** Format: date-time */
+            passedAt: string;
+            score: number | null;
+            maxScore: number;
+            /** @description The graded readiness review (open it in the mentor console). */
+            reviewId: string | null;
+            /** Format: date-time */
+            signedOffAt: string | null;
+            /** @description The lead who signed off. */
+            signedOffBy: string | null;
+            eligible: boolean;
+        };
+        SignOffDto: {
+            /** @description For staff and other leads: what the student is good at, what to watch. */
+            note?: string;
+        };
+        HubStudentAdminDto: {
+            studentId: string;
+            username: string;
+            nickname: string;
+            countryCode: string | null;
+            eligibility: components["schemas"]["HubEligibilityDto"];
+            signedOffBy: string | null;
+            /** Format: date-time */
+            signedOffAt: string | null;
+            signOffNote: string | null;
+            pausedReason: string | null;
+        };
+        PauseHubDto: {
+            reason: string;
+        };
+        UpdateHubRulesDto: {
+            enabled?: boolean;
+            minAge?: number;
+            weeklyMinutes?: number;
+            dayStartMinute?: number;
+            dayEndMinute?: number;
+            schoolDays?: number[];
+            schoolStartMinute?: number;
+            schoolEndMinute?: number;
+            studentPercent?: number;
+            leadPercent?: number;
+            platformPercent?: number;
+            holdDays?: number;
+            withholdingBp?: number;
+        };
+        PublicIntakeDto: {
+            contactName: string;
+            /** Format: email */
+            contactEmail: string;
+            company: string;
+            countryCode?: string;
+            /** @enum {string} */
+            languageCode: "en" | "ar" | "ur";
+            title: string;
+            /** @description What they need, in plain words. */
+            brief: string;
+            /** @enum {string} */
+            budget: "UNDER_500" | "FROM_500" | "FROM_2000" | "FROM_5000" | "UNSURE";
+            deadline?: string;
+            /** @description Left empty by people; bots fill it in (the request is then dropped quietly). */
+            website?: string;
+        };
+        ConfirmIntakeDto: {
+            token: string;
+        };
+        ClientColleagueDto: {
+            /** @enum {string} */
+            role: "OWNER" | "MEMBER";
+            id: string;
+            name: string;
+            email: string;
+            /** @description Hasn't chosen a password yet. */
+            invited: boolean;
+        };
+        ClientContractDto: {
+            version: string;
+            /** Format: date-time */
+            signedAt: string;
+            signedBy: string;
+        };
+        ClientOrgDto: {
+            /** @enum {string} */
+            status: "ACTIVE" | "SUSPENDED";
+            id: string;
+            name: string;
+            countryCode: string;
+            billingName: string | null;
+            billingAddress: string | null;
+            taxId: string | null;
+            /** @description Null until the client agreement is signed. */
+            contract: components["schemas"]["ClientContractDto"] | null;
+        };
+        ClientMeDto: {
+            /** @enum {string} */
+            role: "OWNER" | "MEMBER";
+            colleagues: components["schemas"]["ClientColleagueDto"][];
+            org: components["schemas"]["ClientOrgDto"];
+            /** @description The client agreement's current version: sign it (again) when it differs. */
+            agreementVersion: string;
+            needsAgreement: boolean;
+        };
+        SignClientAgreementDto: {
+            version: string;
+            agree: boolean;
+        };
+        UpdateClientOrgDto: {
+            name?: string;
+            billingName?: string;
+            billingAddress?: string;
+            taxId?: string;
+        };
+        InviteColleagueDto: {
+            /** Format: email */
+            email: string;
+            displayName: string;
+        };
+        IntakeFileDto: {
+            id: string;
+            name: string;
+            /** @description Bytes. */
+            size: number;
+            type: string;
+        };
+        IntakeDto: {
+            /** @enum {string} */
+            source: "SITE" | "PORTAL";
+            /** @enum {string} */
+            status: "UNCONFIRMED" | "NEW" | "ACCEPTED" | "DECLINED";
+            /** @enum {string} */
+            budget: "UNDER_500" | "FROM_500" | "FROM_2000" | "FROM_5000" | "UNSURE";
+            files: components["schemas"]["IntakeFileDto"][];
+            id: string;
+            /** @description "R-0042". */
+            reference: string;
+            title: string;
+            brief: string;
+            deadline: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @description Shown to the client when declined. */
+            declineReason: string | null;
+            /** @description The project made from it, once accepted. */
+            projectId: string | null;
+        };
+        CreateIntakeDto: {
+            title: string;
+            brief: string;
+            /** @enum {string} */
+            budget: "UNDER_500" | "FROM_500" | "FROM_2000" | "FROM_5000" | "UNSURE";
+            deadline?: string;
+        };
+        AdminIntakeDto: {
+            /** @enum {string} */
+            source: "SITE" | "PORTAL";
+            /** @enum {string} */
+            status: "UNCONFIRMED" | "NEW" | "ACCEPTED" | "DECLINED";
+            /** @enum {string} */
+            budget: "UNDER_500" | "FROM_500" | "FROM_2000" | "FROM_5000" | "UNSURE";
+            files: components["schemas"]["IntakeFileDto"][];
+            id: string;
+            /** @description "R-0042". */
+            reference: string;
+            title: string;
+            brief: string;
+            deadline: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @description Shown to the client when declined. */
+            declineReason: string | null;
+            /** @description The project made from it, once accepted. */
+            projectId: string | null;
+            contactName: string;
+            contactEmail: string;
+            company: string;
+            countryCode: string | null;
+            languageCode: string;
+            orgId: string | null;
+            orgName: string | null;
+            decidedBy: string | null;
+        };
+        AcceptIntakeDto: {
+            /**
+             * Format: uuid
+             * @description The lead developer who scopes and leads it.
+             */
+            leadId: string;
+            /** @enum {string} */
+            currency: "USD" | "PKR" | "EGP" | "AED" | "SAR";
+            title?: string;
+            /**
+             * Format: uuid
+             * @description An existing client organisation (a returning client from the site).
+             */
+            orgId?: string;
+            /** @description For a new organisation: its name (default: the company on the request) and country. */
+            orgName?: string;
+            countryCode?: string;
+            /** @description Part of the main quote invoiced before work starts (default 30). */
+            depositPercent?: number;
+        };
+        AcceptedIntakeDto: {
+            projectId: string;
+            orgId: string;
+            /** @description A new client account was invited (they choose a password from the email). */
+            invited: boolean;
+        };
+        DeclineIntakeDto: {
+            /** @description Sent to the client. */
+            reason: string;
+        };
+        AdminClientDto: {
+            /** @enum {string} */
+            status: "ACTIVE" | "SUSPENDED";
+            people: components["schemas"]["ClientColleagueDto"][];
+            /** Format: date-time */
+            createdAt: string;
+            projects: number;
+            intakes: number;
+            id: string;
+            name: string;
+            countryCode: string;
+            billingName: string | null;
+            billingAddress: string | null;
+            taxId: string | null;
+            /** @description Null until the client agreement is signed. */
+            contract: components["schemas"]["ClientContractDto"] | null;
+        };
+        HubLeadDto: {
+            id: string;
+            name: string;
+            /** @description Projects they lead that aren't finished. */
+            openProjects: number;
+        };
+        ProjectSummaryDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            id: string;
+            /** @description "P-0007". */
+            reference: string;
+            title: string;
+            currency: string;
+            leadName: string | null;
+            clientName: string;
+            deadline: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        HubPersonDto: {
+            id: string;
+            /** @description "Developer A": what the client sees. */
+            pseudonym: string;
+            nickname: string;
+            avatarKey: string;
+        };
+        HubTaskDto: {
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE" | "CANCELLED";
+            id: string;
+            number: number;
+            /** @description "T-3". */
+            reference: string;
+            quoteId: string;
+            title: string;
+            spec: string;
+            skillTags: string[];
+            estimateMinutes: number;
+            /** @description Share of the quote's students' pool, in basis points. */
+            shareBp: number;
+            assignee: components["schemas"]["HubPersonDto"] | null;
+            /** Format: date-time */
+            doneAt: string | null;
+        };
+        HubQuoteDto: {
+            /** @enum {string} */
+            kind: "MAIN" | "CHANGE";
+            /** @enum {string} */
+            status: "DRAFT" | "SENT" | "APPROVED" | "DECLINED" | "WITHDRAWN";
+            tasks: components["schemas"]["HubTaskDto"][];
+            id: string;
+            version: number;
+            priceMinor: number;
+            depositMinor: number;
+            note: string | null;
+            /** @description The statement of work, once sent (Markdown). */
+            sowText: string | null;
+            sowVersion: string | null;
+            /** Format: date-time */
+            sentAt: string | null;
+            /** Format: date-time */
+            approvedAt: string | null;
+            approvedBy: string | null;
+            /** Format: date-time */
+            declinedAt: string | null;
+            declineReason: string | null;
+            /** Format: date-time */
+            acceptedAt: string | null;
+        };
+        HubPaymentDto: {
+            /** @enum {string} */
+            provider: "MANUAL" | "STRIPE";
+            amountMinor: number;
+            method: string | null;
+            reference: string | null;
+            /** Format: date-time */
+            paidAt: string;
+        };
+        HubInvoiceDto: {
+            /** @enum {string} */
+            kind: "DEPOSIT" | "FINAL";
+            /** @enum {string} */
+            status: "OPEN" | "PAID" | "VOID";
+            payments: components["schemas"]["HubPaymentDto"][];
+            id: string;
+            /** @description "H-0042". */
+            reference: string;
+            currency: string;
+            amountMinor: number;
+            /** Format: date-time */
+            issuedAt: string;
+            /** Format: date-time */
+            dueAt: string;
+            /** Format: date-time */
+            paidAt: string | null;
+            /** Format: date-time */
+            voidedAt: string | null;
+            voidReason: string | null;
+            projectId: string;
+            projectTitle: string;
+            quoteVersion: number;
+            clientName: string;
+            billingName: string | null;
+            billingAddress: string | null;
+            taxId: string | null;
+        };
+        HubSplitDto: {
+            student: number;
+            lead: number;
+            platform: number;
+        };
+        LeadProjectDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            quotes: components["schemas"]["HubQuoteDto"][];
+            invoices: components["schemas"]["HubInvoiceDto"][];
+            summary: string;
+            split: components["schemas"]["HubSplitDto"];
+            depositPercent: number;
+            portfolioAllowed: boolean;
+            id: string;
+            /** @description "P-0007". */
+            reference: string;
+            title: string;
+            currency: string;
+            leadName: string | null;
+            clientName: string;
+            deadline: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UpdateProjectDto: {
+            title?: string;
+            summary?: string;
+            deadline?: string;
+        };
+        CreateQuoteDto: {
+            /** @enum {string} */
+            kind: "MAIN" | "CHANGE";
+            /** @description In the project's currency, minor units. */
+            priceMinor: number;
+            note?: string;
+        };
+        UpdateQuoteDto: {
+            priceMinor?: number;
+            note?: string;
+        };
+        TaskInputDto: {
+            title: string;
+            spec: string;
+            skillTags: string[];
+            /** @description 15 minutes to 40 hours. */
+            estimateMinutes: number;
+            shareBp: number;
+        };
+        ShareInputDto: {
+            /** Format: uuid */
+            taskId: string;
+            shareBp: number;
+        };
+        SharesDto: {
+            shares: components["schemas"]["ShareInputDto"][];
+        };
+        UpdateTaskDto: {
+            title?: string;
+            spec?: string;
+            skillTags?: string[];
+            estimateMinutes?: number;
+        };
+        ClientTaskDto: {
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE" | "CANCELLED";
+            number: number;
+            title: string;
+            estimateMinutes: number;
+        };
+        ClientQuoteDto: {
+            /** @enum {string} */
+            kind: "MAIN" | "CHANGE";
+            /** @enum {string} */
+            status: "SENT" | "APPROVED" | "DECLINED" | "WITHDRAWN";
+            deliverables: components["schemas"]["ClientTaskDto"][];
+            id: string;
+            version: number;
+            priceMinor: number;
+            depositMinor: number;
+            note: string | null;
+            sowText: string;
+            sowVersion: string;
+            /** Format: date-time */
+            sentAt: string;
+            /** Format: date-time */
+            approvedAt: string | null;
+            /** Format: date-time */
+            declinedAt: string | null;
+            /** Format: date-time */
+            acceptedAt: string | null;
+        };
+        ClientProjectDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            quotes: components["schemas"]["ClientQuoteDto"][];
+            invoices: components["schemas"]["HubInvoiceDto"][];
+            summary: string;
+            portfolioAllowed: boolean;
+            id: string;
+            /** @description "P-0007". */
+            reference: string;
+            title: string;
+            currency: string;
+            leadName: string | null;
+            clientName: string;
+            deadline: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ApproveQuoteDto: {
+            /** @description The statement of work's version, as shown. */
+            sowVersion: string;
+            agree: boolean;
+        };
+        ReasonDto: {
+            reason: string;
+        };
+        CheckoutUrlDto: {
+            url: string;
+        };
+        AdminProjectDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            quotes: components["schemas"]["HubQuoteDto"][];
+            invoices: components["schemas"]["HubInvoiceDto"][];
+            summary: string;
+            split: components["schemas"]["HubSplitDto"];
+            depositPercent: number;
+            portfolioAllowed: boolean;
+            id: string;
+            /** @description "P-0007". */
+            reference: string;
+            title: string;
+            currency: string;
+            leadName: string | null;
+            clientName: string;
+            deadline: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            orgId: string;
+            intakeId: string | null;
+            leadId: string | null;
+            /** @description The project's money held in the ledger (invoiced, not yet shared out). */
+            fundsMinor: number;
+            cancelReason: string | null;
+        };
+        AdminUpdateProjectDto: {
+            /** Format: uuid */
+            leadId?: string;
+            studentPercent?: number;
+            leadPercent?: number;
+            platformPercent?: number;
+            depositPercent?: number;
+            reason: string;
+        };
+        RecordHubPaymentDto: {
+            /** @description e.g. "Bank transfer". */
+            method: string;
+            /** @description The bank's reference. */
+            reference: string;
+            paidAt: string;
+        };
+        HubMemberDto: {
+            /** @enum {string} */
+            status: "INVITED" | "ACCEPTED" | "APPROVED" | "DECLINED" | "REMOVED";
+            memberId: string;
+            /** Format: date-time */
+            invitedAt: string;
+            /** Format: date-time */
+            answeredAt: string | null;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @enum {string|null} */
+            declinedBy: "STUDENT" | "PARENT" | null;
+            /** Format: date-time */
+            removedAt: string | null;
+            /** @description The task they were invited for. */
+            taskId: string | null;
+            /** @description Minutes logged on this project. */
+            minutes: number;
+            id: string;
+            /** @description "Developer A": what the client sees. */
+            pseudonym: string;
+            nickname: string;
+            avatarKey: string;
+        };
+        MatchScoreDto: {
+            total: number;
+            /** @description Task skills the student has (0–40). */
+            skills: number;
+            /** @description Review scores so far (0–25). */
+            reputation: number;
+            /** @description Level and certificates (0–15). */
+            experience: number;
+            /** @description Hours left under this week's cap, against the estimate (0–20). */
+            availability: number;
+        };
+        MatchDto: {
+            studentId: string;
+            nickname: string;
+            avatarKey: string;
+            countryCode: string | null;
+            score: components["schemas"]["MatchScoreDto"];
+            /** @description The task's skills they have. */
+            matchedSkills: string[];
+            /** @description Minutes left under this week's cap. */
+            minutesLeft: number;
+            /** @description Other hub projects they're on now. */
+            activeProjects: number;
+        };
+        InviteDto: {
+            /** Format: uuid */
+            studentId: string;
+            /**
+             * Format: uuid
+             * @description The task they're invited for.
+             */
+            taskId?: string;
+            /** @description For the student and their parent: why them, what it involves. */
+            note?: string;
+        };
+        AssigneeDto: {
+            /**
+             * Format: uuid
+             * @description A student on the team, or null to take the task back.
+             */
+            studentId: string | null;
+        };
+        MoveTaskDto: {
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
+        };
+        StudentInviteDto: {
+            /** @enum {string} */
+            status: "INVITED" | "ACCEPTED" | "APPROVED" | "DECLINED" | "REMOVED";
+            memberId: string;
+            projectId: string;
+            title: string;
+            summary: string;
+            leadName: string | null;
+            note: string | null;
+            taskTitle: string | null;
+            estimateMinutes: number | null;
+            /** @description About what the student earns for the task (minor units), if they finish it. */
+            estimatedEarningsMinor: number | null;
+            currency: string;
+            /** Format: date-time */
+            invitedAt: string;
+        };
+        AnswerInviteDto: {
+            accept: boolean;
+        };
+        StudentProjectSummaryDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            /** @enum {string} */
+            memberStatus: "INVITED" | "ACCEPTED" | "APPROVED" | "DECLINED" | "REMOVED";
+            id: string;
+            reference: string;
+            title: string;
+            /** @description Their tasks not done yet. */
+            openTasks: number;
+        };
+        TeamMateDto: {
+            id: string;
+            /** @description "Developer A": what the client sees. */
+            pseudonym: string;
+            nickname: string;
+            avatarKey: string;
+            isMe: boolean;
+            isLead: boolean;
+        };
+        StudentProjectDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            /** @enum {string} */
+            memberStatus: "INVITED" | "ACCEPTED" | "APPROVED" | "DECLINED" | "REMOVED";
+            team: components["schemas"]["TeamMateDto"][];
+            /** @description The board: tasks of approved quotes. */
+            tasks: components["schemas"]["HubTaskDto"][];
+            id: string;
+            reference: string;
+            title: string;
+            summary: string;
+            leadName: string | null;
+            currency: string;
+            deadline: string | null;
+            /** @description The team's room. */
+            roomId: string | null;
+            /** @description The team has a repository on the platform's git server. */
+            hasRepo: boolean;
+        };
+        RunningTimerDto: {
+            projectId: string;
+            taskId: string;
+            /** Format: date-time */
+            startedAt: string;
+            /**
+             * Format: date-time
+             * @description When it stops by itself: the allowed time ends, or the week's minutes run out.
+             */
+            stopsAt: string;
+        };
+        TimeUsageDto: {
+            weekKey: string;
+            capMinutes: number;
+            usedMinutes: number;
+            leftMinutes: number;
+            allowedNow: boolean;
+            /** Format: date-time */
+            windowEnd: string | null;
+            /** Format: date-time */
+            nextWindow: string | null;
+            running: components["schemas"]["RunningTimerDto"] | null;
+        };
+        OpenHubPullDto: {
+            branch: string;
+            title: string;
+            body?: string;
+            /**
+             * Format: uuid
+             * @description The task it's for: its reference goes in the title ("T-3: …").
+             */
+            taskId?: string;
+        };
+        HubReviewDto: {
+            /** @enum {string} */
+            decision: "APPROVED" | "CHANGES_REQUESTED";
+            /** @description 1 (needs a lot of work) … 5 (excellent). */
+            score: number;
+            body?: string;
+        };
+        ParentApprovalDto: {
+            /** @enum {string} */
+            status: "INVITED" | "ACCEPTED" | "APPROVED" | "DECLINED" | "REMOVED";
+            memberId: string;
+            projectId: string;
+            title: string;
+            summary: string;
+            leadName: string | null;
+            note: string | null;
+            taskTitle: string | null;
+            estimateMinutes: number | null;
+            /** @description About what the student earns for the task (minor units), if they finish it. */
+            estimatedEarningsMinor: number | null;
+            currency: string;
+            /** Format: date-time */
+            invitedAt: string;
+            childId: string;
+            nickname: string;
+            /** @description The share of the students' pool the task carries (basis points). */
+            shareBp: number | null;
+            studentPercent: number;
+        };
+        ParentDecisionDto: {
+            approve: boolean;
+        };
+        ChildHubTaskDto: {
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE" | "CANCELLED";
+            title: string;
+            estimateMinutes: number;
+        };
+        ChildHubProjectDto: {
+            /** @enum {string} */
+            status: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            /** @enum {string} */
+            memberStatus: "INVITED" | "ACCEPTED" | "APPROVED" | "DECLINED" | "REMOVED";
+            /** @description The child's tasks: what, and how far. */
+            tasks: components["schemas"]["ChildHubTaskDto"][];
+            projectId: string;
+            title: string;
+            leadName: string | null;
+            /** @description Minutes the child logged on it. */
+            minutes: number;
+        };
+        AnonymousMemberDto: {
+            pseudonym: string;
+            /** @description Skill keys (the skill map). */
+            skills: string[];
+            /** @description Modules finished with a certificate (titles in English). */
+            certificates: string[];
+            /** @description Projects shipped to their portfolio. */
+            shippedProjects: number;
+            /** @description Tasks on this project finished. */
+            tasksDone: number;
+        };
+        HubDeliveryDto: {
+            /** @enum {string} */
+            status: "SUBMITTED" | "ACCEPTED" | "CHANGES_REQUESTED" | "WITHDRAWN";
+            id: string;
+            number: number;
+            /** @description "M-2". */
+            reference: string;
+            quoteId: string;
+            quoteVersion: number;
+            title: string;
+            notes: string;
+            /** @description The quote's final delivery: accepting it accepts the quote's work. */
+            final: boolean;
+            commit: string;
+            /** Format: date-time */
+            submittedAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @description What the client asked to change. */
+            clientComment: string | null;
+            /** @description The preview's secret link part (after "#" on the sandbox domain); null once withdrawn. */
+            previewToken: string | null;
+            /** @description Files in the preview. */
+            fileCount: number;
+        };
+        CreateDeliveryDto: {
+            /** Format: uuid */
+            quoteId: string;
+            title: string;
+            notes: string;
+            final: boolean;
+        };
+        HubCommentDto: {
+            /**
+             * @description "client", "lead" or "staff".
+             * @enum {string}
+             */
+            from: "client" | "lead" | "staff";
+            id: string;
+            body: string;
+            authorName: string;
+            isMine: boolean;
+            deliveryId: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CommentBodyDto: {
+            body: string;
+            /** Format: uuid */
+            deliveryId?: string;
+        };
+        HubChangeDto: {
+            /** @enum {string} */
+            status: "OPEN" | "IN_SCOPE" | "QUOTED" | "DECLINED";
+            id: string;
+            body: string;
+            deliveryId: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            note: string | null;
+            quoteId: string | null;
+        };
+        DecideChangeDto: {
+            /** @enum {string} */
+            decision: "IN_SCOPE" | "QUOTED" | "DECLINED";
+            /** @description For the client. */
+            note: string;
+            /**
+             * Format: uuid
+             * @description The change quote made for it (QUOTED).
+             */
+            quoteId?: string;
+        };
+        AcceptDeliveryDto: {
+            /** @description Final deliveries: students may show the finished project in their portfolios. */
+            allowPortfolio?: boolean;
+        };
+        RequestChangesDto: {
+            comment: string;
+        };
+        ChangeBodyDto: {
+            body: string;
+        };
+        PreviewFileDto: {
+            path: string;
+            /** @description Its media type. */
+            type: string;
+            /** @description Text files. */
+            text: string | null;
+            /** @description Other files, base64. */
+            base64: string | null;
+        };
+        PreviewDto: {
+            files: components["schemas"]["PreviewFileDto"][];
+            projectTitle: string;
+            title: string;
+            reference: string;
+            /** Format: date-time */
+            submittedAt: string;
+        };
+        EarningsTotalDto: {
+            currency: string;
+            /** @description Earned on accepted, paid work, all time. */
+            earnedMinor: number;
+            /** @description In the hold period. */
+            heldMinor: number;
+            /** @description Ready for the next payout. */
+            payableMinor: number;
+            /** @description Paid out to the parent. */
+            paidMinor: number;
+            /** @description Withheld for tax from payouts. */
+            withheldMinor: number;
+        };
+        EarningDto: {
+            id: string;
+            projectTitle: string;
+            /** @description "P-0007". */
+            projectReference: string;
+            currency: string;
+            amountMinor: number;
+            /** Format: date-time */
+            earnedAt: string;
+            /** Format: date-time */
+            heldUntil: string;
+            /** Format: date-time */
+            releasedAt: string | null;
+        };
+        PayoutDto: {
+            /** @enum {string} */
+            status: "AWAITING_PARENT" | "CONFIRMED" | "SENDING" | "SENT" | "PAID" | "FAILED" | "CANCELLED";
+            id: string;
+            /** @description "PO-0012". */
+            reference: string;
+            childId: string;
+            childNickname: string;
+            currency: string;
+            amountMinor: number;
+            withheldMinor: number;
+            netMinor: number;
+            /** @description The parent's account it goes to (parents only). */
+            accountLast4: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            paidAt: string | null;
+            /** @description The parent can confirm (or decline) it now. */
+            canConfirm: boolean;
+        };
+        EarningsStatementDto: {
+            totals: components["schemas"]["EarningsTotalDto"][];
+            earnings: components["schemas"]["EarningDto"][];
+            payouts: components["schemas"]["PayoutDto"][];
+        };
+        LeadEarningsLineDto: {
+            transactionId: string;
+            kind: string;
+            memo: string;
+            currency: string;
+            /** @description Plus: earned; minus: paid. */
+            amountMinor: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        LeadEarningsDto: {
+            payable: Record<string, never>[];
+            lines: components["schemas"]["LeadEarningsLineDto"][];
+        };
+        PayoutAccountDto: {
+            /** @enum {string} */
+            kind: "IBAN" | "OTHER";
+            /** @enum {string} */
+            state: "COOLING" | "CHECKING" | "READY";
+            id: string;
+            holderName: string;
+            currency: string;
+            countryCode: string;
+            last4: string;
+            /** Format: date-time */
+            usableFrom: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        SetPayoutAccountDto: {
+            /** @description The parent's password again (changing where money goes needs it). */
+            password: string;
+            /** @enum {string} */
+            kind: "IBAN" | "OTHER";
+            holderName: string;
+            /** @description IBAN accounts. */
+            iban?: string;
+            /** @description Other accounts: how to pay (a wallet number, a local account), checked by staff. */
+            details?: string;
+            currency: string;
+            /** @description Other accounts (IBANs carry their country). */
+            countryCode?: string;
+        };
+        PasswordDto: {
+            password: string;
+        };
+        ReadyToPayDto: {
+            /** @enum {string|null} */
+            accountKind: "IBAN" | "OTHER" | null;
+            /** @enum {string|null} */
+            accountState: "COOLING" | "CHECKING" | "READY" | null;
+            studentId: string;
+            nickname: string;
+            currency: string;
+            payableMinor: number;
+            heldMinor: number;
+            parentId: string | null;
+            parentName: string | null;
+            accountId: string | null;
+            /** @description A payout for them is in progress already. */
+            inProgress: boolean;
+        };
+        BatchApprovalDto: {
+            name: string;
+            /** Format: date-time */
+            at: string;
+        };
+        PayoutBatchDto: {
+            /** @enum {string} */
+            provider: "WISE" | "MANUAL";
+            /** @enum {string} */
+            status: "DRAFT" | "APPROVED" | "SENT" | "CANCELLED";
+            approvals: components["schemas"]["BatchApprovalDto"][];
+            id: string;
+            /** @description "B-0007". */
+            reference: string;
+            currency: string;
+            note: string | null;
+            createdByName: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            sentAt: string | null;
+            payoutCount: number;
+            confirmedCount: number;
+            paidCount: number;
+            failedCount: number;
+            totalNetMinor: number;
+        };
+        CreateBatchDto: {
+            currency: string;
+            /** @enum {string} */
+            provider: "WISE" | "MANUAL";
+            note?: string;
+        };
+        AdminPayoutDto: {
+            /** @enum {string} */
+            accountKind: "IBAN" | "OTHER";
+            /** @enum {string} */
+            status: "AWAITING_PARENT" | "CONFIRMED" | "SENDING" | "SENT" | "PAID" | "FAILED" | "CANCELLED";
+            id: string;
+            reference: string;
+            studentId: string;
+            nickname: string;
+            parentId: string;
+            parentName: string;
+            accountLast4: string;
+            currency: string;
+            amountMinor: number;
+            withheldMinor: number;
+            netMinor: number;
+            /** Format: date-time */
+            parentConfirmedAt: string | null;
+            providerTransferId: string | null;
+            providerStatus: string | null;
+            failureReason: string | null;
+            method: string | null;
+            paymentReference: string | null;
+            /** Format: date-time */
+            sentAt: string | null;
+            /** Format: date-time */
+            paidAt: string | null;
+            /** Format: date-time */
+            failedAt: string | null;
+        };
+        PayoutBatchDetailDto: {
+            /** @enum {string} */
+            provider: "WISE" | "MANUAL";
+            /** @enum {string} */
+            status: "DRAFT" | "APPROVED" | "SENT" | "CANCELLED";
+            approvals: components["schemas"]["BatchApprovalDto"][];
+            payouts: components["schemas"]["AdminPayoutDto"][];
+            id: string;
+            /** @description "B-0007". */
+            reference: string;
+            currency: string;
+            note: string | null;
+            createdByName: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            sentAt: string | null;
+            payoutCount: number;
+            confirmedCount: number;
+            paidCount: number;
+            failedCount: number;
+            totalNetMinor: number;
+        };
+        RecordPayoutDto: {
+            /** @description e.g. "Bank transfer", "JazzCash". */
+            method: string;
+            /** @description The bank's or wallet's reference. */
+            reference: string;
+        };
+        SettlePayoutDto: {
+            /**
+             * @description Whether Wise has a transfer for it (reference KCP<number>).
+             * @enum {string}
+             */
+            outcome: "TRANSFER_FOUND" | "NO_TRANSFER";
+            /** @description Wise's transfer ID, when there is one. */
+            transferId?: string;
+            reason: string;
+        };
+        CancelPayoutDto: {
+            reason: string;
+        };
+        AdminPayoutAccountDto: {
+            /** @enum {string} */
+            kind: "IBAN" | "OTHER";
+            /** @enum {string} */
+            state: "COOLING" | "CHECKING" | "READY";
+            id: string;
+            holderName: string;
+            currency: string;
+            countryCode: string;
+            last4: string;
+            /** Format: date-time */
+            usableFrom: string;
+            /** Format: date-time */
+            createdAt: string;
+            parentId: string;
+            parentName: string;
+            parentEmail: string | null;
+            /** Format: date-time */
+            verifiedAt: string | null;
+            /** Format: date-time */
+            removedAt: string | null;
+        };
+        PayoutAccountDetailsDto: {
+            holderName: string;
+            iban: string | null;
+            details: string | null;
+        };
+        LeadPayableDto: {
+            leadId: string;
+            name: string;
+            currency: string;
+            payableMinor: number;
+        };
+        PayLeadDto: {
+            currency: string;
+            amountMinor: number;
+            reference: string;
+        };
+        TrialBalanceDto: {
+            /** @description Each kind of account's balance. */
+            accounts: {
+                [key: string]: number;
+            };
+            currency: string;
+            debits: number;
+            credits: number;
+        };
+        LedgerEntryDto: {
+            accountType: string;
+            owner: string;
+            /** @enum {string} */
+            side: "DEBIT" | "CREDIT";
+            amountMinor: number;
+        };
+        LedgerTransactionDto: {
+            entries: components["schemas"]["LedgerEntryDto"][];
+            id: string;
+            kind: string;
+            memo: string;
+            currency: string;
+            refType: string | null;
+            refId: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        HubStoryDto: {
+            /** @enum {string} */
+            languageCode: "en" | "ar" | "ur";
+            /** @enum {string} */
+            status: "AWAITING_PARENT" | "APPROVED" | "PUBLISHED" | "WITHDRAWN";
+            id: string;
+            studentId: string;
+            childNickname: string;
+            projectId: string | null;
+            firstName: string;
+            headline: string;
+            body: string;
+            /** Format: date-time */
+            parentAnsweredAt: string | null;
+            /** Format: date-time */
+            publishedAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AnswerStoryDto: {
+            approve: boolean;
+        };
+        CreateStoryDto: {
+            /** Format: uuid */
+            studentId: string;
+            /** Format: uuid */
+            projectId?: string;
+            /** @enum {string} */
+            languageCode: "en" | "ar" | "ur";
+            /** @description First name only. */
+            firstName: string;
+            headline: string;
+            body: string;
+        };
+        UpdateStoryDto: {
+            firstName?: string;
+            headline?: string;
+            body?: string;
+        };
+        PublicStoryDto: {
+            id: string;
+            firstName: string;
+            countryCode: string | null;
+            headline: string;
+            body: string;
+            /** Format: date-time */
+            publishedAt: string;
+        };
+        PublicHubAmountDto: {
+            currency: string;
+            amountMinor: number;
+        };
+        PublicHubStatsDto: {
+            /** @description What students earned, all time, per currency. */
+            earned: components["schemas"]["PublicHubAmountDto"][];
+            projectsCompleted: number;
+            /** @description Students who earned money on accepted work. */
+            studentsEarning: number;
         };
         FriendDto: {
             userId: string;
@@ -7388,6 +10655,7 @@ export type NicknameSuggestionsDto = components['schemas']['NicknameSuggestionsD
 export type CreateChildDto = components['schemas']['CreateChildDto'];
 export type UpdateChildDto = components['schemas']['UpdateChildDto'];
 export type ConsentRecordDto = components['schemas']['ConsentRecordDto'];
+export type HubPortfolioItemDto = components['schemas']['HubPortfolioItemDto'];
 export type PortfolioShareDto = components['schemas']['PortfolioShareDto'];
 export type CodeFilesDto = components['schemas']['CodeFilesDto'];
 export type StageDto = components['schemas']['StageDto'];
@@ -7637,6 +10905,123 @@ export type ReadinessBriefDto = components['schemas']['ReadinessBriefDto'];
 export type ReadinessDto = components['schemas']['ReadinessDto'];
 export type SaveReadinessDto = components['schemas']['SaveReadinessDto'];
 export type ReadinessSavedDto = components['schemas']['ReadinessSavedDto'];
+export type ContractDto = components['schemas']['ContractDto'];
+export type HubStepDto = components['schemas']['HubStepDto'];
+export type HubRulesDto = components['schemas']['HubRulesDto'];
+export type HubEligibilityDto = components['schemas']['HubEligibilityDto'];
+export type HubConsentDto = components['schemas']['HubConsentDto'];
+export type HubFamilyChildDto = components['schemas']['HubFamilyChildDto'];
+export type HubConsentRequestDto = components['schemas']['HubConsentRequestDto'];
+export type HubCandidateDto = components['schemas']['HubCandidateDto'];
+export type SignOffDto = components['schemas']['SignOffDto'];
+export type HubStudentAdminDto = components['schemas']['HubStudentAdminDto'];
+export type PauseHubDto = components['schemas']['PauseHubDto'];
+export type UpdateHubRulesDto = components['schemas']['UpdateHubRulesDto'];
+export type PublicIntakeDto = components['schemas']['PublicIntakeDto'];
+export type ConfirmIntakeDto = components['schemas']['ConfirmIntakeDto'];
+export type ClientColleagueDto = components['schemas']['ClientColleagueDto'];
+export type ClientContractDto = components['schemas']['ClientContractDto'];
+export type ClientOrgDto = components['schemas']['ClientOrgDto'];
+export type ClientMeDto = components['schemas']['ClientMeDto'];
+export type SignClientAgreementDto = components['schemas']['SignClientAgreementDto'];
+export type UpdateClientOrgDto = components['schemas']['UpdateClientOrgDto'];
+export type InviteColleagueDto = components['schemas']['InviteColleagueDto'];
+export type IntakeFileDto = components['schemas']['IntakeFileDto'];
+export type IntakeDto = components['schemas']['IntakeDto'];
+export type CreateIntakeDto = components['schemas']['CreateIntakeDto'];
+export type AdminIntakeDto = components['schemas']['AdminIntakeDto'];
+export type AcceptIntakeDto = components['schemas']['AcceptIntakeDto'];
+export type AcceptedIntakeDto = components['schemas']['AcceptedIntakeDto'];
+export type DeclineIntakeDto = components['schemas']['DeclineIntakeDto'];
+export type AdminClientDto = components['schemas']['AdminClientDto'];
+export type HubLeadDto = components['schemas']['HubLeadDto'];
+export type ProjectSummaryDto = components['schemas']['ProjectSummaryDto'];
+export type HubPersonDto = components['schemas']['HubPersonDto'];
+export type HubTaskDto = components['schemas']['HubTaskDto'];
+export type HubQuoteDto = components['schemas']['HubQuoteDto'];
+export type HubPaymentDto = components['schemas']['HubPaymentDto'];
+export type HubInvoiceDto = components['schemas']['HubInvoiceDto'];
+export type HubSplitDto = components['schemas']['HubSplitDto'];
+export type LeadProjectDto = components['schemas']['LeadProjectDto'];
+export type UpdateProjectDto = components['schemas']['UpdateProjectDto'];
+export type CreateQuoteDto = components['schemas']['CreateQuoteDto'];
+export type UpdateQuoteDto = components['schemas']['UpdateQuoteDto'];
+export type TaskInputDto = components['schemas']['TaskInputDto'];
+export type ShareInputDto = components['schemas']['ShareInputDto'];
+export type SharesDto = components['schemas']['SharesDto'];
+export type UpdateTaskDto = components['schemas']['UpdateTaskDto'];
+export type ClientTaskDto = components['schemas']['ClientTaskDto'];
+export type ClientQuoteDto = components['schemas']['ClientQuoteDto'];
+export type ClientProjectDto = components['schemas']['ClientProjectDto'];
+export type ApproveQuoteDto = components['schemas']['ApproveQuoteDto'];
+export type ReasonDto = components['schemas']['ReasonDto'];
+export type CheckoutUrlDto = components['schemas']['CheckoutUrlDto'];
+export type AdminProjectDto = components['schemas']['AdminProjectDto'];
+export type AdminUpdateProjectDto = components['schemas']['AdminUpdateProjectDto'];
+export type RecordHubPaymentDto = components['schemas']['RecordHubPaymentDto'];
+export type HubMemberDto = components['schemas']['HubMemberDto'];
+export type MatchScoreDto = components['schemas']['MatchScoreDto'];
+export type MatchDto = components['schemas']['MatchDto'];
+export type InviteDto = components['schemas']['InviteDto'];
+export type AssigneeDto = components['schemas']['AssigneeDto'];
+export type MoveTaskDto = components['schemas']['MoveTaskDto'];
+export type StudentInviteDto = components['schemas']['StudentInviteDto'];
+export type AnswerInviteDto = components['schemas']['AnswerInviteDto'];
+export type StudentProjectSummaryDto = components['schemas']['StudentProjectSummaryDto'];
+export type TeamMateDto = components['schemas']['TeamMateDto'];
+export type StudentProjectDto = components['schemas']['StudentProjectDto'];
+export type RunningTimerDto = components['schemas']['RunningTimerDto'];
+export type TimeUsageDto = components['schemas']['TimeUsageDto'];
+export type OpenHubPullDto = components['schemas']['OpenHubPullDto'];
+export type HubReviewDto = components['schemas']['HubReviewDto'];
+export type ParentApprovalDto = components['schemas']['ParentApprovalDto'];
+export type ParentDecisionDto = components['schemas']['ParentDecisionDto'];
+export type ChildHubTaskDto = components['schemas']['ChildHubTaskDto'];
+export type ChildHubProjectDto = components['schemas']['ChildHubProjectDto'];
+export type AnonymousMemberDto = components['schemas']['AnonymousMemberDto'];
+export type HubDeliveryDto = components['schemas']['HubDeliveryDto'];
+export type CreateDeliveryDto = components['schemas']['CreateDeliveryDto'];
+export type HubCommentDto = components['schemas']['HubCommentDto'];
+export type CommentBodyDto = components['schemas']['CommentBodyDto'];
+export type HubChangeDto = components['schemas']['HubChangeDto'];
+export type DecideChangeDto = components['schemas']['DecideChangeDto'];
+export type AcceptDeliveryDto = components['schemas']['AcceptDeliveryDto'];
+export type RequestChangesDto = components['schemas']['RequestChangesDto'];
+export type ChangeBodyDto = components['schemas']['ChangeBodyDto'];
+export type PreviewFileDto = components['schemas']['PreviewFileDto'];
+export type PreviewDto = components['schemas']['PreviewDto'];
+export type EarningsTotalDto = components['schemas']['EarningsTotalDto'];
+export type EarningDto = components['schemas']['EarningDto'];
+export type PayoutDto = components['schemas']['PayoutDto'];
+export type EarningsStatementDto = components['schemas']['EarningsStatementDto'];
+export type LeadEarningsLineDto = components['schemas']['LeadEarningsLineDto'];
+export type LeadEarningsDto = components['schemas']['LeadEarningsDto'];
+export type PayoutAccountDto = components['schemas']['PayoutAccountDto'];
+export type SetPayoutAccountDto = components['schemas']['SetPayoutAccountDto'];
+export type PasswordDto = components['schemas']['PasswordDto'];
+export type ReadyToPayDto = components['schemas']['ReadyToPayDto'];
+export type BatchApprovalDto = components['schemas']['BatchApprovalDto'];
+export type PayoutBatchDto = components['schemas']['PayoutBatchDto'];
+export type CreateBatchDto = components['schemas']['CreateBatchDto'];
+export type AdminPayoutDto = components['schemas']['AdminPayoutDto'];
+export type PayoutBatchDetailDto = components['schemas']['PayoutBatchDetailDto'];
+export type RecordPayoutDto = components['schemas']['RecordPayoutDto'];
+export type SettlePayoutDto = components['schemas']['SettlePayoutDto'];
+export type CancelPayoutDto = components['schemas']['CancelPayoutDto'];
+export type AdminPayoutAccountDto = components['schemas']['AdminPayoutAccountDto'];
+export type PayoutAccountDetailsDto = components['schemas']['PayoutAccountDetailsDto'];
+export type LeadPayableDto = components['schemas']['LeadPayableDto'];
+export type PayLeadDto = components['schemas']['PayLeadDto'];
+export type TrialBalanceDto = components['schemas']['TrialBalanceDto'];
+export type LedgerEntryDto = components['schemas']['LedgerEntryDto'];
+export type LedgerTransactionDto = components['schemas']['LedgerTransactionDto'];
+export type HubStoryDto = components['schemas']['HubStoryDto'];
+export type AnswerStoryDto = components['schemas']['AnswerStoryDto'];
+export type CreateStoryDto = components['schemas']['CreateStoryDto'];
+export type UpdateStoryDto = components['schemas']['UpdateStoryDto'];
+export type PublicStoryDto = components['schemas']['PublicStoryDto'];
+export type PublicHubAmountDto = components['schemas']['PublicHubAmountDto'];
+export type PublicHubStatsDto = components['schemas']['PublicHubStatsDto'];
 export type FriendDto = components['schemas']['FriendDto'];
 export type StudentFriendRequestDto = components['schemas']['StudentFriendRequestDto'];
 export type FriendsDto = components['schemas']['FriendsDto'];
@@ -15655,6 +19040,4841 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    HubContracts_contract: {
+        parameters: {
+            query?: {
+                language?: "en" | "ar" | "ur";
+            };
+            header?: never;
+            path: {
+                kind: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractDto"];
+                };
+            };
+        };
+    };
+    HubEligibility_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubEligibilityDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_family: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubFamilyChildDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_child: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubFamilyChildDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_consent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HubConsentRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubFamilyChildDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubFamilyChildDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_candidates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCandidateDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_signOff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignOffDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_students: {
+        parameters: {
+            query?: {
+                status?: "eligible" | "waiting" | "paused";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStudentAdminDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_pause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PauseHubDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_resume: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_countries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubRulesDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubEligibility_updateRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateHubRulesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubRulesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PublicIntake_intake: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublicIntakeDto"];
+            };
+        };
+        responses: {
+            /** @description A confirmation email is on its way. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PublicIntake_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmIntakeDto"];
+            };
+        };
+        responses: {
+            /** @description Confirmed: the request is in the queue. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientMeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_sign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignClientAgreementDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientMeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_updateOrg: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateClientOrgDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientMeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteColleagueDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientMeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_intakes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateIntakeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_intake: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_addFile: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-File-Name"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/octet-stream": string;
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                fileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientPortal_removeFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                fileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_list: {
+        parameters: {
+            query?: {
+                status?: "UNCONFIRMED" | "NEW" | "ACCEPTED" | "DECLINED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminIntakeDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminIntakeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                fileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptIntakeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptedIntakeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_decline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeclineIntakeDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_clientList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminClientDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubIntakeAdmin_leads: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubLeadDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_createQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateQuoteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_updateQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuoteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_addTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskInputDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_shares: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SharesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_removeTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadProjects_updateTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTaskDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApproveQuoteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_decline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                quoteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_invoiceList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubInvoiceDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_invoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubInvoiceDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientProjects_checkout: {
+        parameters: {
+            query?: {
+                locale?: "en" | "ar" | "ur";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutUrlDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_list: {
+        parameters: {
+            query?: {
+                status?: "SCOPING" | "QUOTED" | "AWAITING_DEPOSIT" | "ACTIVE" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminUpdateProjectDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_invoiceList: {
+        parameters: {
+            query?: {
+                status?: "OPEN" | "PAID" | "VOID";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubInvoiceDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_pay: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecordHubPaymentDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubProjectsAdmin_void: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasonDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadTeam_members: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubMemberDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadTeam_suggestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadTeam_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubMemberDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadTeam_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveMemberDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadTeam_assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssigneeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadTeam_move: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveTaskDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_invites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentInviteDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_answer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerInviteDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_projects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentProjectSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_project: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentProjectDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_move: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveTaskDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_usage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeUsageDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeUsageDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentHub_stop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeUsageDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_workspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_pulls: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PullSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_open: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenHubPullDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PullSummaryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_pull: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PullDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PullCommentBodyDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HubReviewDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubGit_merge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentHub_approvals: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentApprovalDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentHub_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParentDecisionDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentHub_childProjects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildHubProjectDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientTeam_anonymousTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnonymousMemberDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubDeliveryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDeliveryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubDeliveryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deliveryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_comments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCommentDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCommentDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_changes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubChangeDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeadDeliveries_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                changeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecideChangeDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubDeliveryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                deliveryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptDeliveryDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_requestChanges: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                deliveryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestChangesDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_comments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCommentDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCommentDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_changes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubChangeDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClientDeliveries_addChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubChangeDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubDeliveriesAdmin_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubDeliveryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubDeliveriesAdmin_comments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCommentDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubDeliveriesAdmin_comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCommentDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HubDeliveriesAdmin_changes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubChangeDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SharedPreview_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreviewDto"];
+                };
+            };
+        };
+    };
+    Earnings_mine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EarningsStatementDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_child: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EarningsStatementDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_lead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadEarningsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutAccountDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_setAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPayoutAccountDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutAccountDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_removeAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Earnings_decline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_ready: {
+        parameters: {
+            query?: {
+                currency?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadyToPayDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_batches: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBatchDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_batch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_cancelBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_record: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecordPayoutDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_settle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettlePayoutDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelPayoutDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutBatchDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_accountList: {
+        parameters: {
+            query?: {
+                /** @description waiting: live accounts staff haven't checked; all: everything (newest first). */
+                show?: "waiting" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPayoutAccountDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_reveal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutAccountDetailsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPayoutAccountDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_leads: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadPayableDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_payLead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leadId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PayLeadDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadPayableDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_trialBalance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrialBalanceDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutsAdmin_transactions: {
+        parameters: {
+            query?: {
+                kind?: string;
+                refId?: string;
+                /** @description Older than this (paging). */
+                before?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LedgerTransactionDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentStories_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentStories_answer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerStoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentStories_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StoriesAdmin_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StoriesAdmin_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StoriesAdmin_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StoriesAdmin_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StoriesAdmin_unpublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubStoryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PublicHub_list: {
+        parameters: {
+            query?: {
+                lang?: "en" | "ar" | "ur";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicStoryDto"][];
+                };
+            };
+        };
+    };
+    PublicHub_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicHubStatsDto"];
+                };
             };
         };
     };

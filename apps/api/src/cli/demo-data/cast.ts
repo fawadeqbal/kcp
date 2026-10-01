@@ -136,7 +136,7 @@ export const FAMILIES: FamilySpec[] = [
     country: 'PK',
     plan: 'none',
     grant: 'active',
-    children: [kid('lahore', 'star', 55, { portfolio: true, age: 15 })],
+    children: [kid('lahore', 'star', 55, { portfolio: true, age: 16 })],
   },
   {
     name: 'Kamran Javed',
@@ -481,6 +481,8 @@ export const PARENTS_WITHOUT_CHILDREN = [
 /** The team, in the admin panel. Each sets up two-factor login the first time. */
 export const STAFF = [
   { name: 'Demo Super Admin', email: 'superadmin', role: 'super_admin' },
+  // Hub payout batches need two different super admins.
+  { name: 'Demo Finance Lead', email: 'superadmin.two', role: 'super_admin' },
   { name: 'Demo Admin', email: 'admin', role: 'admin' },
   { name: 'Demo Moderator', email: 'moderator', role: 'moderator' },
   { name: 'Demo Content Creator', email: 'content', role: 'content_creator' },

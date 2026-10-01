@@ -41,7 +41,18 @@ export type Subject =
   | 'SchoolClass'
   | 'ReadinessCheck'
   | 'Country'
-  | 'Language';
+  | 'Language'
+  | 'Hub'
+  | 'HubEligibility'
+  | 'ClientOrg'
+  | 'HubIntake'
+  | 'HubProject'
+  | 'HubInvoice'
+  | 'Ledger'
+  | 'HubEarnings'
+  | 'PayoutAccount'
+  | 'Payout'
+  | 'HubStory';
 export type AdminAbility = MongoAbility<[Action, Subject | ReturnType<typeof subject>]>;
 
 export function abilityFrom(rules: Record<string, unknown>[]): AdminAbility {

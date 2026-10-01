@@ -110,6 +110,8 @@ enum ChatRoomDtoKindEnum {
   CLASS(r'CLASS'),
   @JsonValue(r'EVENT')
   EVENT(r'EVENT'),
+  @JsonValue(r'HUB')
+  HUB(r'HUB'),
   @JsonValue(r'unknown_default_open_api')
   unknownDefaultOpenApi(r'unknown_default_open_api');
 

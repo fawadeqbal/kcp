@@ -1,5 +1,6 @@
 import {
   frameAncestorsFromEnv,
+  isSitePage,
   portfolioHeaders,
   pyodideHeaders,
   sandboxHeaders,
@@ -35,6 +36,29 @@ describe('sandbox headers', () => {
     expect(csp).toContain("connect-src 'self' https://api.example.com");
     expect(csp).toContain("script-src 'self';");
     expect(csp).toContain("frame-ancestors 'none'");
+  });
+
+  it('gives the sandbox’s own pages (portfolio, hub preview) their headers, but not the frames', () => {
+    for (const path of [
+      '/portfolio/',
+      '/portfolio.js',
+      '/preview/',
+      '/preview',
+      '/preview.js',
+      '/pages.css',
+    ]) {
+      expect(isSitePage(path)).toBe(true);
+    }
+    // The frames run students’ code: they keep the runner’s headers.
+    for (const path of [
+      '/',
+      '/runner.js',
+      '/preview-frame.html',
+      '/preview-frame.js',
+      '/previewx',
+    ]) {
+      expect(isSitePage(path)).toBe(false);
+    }
   });
 
   it('reads and checks the allowed origins', () => {

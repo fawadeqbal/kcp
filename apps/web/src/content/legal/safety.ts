@@ -29,6 +29,10 @@ Kids Coding Platform is built for children, so safety comes first in everything 
 
 Students' code runs in a separate, locked-down "sandbox" on its own web address. It can't see anyone's account, can't send data anywhere and can't open other websites.
 
+## Paid hub work stays safe
+
+Students of 15 and up who join a paid hub project stay anonymous to the client ("Developer A"), and only talk with their lead developer and team in a moderated room — never with the client. The platform keeps the timer, and with it all hub work, outside school hours, before 9 pm and within a few hours a week. A parent approves every project and can stop hub work at any time; earnings go only to the parent.
+
 ## We collect as little as we can
 
 We store a child's year of birth (not the full date), their country, and optionally a region and city, to run local leaderboards. No photos, no advertising and no trackers. The [privacy policy](privacy) has the details.
@@ -63,6 +67,10 @@ Tell us straight away with the **Feedback** button (at the bottom of every page 
 
 يعمل كود الطلاب في «صندوق حماية» منفصل ومغلق على عنوان ويب خاص به. لا يستطيع رؤية حساب أي أحد، ولا إرسال بيانات إلى أي مكان، ولا فتح مواقع أخرى.
 
+## العمل المدفوع في المركز يبقى آمنًا
+
+يبقى الطلاب من عمر 15 عامًا فما فوق الذين ينضمون إلى مشروع مدفوع في المركز مجهولي الهوية للعميل ("المطوّر A")، ولا يتحدثون إلا مع مطوّرهم الرئيسي وفريقهم في غرفة خاضعة للإشراف، وليس مع العميل أبدًا. تُبقي المنصة المؤقّت، ومعه كل العمل في المركز، خارج ساعات المدرسة، وقبل التاسعة مساءً، وضمن ساعات قليلة أسبوعيًا. يوافق الوالد على كل مشروع ويمكنه إيقاف العمل في أي وقت؛ وتذهب الأرباح إلى الوالد فقط.
+
 ## نجمع أقل قدر ممكن من البيانات
 
 نحفظ سنة ميلاد الطفل (وليس التاريخ الكامل) وبلده، ومنطقته ومدينته إن أراد الأهل، لتشغيل لوحات الصدارة المحلية. لا صور ولا إعلانات ولا أدوات تتبّع. التفاصيل في [سياسة الخصوصية](privacy).
@@ -96,6 +104,10 @@ Kids Coding Platform بچوں کے لیے بنایا گیا ہے، اس لیے �
 ## کوڈ ایک محفوظ ڈبے میں چلتا ہے
 
 طلبہ کا کوڈ ایک الگ، بند «سینڈ باکس» میں اپنے ویب پتے پر چلتا ہے۔ یہ کسی کا اکاؤنٹ نہیں دیکھ سکتا، کہیں ڈیٹا نہیں بھیج سکتا اور دوسری ویب سائٹس نہیں کھول سکتا۔
+
+## ہب میں معاوضے والا کام محفوظ رہتا ہے
+
+15 سال یا اس سے بڑے طلبہ جو ہب کے معاوضے والے پروجیکٹ میں شامل ہوتے ہیں، کلائنٹ کے لیے گمنام رہتے ہیں ("ڈیولپر A")، اور صرف اپنے لیڈ ڈیولپر اور ٹیم سے ایک نگرانی والے کمرے میں بات کرتے ہیں — کلائنٹ سے کبھی نہیں۔ پلیٹ فارم ٹائمر کو، اور اس کے ساتھ ہب کے سارے کام کو، اسکول کے اوقات سے باہر، رات 9 بجے سے پہلے اور ہفتے میں چند گھنٹوں کے اندر رکھتا ہے۔ والدین ہر پروجیکٹ کی منظوری دیتے ہیں اور کسی بھی وقت ہب کا کام روک سکتے ہیں؛ آمدنی صرف والدین کو جاتی ہے۔
 
 ## ہم کم سے کم معلومات جمع کرتے ہیں
 

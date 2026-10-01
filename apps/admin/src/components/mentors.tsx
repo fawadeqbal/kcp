@@ -116,6 +116,7 @@ export function MentorsPage() {
                     {mentor.codeOfConductSignedAt ? null : (
                       <Badge tone="warning">Code of conduct not signed</Badge>
                     )}
+                    {mentor.isLead ? <Badge tone="brand">Hub lead</Badge> : null}
                   </span>
                 </Cell>
                 <Cell>
@@ -262,6 +263,7 @@ function EditDialog({
   const [languages, setLanguages] = useState<string[]>(mentor.languages);
   const [capacity, setCapacity] = useState(String(mentor.capacity));
   const [active, setActive] = useState(mentor.isActive);
+  const [lead, setLead] = useState(mentor.isLead);
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState<string>();
   const action = useAction();
@@ -281,6 +283,7 @@ function EditDialog({
             languages,
             capacity: Number(capacity),
             isActive: active,
+            isLead: lead,
             reason: reason.trim(),
           },
         }),
@@ -324,6 +327,11 @@ function EditDialog({
           label="Active (a paused mentor’s open reviews go back to the queue)"
           checked={active}
           onChange={(e) => setActive(e.target.checked)}
+        />
+        <Checkbox
+          label="Lead developer for the hub (signs students off, leads client projects)"
+          checked={lead}
+          onChange={(e) => setLead(e.target.checked)}
         />
         <TextField
           label="Reason"

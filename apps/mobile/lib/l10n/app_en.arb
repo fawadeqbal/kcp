@@ -1411,5 +1411,172 @@
     }
   },
   "errorClassFull": "This class is full.",
-  "errorRequestAnswered": "That request was already answered."
+  "errorRequestAnswered": "That request was already answered.",
+  "parentHubTitle": "Paid projects to approve",
+  "parentHubIntro": "Your child wants to work on a paid project for a client. A lead developer runs it, the client never sees your child’s name, and the hours stay within the hub’s rules.",
+  "parentHubRequest": "{nickname} wants to work on {title}",
+  "@parentHubRequest": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "parentHubTask": "Task: {task}",
+  "@parentHubTask": {
+    "placeholders": {
+      "task": {
+        "type": "String"
+      }
+    }
+  },
+  "parentHubTime": "About {time} of work",
+  "@parentHubTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "parentHubEarnings": "About {amount} if they finish it",
+  "@parentHubEarnings": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "parentHubLead": "Lead developer: {name}",
+  "@parentHubLead": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "parentHubSafety": "Approving lets them join the team’s private room and repository. You can take back your agreement at any time on the website.",
+  "parentHubApprove": "Approve",
+  "parentHubDecline": "Decline",
+  "parentHubApproved": "{nickname} is on {title}.",
+  "@parentHubApproved": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "parentHubDeclined": "{nickname} won’t work on {title}.",
+  "@parentHubDeclined": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "hubMinutes": "{minutes} min",
+  "@hubMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hubHours": "{hours} h",
+  "@hubHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "hubHoursMinutes": "{hours} h {minutes} min",
+  "@hubHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "childEarningsTitle": "Hub earnings",
+  "childEarningsBody": "{nickname}’s share of the paid projects they worked on. Payouts go to your account once you confirm them on the website.",
+  "@childEarningsBody": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "childEarningsEarned": "Earned",
+  "childEarningsHeld": "Waiting (hold period)",
+  "childEarningsPayable": "Ready to pay out",
+  "childEarningsPaid": "Paid to you",
+  "notificationHubEligible": "You can now join paid hub projects.",
+  "notificationHubSignedOff": "A lead developer signed you off for paid projects.",
+  "notificationHubPaused": "Your hub work is paused for now.",
+  "notificationHubInvite": "You’re invited to the project {title}.",
+  "@notificationHubInvite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationHubJoined": "Your parent said yes: you’re on {title}.",
+  "@notificationHubJoined": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildHubSignedOff": "A lead developer signed {nickname} off for paid projects. Read the parent agreement on the website to say yes.",
+  "@notificationChildHubSignedOff": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildHubPaused": "{nickname}’s hub work is paused. See why on the website.",
+  "@notificationChildHubPaused": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildHubInvite": "{nickname} wants to work on {title}: approve or decline on your home screen.",
+  "@notificationChildHubInvite": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildHubConsent": "{by} agreed to the hub’s parent agreement for {nickname}: their hub earnings are paid to {by}’s payout account.",
+  "@notificationChildHubConsent": {
+    "placeholders": {
+      "by": {
+        "type": "String"
+      },
+      "nickname": {
+        "type": "String"
+      }
+    }
+  }
 }

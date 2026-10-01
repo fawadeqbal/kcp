@@ -290,12 +290,13 @@ export function useAuth(): AuthContextValue {
 }
 
 /** The part of the web app an account belongs to. */
-export type Area = 'STUDENT' | 'PARENT' | 'MENTOR' | 'TEACHER';
+export type Area = 'STUDENT' | 'PARENT' | 'MENTOR' | 'TEACHER' | 'CLIENT';
 
 export function areaOf(user: Pick<Me, 'kind' | 'role'>): Area {
   if (user.kind === 'STUDENT') return 'STUDENT';
   if (user.role.key === 'mentor') return 'MENTOR';
   if (user.role.key === 'teacher') return 'TEACHER';
+  if (user.role.key === 'client') return 'CLIENT';
   return 'PARENT';
 }
 
@@ -304,6 +305,7 @@ const HOMES = {
   PARENT: '/dashboard',
   MENTOR: '/mentor',
   TEACHER: '/teacher',
+  CLIENT: '/client',
 } as const satisfies Record<Area, string>;
 
 /** Where each kind of account lands after logging in. */

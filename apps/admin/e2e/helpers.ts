@@ -26,7 +26,12 @@ export function createStaff(
   return { email, name, password };
 }
 
-async function confirmationToken(request: APIRequestContext, email: string): Promise<string> {
+/** The token in the last email to this address, from a link like `…/path?token=…`. */
+export async function emailToken(
+  request: APIRequestContext,
+  email: string,
+  link = /verify-email\?token=([\w%-]+)/,
+): Promise<string> {
   const deadline = Date.now() + 15_000;
   while (Date.now() < deadline) {
     const search = await request.get(`${MAILPIT_URL}/api/v1/search`, {
@@ -36,12 +41,12 @@ async function confirmationToken(request: APIRequestContext, email: string): Pro
     if (messages[0]) {
       const message = await request.get(`${MAILPIT_URL}/api/v1/message/${messages[0].ID}`);
       const { Text } = (await message.json()) as { Text: string };
-      const token = Text.match(/verify-email\?token=([\w%-]+)/)?.[1];
+      const token = Text.match(link)?.[1];
       if (token) return decodeURIComponent(token);
     }
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
-  throw new Error(`No confirmation email to ${email}`);
+  throw new Error(`No email with a link to ${email}`);
 }
 
 /** A confirmed parent with one child (account consent only), made through the API. */
@@ -61,7 +66,7 @@ export async function createFamily(
     },
   });
   expect(signUp.status()).toBe(202);
-  const token = await confirmationToken(request, parent.email);
+  const token = await emailToken(request, parent.email);
   expect((await request.post(`${API_URL}/v1/auth/email/verify`, { data: { token } })).ok()).toBe(
     true,
   );

@@ -16,14 +16,15 @@ export interface AdultInvite {
   email: string;
   displayName: string;
   languageCode: string;
-  roleKey: 'mentor' | 'teacher';
+  roleKey: 'mentor' | 'teacher' | 'client';
   countryCode?: string | null;
 }
 
 /**
- * Accounts staff make for adults who work with children in the web app (mentors,
- * teachers): no password until the person chooses one from the invitation email,
- * which also confirms the address. They set up two-factor login at their first login.
+ * Accounts made for adults by invitation (mentors and teachers by staff; clients by
+ * staff or a colleague): no password until the person chooses one from the invitation
+ * email, which also confirms the address. They set up two-factor login at their first
+ * login.
  */
 @Injectable()
 export class AdultInvitesService {
@@ -90,18 +91,21 @@ export class AdultInvitesService {
   private async send(userId: string) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
-      include: { role: { select: { key: true } } },
+      include: {
+        role: { select: { key: true } },
+        clientMembership: { select: { org: { select: { name: true } } } },
+      },
     });
     const token = await this.tokens.issue(user.id, 'PASSWORD_RESET', INVITE_TTL_HOURS);
     const base = this.config.get('WEB_APP_URL').replace(/\/+$/, '');
     await this.mail.send({
       to: user.email!,
-      template: 'adultInvite',
+      template: user.role.key === 'client' ? 'clientInvite' : 'adultInvite',
       language: toMailLanguage(user.languageCode),
       params: {
         name: user.displayName ?? '',
         actionUrl: `${base}/${toMailLanguage(user.languageCode)}/reset-password?token=${encodeURIComponent(token)}`,
-        vars: { role: user.role.key },
+        vars: { role: user.role.key, org: user.clientMembership?.org.name ?? '' },
       },
     });
   }

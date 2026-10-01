@@ -91,6 +91,39 @@ New attack surface since the review, and how it is handled. Review these again w
 - **The readiness check** runs its timer on the server: saving and handing in are refused after the time plus 5 minutes; what was saved is handed in automatically. Only the page's three files are kept. A mentor grades it through the same review flow as projects. Passing records readiness only.
 - **Hardening:** the route permission test covers every new route (staff routes, 404 for others' classes); the demo data now fills every table (`pnpm demo:data` fails otherwise).
 
+## Phase 3 additions (the real-world hub)
+
+New attack surface for paid client projects. Gate 2 (the lawyer's sign-off of the hub agreements and payouts) is not met yet: the `hub_payouts` flag stays off and each country's hub stays closed (Admin → Countries) until it is. Review this section with the rest before launch.
+
+**Who can be on a project.**
+
+- A student is eligible only when every check passes on the server, on every request: age (per country, 15 by default), the Pro track finished, the readiness check passed, a lead developer's sign-off, the parent's agreement in its current version (two consent records: paid work and earnings), the country's hub open, and not paused by staff. A consent taken back or a staff pause stops the student's timer and takes them off every project at once.
+- A parent approves each project separately (the work, the hours, the share) before the student joins; invites past 6 students per team or 2 active projects per student are refused.
+- Lead developers are mentors staff mark as leads; they are checked on every request (a paused mentor loses their projects).
+
+**Clients never learn who a student is.**
+
+- Clients are adults staff invite (never self sign-up) with two-factor login. Every client answer is built by a separate client view: students appear only as "Developer A/B…", with no nickname, avatar, age, country, task assignee or share. A test walks every client route's JSON for student identifiers.
+- Clients can't message students: their messages and change requests go to the lead and staff; students never see them. The team room is a moderated room (kind HUB) with the lead as its adult; clients aren't in it.
+- Client files (up to 5 per request, 10 MB each) are checked by their first bytes (PDF, PNG, JPEG or plain text), stored under random keys, and served only to the client's own people and staff with `Content-Disposition: attachment`.
+- The public request form has a hidden honeypot field and a per-IP limit, and requests count only after the email link is clicked (unconfirmed ones are deleted after 7 days).
+
+**Work, time and code.**
+
+- The hub timer runs on the server: it can't start outside the country's allowed hours (07:00–21:00, never 08:00–14:00 on school days by default) or past the weekly cap (6 hours by default); it stops itself at the window's end or the cap, and a job closes any it missed every 5 minutes. Pushes to the project's repository go through the same git proxy as hackathons and are refused unless the student's timer is running on that project; students push only their own branch, `main` changes only through pull requests the lead approved (the approval must be of the latest commit) and the lead merges.
+- Milestone previews copy only static files (HTML, CSS, JS, images, fonts; at most 200 files, 1 MB each, 5 MB in all; no hidden folders or `node_modules`) from `main` into storage, and are shown on the sandbox domain (no cookies, its own CSP) at a link whose secret is in the URL fragment. A withdrawn milestone or a cancelled project's link stops working. The preview page itself (script-src 'self', connect-src only the API, never embeddable) parses the files with `DOMParser`, which runs nothing, and shows each page in a nested sandboxed frame with the runner's policy: the client's site can run its scripts but can't call any server, submit forms or reach the preview page; links between its pages only post the page's path, which is checked against the file list.
+
+**Money.**
+
+- **Double-entry ledger.** Every movement (invoice issued, paid, voided; earnings shared out; holds released; payouts sent, paid, failed; lead paid) is a posting whose debits equal its credits, checked in code and again by a deferred database trigger at commit. Ledger rows can't be updated or deleted (triggers), and each posting has an idempotency key, so retries and duplicate webhooks never post twice. Admin → Ledger shows the trial balance.
+- **Sharing out** happens only when an invoice is paid **and** the client accepted the quote's work, once per invoice (row lock + key). Students' parts are held for the country's hold days (14 by default) before they can be paid out.
+- **Payout accounts** belong to parents only. The holder's name and IBAN (or other details) are encrypted with `ENCRYPTION_KEY` (AES-256-GCM); only the last four characters are readable. Setting or changing one needs the parent's password, emails the parent, cancels payouts waiting for the old account, and the new one can be paid only after 48 hours **and** once staff have checked it. Staff see full details only through an audited "reveal". Deleting the parent's account wipes the details.
+- **Payout batches** need the parent's confirmation of each payout and **two different super admins'** approval (a database check refuses the same person twice); sending also needs the `hub_payouts` flag. One payout per student can be in progress at a time (a unique index), so payable money can't be paid twice. A failed transfer puts the money back (ledger posting) for the next round.
+- **Wise.** The API token, profile ID and webhook public key are secrets in the environment. Webhooks are accepted only with a valid `X-Signature-SHA256` (RSA-SHA256 of the raw body with Wise's public key); transfers are idempotent by our payout ID (`customerTransactionId`); a status job asks Wise about unsettled transfers every 30 minutes in case a webhook was missed. Without a token, development uses a signed mock and production pays by hand (staff record each payment with its reference).
+- **Not done:** Wise's account requirements per currency may need more than an IBAN (the payout then fails with Wise's message and is paid by hand); Strong Customer Authentication for funding, where Wise asks for it, has to be approved in Wise. Chargebacks of client card payments after sharing out need a manual adjusting posting (runbook).
+
+**Stories and numbers on the site.** A story shows a first name and country only, appears only after a parent's yes, and comes off the site the moment the parent takes it back (the public answer is cached for at most a minute). The public counter shows totals only.
+
 ## Dependency audit
 
 `pnpm audit` flagged three transitive packages (`mysql2`, `deepmerge-ts`, `smol-toml`, pulled in by development tooling); `pnpm-workspace.yaml` overrides them to fixed versions, and the audit is now clean (30 September 2026). CI now fails on any new high or critical advisory. Dependabot keeps packages and actions current.

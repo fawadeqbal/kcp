@@ -16,6 +16,7 @@ const SECTIONS = new Set([
   'skills',
   'badges',
   'portfolio',
+  'hub',
 ]);
 
 /**

@@ -16,6 +16,7 @@ import '../rooms/room_screen.dart';
 import '../social/growth.dart';
 import '../social/parent_friends.dart';
 import 'parent_data.dart';
+import 'parent_hub.dart';
 import 'premium_text.dart';
 
 /// One child: progress, and the switches a parent controls. Every change asks the
@@ -244,6 +245,7 @@ class _ChildScreenState extends ConsumerState<ChildScreen> {
         const SizedBox(height: 16),
         ChildFriendsCard(childId: child.id, nickname: child.nickname),
         ChildRoomsCard(childId: child.id),
+        ChildEarningsCard(childId: child.id, nickname: child.nickname),
         if (ref.watch(childSkillMapProvider(child.id)).value case final map?) ...[
           const SizedBox(height: 16),
           SkillMapCard(map: map, title: t.childSkillsTitle),

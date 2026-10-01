@@ -14,11 +14,12 @@ import {
   type StageLabels,
   type StageLevel,
 } from '@kcp/checks';
+import { element, fullScreenButton, type Language, pageLanguage, translator } from './page-kit.js';
 
 /** Set at build time (scripts/build.mjs). */
 declare const PORTFOLIO_API_URL: string;
 declare const PORTFOLIO_WEB_URL: string;
-declare const PORTFOLIO_MESSAGES: Record<'en' | 'ar' | 'ur', Record<string, string>>;
+declare const PORTFOLIO_MESSAGES: Record<Language, Record<string, string>>;
 
 interface Item {
   id: string;
@@ -37,112 +38,12 @@ interface Portfolio {
   items: Item[];
 }
 
-type Language = 'en' | 'ar' | 'ur';
-const params = new URLSearchParams(location.search);
-const requested = params.get('lang');
-const language: Language = requested === 'ar' || requested === 'ur' ? requested : 'en';
+const language = pageLanguage();
 const messages = PORTFOLIO_MESSAGES[language];
-const text = (key: string, values: Record<string, string> = {}) =>
-  (messages[key] ?? PORTFOLIO_MESSAGES.en[key] ?? key).replace(
-    /\{(\w+)\}/g,
-    (_, name: string) => values[name] ?? '',
-  );
-
+const text = translator(PORTFOLIO_MESSAGES, language);
 const root = document.getElementById('app') as HTMLElement;
-document.documentElement.lang = language;
-document.documentElement.dir = language === 'en' ? 'ltr' : 'rtl';
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  attributes: Record<string, string> = {},
-  ...children: (Node | string)[]
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
-  node.append(...children);
-  return node;
-}
-
-/** Interface icons (Lucide paths, as in packages/ui/src/icons.tsx), drawn in the text colour. */
-const ICONS = {
-  maximize: [
-    'M8 3H5a2 2 0 0 0-2 2v3',
-    'M21 8V5a2 2 0 0 0-2-2h-3',
-    'M3 16v3a2 2 0 0 0 2 2h3',
-    'M16 21h3a2 2 0 0 0 2-2v-3',
-  ],
-  minimize: [
-    'M8 3v3a2 2 0 0 1-2 2H3',
-    'M21 8h-3a2 2 0 0 1-2-2V3',
-    'M3 16h3a2 2 0 0 1 2 2v3',
-    'M16 21v-3a2 2 0 0 1 2-2h3',
-  ],
-};
-
-function icon(name: keyof typeof ICONS) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  for (const [key, value] of Object.entries({
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '2.75',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'aria-hidden': 'true',
-  })) {
-    svg.setAttribute(key, value);
-  }
-  for (const d of ICONS[name]) {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', d);
-    svg.append(path);
-  }
-  return svg;
-}
-
-/**
- * A "Full screen" button for a project's card: it shows the whole card (name, details
- * and the running project) on the whole screen, and the button (or Esc) brings it back.
- * Where the browser has no full-screen mode (Safari on iPhone), the card covers the
- * window instead. The card is never moved, so a running program keeps running.
- */
-function fullScreenButton(card: HTMLElement) {
-  const button = element('button', { type: 'button', class: 'secondary' });
-  let covering = false;
-  const isFull = () => covering || document.fullscreenElement === card;
-  const render = () => {
-    const full = isFull();
-    card.classList.toggle('is-full', full);
-    document.documentElement.classList.toggle('covered', covering);
-    button.replaceChildren(
-      icon(full ? 'minimize' : 'maximize'),
-      text(full ? 'exitFullScreen' : 'fullScreen'),
-    );
-  };
-  button.addEventListener('click', async () => {
-    if (isFull()) {
-      if (document.fullscreenElement === card) await document.exitFullscreen().catch(() => {});
-      covering = false;
-    } else if (document.fullscreenEnabled && typeof card.requestFullscreen === 'function') {
-      covering = await card.requestFullscreen().then(
-        () => false,
-        () => true,
-      );
-    } else {
-      covering = true;
-    }
-    render();
-  });
-  document.addEventListener('fullscreenchange', render);
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && covering) {
-      covering = false;
-      render();
-    }
-  });
-  render();
-  return button;
-}
+const fullScreen = (card: HTMLElement) =>
+  fullScreenButton(card, { enter: text('fullScreen'), exit: text('exitFullScreen') });
 
 /** Latin nicknames stay left-to-right inside Arabic and Urdu sentences. */
 const isolate = (value: string) => element('bdi', {}, value);
@@ -250,7 +151,7 @@ function projectCard(item: Item) {
         element('h2', {}, item.title),
         element('p', { class: 'muted' }, `${item.moduleTitle} · ${text('shippedOn', { date })}`),
       ),
-      fullScreenButton(card),
+      fullScreen(card),
     ),
   );
   if (item.files.blocks !== undefined && item.stage) return stageCard(card, item, item.stage);

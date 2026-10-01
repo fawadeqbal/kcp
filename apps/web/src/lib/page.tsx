@@ -41,7 +41,13 @@ type TitleKey =
   | 'mentorEvents.title'
   | 'classes.title'
   | 'teacher.title'
-  | 'readiness.title';
+  | 'readiness.title'
+  | 'hub.title'
+  | 'hub.family.title'
+  | 'hub.payouts.title'
+  | 'hub.lead.title'
+  | 'client.title'
+  | 'client.settings.title';
 
 /**
  * A page made of one client component: sets the language for static rendering,

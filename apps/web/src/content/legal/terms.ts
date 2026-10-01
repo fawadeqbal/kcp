@@ -37,6 +37,10 @@ If something breaks these rules we may remove it, and in serious or repeated cas
 
 The code and projects a student makes are theirs. You give us permission to store them and to show them to the student, to their parent and, **only if the parent turns sharing on**, to the people they share them with. That permission ends when the work or the account is deleted.
 
+## Paid hub work (ages 15 and up)
+
+Paid projects for real clients have their own **parent agreement**, which a parent accepts on their dashboard before their child can join any project; it sets out the hours limits, how earnings are shared and held, and how payouts work. In short: a parent approves each project; the platform keeps hub work outside school hours and within the weekly limit; a lead developer reviews all the work; clients never learn who a student is; earnings are paid only to the parent's own account, after a hold period; and a parent can stop their child's hub work at any time. Clients agree to a separate client agreement and a statement of work for each project. Unlike lesson work, code written for a client's project belongs to the client once it's paid for, as those agreements say. If these terms and the parent agreement differ about hub work, the parent agreement applies.
+
 ## Our lessons
 
 The lessons, challenges, pictures and other content on the platform belong to us or the people who licensed them to us. You may use them to learn with your family, but not copy or sell them.
@@ -85,6 +89,10 @@ If we change these terms in an important way, we will email you before the chang
 
 الكود والمشاريع التي يصنعها الطالب ملكه. أنت تسمح لنا بحفظها وعرضها على الطالب ووليّ أمره، و**فقط إذا فعّل وليّ الأمر المشاركة**، على الأشخاص الذين يشاركها معهم. ينتهي هذا الإذن عند حذف العمل أو الحساب.
 
+## العمل المدفوع في المركز (من 15 عامًا فما فوق)
+
+للمشاريع المدفوعة لعملاء حقيقيين **اتفاقية خاصة بالوالدين** يقبلها أحد الوالدين من لوحته قبل أن ينضم طفله إلى أي مشروع؛ وهي تحدّد حدود الساعات، وكيف تُقسَّم الأرباح وتُحجز، وكيف تتم الدفعات. باختصار: يوافق الوالد على كل مشروع؛ وتُبقي المنصة العمل خارج ساعات المدرسة وضمن الحد الأسبوعي؛ ويراجع مطوّر رئيسي كل العمل؛ ولا يعرف العملاء أبدًا هوية الطالب؛ وتُدفع الأرباح إلى حساب الوالد فقط بعد فترة حجز؛ ويمكن للوالد إيقاف عمل طفله في المركز في أي وقت. يوافق العملاء على اتفاقية عملاء منفصلة وبيان عمل لكل مشروع. وبخلاف عمل الدروس، يصبح الكود المكتوب لمشروع عميل ملكًا للعميل بعد دفع ثمنه، كما تنص تلك الاتفاقيات. إذا اختلفت هذه الشروط عن اتفاقية الوالدين بشأن العمل في المركز، تسري اتفاقية الوالدين.
+
 ## دروسنا
 
 الدروس والتحديات والصور وغيرها من محتوى المنصة ملك لنا أو لمن منحنا ترخيص استخدامها. يمكنك استخدامها للتعلّم مع عائلتك، لكن لا يجوز نسخها أو بيعها.
@@ -132,6 +140,10 @@ If we change these terms in an important way, we will email you before the chang
 ## آپ کا کام آپ کا ہے
 
 طالب علم جو کوڈ اور پروجیکٹس بناتا ہے وہ اسی کے ہیں۔ آپ ہمیں اجازت دیتے ہیں کہ ہم انہیں محفوظ رکھیں اور طالب علم، اس کے والدین اور، **صرف اگر والدین شیئرنگ آن کریں**، ان لوگوں کو دکھائیں جن کے ساتھ وہ شیئر کریں۔ یہ اجازت کام یا اکاؤنٹ حذف ہونے پر ختم ہو جاتی ہے۔
+
+## ہب میں معاوضے والا کام (15 سال اور اس سے زیادہ)
+
+حقیقی کلائنٹس کے معاوضے والے پروجیکٹس کا اپنا **والدین کا معاہدہ** ہے، جسے والدین اپنے ڈیش بورڈ پر قبول کرتے ہیں اس سے پہلے کہ ان کا بچہ کسی پروجیکٹ میں شامل ہو؛ اس میں اوقات کی حدیں، آمدنی کی تقسیم اور روکے رکھنے کا طریقہ، اور ادائیگیوں کا طریقہ درج ہے۔ مختصراً: والدین ہر پروجیکٹ کی منظوری دیتے ہیں؛ پلیٹ فارم ہب کا کام اسکول کے اوقات سے باہر اور ہفتہ وار حد کے اندر رکھتا ہے؛ لیڈ ڈیولپر سارا کام جانچتا ہے؛ کلائنٹس کبھی نہیں جانتے کہ طالب علم کون ہے؛ آمدنی ایک مدت تک روکنے کے بعد صرف والدین کے اپنے اکاؤنٹ میں ادا ہوتی ہے؛ اور والدین کسی بھی وقت اپنے بچے کا ہب کا کام روک سکتے ہیں۔ کلائنٹس ہر پروجیکٹ کے لیے الگ کلائنٹ معاہدے اور کام کے بیان پر رضامند ہوتے ہیں۔ اسباق کے کام کے برعکس، کلائنٹ کے پروجیکٹ کے لیے لکھا گیا کوڈ ادائیگی کے بعد کلائنٹ کا ہو جاتا ہے، جیسا کہ ان معاہدوں میں درج ہے۔ اگر ہب کے کام کے بارے میں یہ شرائط اور والدین کا معاہدہ مختلف ہوں تو والدین کا معاہدہ لاگو ہوگا۔
 
 ## ہمارے اسباق
 

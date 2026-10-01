@@ -29,6 +29,12 @@ import {
  *   SchoolClass → teacherId, memberIds (approved students), parentIds (their parents)
  *   ClassMember → userId, parentIds
  *   ReadinessCheck → studentId, parentIds
+ *   HubEligibility → studentId, parentIds
+ *   ClientOrg → memberIds (its client accounts)
+ *   HubIntake, HubInvoice → clientIds (the organisation's client accounts)
+ *   HubProject → clientIds, leadId, memberIds (the team's students), parentIds (theirs)
+ *   HubEarnings → studentId, parentIds
+ *   PayoutAccount, Payout, HubStory → parentId
  */
 
 /** Fields any adult may change on their own account. */
@@ -81,6 +87,12 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'create', subject: 'ReadinessCheck' },
     { action: 'read', subject: 'ReadinessCheck', conditions: { studentId: SELF } },
     { action: 'update', subject: 'ReadinessCheck', conditions: { studentId: SELF } },
+    // The hub: their own steps towards paid work, the projects they're on (the board,
+    // their time, the repository) and their own earnings.
+    { action: 'read', subject: 'HubEligibility', conditions: { studentId: SELF } },
+    { action: 'read', subject: 'HubProject', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'HubProject', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'read', subject: 'HubEarnings', conditions: { studentId: SELF } },
   ],
 
   [ROLE_KEYS.PARENT]: [
@@ -117,6 +129,22 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'update', subject: 'ClassMember', conditions: { parentIds: { $all: [SELF] } } },
     { action: 'read', subject: 'SchoolClass', conditions: { parentIds: { $all: [SELF] } } },
     { action: 'read', subject: 'ReadinessCheck', conditions: { parentIds: { $all: [SELF] } } },
+    // The hub: consent to paid work and earnings for their own children (or take it back).
+    { action: 'read', subject: 'HubEligibility', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'HubEligibility', conditions: { parentIds: { $all: [SELF] } } },
+    // Approve each project before their child joins it; see their children's earnings;
+    // their payout account and payouts (they confirm each one); earnings stories.
+    { action: 'read', subject: 'HubProject', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'HubProject', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'read', subject: 'HubEarnings', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'create', subject: 'PayoutAccount' },
+    { action: 'read', subject: 'PayoutAccount', conditions: { parentId: SELF } },
+    { action: 'update', subject: 'PayoutAccount', conditions: { parentId: SELF } },
+    { action: 'delete', subject: 'PayoutAccount', conditions: { parentId: SELF } },
+    { action: 'read', subject: 'Payout', conditions: { parentId: SELF } },
+    { action: 'update', subject: 'Payout', conditions: { parentId: SELF } },
+    { action: 'read', subject: 'HubStory', conditions: { parentId: SELF } },
+    { action: 'update', subject: 'HubStory', conditions: { parentId: SELF } },
   ],
 
   // Mentors review students' projects (they see nicknames only, never accounts), keep
@@ -146,6 +174,12 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'update', subject: 'EventTeam', conditions: { mentorId: SELF } },
     { action: 'create', subject: 'EventScore' },
     { action: 'read', subject: 'EventScore' },
+    // The hub: lead developers sign students off and lead the projects they're given
+    // (the service checks they're a ready lead).
+    { action: 'read', subject: 'HubEligibility' },
+    { action: 'update', subject: 'HubEligibility' },
+    { action: 'read', subject: 'HubProject', conditions: { leadId: SELF } },
+    { action: 'update', subject: 'HubProject', conditions: { leadId: SELF } },
   ],
   // Preview lessons before they're published (publishing modules is for admins), and
   // translate in the content studio: write drafts, review and publish each other's
@@ -158,7 +192,21 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'read', subject: 'ContentText' },
     { action: 'update', subject: 'ContentText' },
   ],
-  [ROLE_KEYS.CLIENT]: [readSelf, updateOwnProfile],
+  // Clients: their organisation, its project requests, projects (quotes, deliveries,
+  // messages to the lead) and invoices. Never any student's account or identity: the
+  // team is shown with pseudonyms only (checked by tests on every client route).
+  [ROLE_KEYS.CLIENT]: [
+    readSelf,
+    updateOwnProfile,
+    { action: 'read', subject: 'ClientOrg', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'ClientOrg', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'create', subject: 'HubIntake' },
+    { action: 'read', subject: 'HubIntake', conditions: { clientIds: { $all: [SELF] } } },
+    { action: 'read', subject: 'HubProject', conditions: { clientIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'HubProject', conditions: { clientIds: { $all: [SELF] } } },
+    { action: 'read', subject: 'HubInvoice', conditions: { clientIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'HubInvoice', conditions: { clientIds: { $all: [SELF] } } },
+  ],
   [ROLE_KEYS.TEACHER]: [
     readSelf,
     updateOwnProfile,
@@ -225,7 +273,7 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     {
       action: 'update',
       subject: 'Country',
-      fields: ['isActive', 'currency', 'under13ConsentMethods'],
+      fields: ['isActive', 'currency', 'under13ConsentMethods', 'hubRules'],
     },
     // Checks the consent forms parents of under-13s upload (approve or reject).
     { action: 'read', subject: 'ParentalConsent' },
@@ -276,6 +324,24 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'read', subject: 'SchoolClass' },
     // How many students passed the readiness check (the Gate 2 number).
     { action: 'read', subject: 'ReadinessCheck' },
+    // The hub: intake, clients and projects; who may do paid work (pause a student,
+    // with a reason); and the ledger (read only).
+    { action: 'manage', subject: 'Hub' },
+    { action: 'read', subject: 'Ledger' },
+    { action: 'read', subject: 'ClientOrg' },
+    { action: 'read', subject: 'HubIntake' },
+    { action: 'read', subject: 'HubProject' },
+    // Client invoices: record bank transfers, void an unpaid invoice (with a reason).
+    { action: 'manage', subject: 'HubInvoice' },
+    // Earnings and payouts: prepare payout batches and send approved ones (approving a
+    // batch takes two super admins), check parents' payout accounts.
+    { action: 'read', subject: 'HubEarnings' },
+    { action: 'read', subject: 'PayoutAccount' },
+    { action: 'update', subject: 'PayoutAccount', fields: ['verified'] },
+    { action: 'read', subject: 'Payout' },
+    { action: 'create', subject: 'Payout' },
+    { action: 'update', subject: 'Payout' },
+    { action: 'manage', subject: 'HubStory' },
   ],
 
   [ROLE_KEYS.SUPER_ADMIN]: [{ action: 'manage', subject: 'all' }],

@@ -300,6 +300,25 @@ export class ForgejoService {
     }
   }
 
+  /** Every file of a commit or branch: paths, sizes and blob IDs (the tree, recursively). */
+  async tree(repo: string, ref: string): Promise<{ path: string; size: number; sha: string }[]> {
+    const found = await this.json<{
+      tree: { path: string; type: string; size?: number; sha: string }[];
+    }>('GET', `/repos/${repo}/git/trees/${encodeURIComponent(ref)}?recursive=true&per_page=1000`);
+    return found.tree
+      .filter((entry) => entry.type === 'blob')
+      .map((entry) => ({ path: entry.path, size: entry.size ?? 0, sha: entry.sha }));
+  }
+
+  /** A file's bytes, by its blob ID. */
+  async blob(repo: string, sha: string): Promise<Buffer> {
+    const found = await this.json<{ content: string; encoding: string }>(
+      'GET',
+      `/repos/${repo}/git/blobs/${sha}`,
+    );
+    return Buffer.from(found.content, found.encoding === 'base64' ? 'base64' : 'utf8');
+  }
+
   // ── Pull requests ────────────────────────────────────────────────────────
 
   pulls(repo: string): Promise<ForgejoPull[]> {

@@ -18,6 +18,7 @@ import '../social/parent_events.dart';
 import '../social/parent_friends.dart';
 import '../social/social_data.dart';
 import 'parent_data.dart';
+import 'parent_hub.dart';
 import 'premium_text.dart';
 
 /// The parent's home: each child's progress with the streak reminder switch, the
@@ -44,6 +45,7 @@ class ParentHomeScreen extends ConsumerWidget {
       ref.invalidate(parentFriendRequestsProvider);
       ref.invalidate(parentEventRequestsProvider);
       ref.invalidate(parentClassRequestsProvider);
+      ref.invalidate(parentHubApprovalsProvider);
       ref.invalidate(parentReportsProvider);
       await ref.read(authControllerProvider.notifier).reloadMe().catchError((_) {});
       await ref.read(childrenProvider.future);
@@ -115,6 +117,7 @@ class ParentHomeScreen extends ConsumerWidget {
               const FriendRequestsSection(),
               const EventRequestsSection(),
               const ClassRequestsSection(),
+              const HubApprovalsSection(),
               const WeeklyReportCard(),
               switch (children) {
                 AsyncData(:final value) when value.isEmpty => SectionCard(

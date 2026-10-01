@@ -129,7 +129,7 @@ describe('permissions on every route (e2e)', () => {
   it('finds the routes', () => {
     expect(routes.length).toBeGreaterThan(100);
     // Every public route is listed in src/permissions/route-access.spec.ts.
-    expect(routes.filter((r) => r.access === 'public').length).toBeLessThan(40);
+    expect(routes.filter((r) => r.access === 'public').length).toBeLessThan(50);
   });
 
   it('refuses every route that is not public without a token (401)', async () => {

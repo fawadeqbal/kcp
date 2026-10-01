@@ -161,6 +161,42 @@ model User {
   assignmentsMade    Assignment[]
   licensesRecorded   SchoolLicense[]
   readinessChecks    ReadinessCheck[]
+  hubEligibility     HubEligibility?          @relation("HubEligibilityStudent")
+  hubSignOffs        HubEligibility[]         @relation("HubEligibilitySignOff")
+  hubRevocations     HubEligibility[]         @relation("HubEligibilityRevoker")
+  clientMembership   ClientMember?
+  clientAgreements   ClientOrg[]              @relation("ClientOrgSigner")
+  hubIntakesMade     HubIntake[]              @relation("HubIntakeAuthor")
+  hubIntakesDecided  HubIntake[]              @relation("HubIntakeDecider")
+  hubProjectsLed     HubProject[]             @relation("HubProjectLead")
+  hubProjectsMade    HubProject[]             @relation("HubProjectCreator")
+  hubQuotesMade      HubQuote[]               @relation("HubQuoteCreator")
+  hubQuotesApproved  HubQuote[]               @relation("HubQuoteApprover")
+  hubTasks           HubTask[]                @relation("HubTaskAssignee")
+  hubPaymentsMade    HubPayment[]             @relation("HubPaymentRecorder")
+  hubMemberships     HubMember[]              @relation("HubMemberStudent")
+  hubInvitesSent     HubMember[]              @relation("HubMemberInviter")
+  hubApprovals       HubMember[]              @relation("HubMemberParent")
+  hubTimeEntries     HubTimeEntry[]
+  hubReviewsGot      HubCodeReview[]          @relation("HubCodeReviewStudent")
+  hubReviewsGiven    HubCodeReview[]          @relation("HubCodeReviewReviewer")
+  hubDeliveriesMade  HubDelivery[]            @relation("HubDeliveryCreator")
+  hubDeliveriesSeen  HubDelivery[]            @relation("HubDeliveryDecider")
+  hubComments        HubComment[]
+  hubChangesAsked    HubChangeRequest[]       @relation("HubChangeAuthor")
+  hubChangesDecided  HubChangeRequest[]       @relation("HubChangeDecider")
+  hubEarnings        HubEarning[]
+  payoutAccounts     PayoutAccount[]          @relation("PayoutAccountParent")
+  payoutAccountsSeen PayoutAccount[]          @relation("PayoutAccountVerifier")
+  payoutBatchesMade  PayoutBatch[]            @relation("PayoutBatchCreator")
+  payoutBatchesOk1   PayoutBatch[]            @relation("PayoutBatchFirstApprover")
+  payoutBatchesOk2   PayoutBatch[]            @relation("PayoutBatchSecondApprover")
+  payoutsEarned      Payout[]                 @relation("PayoutStudent")
+  payoutsReceived    Payout[]                 @relation("PayoutParent")
+  payoutsRecorded    Payout[]                 @relation("PayoutRecorder")
+  hubStoriesAbout    HubStory[]               @relation("HubStoryStudent")
+  hubStoriesAsked    HubStory[]               @relation("HubStoryParent")
+  hubStoriesWritten  HubStory[]               @relation("HubStoryAuthor")
 
   @@index([roleId])
   @@index([countryCode, regionId, cityId])
@@ -479,6 +515,28 @@ model Country {
   /// How parents of children under 13 can give verified consent here. None: no
   /// under-13 accounts in this country (even with the under_13_accounts flag on).
   under13ConsentMethods Under13ConsentMethod[] @default([]) @map("under13_consent_methods")
+  /// The hub (paid client work for students) is open here — only after the lawyer's
+  /// review of child work, earnings, tax and IP for this country.
+  hubEnabled            Boolean                @default(false) @map("hub_enabled")
+  /// Youngest age for paid hub work.
+  hubMinAge             Int                    @default(15) @map("hub_min_age") @db.SmallInt
+  /// Most hub work a student may do in a week (their own Monday to Sunday), in minutes.
+  hubWeeklyMinutes      Int                    @default(360) @map("hub_weekly_minutes") @db.SmallInt
+  /// Hub work only between these local times (minutes after midnight): 07:00–21:00.
+  hubDayStartMinute     Int                    @default(420) @map("hub_day_start_minute") @db.SmallInt
+  hubDayEndMinute       Int                    @default(1260) @map("hub_day_end_minute") @db.SmallInt
+  /// No hub work during school hours on school days (0 = Sunday … 6 = Saturday).
+  hubSchoolDays         Int[]                  @default([1, 2, 3, 4, 5]) @map("hub_school_days")
+  hubSchoolStartMinute  Int                    @default(480) @map("hub_school_start_minute") @db.SmallInt
+  hubSchoolEndMinute    Int                    @default(840) @map("hub_school_end_minute") @db.SmallInt
+  /// How a project's money is split by default (percent, adding up to 100).
+  hubStudentPercent     Int                    @default(50) @map("hub_student_percent") @db.SmallInt
+  hubLeadPercent        Int                    @default(25) @map("hub_lead_percent") @db.SmallInt
+  hubPlatformPercent    Int                    @default(25) @map("hub_platform_percent") @db.SmallInt
+  /// Students' earnings are held this many days before they can be paid out.
+  hubHoldDays           Int                    @default(14) @map("hub_hold_days") @db.SmallInt
+  /// Withheld from payouts where the law asks for it, in basis points (100 = 1%).
+  hubWithholdingBp      Int                    @default(0) @map("hub_withholding_bp") @db.SmallInt
   createdAt             DateTime               @default(now()) @map("created_at")
   updatedAt             DateTime               @updatedAt @map("updated_at")
 
@@ -487,6 +545,7 @@ model Country {
   users           User[]
   prices          PlanPrice[]
   schools         School[]
+  clientOrgs      ClientOrg[]
 
   @@map("countries")
 }
@@ -1278,6 +1337,8 @@ enum ChatRoomKind {
   TEAM
   CLASS
   EVENT
+  /// A hub project's team and its lead developer (never the client).
+  HUB
 }
 
 enum ChatMemberRole {
@@ -2341,6 +2402,8 @@ model MentorProfile {
   languages             String[]              @default([])
   /// Reviews they may have open at once.
   capacity              Int                   @default(5)
+  /// A lead developer: signs students off for the hub, scopes and leads client projects.
+  isLead                Boolean               @default(false) @map("is_lead")
   isActive              Boolean               @default(true) @map("is_active")
   createdAt             DateTime              @default(now()) @map("created_at")
   updatedAt             DateTime              @updatedAt @map("updated_at")
@@ -2438,4 +2501,879 @@ model MentorNote {
 
   @@index([studentId, createdAt])
   @@map("mentor_notes")
+}
+
+// ── Phase 3: the real-world hub ──────────────────────────────────────────────
+
+/// A student's way into paid hub work: the Pro track, the readiness check, a lead
+/// developer's sign-off, both parent consents (hub work and earnings) to the current
+/// parent agreement, the country's minimum age and an open hub in their country. The
+/// steps are checked live; `eligibleAt` records the first time they were all met.
+model HubEligibility {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  studentId     String    @unique @map("student_id") @db.Uuid
+  /// The passed readiness check the sign-off was based on.
+  readinessId   String?   @map("readiness_id") @db.Uuid
+  signedOffById String?   @map("signed_off_by_id") @db.Uuid
+  signedOffAt   DateTime? @map("signed_off_at")
+  /// The lead developer's note (for staff and other mentors).
+  signOffNote   String?   @map("sign_off_note")
+  eligibleAt    DateTime? @map("eligible_at")
+  /// Staff paused the student's hub work (with a reason in the audit log).
+  revokedAt     DateTime? @map("revoked_at")
+  revokedById   String?   @map("revoked_by_id") @db.Uuid
+  revokedReason String?   @map("revoked_reason")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  student     User  @relation("HubEligibilityStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  signedOffBy User? @relation("HubEligibilitySignOff", fields: [signedOffById], references: [id], onDelete: SetNull)
+  revokedBy   User? @relation("HubEligibilityRevoker", fields: [revokedById], references: [id], onDelete: SetNull)
+
+  @@index([eligibleAt])
+  @@map("hub_eligibility")
+}
+
+enum LedgerAccountType {
+  /// Money the platform holds (bank and card processor).
+  CASH
+  /// What a client organisation owes on invoices issued.
+  CLIENT_RECEIVABLE
+  /// A project's invoiced money, until the accepted work is shared out.
+  PROJECT_FUNDS
+  PLATFORM_REVENUE
+  /// What the platform owes a lead developer.
+  LEAD_PAYABLE
+  /// A student's earnings while they are held (the hold period).
+  STUDENT_HELD
+  /// A student's earnings that can be paid out to their parent.
+  STUDENT_PAYABLE
+  /// Payouts sent and not yet confirmed by the provider.
+  PAYOUT_CLEARING
+  /// Withheld from payouts for tax, where the law asks for it.
+  TAX_WITHHELD
+}
+
+enum LedgerSide {
+  DEBIT
+  CREDIT
+}
+
+/// An account in the hub's double-entry ledger, per currency. `ownerKey` is the owner's
+/// ID (a client organisation, project, lead developer or student), or "" for the
+/// platform's own accounts.
+model LedgerAccount {
+  id        String            @id @default(uuid(7)) @db.Uuid
+  type      LedgerAccountType
+  currency  String            @db.Char(3)
+  ownerKey  String            @default("") @map("owner_key")
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  entries LedgerEntry[]
+
+  @@unique([type, currency, ownerKey])
+  @@map("ledger_accounts")
+}
+
+/// One posting: its entries balance (debits equal credits in each currency — checked
+/// by the database when the transaction commits). Nothing is ever edited or deleted:
+/// a mistake is put right by a new posting.
+model LedgerTransaction {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  /// e.g. "invoice.issued", "invoice.paid", "earnings.shared", "earnings.released".
+  kind           String
+  memo           String
+  /// What it is about, e.g. ("HubInvoice", id).
+  refType        String?  @map("ref_type")
+  refId          String?  @map("ref_id") @db.Uuid
+  /// The same key never posts twice (retries, a webhook delivered twice).
+  idempotencyKey String   @unique @map("idempotency_key")
+  createdById    String?  @map("created_by_id") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  entries LedgerEntry[]
+
+  @@index([refType, refId])
+  @@index([createdAt])
+  @@map("ledger_transactions")
+}
+
+model LedgerEntry {
+  id            String     @id @default(uuid(7)) @db.Uuid
+  transactionId String     @map("transaction_id") @db.Uuid
+  accountId     String     @map("account_id") @db.Uuid
+  side          LedgerSide
+  /// Minor units (cents, paisa, piastres); always more than zero.
+  amountMinor   Int        @map("amount_minor")
+  currency      String     @db.Char(3)
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  transaction LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  account     LedgerAccount     @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, createdAt])
+  @@index([transactionId])
+  @@map("ledger_entries")
+}
+
+enum ClientOrgStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+/// A client: a business that brings projects to the hub. It signs the client agreement
+/// with the platform; its people sign in to the client portal (two-factor login).
+model ClientOrg {
+  id                 String          @id @default(uuid(7)) @db.Uuid
+  name               String
+  countryCode        String          @map("country_code") @db.Char(2)
+  /// On invoices.
+  billingName        String?         @map("billing_name")
+  billingAddress     String?         @map("billing_address")
+  taxId              String?         @map("tax_id")
+  /// The client agreement's version they signed (HUB_AGREEMENTS.client), and who and when.
+  contractVersion    String?         @map("contract_version")
+  contractSignedAt   DateTime?       @map("contract_signed_at")
+  contractSignedById String?         @map("contract_signed_by_id") @db.Uuid
+  status             ClientOrgStatus @default(ACTIVE)
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  country          Country        @relation(fields: [countryCode], references: [code])
+  contractSignedBy User?          @relation("ClientOrgSigner", fields: [contractSignedById], references: [id], onDelete: SetNull)
+  members          ClientMember[]
+  intakes          HubIntake[]
+  projects         HubProject[]
+  invoices         HubInvoice[]
+
+  @@map("client_orgs")
+}
+
+enum ClientMemberRole {
+  /// Signs the agreement, approves quotes, invites colleagues.
+  OWNER
+  MEMBER
+}
+
+model ClientMember {
+  id        String           @id @default(uuid(7)) @db.Uuid
+  orgId     String           @map("org_id") @db.Uuid
+  /// A client account belongs to one organisation.
+  userId    String           @unique @map("user_id") @db.Uuid
+  role      ClientMemberRole @default(MEMBER)
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  org  ClientOrg @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@map("client_members")
+}
+
+enum HubIntakeStatus {
+  /// From the marketing site: waiting for the contact to confirm their email.
+  UNCONFIRMED
+  /// In the admin Hub queue.
+  NEW
+  ACCEPTED
+  DECLINED
+}
+
+enum HubIntakeSource {
+  SITE
+  PORTAL
+}
+
+/// What a client says they'll spend (US dollars, a rough range).
+enum HubBudget {
+  UNDER_500
+  FROM_500
+  FROM_2000
+  FROM_5000
+  UNSURE
+}
+
+/// A project request: from the "Hire our students" page or the client portal.
+model HubIntake {
+  id             String          @id @default(uuid(7)) @db.Uuid
+  number         Int             @unique @default(autoincrement())
+  source         HubIntakeSource
+  status         HubIntakeStatus
+  orgId          String?         @map("org_id") @db.Uuid
+  createdById    String?         @map("created_by_id") @db.Uuid
+  contactName    String          @map("contact_name")
+  /// Stored lowercase.
+  contactEmail   String          @map("contact_email")
+  company        String
+  countryCode    String?         @map("country_code") @db.Char(2)
+  languageCode   String          @default("en") @map("language_code")
+  title          String
+  /// What they need (plain text).
+  brief          String
+  budget         HubBudget
+  deadline       DateTime?       @db.Date
+  /// [{ id, key, name, size, type }] — files in storage (hub/intakes/…), private.
+  files          Json            @default("[]")
+  /// Sites only: the email link (hashed) that confirms the request.
+  tokenHash      String?         @unique @map("token_hash")
+  tokenExpiresAt DateTime?       @map("token_expires_at")
+  decidedById    String?         @map("decided_by_id") @db.Uuid
+  decidedAt      DateTime?       @map("decided_at")
+  declineReason  String?         @map("decline_reason")
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  org       ClientOrg?  @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  createdBy User?       @relation("HubIntakeAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  decidedBy User?       @relation("HubIntakeDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  project   HubProject?
+
+  @@index([status, createdAt])
+  @@index([orgId])
+  @@map("hub_intakes")
+}
+
+enum HubProjectStatus {
+  /// The lead developer splits the work into tasks.
+  SCOPING
+  /// The quote is with the client.
+  QUOTED
+  /// The client approved the quote: the deposit invoice is open.
+  AWAITING_DEPOSIT
+  /// The deposit is paid: the team works.
+  ACTIVE
+  /// The client accepted the final delivery: the final invoice is open.
+  DELIVERED
+  /// Paid in full and the earnings shared out.
+  COMPLETED
+  CANCELLED
+}
+
+/// A client project in the hub, led by a lead developer.
+model HubProject {
+  id               String           @id @default(uuid(7)) @db.Uuid
+  number           Int              @unique @default(autoincrement())
+  orgId            String           @map("org_id") @db.Uuid
+  intakeId         String?          @unique @map("intake_id") @db.Uuid
+  title            String
+  /// What the client needs, as the platform understood it (shown to the team).
+  summary          String
+  status           HubProjectStatus @default(SCOPING)
+  leadId           String?          @map("lead_id") @db.Uuid
+  currency         String           @db.Char(3)
+  /// The split for this project (from the client's country; adds up to 100).
+  studentPercent   Int              @map("student_percent") @db.SmallInt
+  leadPercent      Int              @map("lead_percent") @db.SmallInt
+  platformPercent  Int              @map("platform_percent") @db.SmallInt
+  /// Part of each main quote invoiced before work starts.
+  depositPercent   Int              @default(30) @map("deposit_percent") @db.SmallInt
+  deadline         DateTime?        @db.Date
+  /// The team's repository on the git server, and its room.
+  repo             String?
+  /// The client allowed students to show the finished project in their portfolios.
+  portfolioAllowed Boolean          @default(false) @map("portfolio_allowed")
+  createdById      String?          @map("created_by_id") @db.Uuid
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  completedAt      DateTime?        @map("completed_at")
+  cancelledAt      DateTime?        @map("cancelled_at")
+  cancelReason     String?          @map("cancel_reason")
+
+  org        ClientOrg          @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  intake     HubIntake?         @relation(fields: [intakeId], references: [id], onDelete: SetNull)
+  lead       User?              @relation("HubProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
+  createdBy  User?              @relation("HubProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  quotes     HubQuote[]
+  tasks      HubTask[]
+  invoices   HubInvoice[]
+  members    HubMember[]
+  time       HubTimeEntry[]
+  reviews    HubCodeReview[]
+  deliveries HubDelivery[]
+  comments   HubComment[]
+  changes    HubChangeRequest[]
+  earnings   HubEarning[]
+  stories    HubStory[]
+
+  @@index([orgId, createdAt])
+  @@index([leadId, status])
+  @@index([status])
+  @@map("hub_projects")
+}
+
+enum HubQuoteKind {
+  /// The project's first quote: a deposit before work, the rest on acceptance.
+  MAIN
+  /// Changes the client asked for beyond the statement of work.
+  CHANGE
+}
+
+enum HubQuoteStatus {
+  DRAFT
+  SENT
+  APPROVED
+  DECLINED
+  WITHDRAWN
+}
+
+/// A quote for (part of) a project: its tasks, price and deposit. Once the client
+/// approves it, its statement of work (kept as approved) is part of their agreement.
+model HubQuote {
+  id            String         @id @default(uuid(7)) @db.Uuid
+  projectId     String         @map("project_id") @db.Uuid
+  /// 1, 2, 3… within the project.
+  version       Int            @db.SmallInt
+  kind          HubQuoteKind
+  status        HubQuoteStatus @default(DRAFT)
+  priceMinor    Int            @map("price_minor")
+  depositMinor  Int            @default(0) @map("deposit_minor")
+  /// For the client: what's in it, what isn't.
+  note          String?
+  /// The statement of work as the client saw it when it was sent (and approved).
+  sowText       String?        @map("sow_text")
+  sowVersion    String?        @map("sow_version")
+  sentAt        DateTime?      @map("sent_at")
+  approvedAt    DateTime?      @map("approved_at")
+  approvedById  String?        @map("approved_by_id") @db.Uuid
+  declinedAt    DateTime?      @map("declined_at")
+  declineReason String?        @map("decline_reason")
+  withdrawnAt   DateTime?      @map("withdrawn_at")
+  /// The client accepted the work it covers (its final delivery).
+  acceptedAt    DateTime?      @map("accepted_at")
+  createdById   String?        @map("created_by_id") @db.Uuid
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  project    HubProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy  User?              @relation("HubQuoteCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  approvedBy User?              @relation("HubQuoteApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  tasks      HubTask[]
+  invoices   HubInvoice[]
+  deliveries HubDelivery[]
+  changes    HubChangeRequest[]
+
+  @@unique([projectId, version])
+  @@index([status])
+  @@map("hub_quotes")
+}
+
+enum HubTaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  CANCELLED
+}
+
+/// A piece of a project sized for one student: a spec, skills, an estimate and a share
+/// of the students' pool (basis points; a quote's tasks add up to 10,000).
+model HubTask {
+  id              String        @id @default(uuid(7)) @db.Uuid
+  projectId       String        @map("project_id") @db.Uuid
+  quoteId         String        @map("quote_id") @db.Uuid
+  /// 1, 2, 3… within the project ("T-3").
+  number          Int           @db.SmallInt
+  title           String
+  /// What to build (Markdown, for the team).
+  spec            String
+  skillTags       String[]      @default([]) @map("skill_tags")
+  estimateMinutes Int           @map("estimate_minutes")
+  shareBp         Int           @map("share_bp")
+  status          HubTaskStatus @default(TODO)
+  assigneeId      String?       @map("assignee_id") @db.Uuid
+  sortOrder       Int           @default(0) @map("sort_order")
+  doneAt          DateTime?     @map("done_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  project  HubProject      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  quote    HubQuote        @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  assignee User?           @relation("HubTaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  invites  HubMember[]
+  time     HubTimeEntry[]
+  reviews  HubCodeReview[]
+
+  @@unique([projectId, number])
+  @@index([quoteId])
+  @@index([assigneeId, status])
+  @@map("hub_tasks")
+}
+
+enum HubInvoiceKind {
+  DEPOSIT
+  FINAL
+}
+
+enum HubInvoiceStatus {
+  OPEN
+  PAID
+  VOID
+}
+
+/// A client's invoice for a quote: the deposit, or the rest once the work is accepted.
+model HubInvoice {
+  id                String           @id @default(uuid(7)) @db.Uuid
+  /// "H-0042".
+  number            Int              @unique @default(autoincrement())
+  projectId         String           @map("project_id") @db.Uuid
+  orgId             String           @map("org_id") @db.Uuid
+  quoteId           String           @map("quote_id") @db.Uuid
+  kind              HubInvoiceKind
+  status            HubInvoiceStatus @default(OPEN)
+  currency          String           @db.Char(3)
+  amountMinor       Int              @map("amount_minor")
+  issuedAt          DateTime         @default(now()) @map("issued_at")
+  dueAt             DateTime         @map("due_at")
+  paidAt            DateTime?        @map("paid_at")
+  voidedAt          DateTime?        @map("voided_at")
+  voidReason        String?          @map("void_reason")
+  /// The card checkout page open for it (Stripe Checkout), if any.
+  checkoutSessionId String?          @map("checkout_session_id")
+  /// The money was shared out (team, lead, platform) in the ledger.
+  distributedAt     DateTime?        @map("distributed_at")
+
+  project  HubProject   @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  org      ClientOrg    @relation(fields: [orgId], references: [id], onDelete: Restrict)
+  quote    HubQuote     @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  payments HubPayment[]
+  earnings HubEarning[]
+
+  @@unique([quoteId, kind])
+  @@index([orgId, issuedAt])
+  @@index([status])
+  @@map("hub_invoices")
+}
+
+/// A payment of a client invoice: by card (Stripe) or recorded by staff (bank transfer).
+model HubPayment {
+  id                String          @id @default(uuid(7)) @db.Uuid
+  invoiceId         String          @map("invoice_id") @db.Uuid
+  provider          PaymentProvider
+  /// Stripe's payment intent; null for payments staff record.
+  providerPaymentId String?         @map("provider_payment_id")
+  currency          String          @db.Char(3)
+  amountMinor       Int             @map("amount_minor")
+  /// Recorded payments: how, and the bank's reference.
+  method            String?
+  reference         String?
+  recordedById      String?         @map("recorded_by_id") @db.Uuid
+  paidAt            DateTime        @map("paid_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  invoice    HubInvoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  recordedBy User?      @relation("HubPaymentRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@unique([provider, providerPaymentId])
+  @@index([invoiceId])
+  @@map("hub_payments")
+}
+
+enum HubMemberStatus {
+  /// The lead invited the student; they haven't answered.
+  INVITED
+  /// The student said yes; a parent approves next.
+  ACCEPTED
+  /// A parent approved: the student is on the team.
+  APPROVED
+  DECLINED
+  REMOVED
+}
+
+/// A student on a hub project's team: invited by the lead, accepted by the student,
+/// approved by a parent (for each project). Clients see them by pseudonym only.
+model HubMember {
+  id            String          @id @default(uuid(7)) @db.Uuid
+  projectId     String          @map("project_id") @db.Uuid
+  studentId     String          @map("student_id") @db.Uuid
+  status        HubMemberStatus @default(INVITED)
+  /// "Developer A": all a client ever sees of the student.
+  pseudonym     String
+  /// The task the student was invited for.
+  taskId        String?         @map("task_id") @db.Uuid
+  /// The lead's message to the student and their parent.
+  note          String?
+  invitedById   String?         @map("invited_by_id") @db.Uuid
+  invitedAt     DateTime        @default(now()) @map("invited_at")
+  answeredAt    DateTime?       @map("answered_at")
+  parentId      String?         @map("parent_id") @db.Uuid
+  decidedAt     DateTime?       @map("decided_at")
+  /// Who said no: STUDENT or PARENT.
+  declinedBy    String?         @map("declined_by")
+  removedAt     DateTime?       @map("removed_at")
+  removedReason String?         @map("removed_reason")
+
+  project   HubProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  student   User       @relation("HubMemberStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  task      HubTask?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  invitedBy User?      @relation("HubMemberInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+  parent    User?      @relation("HubMemberParent", fields: [parentId], references: [id], onDelete: SetNull)
+
+  @@unique([projectId, studentId])
+  @@unique([projectId, pseudonym])
+  @@index([studentId, status])
+  @@map("hub_members")
+}
+
+/// Time a student logs on a hub task (a timer). The system keeps it inside the weekly
+/// cap and the allowed hours: a timer stops at the cap or when the allowed time ends.
+model HubTimeEntry {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  projectId String    @map("project_id") @db.Uuid
+  taskId    String    @map("task_id") @db.Uuid
+  studentId String    @map("student_id") @db.Uuid
+  startedAt DateTime  @map("started_at")
+  /// Null while the timer runs.
+  endedAt   DateTime? @map("ended_at")
+  /// Counted minutes (set when the timer stops).
+  minutes   Int       @default(0) @db.SmallInt
+  /// The student's week ("2026-W41", their own time zone).
+  weekKey   String    @map("week_key")
+  /// Who stopped it: STUDENT, CAP, HOURS (allowed time ended), LEAD or SYSTEM.
+  stoppedBy String?   @map("stopped_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  project HubProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task    HubTask    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  student User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, weekKey])
+  @@index([taskId])
+  @@index([endedAt])
+  @@map("hub_time_entries")
+}
+
+enum HubReviewDecision {
+  APPROVED
+  CHANGES_REQUESTED
+}
+
+/// The lead developer's review of a student's pull request: what lets it merge, and
+/// a score (1–5) that builds the student's reputation for matching.
+model HubCodeReview {
+  id         String            @id @default(uuid(7)) @db.Uuid
+  projectId  String            @map("project_id") @db.Uuid
+  taskId     String?           @map("task_id") @db.Uuid
+  studentId  String            @map("student_id") @db.Uuid
+  reviewerId String?           @map("reviewer_id") @db.Uuid
+  pullNumber Int               @map("pull_number")
+  /// The commit reviewed.
+  commit     String
+  decision   HubReviewDecision
+  /// 1 (needs a lot of work) … 5 (excellent).
+  score      Int               @db.SmallInt
+  comment    String?
+  createdAt  DateTime          @default(now()) @map("created_at")
+
+  project  HubProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task     HubTask?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  student  User       @relation("HubCodeReviewStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  reviewer User?      @relation("HubCodeReviewReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([studentId, createdAt])
+  @@index([projectId, pullNumber])
+  @@map("hub_code_reviews")
+}
+
+enum HubDeliveryStatus {
+  SUBMITTED
+  ACCEPTED
+  CHANGES_REQUESTED
+  WITHDRAWN
+}
+
+/// A milestone shown to the client: the repository's main branch at a commit, kept as
+/// a static preview (in storage, opened on the sandbox domain with its secret link).
+/// Accepting a quote's final delivery accepts its work and issues the final invoice.
+model HubDelivery {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  projectId     String            @map("project_id") @db.Uuid
+  quoteId       String            @map("quote_id") @db.Uuid
+  /// 1, 2, 3… within the project ("M-2").
+  number        Int               @db.SmallInt
+  title         String
+  /// For the client: what's in it, what to look at.
+  notes         String
+  /// The quote's final delivery: accepting it accepts the quote's work.
+  final         Boolean           @default(false)
+  commit        String
+  /// [{ path, size, type }] — files under hub/previews/<id>/ in storage.
+  files         Json              @default("[]")
+  /// The preview's secret link (after "#" on the sandbox domain).
+  previewToken  String            @unique @map("preview_token")
+  status        HubDeliveryStatus @default(SUBMITTED)
+  submittedAt   DateTime          @default(now()) @map("submitted_at")
+  decidedAt     DateTime?         @map("decided_at")
+  decidedById   String?           @map("decided_by_id") @db.Uuid
+  /// What the client asked to change (goes to the lead, never to students).
+  clientComment String?           @map("client_comment")
+  createdById   String?           @map("created_by_id") @db.Uuid
+
+  project   HubProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  quote     HubQuote           @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  decidedBy User?              @relation("HubDeliveryDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  createdBy User?              @relation("HubDeliveryCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  comments  HubComment[]
+  changes   HubChangeRequest[]
+
+  @@unique([projectId, number])
+  @@index([quoteId])
+  @@map("hub_deliveries")
+}
+
+/// A message between the client and the platform (the lead and staff) about a project.
+/// Students never see these: the lead passes on what the team needs.
+model HubComment {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  projectId  String   @map("project_id") @db.Uuid
+  deliveryId String?  @map("delivery_id") @db.Uuid
+  authorId   String?  @map("author_id") @db.Uuid
+  body       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  project  HubProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  delivery HubDelivery? @relation(fields: [deliveryId], references: [id], onDelete: SetNull)
+  author   User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, createdAt])
+  @@map("hub_comments")
+}
+
+enum HubChangeStatus {
+  OPEN
+  /// Inside the statement of work: the lead adds tasks to the quote.
+  IN_SCOPE
+  /// Beyond it: a change quote follows.
+  QUOTED
+  DECLINED
+}
+
+/// A change the client asks for: in scope (new tasks), quoted separately, or declined.
+model HubChangeRequest {
+  id          String          @id @default(uuid(7)) @db.Uuid
+  projectId   String          @map("project_id") @db.Uuid
+  deliveryId  String?         @map("delivery_id") @db.Uuid
+  body        String
+  status      HubChangeStatus @default(OPEN)
+  createdById String?         @map("created_by_id") @db.Uuid
+  createdAt   DateTime        @default(now()) @map("created_at")
+  decidedById String?         @map("decided_by_id") @db.Uuid
+  decidedAt   DateTime?       @map("decided_at")
+  /// The lead's answer to the client.
+  note        String?
+  /// The change quote made for it.
+  quoteId     String?         @map("quote_id") @db.Uuid
+
+  project   HubProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  delivery  HubDelivery? @relation(fields: [deliveryId], references: [id], onDelete: SetNull)
+  quote     HubQuote?    @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  createdBy User?        @relation("HubChangeAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  decidedBy User?        @relation("HubChangeDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([projectId, status])
+  @@map("hub_change_requests")
+}
+
+/// A student's part of one paid invoice whose work the client accepted: held for the
+/// country's hold days (in case the client's payment is reversed), then payable — paid
+/// out to their parent. The ledger has the money; this row has the hold.
+model HubEarning {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  studentId   String    @map("student_id") @db.Uuid
+  projectId   String    @map("project_id") @db.Uuid
+  invoiceId   String    @map("invoice_id") @db.Uuid
+  currency    String    @db.Char(3)
+  amountMinor Int       @map("amount_minor")
+  heldUntil   DateTime  @map("held_until")
+  releasedAt  DateTime? @map("released_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  student User       @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  project HubProject @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  invoice HubInvoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@unique([invoiceId, studentId])
+  @@index([studentId, createdAt])
+  @@index([releasedAt, heldUntil])
+  @@map("hub_earnings")
+}
+
+enum PayoutAccountKind {
+  /// A bank account by IBAN: paid through the payouts provider (Wise), or by hand.
+  IBAN
+  /// Anything else (a mobile wallet, a local account number): paid by hand only.
+  OTHER
+}
+
+/// Where a parent receives their children's hub earnings. The details are encrypted
+/// (ENCRYPTION_KEY); only the last four characters stay readable. A new account can be
+/// paid only after the cooling-off time (48 hours) and once staff have checked it.
+/// Changing it means a new row (the old one is removed): one live account per parent.
+model PayoutAccount {
+  id                  String            @id @default(uuid(7)) @db.Uuid
+  parentId            String            @map("parent_id") @db.Uuid
+  kind                PayoutAccountKind
+  /// The account's currency (what the parent's bank receives).
+  currency            String            @db.Char(3)
+  countryCode         String            @map("country_code") @db.Char(2)
+  /// {holderName, iban} or {holderName, details}, encrypted.
+  detailsCipher       String            @map("details_cipher")
+  last4               String
+  usableFrom          DateTime          @map("usable_from")
+  verifiedAt          DateTime?         @map("verified_at")
+  verifiedById        String?           @map("verified_by_id") @db.Uuid
+  /// The payouts provider's recipient for it (a Wise account ID), made on first use.
+  providerRecipientId String?           @map("provider_recipient_id")
+  removedAt           DateTime?         @map("removed_at")
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  parent     User     @relation("PayoutAccountParent", fields: [parentId], references: [id], onDelete: Restrict)
+  verifiedBy User?    @relation("PayoutAccountVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
+  payouts    Payout[]
+
+  @@index([parentId, createdAt])
+  @@map("payout_accounts")
+}
+
+enum PayoutProvider {
+  /// Sent through Wise (or its mock in development).
+  WISE
+  /// Paid by staff outside the platform and recorded here.
+  MANUAL
+}
+
+enum PayoutBatchStatus {
+  /// Made; parents confirm, two super admins approve.
+  DRAFT
+  APPROVED
+  /// Sent (Wise), or released for staff to pay and record (manual).
+  SENT
+  CANCELLED
+}
+
+/// A round of payouts in one currency. Two different super admins approve it before
+/// any money moves; payouts its parents didn't confirm are left out when it's sent.
+model PayoutBatch {
+  id                 String            @id @default(uuid(7)) @db.Uuid
+  /// "B-0007".
+  number             Int               @unique @default(autoincrement())
+  currency           String            @db.Char(3)
+  provider           PayoutProvider
+  status             PayoutBatchStatus @default(DRAFT)
+  note               String?
+  createdById        String            @map("created_by_id") @db.Uuid
+  firstApprovedById  String?           @map("first_approved_by_id") @db.Uuid
+  firstApprovedAt    DateTime?         @map("first_approved_at")
+  secondApprovedById String?           @map("second_approved_by_id") @db.Uuid
+  secondApprovedAt   DateTime?         @map("second_approved_at")
+  sentAt             DateTime?         @map("sent_at")
+  cancelledAt        DateTime?         @map("cancelled_at")
+  createdAt          DateTime          @default(now()) @map("created_at")
+
+  createdBy        User     @relation("PayoutBatchCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  firstApprovedBy  User?    @relation("PayoutBatchFirstApprover", fields: [firstApprovedById], references: [id], onDelete: Restrict)
+  secondApprovedBy User?    @relation("PayoutBatchSecondApprover", fields: [secondApprovedById], references: [id], onDelete: Restrict)
+  payouts          Payout[]
+
+  @@index([status, createdAt])
+  @@map("payout_batches")
+}
+
+enum PayoutStatus {
+  /// Waiting for the parent to confirm the account and amount.
+  AWAITING_PARENT
+  /// The parent confirmed.
+  CONFIRMED
+  /// Being handed to the provider.
+  SENDING
+  /// The provider has it.
+  SENT
+  PAID
+  /// The provider couldn't pay it: the money is payable again.
+  FAILED
+  /// Not sent (declined, not confirmed in time, the batch or the account went).
+  CANCELLED
+}
+
+/// A student's payable earnings paid out to their parent's payout account.
+model Payout {
+  id                 String       @id @default(uuid(7)) @db.Uuid
+  /// "PO-0012".
+  number             Int          @unique @default(autoincrement())
+  batchId            String       @map("batch_id") @db.Uuid
+  studentId          String       @map("student_id") @db.Uuid
+  parentId           String       @map("parent_id") @db.Uuid
+  accountId          String       @map("account_id") @db.Uuid
+  currency           String       @db.Char(3)
+  /// Taken from the student's payable money.
+  amountMinor        Int          @map("amount_minor")
+  /// Withheld for tax where the country asks for it.
+  withheldMinor      Int          @default(0) @map("withheld_minor")
+  /// What the parent receives (before the provider's own fee).
+  netMinor           Int          @map("net_minor")
+  status             PayoutStatus @default(AWAITING_PARENT)
+  parentConfirmedAt  DateTime?    @map("parent_confirmed_at")
+  providerTransferId String?      @unique @map("provider_transfer_id")
+  providerStatus     String?      @map("provider_status")
+  failureReason      String?      @map("failure_reason")
+  /// Manual payouts: how they were paid, and the reference.
+  method             String?
+  reference          String?
+  recordedById       String?      @map("recorded_by_id") @db.Uuid
+  sentAt             DateTime?    @map("sent_at")
+  paidAt             DateTime?    @map("paid_at")
+  failedAt           DateTime?    @map("failed_at")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  batch      PayoutBatch   @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  student    User          @relation("PayoutStudent", fields: [studentId], references: [id], onDelete: Restrict)
+  parent     User          @relation("PayoutParent", fields: [parentId], references: [id], onDelete: Restrict)
+  account    PayoutAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  recordedBy User?         @relation("PayoutRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([batchId])
+  @@index([studentId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([status])
+  @@map("payouts")
+}
+
+enum HubStoryStatus {
+  /// Staff wrote it; the parent hasn't answered.
+  AWAITING_PARENT
+  /// The parent agreed: staff can publish it.
+  APPROVED
+  /// On the marketing site.
+  PUBLISHED
+  /// The parent said no or took it back: never shown again.
+  WITHDRAWN
+}
+
+/// A short story about a student's hub work for the marketing site: their first name
+/// only, never a photo, surname, school or city — and only with a parent's agreement,
+/// which the parent can take back at any time (it comes off the site at once).
+model HubStory {
+  id               String         @id @default(uuid(7)) @db.Uuid
+  studentId        String         @map("student_id") @db.Uuid
+  parentId         String         @map("parent_id") @db.Uuid
+  projectId        String?        @map("project_id") @db.Uuid
+  languageCode     String         @map("language_code")
+  firstName        String         @map("first_name")
+  headline         String
+  body             String
+  status           HubStoryStatus @default(AWAITING_PARENT)
+  parentAnsweredAt DateTime?      @map("parent_answered_at")
+  publishedAt      DateTime?      @map("published_at")
+  withdrawnAt      DateTime?      @map("withdrawn_at")
+  createdById      String?        @map("created_by_id") @db.Uuid
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  student   User        @relation("HubStoryStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  parent    User        @relation("HubStoryParent", fields: [parentId], references: [id], onDelete: Cascade)
+  project   HubProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdBy User?       @relation("HubStoryAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, languageCode, publishedAt])
+  @@index([parentId, createdAt])
+  @@map("hub_stories")
 }

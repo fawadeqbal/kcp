@@ -3,11 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsIn, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 
-export type ChatRoomKindValue = 'TEAM' | 'CLASS' | 'EVENT';
+export type ChatRoomKindValue = 'TEAM' | 'CLASS' | 'EVENT' | 'HUB';
 
 export class ChatRoomDto {
   id!: string;
-  @ApiProperty({ enum: ['TEAM', 'CLASS', 'EVENT'] })
+  @ApiProperty({ enum: ['TEAM', 'CLASS', 'EVENT', 'HUB'] })
   kind!: ChatRoomKindValue;
   name!: string;
   /** Messages since the member last read the room. */

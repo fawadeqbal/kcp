@@ -1,4 +1,4 @@
-import { CONSENT_FORM_MAX_BYTES, CONSENT_FORM_TYPES } from '@kcp/shared';
+import { CONSENT_FORM_MAX_BYTES, CONSENT_FORM_TYPES, HUB_INTAKE_FILE_MAX_BYTES } from '@kcp/shared';
 import { ValidationPipe } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
@@ -47,16 +47,25 @@ export function configureApp(app: NestExpressApplication, options: ConfigureAppO
     `/${API_PREFIX}/children`,
     raw({ type: [...CONSENT_FORM_TYPES], limit: CONSENT_FORM_MAX_BYTES + 1024 }),
   );
+  // Files on a client's project request are sent as they are (the type is checked
+  // from the bytes; JSON requests to the same path stay JSON).
+  app.use(
+    `/${API_PREFIX}/client/intakes`,
+    raw({ type: 'application/octet-stream', limit: HUB_INTAKE_FILE_MAX_BYTES + 1024 }),
+  );
   // Git over HTTP (team repositories) sends packs as they are.
   app.use(`/${API_PREFIX}/git`, raw({ type: () => true, limit: '25mb' }));
   // Stripe signs the exact bytes it sends: its webhooks keep their raw body.
   app.use(`/${API_PREFIX}/payments/webhooks`, raw({ type: '*/*', limit: '1mb' }));
+  // Wise signs the exact bytes of its webhooks too (hub payouts).
+  app.use(`/${API_PREFIX}/payouts/webhooks`, raw({ type: '*/*', limit: '256kb' }));
   // A shared portfolio is read by the page on the user-content domain (apps/sandbox),
   // without cookies: any origin may read it, errors included ("this link stopped
   // working" must not look like a network failure). Like every answer below, it is
   // never cached, so a link the parent stops stops everywhere at once.
+  // A hub milestone's preview is read the same way (apps/sandbox, /preview/).
   app.use(
-    `/${API_PREFIX}/shared/portfolios`,
+    [`/${API_PREFIX}/shared/portfolios`, `/${API_PREFIX}/shared/previews`],
     (_req: Request, res: Response, next: NextFunction) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       next();

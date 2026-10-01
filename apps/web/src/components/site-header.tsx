@@ -3,9 +3,10 @@
 import { type IconName, Popover } from '@kcp/ui';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { isolate } from '@/features/auth/validation';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { api } from '@/lib/api';
 import { areaOf, useAuth } from '@/lib/auth-provider';
 import { LanguageSwitcher } from './language-switcher';
 import { NotificationBell } from './notification-bell';
@@ -49,6 +50,46 @@ function PillNav({ label, items }: { label: string; items: NavItem[] }) {
   );
 }
 
+/**
+ * Whether to show "Hub" in the menu: for students of hub age, and for parents with a
+ * child of hub age (or something waiting for them). Asked once per account.
+ */
+function useHubInNav() {
+  const { state } = useAuth();
+  const [shown, setShown] = useState<{ id: string; shown: boolean } | null>(null);
+  const user = state.status === 'authenticated' ? state.user : null;
+  const area = user ? areaOf(user) : null;
+  useEffect(() => {
+    if (!user || (area !== 'STUDENT' && area !== 'PARENT') || shown?.id === user.id) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        if (area === 'STUDENT') {
+          const { data } = await api.GET('/v1/hub/me');
+          const age = data?.steps.find((s) => s.key === 'AGE')?.done ?? false;
+          if (!cancelled) setShown({ id: user.id, shown: age || Boolean(data?.eligible) });
+        } else {
+          const [family, approvals] = await Promise.all([
+            api.GET('/v1/hub/family'),
+            api.GET('/v1/hub/approvals'),
+          ]);
+          const age = (family.data ?? []).some(
+            (c) => c.readinessPassed || c.eligibility.steps.find((s) => s.key === 'AGE')?.done,
+          );
+          if (!cancelled)
+            setShown({ id: user.id, shown: age || (approvals.data ?? []).length > 0 });
+        }
+      } catch {
+        if (!cancelled) setShown({ id: user.id, shown: false });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, area, shown?.id]);
+  return Boolean(user && shown?.id === user.id && shown.shown);
+}
+
 export function SiteHeader() {
   const t = useTranslations();
   const { state, logout } = useAuth();
@@ -61,8 +102,24 @@ export function SiteHeader() {
     router.replace('/');
   };
 
+  const hubShown = useHubInNav();
   let nav: NavItem[] | null = null;
-  if (state.status === 'authenticated' && state.user.kind === 'STUDENT') {
+  if (state.status === 'authenticated' && areaOf(state.user) === 'CLIENT') {
+    nav = [
+      {
+        href: '/client',
+        label: t('nav.clientProjects'),
+        icon: 'rocket',
+        current: is('/client') && !is('/client/settings'),
+      },
+      {
+        href: '/client/settings',
+        label: t('nav.clientSettings'),
+        icon: 'settings',
+        current: is('/client/settings'),
+      },
+    ];
+  } else if (state.status === 'authenticated' && state.user.kind === 'STUDENT') {
     const other = [
       '/learn/league',
       '/learn/friends',
@@ -73,6 +130,7 @@ export function SiteHeader() {
       '/learn/leaderboard',
       '/learn/badges',
       '/learn/portfolio',
+      '/learn/hub',
     ].some(is);
     nav = [
       { href: '/learn', label: t('nav.learn'), icon: 'book', current: is('/learn') && !other },
@@ -102,6 +160,16 @@ export function SiteHeader() {
         icon: 'rocket',
         current: is('/learn/portfolio'),
       },
+      ...(hubShown
+        ? [
+            {
+              href: '/learn/hub',
+              label: t('nav.hub'),
+              icon: 'zap' as const,
+              current: is('/learn/hub'),
+            },
+          ]
+        : []),
     ];
   } else if (state.status === 'authenticated' && areaOf(state.user) === 'MENTOR') {
     nav = [
@@ -114,7 +182,8 @@ export function SiteHeader() {
           !is('/mentor/events') &&
           !is('/mentor/teams') &&
           !is('/mentor/judging') &&
-          !is('/mentor/rooms'),
+          !is('/mentor/rooms') &&
+          !is('/mentor/hub'),
       },
       {
         href: '/mentor/events',
@@ -126,6 +195,7 @@ export function SiteHeader() {
           is('/mentor/judging') ||
           is('/mentor/rooms'),
       },
+      { href: '/mentor/hub', label: t('nav.hub'), icon: 'zap', current: is('/mentor/hub') },
     ];
   } else if (state.status === 'authenticated' && areaOf(state.user) === 'TEACHER') {
     nav = [
@@ -143,8 +213,20 @@ export function SiteHeader() {
         href: '/dashboard',
         label: t('nav.dashboard'),
         icon: 'grid',
-        current: is('/dashboard') || is('/children') || is('/reports'),
+        current:
+          (is('/dashboard') || is('/children') || is('/reports')) &&
+          !(hubShown && /^\/children\/[^/]+\/hub/.test(pathname)),
       },
+      ...(hubShown
+        ? [
+            {
+              href: '/hub',
+              label: t('nav.hub'),
+              icon: 'zap' as const,
+              current: is('/hub') || is('/payouts') || /^\/children\/[^/]+\/hub/.test(pathname),
+            },
+          ]
+        : []),
       { href: '/billing', label: t('nav.billing'), icon: 'card', current: is('/billing') },
     ];
   }

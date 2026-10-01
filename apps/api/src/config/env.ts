@@ -161,6 +161,32 @@ export const envSchema = z
     FORGEJO_URL: z.url().optional(),
     /** An access token of Forgejo's admin account (scopes: all). */
     FORGEJO_TOKEN: z.string().min(20).optional(),
+
+    // ── Hub payouts (Wise) ──
+    /**
+     * Wise's API token (a personal or business token from Wise → Settings → API tokens).
+     * With it, hub payouts to parents go through Wise; without it, development uses a
+     * mock of Wise and production pays by hand (staff record each payout).
+     */
+    WISE_API_TOKEN: z.string().min(20).optional(),
+    /** Wise's sandbox until the live keys: https://api.wise.com for live. */
+    WISE_API_URL: z.url().default('https://api.sandbox.transferwise.tech'),
+    /** The Wise business profile that pays (GET /v2/profiles). */
+    WISE_PROFILE_ID: z.string().regex(/^\d+$/, 'WISE_PROFILE_ID is a number').optional(),
+    /**
+     * Wise's public key for webhook signatures (PEM; "\n" for line breaks is fine), from
+     * Wise's webhook documentation (sandbox and live keys differ).
+     */
+    WISE_WEBHOOK_PUBLIC_KEY: z
+      .string()
+      .optional()
+      .transform((value) => value?.replace(/\\n/g, '\n'))
+      .refine(
+        (value) => !value || value.includes('BEGIN PUBLIC KEY'),
+        'WISE_WEBHOOK_PUBLIC_KEY must be a PEM public key',
+      ),
+    /** Use the mock of Wise (never in production). Defaults to on without WISE_API_TOKEN. */
+    WISE_MOCK: z.stringbool().optional(),
   })
   .refine((env) => env.MAIL_TRANSPORT !== 'smtp' || Boolean(env.SMTP_URL), {
     message: 'SMTP_URL is required when MAIL_TRANSPORT is smtp',
@@ -182,6 +208,21 @@ export const envSchema = z
   .refine((env) => !env.FORGEJO_URL || Boolean(env.FORGEJO_TOKEN), {
     message: 'FORGEJO_TOKEN is required with FORGEJO_URL',
     path: ['FORGEJO_TOKEN'],
+  })
+  .refine(
+    (env) => !env.WISE_API_TOKEN || Boolean(env.WISE_PROFILE_ID && env.WISE_WEBHOOK_PUBLIC_KEY),
+    {
+      message: 'WISE_PROFILE_ID and WISE_WEBHOOK_PUBLIC_KEY are required with WISE_API_TOKEN',
+      path: ['WISE_PROFILE_ID'],
+    },
+  )
+  .refine((env) => env.NODE_ENV !== 'production' || env.WISE_MOCK !== true, {
+    message: 'WISE_MOCK must not be on in production',
+    path: ['WISE_MOCK'],
+  })
+  .refine((env) => !(env.WISE_API_TOKEN && env.WISE_MOCK === true), {
+    message: 'WISE_MOCK and WISE_API_TOKEN can’t both be set',
+    path: ['WISE_MOCK'],
   })
   .refine((env) => env.PUSH_TRANSPORT !== 'fcm' || Boolean(env.FIREBASE_SERVICE_ACCOUNT), {
     message: 'FIREBASE_SERVICE_ACCOUNT is required when PUSH_TRANSPORT is fcm',
@@ -229,9 +270,16 @@ export const envSchema = z
       : (env.STRIPE_MOCK ?? env.NODE_ENV !== 'production')
         ? 'mock'
         : 'off';
+    // Payouts: Wise with a token, its mock in development, otherwise by hand only.
+    const wiseMode: 'wise' | 'mock' | 'off' = env.WISE_API_TOKEN
+      ? 'wise'
+      : (env.WISE_MOCK ?? env.NODE_ENV !== 'production')
+        ? 'mock'
+        : 'off';
     return {
       ...env,
       STRIPE_MODE: stripeMode,
+      WISE_MODE: wiseMode,
       STRIPE_WEBHOOK_SECRET:
         env.STRIPE_WEBHOOK_SECRET ??
         (stripeMode === 'mock' ? MOCK_STRIPE_WEBHOOK_SECRET : undefined),

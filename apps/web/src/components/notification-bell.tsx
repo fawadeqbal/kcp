@@ -204,6 +204,48 @@ function useDescribe() {
           }),
           href: `/reviews/${str(d['reviewId'])}`,
         };
+      case 'hub_eligible':
+        return { text: t('hubEligible'), href: '/learn/hub' };
+      case 'hub_signed_off':
+        return { text: t('hubSignedOff'), href: '/learn/hub' };
+      case 'hub_paused':
+        return { text: t('hubPaused'), href: '/learn/hub' };
+      case 'hub_invite':
+        return {
+          text: t('hubInvite', { title: isolate(str(d['title'])) }),
+          href: '/learn/hub',
+        };
+      case 'hub_joined':
+        return {
+          text: t('hubJoined', { title: isolate(str(d['title'])) }),
+          href: `/learn/hub/projects/${str(d['projectId'])}`,
+        };
+      case 'child_hub_signed_off':
+        return {
+          text: t('childHubSignedOff', { nickname: isolate(str(d['nickname'])) }),
+          href: `/children/${str(d['childId'])}/hub`,
+        };
+      case 'child_hub_paused':
+        return {
+          text: t('childHubPaused', { nickname: isolate(str(d['nickname'])) }),
+          href: `/children/${str(d['childId'])}/hub`,
+        };
+      case 'child_hub_consent':
+        return {
+          text: t('childHubConsent', {
+            by: isolate(str(d['by'])),
+            nickname: isolate(str(d['nickname'])),
+          }),
+          href: `/children/${str(d['childId'])}/hub`,
+        };
+      case 'child_hub_invite':
+        return {
+          text: t('childHubInvite', {
+            nickname: isolate(str(d['nickname'])),
+            title: isolate(str(d['title'])),
+          }),
+          href: '/hub',
+        };
       default:
         return { text: t('other'), href: '/' };
     }
@@ -319,7 +361,7 @@ export function NotificationBell() {
                       <span className="min-w-0">
                         <bdi>{text}</bdi>
                         <span className="mt-0.5 block text-xs font-normal text-muted">
-                          {format.relativeTime(new Date(item.createdAt))}
+                          {format.relativeTime(new Date(item.createdAt), new Date())}
                         </span>
                       </span>
                     </Link>

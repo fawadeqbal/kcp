@@ -17,6 +17,7 @@ import 'package:kcp_api/src/api/devices_api.dart';
 import 'package:kcp_api/src/api/events_api.dart';
 import 'package:kcp_api/src/api/feedback_api.dart';
 import 'package:kcp_api/src/api/friends_api.dart';
+import 'package:kcp_api/src/api/hub_api.dart';
 import 'package:kcp_api/src/api/learning_api.dart';
 import 'package:kcp_api/src/api/notifications_api.dart';
 import 'package:kcp_api/src/api/progress_api.dart';
@@ -204,6 +205,12 @@ class KcpApi {
   /// by doing that all interceptors will not be executed
   FriendsApi getFriendsApi() {
     return FriendsApi(dio);
+  }
+
+  /// Get HubApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  HubApi getHubApi() {
+    return HubApi(dio);
   }
 
   /// Get LearningApi instance, base route and serializer can be overridden by a given but be careful,

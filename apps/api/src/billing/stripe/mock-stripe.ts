@@ -3,8 +3,9 @@ import type { Redis } from 'ioredis';
 import { Stripe } from 'stripe';
 import type {
   CheckoutSessionParams,
-  SetupSessionParams,
   Metadata,
+  PaymentSessionParams,
+  SetupSessionParams,
   StripeApi,
   StripeCharge,
   StripeCheckoutSession,
@@ -33,7 +34,9 @@ const KEEP_SECONDS = 60 * 24 * 60 * 60;
 export type WebhookDelivery = (payload: string, signature: string) => Promise<void>;
 
 interface StoredSession extends StripeCheckoutSession {
-  mode: 'subscription' | 'setup';
+  mode: 'subscription' | 'setup' | 'payment';
+  /** Payment mode: what it's for (the mock checkout page shows it). */
+  product_name?: string;
   line_items: CheckoutSessionParams['line_items'];
   success_url: string;
   cancel_url: string;
@@ -205,8 +208,33 @@ export class MockStripe implements StripeApi {
 
   checkout = {
     sessions: {
-      create: async (params: CheckoutSessionParams | SetupSessionParams) => {
+      create: async (params: CheckoutSessionParams | SetupSessionParams | PaymentSessionParams) => {
         const id = newId('cs');
+        if (params.mode === 'payment') {
+          const line = params.line_items[0]!;
+          const payment: StoredSession = {
+            id,
+            object: 'checkout.session',
+            url: `${this.options.apiPublicUrl}/v1/payments/mock-stripe/checkout/${id}`,
+            mode: 'payment',
+            customer: null,
+            subscription: null,
+            client_reference_id: params.client_reference_id,
+            metadata: params.metadata,
+            line_items: [],
+            success_url: params.success_url,
+            cancel_url: params.cancel_url,
+            subscription_metadata: {},
+            status: 'open',
+            amount_total: line.price_data.unit_amount,
+            currency: line.price_data.currency,
+            payment_status: 'unpaid',
+            payment_intent: null,
+            product_name: line.price_data.product_data.name,
+          };
+          await this.save('session', id, payment);
+          return payment;
+        }
         if (params.mode === 'setup') {
           const setup: StoredSession = {
             id,
@@ -274,6 +302,15 @@ export class MockStripe implements StripeApi {
   async completeSession(id: string): Promise<StoredSession> {
     const session = await this.load<StoredSession>('session', id);
     if (session.status !== 'open') return session;
+    if (session.mode === 'payment') {
+      // A one-off payment: charged at once.
+      session.status = 'complete';
+      session.payment_status = 'paid';
+      session.payment_intent = newId('pi');
+      await this.save('session', id, session);
+      this.emit([{ type: 'checkout.session.completed', object: this.publicSession(session) }]);
+      return session;
+    }
     if (session.mode === 'setup') {
       // A card check: nothing to charge.
       session.status = 'complete';
@@ -329,7 +366,24 @@ export class MockStripe implements StripeApi {
   private publicSession(session: StoredSession): StripeCheckoutSession {
     const { id, object, url, mode, customer, subscription, client_reference_id, metadata } =
       session;
-    return { id, object, url, mode, customer, subscription, client_reference_id, metadata };
+    return {
+      id,
+      object,
+      url,
+      mode,
+      customer,
+      subscription,
+      client_reference_id,
+      metadata,
+      ...(mode === 'payment'
+        ? {
+            amount_total: session.amount_total,
+            currency: session.currency,
+            payment_status: session.payment_status,
+            payment_intent: session.payment_intent,
+          }
+        : {}),
+    };
   }
 
   /** Invoices the subscription's current period and pays it with a new charge. */

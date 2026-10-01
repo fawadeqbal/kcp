@@ -6,8 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // One-time confirmation links from waitlist emails.
-      disallow: '/*/waitlist/confirm',
+      // One-time confirmation links from emails (the waitlist, "Hire our students").
+      disallow: ['/*/waitlist/confirm', '/*/hire/confirm'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

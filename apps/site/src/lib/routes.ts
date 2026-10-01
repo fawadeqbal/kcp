@@ -12,6 +12,7 @@ export const STATIC_PATHS = [
   '/pricing',
   '/blog',
   '/waitlist',
+  '/hire',
 ] as const;
 
 const PRICING_PATH = new RegExp(`^/(${LOCALES.join('|')})/pricing/?$`);

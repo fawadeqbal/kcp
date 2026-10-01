@@ -213,11 +213,4 @@ export async function openTeamRepo(workspace: Workspace): Promise<TeamRepo> {
   };
 }
 
-/** The files a team page is made of, for the preview. */
-export function pageFiles(files: Record<string, string>) {
-  return {
-    html: files['index.html'] ?? '',
-    css: files['style.css'] ?? '',
-    js: files['script.js'] ?? '',
-  };
-}
+export { pageFiles } from './page-files';

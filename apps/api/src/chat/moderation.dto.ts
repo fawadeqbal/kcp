@@ -44,8 +44,8 @@ export class ModerationSubjectDto extends ModerationPersonDto {
 export class ModerationRoomDto {
   id!: string;
   name!: string;
-  @ApiProperty({ enum: ['TEAM', 'CLASS', 'EVENT'] })
-  kind!: 'TEAM' | 'CLASS' | 'EVENT';
+  @ApiProperty({ enum: ['TEAM', 'CLASS', 'EVENT', 'HUB'] })
+  kind!: 'TEAM' | 'CLASS' | 'EVENT' | 'HUB';
 }
 
 export class ModerationActionDto {

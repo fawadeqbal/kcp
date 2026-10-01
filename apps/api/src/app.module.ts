@@ -16,6 +16,7 @@ import { AppConfigModule } from './config/config.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { FamilyEmailsModule } from './family-emails/family-emails.module.js';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module.js';
+import { HubModule } from './hub/hub.module.js';
 import { HealthModule } from './health/health.module.js';
 import { LearningModule } from './learning/learning.module.js';
 import { ProgressModule } from './progress/progress.module.js';
@@ -89,6 +90,7 @@ import { SettingsAdminModule } from './settings-admin/settings-admin.module.js';
     EventsModule,
     SchoolsModule,
     ReadinessModule,
+    HubModule,
     FriendsModule,
     ReferralsModule,
     ReportsModule,

@@ -109,6 +109,10 @@ export const MOBILE_OPERATIONS = [
   // A teacher's class: a parent approves each child's place.
   'get /v1/class-requests',
   'post /v1/class-requests/{classId}/decision',
+  // The hub (paid projects, 15+): a parent approves each project, and sees earnings.
+  'get /v1/hub/approvals',
+  'post /v1/hub/approvals/{memberId}',
+  'get /v1/children/{childId}/hub/earnings',
   'get /v1/billing',
   'get /v1/account/email-preferences',
   'put /v1/account/email-preferences',

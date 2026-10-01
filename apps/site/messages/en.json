@@ -29,7 +29,8 @@
     "terms": "Terms of use",
     "logIn": "Parent log in",
     "cookies": "This site uses one cookie, to remember your language.",
-    "copyright": "© {year} {brand}"
+    "copyright": "© {year} {brand}",
+    "hire": "Hire our students"
   },
   "cta": {
     "signUp": "Create a parent account",
@@ -300,6 +301,92 @@
     "failed": "We couldn't confirm your email right now. Please try again.",
     "retry": "Try again",
     "home": "Back to the home page"
+  },
+  "hire": {
+    "metaTitle": "Hire our students",
+    "metaDescription": "Small websites, apps and tools built by our students aged 15 and up, led by a professional developer, at a fair price.",
+    "title": "Hire our students",
+    "subtitle": "Our students aged 15 and up build small websites, apps and tools for real businesses. A professional lead developer plans the work, reviews every change and answers to you.",
+    "howTitle": "How it works",
+    "steps": {
+      "one": {
+        "title": "Tell us what you need",
+        "body": "Describe the project below. We reply within a few working days, and say so kindly when a project isn’t a good fit for students."
+      },
+      "two": {
+        "title": "Agree on scope and price",
+        "body": "Your lead developer writes the scope and a fixed quote. You pay a deposit to start, and the rest when you accept the final delivery."
+      },
+      "three": {
+        "title": "Watch it come together",
+        "body": "You see previews as the work goes, ask for changes in your client portal, and get the code when it’s done."
+      }
+    },
+    "promisesTitle": "What we promise",
+    "promises": {
+      "lead": "A professional lead developer is responsible for the work, and is your one contact.",
+      "anonymous": "Students stay private: you see a made-up name and their track record, never their real name or photo.",
+      "hours": "Students work a few hours a week at most, never during school hours or late at night.",
+      "parents": "A parent agrees before each student joins a project, and sees what they earn.",
+      "code": "Students are paid fairly: half of what you pay goes to the students who did the work."
+    },
+    "proofTitle": "So far",
+    "formTitle": "Tell us about your project",
+    "formIntro": "We’ll email you a link to confirm your address. Your request reaches our team once you’ve clicked it.",
+    "form": {
+      "name": "Your name",
+      "email": "Work email",
+      "company": "Business or organisation",
+      "country": "Country",
+      "otherCountry": "Somewhere else",
+      "title": "The project in a few words",
+      "brief": "What do you need?",
+      "briefHint": "Who will use it, what it should do, and what you already have (a design, a website, data). At least 30 characters.",
+      "budget": "Budget",
+      "budgets": {
+        "UNDER_500": "Under US$500",
+        "FROM_500": "US$500 to 2,000",
+        "FROM_2000": "US$2,000 to 5,000",
+        "FROM_5000": "Over US$5,000",
+        "UNSURE": "Not sure yet"
+      },
+      "deadline": "Wanted by (optional)",
+      "send": "Send request",
+      "sentTitle": "Check your email",
+      "sent": "We sent a link to {email}. Click it within 7 days, and your request reaches our team.",
+      "privacy": "We use these details only to reply about this project. If you don’t confirm, we delete them after 7 days.",
+      "errors": {
+        "name": "Please enter your name.",
+        "email": "Please enter an email address like name@example.com.",
+        "company": "Please enter your business’s name.",
+        "title": "Please describe the project in a few words.",
+        "brief": "Please tell us a little more (at least 30 characters)."
+      },
+      "problems": {
+        "tooMany": "Too many requests from here. Please try again in an hour.",
+        "invalid": "Something in the form isn’t right. Please check it and try again.",
+        "failed": "We couldn’t send your request. Please check your connection and try again."
+      }
+    },
+    "confirm": {
+      "metaTitle": "Confirm your request",
+      "title": "Confirm your request",
+      "checking": "Checking your link…",
+      "confirmedTitle": "Thank you, it’s confirmed",
+      "confirmed": "Your request is with our team. We’ll reply by email within a few working days.",
+      "back": "Back to Hire our students",
+      "failed": "We couldn’t reach our server. Please try again.",
+      "retry": "Try again",
+      "expiredTitle": "This link has expired",
+      "expired": "Links work for 7 days. Please send your request again and we’ll email you a new one.",
+      "again": "Send the request again"
+    },
+    "proof": {
+      "projects": "Projects delivered",
+      "students": "Students who earned",
+      "earned": "Paid to students",
+      "note": "Stories are shared with a parent’s agreement, with first names only."
+    }
   },
   "notFound": {
     "title": "We can't find that page",

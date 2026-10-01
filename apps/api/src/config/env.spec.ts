@@ -101,6 +101,28 @@ describe('validateEnv', () => {
     );
   });
 
+  it('pays through the Wise mock in development, Wise with a token, and by hand in production', () => {
+    expect(validateEnv(base).WISE_MODE).toBe('mock');
+    expect(validateEnv({ ...base, WISE_MOCK: 'false' }).WISE_MODE).toBe('off');
+    expect(validateEnv(production).WISE_MODE).toBe('off');
+    const key = '-----BEGIN PUBLIC KEY-----\\nMIIB\\n-----END PUBLIC KEY-----';
+    const live = validateEnv({
+      ...production,
+      WISE_API_TOKEN: 'a'.repeat(36),
+      WISE_PROFILE_ID: '12345',
+      WISE_WEBHOOK_PUBLIC_KEY: key,
+    });
+    expect(live.WISE_MODE).toBe('wise');
+    expect(live.WISE_WEBHOOK_PUBLIC_KEY).toBe(
+      '-----BEGIN PUBLIC KEY-----\nMIIB\n-----END PUBLIC KEY-----',
+    );
+    expect(() => validateEnv({ ...base, WISE_API_TOKEN: 'a'.repeat(36) })).toThrow(
+      /WISE_PROFILE_ID/,
+    );
+    expect(() => validateEnv({ ...production, WISE_MOCK: 'true' })).toThrow(/WISE_MOCK/);
+    expect(() => validateEnv({ ...base, WISE_WEBHOOK_PUBLIC_KEY: 'nope' })).toThrow(/PEM/);
+  });
+
   it('only logs push notifications until Firebase is set up', () => {
     expect(validateEnv(base).PUSH_TRANSPORT).toBe('log');
     const account = JSON.stringify({

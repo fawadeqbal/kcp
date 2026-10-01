@@ -5,7 +5,8 @@
  * portfolios, XP, streaks, levels and badges, weekly and season leaderboards (with city
  * and region boards), certificates, plans, payments, refunds and invoices, premium
  * given by staff, feedback, notifications, the waitlist, app crash reports, the daily
- * numbers and the audit trail.
+ * numbers and the audit trail — and the real-world hub (Pakistan's hub opened in this
+ * database: clients, requests, projects, milestones, earnings, payouts and stories).
  *
  *   pnpm demo:data           loads it (running it again only prints the logins)
  *   pnpm demo:data --fresh   removes the earlier demo data and loads it again, dated from today
@@ -23,6 +24,9 @@ import { config as loadEnv } from 'dotenv';
 import type { Redis } from 'ioredis';
 import { AppModule } from '../app.module.js';
 import { BillingRecordsService } from '../billing/billing-records.service.js';
+import { AppConfigService } from '../config/app-config.service.js';
+import { HubEarningsService } from '../hub/earnings.service.js';
+import { LedgerService } from '../hub/ledger/ledger.service.js';
 import { StripeGateway } from '../billing/stripe/stripe.gateway.js';
 import { PrismaService } from '../database/prisma.service.js';
 import { MetricsService } from '../metrics/metrics.service.js';
@@ -50,6 +54,7 @@ import {
   trialReminders,
   waitlist,
 } from './demo-data/extras.js';
+import { createHub } from './demo-data/hub.js';
 import { createPhase2, createWebAdults, WEB_ADULTS } from './demo-data/phase2.js';
 import {
   createDevices,
@@ -164,6 +169,27 @@ async function printLogins(ctx: DemoContext, progress: ProgressService) {
     console.info(`  ${`${adult.email}@${DEMO_DOMAIN}`.padEnd(34)} ${note}`);
   }
   console.info(`  password for all: ${PASSWORDS.staff}`);
+
+  const clients = await ctx.prisma.user.findMany({
+    where: { email: { endsWith: domain }, role: { key: 'client' } },
+    orderBy: { createdAt: 'asc' },
+    select: {
+      email: true,
+      clientMembership: { select: { role: true, org: { select: { name: true } } } },
+    },
+  });
+  if (clients.length) {
+    console.info(
+      '\nHub clients: http://localhost:3001/en/login, then /en/client (two-factor login is set up the first time)',
+    );
+    for (const client of clients) {
+      const member = client.clientMembership;
+      console.info(
+        `  ${client.email!.padEnd(34)} ${member ? `${member.org.name} (${member.role.toLowerCase()})` : ''}`,
+      );
+    }
+    console.info(`  password for all: ${PASSWORDS.staff}`);
+  }
 
   console.info(
     `\nParents: http://localhost:3001/en/login (password "${PASSWORDS.parent}")` +
@@ -305,6 +331,24 @@ async function main() {
     log(
       `${phase2.reports} weekly reports; a younger child (${phase2.young.username}) with verified consent.`,
     );
+
+    log('The real-world hub: clients, projects, earnings and payouts…');
+    const hub = await createHub(
+      ctx,
+      {
+        ledger: app.get(LedgerService),
+        earnings: app.get(HubEarningsService),
+        storage,
+        encryptionKey: app.get(AppConfigService).get('ENCRYPTION_KEY'),
+      },
+      families,
+      staff,
+      adults,
+    );
+    log(
+      `Hub open in Pakistan (this database only); students ${hub.students.join(', ')}; projects: ${hub.projects.join('; ')}.`,
+    );
+    if (hub.storageWarning) log(`Hub files were not stored (${hub.storageWarning}).`);
 
     log('Leaderboards: weeks, seasons and the live boards…');
     const closed = await finishBoards(ctx, boards, seasons);

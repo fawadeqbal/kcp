@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Preview</title>
+    <link rel="stylesheet" href="/pages.css" />
+    <style>
+      main {
+        max-width: 80rem;
+      }
+      .card iframe {
+        height: 75vh;
+        min-height: 24rem;
+      }
+      .field {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      select {
+        min-height: 40px;
+        padding: 6px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--raised);
+        color: var(--ink);
+        font: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app" aria-live="polite"></main>
+    <script src="/preview.js"></script>
+  </body>
+</html>

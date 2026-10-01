@@ -2,12 +2,16 @@ import type { StorageService } from '../../storage/storage.service.js';
 import { SEASON_NAMES } from './boards.js';
 import { DEMO_DOMAIN } from './cast.js';
 import type { DemoContext } from './context.js';
+import { hubDemoIds } from './hub.js';
 
 /** Append-only tables: their protection is switched off only inside the removal below. */
 const PROTECTED = [
   ['xp_events', 'xp_events_append_only'],
   ['audit_logs', 'audit_logs_append_only'],
   ['payment_events', 'payment_events_append_only'],
+  ['ledger_entries', 'ledger_entries_append_only'],
+  ['ledger_transactions', 'ledger_transactions_append_only'],
+  ['ledger_accounts', 'ledger_accounts_append_only'],
 ] as const;
 
 /** Whether demo data is loaded already. */
@@ -64,8 +68,23 @@ export async function removeDemoData(ctx: DemoContext, storage: StorageService) 
     })
   ).map((c) => c.id);
 
+  // Phase 3: the hub's clients, requests, projects, money and payouts.
+  const hub = await hubDemoIds(ctx, adults, students);
+  const ledgerRefs = [...hub.invoices, ...hub.earnings, ...hub.payouts, ...adults];
+  const ledgerOwners = [...hub.orgs, ...hub.projects, ...people];
+
   // Shipped projects' files first (the database still says where they are).
   let filesRemoved = true;
+  for (const prefix of [
+    ...hub.deliveries.map((id) => `hub/previews/${id}/`),
+    ...hub.intakes.map((id) => `hub/intakes/${id}/`),
+  ]) {
+    try {
+      await storage.deletePrefix(prefix);
+    } catch {
+      filesRemoved = false;
+    }
+  }
   for (const id of students) {
     try {
       await storage.deletePrefix(`projects/${id}/`);
@@ -126,8 +145,27 @@ export async function removeDemoData(ctx: DemoContext, storage: StorageService) 
       await tx.$executeRaw`DELETE FROM league_groups g
         WHERE g.id = ANY(${groups.map((g) => g.group_id)}::uuid[])
           AND NOT EXISTS (SELECT 1 FROM league_memberships m WHERE m.group_id = g.id)`;
+      // The hub: the ledger's postings about demo records, then the records.
+      await tx.$executeRaw`DELETE FROM ledger_entries WHERE transaction_id IN (
+        SELECT id FROM ledger_transactions WHERE ref_id = ANY(${ledgerRefs}::uuid[]))`;
+      await tx.$executeRaw`DELETE FROM ledger_transactions WHERE ref_id = ANY(${ledgerRefs}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM ledger_accounts a
+        WHERE a.owner_key = ANY(${ledgerOwners}::text[])
+          AND NOT EXISTS (SELECT 1 FROM ledger_entries e WHERE e.account_id = a.id)`;
+      await tx.$executeRaw`DELETE FROM payouts WHERE id = ANY(${hub.payouts}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM payout_batches b WHERE created_by_id = ANY(${adults}::uuid[])
+        AND NOT EXISTS (SELECT 1 FROM payouts p WHERE p.batch_id = b.id)`;
+      await tx.$executeRaw`DELETE FROM payout_accounts WHERE parent_id = ANY(${adults}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM hub_earnings WHERE id = ANY(${hub.earnings}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM hub_payments WHERE invoice_id = ANY(${hub.invoices}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM hub_invoices WHERE id = ANY(${hub.invoices}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM chat_rooms
+        WHERE kind = 'HUB' AND ref_id = ANY(${hub.projects}::text[])`;
+      await tx.$executeRaw`DELETE FROM hub_projects WHERE id = ANY(${hub.projects}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM hub_intakes WHERE id = ANY(${hub.intakes}::uuid[])`;
+      await tx.$executeRaw`DELETE FROM client_orgs WHERE id = ANY(${hub.orgs}::uuid[])`;
       await tx.$executeRaw`DELETE FROM audit_logs
-        WHERE actor_id = ANY(${people}::uuid[]) OR entity_id = ANY(${texts}::text[])`;
+        WHERE actor_id = ANY(${people}::uuid[]) OR entity_id = ANY(${[...texts, ...hub.projects]}::text[])`;
       // Children first (their parents' links go with them), then the adults.
       await tx.$executeRaw`DELETE FROM users WHERE id = ANY(${students}::uuid[])`;
       await tx.$executeRaw`DELETE FROM users WHERE id = ANY(${adults}::uuid[])`;

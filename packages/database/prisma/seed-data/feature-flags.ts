@@ -20,4 +20,9 @@ export const featureFlags = [
     description:
       'Allow child accounts for ages 9–12, in countries with at least one verified parental consent method (Admin → Countries). Switch on per country once the lawyer approves its methods.',
   },
+  {
+    key: 'hub_payouts',
+    description:
+      'Send hub earnings to parents (Wise, or recorded by hand) and record payments to lead developers. Switch on only once the lawyer has signed off the hub agreements and payouts (Gate 2). Batches can be prepared and approved while it is off.',
+  },
 ];

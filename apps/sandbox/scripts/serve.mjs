@@ -9,6 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   frameAncestorsFromEnv,
+  isSitePage,
   originFromEnv,
   portfolioHeaders,
   pyodideHeaders,
@@ -24,6 +25,7 @@ const TYPES = {
   '.wasm': 'application/wasm',
   '.zip': 'application/zip',
   '.svg': 'image/svg+xml',
+  '.css': 'text/css; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 };
 
@@ -32,9 +34,6 @@ function extraHeaders(pathname) {
   if (!pathname.startsWith('/pyodide/')) return { 'Cache-Control': 'no-cache' };
   return pyodideHeaders(pathname !== '/pyodide/manifest.json');
 }
-
-const isPortfolio = (pathname) =>
-  pathname === '/portfolio' || pathname.startsWith('/portfolio/') || pathname === '/portfolio.js';
 
 export function serveSandbox(port = Number(process.env.SANDBOX_PORT ?? 3004)) {
   const headers = sandboxHeaders(frameAncestorsFromEnv());
@@ -59,7 +58,7 @@ export function serveSandbox(port = Number(process.env.SANDBOX_PORT ?? 3004)) {
       if (!(await stat(target)).isFile()) throw new Error('not a file');
       const { size } = await stat(target);
       res.writeHead(200, {
-        ...(isPortfolio(url.pathname) ? portfolio : headers),
+        ...(isSitePage(url.pathname) ? portfolio : headers),
         ...extraHeaders(url.pathname),
         'Content-Type': TYPES[path.extname(target)] ?? 'application/octet-stream',
         'Content-Length': size,

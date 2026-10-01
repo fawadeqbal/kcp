@@ -22,6 +22,11 @@ export class FeatureFlagsService {
     );
   }
 
+  /** Whether a flag is on at all: everywhere, or in at least one country. */
+  async isOnSomewhere(key: string): Promise<boolean> {
+    return (await this.flags()).get(key)?.enabled ?? false;
+  }
+
   /** Clears the cache after a change. */
   invalidate(): void {
     this.cache = undefined;
