@@ -17,7 +17,7 @@ part 'code_files_dto.g.dart';
 )
 class CodeFilesDto {
   /// Returns a new [CodeFilesDto] instance.
-  CodeFilesDto({this.html, this.css, this.js, this.py});
+  CodeFilesDto({this.html, this.css, this.js, this.py, this.blocks, this.git});
 
   @JsonKey(name: r'html', required: false, includeIfNull: false)
   final String? html;
@@ -32,6 +32,14 @@ class CodeFilesDto {
   @JsonKey(name: r'py', required: false, includeIfNull: false)
   final String? py;
 
+  /// Explorer lessons: the block program, as JSON (see packages/checks, stage).
+  @JsonKey(name: r'blocks', required: false, includeIfNull: false)
+  final String? blocks;
+
+  /// Git lessons: the steps taken in the practice repository, as JSON (packages/checks, git).
+  @JsonKey(name: r'git', required: false, includeIfNull: false)
+  final String? git;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -39,10 +47,18 @@ class CodeFilesDto {
           other.html == html &&
           other.css == css &&
           other.js == js &&
-          other.py == py;
+          other.py == py &&
+          other.blocks == blocks &&
+          other.git == git;
 
   @override
-  int get hashCode => html.hashCode + css.hashCode + js.hashCode + py.hashCode;
+  int get hashCode =>
+      html.hashCode +
+      css.hashCode +
+      js.hashCode +
+      py.hashCode +
+      blocks.hashCode +
+      git.hashCode;
 
   factory CodeFilesDto.fromJson(Map<String, dynamic> json) =>
       _$CodeFilesDtoFromJson(json);

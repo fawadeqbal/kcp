@@ -35,6 +35,16 @@ import { UsersModule } from './users/users.module.js';
 import { WaitlistModule } from './waitlist/waitlist.module.js';
 import { AccountModule } from './account/account.module.js';
 import { ContentAdminModule } from './content-admin/content-admin.module.js';
+import { ContentStudioModule } from './content-studio/content-studio.module.js';
+import { ChatModule } from './chat/chat.module.js';
+import { EventsModule } from './events/events.module.js';
+import { ReadinessModule } from './readiness/readiness.module.js';
+import { SchoolsModule } from './schools/schools.module.js';
+import { FriendsModule } from './friends/friends.module.js';
+import { ReferralsModule } from './referrals/referrals.module.js';
+import { ReportsModule } from './reports/reports.module.js';
+import { ParentalConsentModule } from './parental-consent/parental-consent.module.js';
+import { ReviewsModule } from './reviews/reviews.module.js';
 import { SettingsAdminModule } from './settings-admin/settings-admin.module.js';
 
 @Module({
@@ -72,6 +82,16 @@ import { SettingsAdminModule } from './settings-admin/settings-admin.module.js';
     WaitlistModule,
     CertificatesModule,
     ContentAdminModule,
+    ContentStudioModule,
+    ReviewsModule,
+    ParentalConsentModule,
+    ChatModule,
+    EventsModule,
+    SchoolsModule,
+    ReadinessModule,
+    FriendsModule,
+    ReferralsModule,
+    ReportsModule,
     SettingsAdminModule,
     AccountModule,
     AppCrashesModule,

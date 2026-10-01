@@ -23,7 +23,7 @@ import type {
   StudentXpDto,
 } from './dto/progress.dto.js';
 import { LeaderboardService, type PeriodRef } from './leaderboard.service.js';
-import { addDays, weekOfDay } from './xp-rules.js';
+import { seasonEndDay, weekOfDay } from './xp-rules.js';
 
 const asDate = (day: string) => new Date(`${day}T00:00:00Z`);
 const asDay = (date: Date) => date.toISOString().slice(0, 10);
@@ -165,10 +165,16 @@ export class LeaderboardsAdminService {
     if (season.status === 'ENDED') {
       throw new ConflictException({ error: 'SEASON_ENDED', message: 'This season has ended.' });
     }
-    // Ending early counts today in full; a planned end stays as planned.
-    const tomorrow = addDays(utcToday(), 1);
-    const endDay =
-      season.endDay && asDay(season.endDay) <= tomorrow ? asDay(season.endDay) : tomorrow;
+    // Ending early counts today in full in every country; a planned end stays as planned.
+    const countries = await this.prisma.country.findMany({
+      where: { isActive: true },
+      select: { timezone: true },
+    });
+    const endDay = seasonEndDay(
+      new Date(),
+      countries.map((c) => c.timezone),
+      season.endDay ? asDay(season.endDay) : null,
+    );
     const ref: PeriodRef = {
       period: 'season',
       key: season.id,

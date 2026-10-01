@@ -11,7 +11,7 @@ type Quiz = components['schemas']['QuizDto'];
 type QuizResult = components['schemas']['QuizResultDto'];
 
 const codeBlock =
-  'elev-sm overflow-x-auto whitespace-pre rounded-well bg-code-bg p-4 text-start font-mono text-[0.95rem] leading-relaxed text-ink';
+  'elev-sm max-h-[70dvh] overflow-auto whitespace-pre rounded-well bg-code-bg p-4 text-start font-mono text-[0.95rem] leading-relaxed text-ink';
 
 /**
  * "Check yourself": the lesson's quick questions (the same ones the mobile app uses

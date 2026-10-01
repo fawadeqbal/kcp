@@ -2,10 +2,21 @@
 
 import type { ReactNode } from 'react';
 import { usePathname } from '@/i18n/navigation';
+import { ActivityHeartbeat } from '@/features/reports/activity-heartbeat';
+import { useAuth } from '@/lib/auth-provider';
 import { AUTH_PATHS, AuthFrame } from './auth-frame';
 import { FeedbackButton } from './feedback-button';
 
-const SECTIONS = new Set(['leaderboard', 'badges', 'portfolio']);
+const SECTIONS = new Set([
+  'leaderboard',
+  'league',
+  'friends',
+  'rooms',
+  'events',
+  'skills',
+  'badges',
+  'portfolio',
+]);
 
 /**
  * A lesson or a project is a full-screen workspace with its own header (the steps,
@@ -29,6 +40,7 @@ export function AppFrame({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const { state } = useAuth();
   if (AUTH_PATHS.includes(pathname)) {
     return (
       <main id="main" className="flex min-h-dvh flex-1 flex-col">
@@ -39,6 +51,10 @@ export function AppFrame({
   if (isWorkspacePath(pathname)) {
     return (
       <main id="main" className="flex min-h-dvh flex-1 flex-col">
+        {/* Minutes learning, for the parents' weekly report. */}
+        {state.status === 'authenticated' && state.user.kind === 'STUDENT' ? (
+          <ActivityHeartbeat />
+        ) : null}
         {children}
       </main>
     );

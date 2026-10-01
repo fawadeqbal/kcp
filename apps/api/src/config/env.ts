@@ -152,6 +152,15 @@ export const envSchema = z
      * Defaults to fcm with FIREBASE_SERVICE_ACCOUNT, otherwise log.
      */
     PUSH_TRANSPORT: z.enum(['fcm', 'log', 'memory']).optional(),
+
+    // ── Team git hosting (hackathons) ──
+    /**
+     * The Forgejo server that holds the teams' repositories (never public: students
+     * reach it only through this API). Without it, events run without team repositories.
+     */
+    FORGEJO_URL: z.url().optional(),
+    /** An access token of Forgejo's admin account (scopes: all). */
+    FORGEJO_TOKEN: z.string().min(20).optional(),
   })
   .refine((env) => env.MAIL_TRANSPORT !== 'smtp' || Boolean(env.SMTP_URL), {
     message: 'SMTP_URL is required when MAIL_TRANSPORT is smtp',
@@ -169,6 +178,10 @@ export const envSchema = z
   .refine((env) => !env.STRIPE_SECRET_KEY || Boolean(env.STRIPE_WEBHOOK_SECRET), {
     message: 'STRIPE_WEBHOOK_SECRET is required with STRIPE_SECRET_KEY',
     path: ['STRIPE_WEBHOOK_SECRET'],
+  })
+  .refine((env) => !env.FORGEJO_URL || Boolean(env.FORGEJO_TOKEN), {
+    message: 'FORGEJO_TOKEN is required with FORGEJO_URL',
+    path: ['FORGEJO_TOKEN'],
   })
   .refine((env) => env.PUSH_TRANSPORT !== 'fcm' || Boolean(env.FIREBASE_SERVICE_ACCOUNT), {
     message: 'FIREBASE_SERVICE_ACCOUNT is required when PUSH_TRANSPORT is fcm',

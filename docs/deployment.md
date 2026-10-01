@@ -54,6 +54,8 @@ Tags: `sha-<7 chars>` for pushes to `main`, the tag name (for example `v0.1.0`) 
      | `STRIPE_SECRET_KEY`        | optional: turns on card payments (see "Card payments")                                                                    |
      | `STRIPE_WEBHOOK_SECRET`    | with `STRIPE_SECRET_KEY`: the webhook endpoint's signing secret                                                           |
      | `FIREBASE_SERVICE_ACCOUNT` | optional: push notifications for the mobile app ([mobile-release.md](mobile-release.md)); without it they are only logged |
+     | `FORGEJO_URL`              | optional: the private git server for hackathon teams (see "Team repositories"); without it teams can't use git            |
+     | `FORGEJO_TOKEN`            | with `FORGEJO_URL`: the Forgejo admin account's access token                                                              |
 
      Optional: `STAFF_SESSION_HOURS` (default 12) and `REFRESH_TOKEN_TTL_DAYS` (default 30) set how long staff and families stay signed in before typing their password again.
 
@@ -137,6 +139,17 @@ The API runs these jobs itself (UTC). If the host runs more than one API instanc
 Leaderboards live in Redis and are rebuilt from PostgreSQL when missing, so emptying Redis loses nothing.
 
 **How many instances:** the [load test](load-test.md) had 1,000 students working at once on one small instance with every answer under 120 ms; a burst (a whole class pressing "Check" together) saturated it. Run at least two instances in production.
+
+## Team repositories (Forgejo)
+
+Hackathon teams keep their code in a private git repository on our own Forgejo server. Families never reach Forgejo directly: the web app talks git to the API (`/v1/git/teams/<id>`), which checks the student's access token and team, refuses pushes to `main`, and forwards to Forgejo with the admin token. Pull requests, reviews and merges also go through the API.
+
+1. **Run Forgejo 11** on a private network next to the API (a small container with a persistent volume; SQLite is enough for the pilot). Do not give it a public address. Use the same settings as the `forgejo` service in `docker-compose.yml`: install lock on, registration off, sign-in required to view, private repositories by default, SSH, mail, OpenID and webhooks off.
+2. **Make the admin account and token:** `docker exec -u git <container> forgejo admin user create --admin --username kcp-admin --email kcp-admin@forgejo.localhost --password <random> --must-change-password=false`, then `forgejo admin user generate-access-token --username kcp-admin --token-name kcp-api --scopes all --raw`. Locally `pnpm forgejo:setup` does both.
+3. **Give the API** `FORGEJO_URL` (the private address, for example `http://forgejo:3000`) and `FORGEJO_TOKEN`. Keep the token like a database password: it can act as any team member.
+4. **Back up** the Forgejo data volume daily with the database (see [backup-restore.md](runbooks/backup-restore.md)).
+
+Without these two variables hackathons still run (teams, rooms, hand-ins with a title and description, judging), but teams have no shared repository: the workspace says git isn't set up. The git lessons in the Pro track never need Forgejo (they run in the browser).
 
 ## The client's IP address
 

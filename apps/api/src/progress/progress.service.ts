@@ -23,6 +23,7 @@ import type { AuthUser } from '../permissions/auth-user.js';
 import { BadgesService } from './badges.service.js';
 import type { LeaderboardDto, ProgressDto } from './dto/progress.dto.js';
 import { LeaderboardService, type PeriodRef } from './leaderboard.service.js';
+import { LeaguesService } from './leagues.service.js';
 import {
   freezesNeeded,
   levelFor,
@@ -66,6 +67,7 @@ export class ProgressService {
     private readonly leaderboards: LeaderboardService,
     private readonly badges: BadgesService,
     private readonly audit: AuditService,
+    private readonly leagues: LeaguesService,
   ) {}
 
   async levels() {
@@ -94,9 +96,10 @@ export class ProgressService {
   ): Promise<XpAward | null> {
     if (amount <= 0) return null;
     // One award at a time per student, so the daily cap can't be overshot.
-    const locked = await tx.$queryRaw<{ user_id: string }[]>`
-      SELECT user_id FROM student_profiles WHERE user_id = ${userId}::uuid FOR UPDATE`;
-    if (locked.length === 0) return null;
+    const locked = await tx.$queryRaw<{ xp_total: number; league_tier: number }[]>`
+      SELECT xp_total, league_tier FROM student_profiles WHERE user_id = ${userId}::uuid FOR UPDATE`;
+    const profile = locked[0];
+    if (!profile) return null;
     const already = await tx.xpEvent.findUnique({
       where: { userId_source_sourceId: { userId, source, sourceId } },
       select: { id: true },
@@ -124,6 +127,14 @@ export class ProgressService {
       where: { userId },
       data: { xpTotal: { increment: give } },
     });
+    const level = await this.levelFor(profile.xp_total);
+    await this.leagues.addXp(
+      tx,
+      { userId, tier: profile.league_tier, level: level.number },
+      today,
+      give,
+      now,
+    );
 
     const streak = await tx.streak.findUnique({ where: { userId } });
     const goal = streak?.dailyGoalXp ?? DAILY_GOAL_XP;
@@ -199,6 +210,7 @@ export class ProgressService {
         where: { userId },
         data: { xpTotal: { decrement: amount } },
       });
+      await this.leagues.addXp(tx, { userId, tier: 0, level: 1 }, today, -amount);
       await this.audit.record(
         {
           actor: { id: staff.id, roleKey: staff.roleKey },

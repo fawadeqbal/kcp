@@ -22,12 +22,11 @@ import {
 } from '../src/permissions/permission.decorators.js';
 import {
   createTestApp,
-  createUser,
-  PASSWORD,
   resetRateLimits,
   signUpAndLogin,
   staffLogin,
   type TestContext,
+  webTwoFactorLogin,
 } from './helpers.js';
 import { auth, family } from './learning-fixture.js';
 
@@ -90,6 +89,7 @@ const ROLES: RoleKey[] = [
   ROLE_KEYS.STUDENT,
   ROLE_KEYS.PARENT,
   ROLE_KEYS.MENTOR,
+  ROLE_KEYS.TEACHER,
   ROLE_KEYS.CONTENT_CREATOR,
   ROLE_KEYS.MODERATOR,
   ROLE_KEYS.ADMIN,
@@ -106,14 +106,10 @@ describe('permissions on every route (e2e)', () => {
     const { student } = await family(t);
     tokens.set(ROLE_KEYS.STUDENT, student);
     tokens.set(ROLE_KEYS.PARENT, (await signUpAndLogin(t)).accessToken);
-    // Mentors aren't staff (no admin panel): they sign in like parents.
-    const mentor = await createUser(t.prisma, ROLE_KEYS.MENTOR);
-    const login = await t
-      .http()
-      .post('/v1/auth/login')
-      .send({ email: mentor.email, password: PASSWORD })
-      .expect(200);
-    tokens.set(ROLE_KEYS.MENTOR, login.body.accessToken as string);
+    // Mentors and teachers aren't staff (no admin panel): they sign in to the web app,
+    // with a two-factor code.
+    tokens.set(ROLE_KEYS.MENTOR, (await webTwoFactorLogin(t, ROLE_KEYS.MENTOR)).token);
+    tokens.set(ROLE_KEYS.TEACHER, (await webTwoFactorLogin(t, ROLE_KEYS.TEACHER)).token);
     for (const role of [ROLE_KEYS.CONTENT_CREATOR, ROLE_KEYS.MODERATOR, ROLE_KEYS.ADMIN]) {
       tokens.set(role, (await staffLogin(t, role)).token);
     }
@@ -132,7 +128,8 @@ describe('permissions on every route (e2e)', () => {
 
   it('finds the routes', () => {
     expect(routes.length).toBeGreaterThan(100);
-    expect(routes.filter((r) => r.access === 'public').length).toBeLessThan(30);
+    // Every public route is listed in src/permissions/route-access.spec.ts.
+    expect(routes.filter((r) => r.access === 'public').length).toBeLessThan(40);
   });
 
   it('refuses every route that is not public without a token (401)', async () => {

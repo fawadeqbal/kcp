@@ -4,6 +4,7 @@ import type { CodeError, CodeFileKey, CodeFiles, PreviewLabels } from '@kcp/chec
 import { clsx } from 'clsx';
 import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { FULL_SCREEN_CLASS, FullScreenButton, useFullScreen } from '@/components/full-screen';
 import { Alert, Button, Icon, textareaClass } from '@/components/ui';
 import { CodeEditor } from './code-editor';
 import { loadPython, type PythonLoad, usePythonRuntime } from './python-runtime';
@@ -45,6 +46,24 @@ export function usePreviewLabels(): PreviewLabels {
 
 const PREVIEW_DELAY_MS = 400;
 const AUTOSAVE_DELAY_MS = 1000;
+
+/**
+ * A lesson's or a project's page: at least one screen tall, and on wide screens (xl)
+ * exactly one, with the editor and the preview sharing it. `flex-none` matters there:
+ * a `flex-1` box takes its height from its content (its parent's height isn't fixed),
+ * which let long code stretch the whole page far past the screen.
+ * Every panel that scrolls inside it is `relative` too: text for screen readers only
+ * (`sr-only`, absolutely placed) then stays in its panel instead of making the page
+ * longer than the screen.
+ */
+export const WORKSPACE_PAGE_CLASS = 'flex min-h-dvh flex-1 flex-col xl:h-dvh xl:flex-none';
+
+/**
+ * The editor's and the preview's height: never taller than the screen, so long code and
+ * long pages scroll inside them (with their own scroll bar) instead of stretching the
+ * page. On wide screens they share the one-screen workspace (`WORKSPACE_PAGE_CLASS`).
+ */
+export const WORKSPACE_PANE_CLASS = 'h-[max(24rem,calc(100dvh-6rem))] xl:h-auto xl:min-h-0';
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
 
@@ -368,7 +387,7 @@ export function FilesEditor({
         id={panelId}
         role="tabpanel"
         aria-labelledby={tabId(active)}
-        className="min-h-72 flex-1 overflow-auto"
+        className="relative min-h-48 flex-1 overflow-auto"
       >
         <CodeEditor
           key={active}
@@ -412,48 +431,60 @@ export function PreviewPane({
   const t = useTranslations('lesson');
   const baseId = useId();
   const [tab, setTab] = useState<'preview' | 'console'>('preview');
+  const fullScreen = useFullScreen<HTMLDivElement>();
   const tabs = python ? (['preview'] as const) : (['preview', 'console'] as const);
   const label = (key: 'preview' | 'console') =>
     key === 'console' ? t('console') : python ? t('output') : t('preview');
   return (
     <div
+      ref={fullScreen.ref}
       className={clsx(
-        'flex min-w-0 flex-col gap-3 overflow-hidden rounded-panel bg-surface p-3',
-        className,
+        '@container flex min-w-0 flex-col gap-3 overflow-y-auto bg-surface p-3',
+        fullScreen.active ? FULL_SCREEN_CLASS : clsx('relative rounded-panel', className),
       )}
     >
-      <div role="tablist" aria-label={title} className="flex gap-1">
-        {tabs.map((key, index) => (
-          <button
-            key={key}
-            id={`${baseId}-${key}`}
-            type="button"
-            role="tab"
-            aria-selected={tab === key}
-            aria-controls={`${baseId}-panel`}
-            tabIndex={tab === key ? 0 : -1}
-            onClick={() => setTab(key)}
-            onKeyDown={(event) => onTabKeyDown(event, tabs.length, index, (i) => setTab(tabs[i]!))}
-            className={clsx(
-              'flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-sm transition-colors',
-              tab === key
-                ? 'elev-sm bg-canvas font-bold'
-                : 'font-semibold text-muted hover:text-ink',
-            )}
-          >
-            <Icon name={key === 'console' ? 'terminal' : python ? 'terminal' : 'eye'} />
-            {label(key)}
-            {key === 'console' && lines.length ? (
-              <span className="size-2 rounded-full bg-brand" aria-hidden="true" />
-            ) : null}
-          </button>
-        ))}
+      <div className="flex items-center gap-2">
+        <div role="tablist" aria-label={title} className="flex gap-1">
+          {tabs.map((key, index) => (
+            <button
+              key={key}
+              id={`${baseId}-${key}`}
+              type="button"
+              role="tab"
+              aria-selected={tab === key}
+              aria-controls={`${baseId}-panel`}
+              tabIndex={tab === key ? 0 : -1}
+              onClick={() => setTab(key)}
+              onKeyDown={(event) =>
+                onTabKeyDown(event, tabs.length, index, (i) => setTab(tabs[i]!))
+              }
+              className={clsx(
+                'flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-sm transition-colors',
+                tab === key
+                  ? 'elev-sm bg-canvas font-bold'
+                  : 'font-semibold text-muted hover:text-ink',
+              )}
+            >
+              <Icon name={key === 'console' ? 'terminal' : python ? 'terminal' : 'eye'} />
+              {label(key)}
+              {key === 'console' && lines.length ? (
+                <span className="size-2 rounded-full bg-brand" aria-hidden="true" />
+              ) : null}
+            </button>
+          ))}
+        </div>
+        <FullScreenButton
+          compact
+          active={fullScreen.active}
+          onToggle={fullScreen.toggle}
+          className="ms-auto"
+        />
       </div>
       <div
         id={`${baseId}-panel`}
         role="tabpanel"
         aria-labelledby={`${baseId}-${tab}`}
-        className="relative min-h-72 flex-1"
+        className="relative min-h-48 flex-1"
       >
         <iframe
           key={sandbox.frameKey}

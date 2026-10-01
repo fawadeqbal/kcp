@@ -1,0 +1,41 @@
+id: pro-m01-l03-c1
+order: 1
+type: git
+xp: 10
+repo:
+  files:
+    index.html: |
+      <h1>Our club</h1>
+      <p>We meet every Saturday.</p>
+    style.css: |
+      body { background-color: white; color: black; }
+  setup:
+    - run: git init
+    - run: git add .
+    - run: git commit -m "Add the club page"
+starter:
+  git: []
+solution:
+  git:
+    - run: git switch -c dark-mode
+    - write: style.css
+      content: |
+        body { background-color: black; color: white; }
+    - run: git commit -am "Try a dark mode"
+checks:
+  - id: branch
+    expect: git
+    branches: [dark-mode]
+    onBranch: dark-mode
+    hint: branch
+  - id: dark-committed
+    expect: git
+    commits: 2
+    contains:
+      path: style.css
+      text: black
+    hint: commit
+  - id: main-safe
+    expect: git
+    clean: true
+    hint: commit

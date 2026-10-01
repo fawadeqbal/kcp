@@ -309,6 +309,8 @@ export class CountryPricesDto {
   currency!: string;
   isActive!: boolean;
   familyDiscountPercent!: number;
+  /** How parents of under-13s give verified consent here (Admin → Countries). */
+  under13ConsentMethods!: ('CARD_CHECK' | 'SIGNED_FORM' | 'EMAIL_PLUS')[];
   /** Per child, by plan key; null when not set yet. */
   prices!: Record<string, number | null>;
 }

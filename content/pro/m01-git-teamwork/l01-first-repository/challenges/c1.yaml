@@ -1,0 +1,30 @@
+id: pro-m01-l01-c1
+order: 1
+type: git
+xp: 10
+repo:
+  files:
+    index.html: |
+      <h1>My hobbies</h1>
+      <p>I like football and drawing.</p>
+starter:
+  git: []
+solution:
+  git:
+    - run: git init
+    - run: git add index.html
+    - run: git commit -m "Add my hobbies page"
+checks:
+  - id: initialized
+    expect: git
+    initialized: true
+    hint: init
+  - id: first-commit
+    expect: git
+    commits: 1
+    committed: [index.html]
+    hint: add_commit
+  - id: clean
+    expect: git
+    clean: true
+    hint: status

@@ -151,6 +151,7 @@ describe('admin settings, content publishing and account data (e2e)', () => {
         code: TEST_COUNTRY,
         isActive: true,
         currency: 'USD',
+        under13ConsentMethods: [],
       });
       expect((await update({ currency: 'EUR' }).expect(409)).body.error).toBe('COUNTRY_ACTIVE');
 
@@ -165,7 +166,7 @@ describe('admin settings, content publishing and account data (e2e)', () => {
         where: { action: 'country.update', entityId: TEST_COUNTRY },
         orderBy: { createdAt: 'desc' },
       });
-      expect(log.after).toEqual({ isActive: false, currency: 'EUR' });
+      expect(log.after).toEqual({ isActive: false, currency: 'EUR', under13ConsentMethods: [] });
     });
 
     it('keeps the languages families rely on switched on', async () => {
@@ -200,6 +201,7 @@ describe('admin settings, content publishing and account data (e2e)', () => {
     it('switches a flag for some countries, with a reason, and it applies at once', async () => {
       const list = await t.http().get('/v1/admin/feature-flags').set(auth(admin.token)).expect(200);
       expect(list.body.flags.map((f: { key: string }) => f.key)).toEqual([
+        'mentor_approval_for_certificates',
         'payments',
         'under_13_accounts',
       ]);
@@ -218,7 +220,7 @@ describe('admin settings, content publishing and account data (e2e)', () => {
         .get('/v1/admin/feature-flags')
         .set(auth(admin.token))
         .expect(200);
-      expect(after.body.flags[0]).toMatchObject({
+      expect(after.body.flags.find((f: { key: string }) => f.key === 'payments')).toMatchObject({
         key: 'payments',
         countryCodes: ['PK'],
         updatedBy: 'admin tester',

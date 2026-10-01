@@ -56,3 +56,41 @@ export async function giveCertificate(username: string, code: string) {
     [username, code],
   );
 }
+
+/** Reads rows (test checks only). */
+export async function query<T>(sql: string, values: unknown[]): Promise<T[]> {
+  const client = new Client({ connectionString: databaseUrl() });
+  await client.connect();
+  try {
+    return (await client.query(sql, values)).rows as T[];
+  } finally {
+    await client.end();
+  }
+}
+
+/** Removes a translation made by a test, and any draft of it. */
+export async function removeLessonTranslation(lessonId: string, languageCode: string) {
+  await run(`DELETE FROM lesson_translations WHERE lesson_id = $1 AND language_code = $2`, [
+    lessonId,
+    languageCode,
+  ]);
+  await run(`DELETE FROM content_drafts WHERE entity_id = $1 AND language_code = $2`, [
+    lessonId,
+    languageCode,
+  ]);
+}
+
+/** MENTOR_CODE_OF_CONDUCT_VERSION in @kcp/database (the admin app doesn't depend on it). */
+const CODE_OF_CONDUCT_VERSION = '2026-10';
+
+/** A mentor who may mentor teams and judge: background check passed, code of conduct signed. */
+export async function readyMentor(email: string) {
+  await run(
+    `INSERT INTO mentor_profiles (user_id, background_check, background_checked_at, languages,
+                                  code_of_conduct_version, code_of_conduct_signed_at, updated_at)
+     SELECT id, 'PASSED', now(), '{en}', $2, now(), now() FROM users WHERE email = $1
+     ON CONFLICT (user_id) DO UPDATE
+       SET background_check = 'PASSED', code_of_conduct_version = $2, code_of_conduct_signed_at = now()`,
+    [email, CODE_OF_CONDUCT_VERSION],
+  );
+}

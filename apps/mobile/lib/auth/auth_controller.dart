@@ -130,6 +130,68 @@ class AuthController extends Notifier<AuthState> {
     await _signedIn(response.data!);
   }
 
+  static const lastStudentKey = 'kcp.lastStudent';
+
+  /// The login name of the last student who signed in on this device: picture
+  /// sign-in starts with it, so a young child only taps their pictures.
+  String? get lastStudent => ref.read(sharedPreferencesProvider).getString(lastStudentKey);
+
+  Future<void> _rememberStudent(LoginResponseDto result) async {
+    final user = result.user;
+    final username = user?.username;
+    if (user?.kind == MeDtoKindEnum.STUDENT && username != null) {
+      await ref.read(sharedPreferencesProvider).setString(lastStudentKey, username);
+    }
+  }
+
+  /// A young student signs in with their login name and four pictures, in order.
+  Future<void> loginWithPictures(String username, List<String> pictures) async {
+    final response = await _api.getAuthApi().authPictureLogin(
+      pictureLoginDto: PictureLoginDto(
+        username: username.trim().toLowerCase(),
+        pictures: [
+          for (final picture in pictures)
+            PictureLoginDtoPicturesEnum.values.firstWhere(
+              (value) => value.value == picture,
+              orElse: () => PictureLoginDtoPicturesEnum.unknownDefaultOpenApi,
+            ),
+        ],
+        tokenDelivery: PictureLoginDtoTokenDeliveryEnum.body,
+        app: PictureLoginDtoAppEnum.mobile,
+      ),
+    );
+    await _signedIn(response.data!);
+  }
+
+  /// "Parent's phone": this device asks for a code to show; a parent approves it
+  /// from their own phone and picks the child (young-login, API).
+  Future<PairingStartedDto> startPairing() async {
+    final response = await _api.getAuthApi().authStartPairing(
+      pairingStartDto: PairingStartDto(app: PairingStartDtoAppEnum.mobile),
+    );
+    return response.data!;
+  }
+
+  Future<PairingStatusDtoStatusEnum> pairingStatus(PairingStartedDto pairing) async {
+    final response = await _api.getAuthApi().authPairingStatus(
+      pairingDeviceDto: PairingDeviceDto(pairingId: pairing.pairingId, secret: pairing.secret),
+    );
+    return response.data!.status;
+  }
+
+  /// Signs in the child the parent picked (once: the pairing is used up).
+  Future<void> claimPairing(PairingStartedDto pairing) async {
+    final response = await _api.getAuthApi().authClaimPairing(
+      pairingDeviceDto: PairingDeviceDto(
+        pairingId: pairing.pairingId,
+        secret: pairing.secret,
+        tokenDelivery: PairingDeviceDtoTokenDeliveryEnum.body,
+        app: PairingDeviceDtoAppEnum.mobile,
+      ),
+    );
+    await _signedIn(response.data!);
+  }
+
   Future<void> _signedIn(LoginResponseDto result) async {
     if (result.status != LoginResponseDtoStatusEnum.authenticated ||
         result.accessToken == null ||
@@ -141,6 +203,7 @@ class AuthController extends Notifier<AuthState> {
     ref.read(tokenRefresherProvider).invalidate();
     _tokens.accessToken = result.accessToken;
     await _store.saveRefreshToken(result.refreshToken!);
+    await _rememberStudent(result);
     _set(SignedIn(result.user!));
   }
 

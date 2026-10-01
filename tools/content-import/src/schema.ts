@@ -1,3 +1,12 @@
+import {
+  BLOCK_KINDS,
+  DIRECTIONS,
+  programProblem,
+  readGrid,
+  STAGE_MODES,
+  STAGE_THEMES,
+  type StageLevel,
+} from '@kcp/checks';
 import { z } from 'zod';
 
 /** Content IDs: lowercase letters, digits and dashes, e.g. "builder-m01-l03-c1". */
@@ -15,6 +24,11 @@ export const trackSchema = z
     id: contentId,
     order: z.number().int().min(0),
     titles: texts,
+    /** Ages the track is made for, e.g. [9, 12]: students of those ages see it first. */
+    ages: z
+      .tuple([z.number().int().min(5).max(18), z.number().int().min(5).max(18)])
+      .refine(([from, to]) => from <= to, 'ages go from youngest to oldest')
+      .optional(),
   })
   .strict();
 
@@ -34,16 +48,77 @@ const video = z
   })
   .strict();
 
+/** Skill keys (content/skills.yaml), e.g. "loops". */
+const skillKey = z
+  .string()
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'use lowercase letters, digits and dashes');
+
+/** Skill map groups (packages/shared SKILL_CATEGORIES). */
+export const SKILL_CATEGORIES = ['logic', 'web', 'python', 'teamwork'] as const;
+
+/** content/skills.yaml: every skill lessons can teach, for the skill map. */
+export const skillsSchema = z
+  .object({
+    skills: z
+      .array(
+        z
+          .object({
+            key: skillKey,
+            category: z.enum(SKILL_CATEGORIES),
+            names: texts,
+          })
+          .strict(),
+      )
+      .min(1),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    const keys = value.skills.map((skill) => skill.key);
+    for (const key of new Set(keys.filter((k, i) => keys.indexOf(k) !== i))) {
+      ctx.addIssue({ code: 'custom', message: `skill "${key}" is listed twice` });
+    }
+  });
+
 export const lessonSchema = z
   .object({
     id: contentId,
     order: z.number().int().min(0),
     xp: z.number().int().min(0).max(1000),
     isPremium: z.boolean().default(false),
+    /** What the lesson teaches (keys from content/skills.yaml). */
+    skills: z.array(skillKey).max(5).default([]),
     /** Optional video per language code. */
     video: z.record(z.string().regex(/^[a-z]{2}$/), video).optional(),
   })
   .strict();
+
+/**
+ * A block program (Explorer), written as scripts: `- when: run` then `do:` a list of
+ * blocks (`move: right`, `collect`, `repeat: 3` with `do:` …). Stored as JSON.
+ */
+const blocks = z
+  .array(z.unknown())
+  .superRefine((value, ctx) => {
+    const problem = programProblem(value);
+    if (problem) ctx.addIssue({ code: 'custom', message: `not a block program: ${problem}` });
+  })
+  .transform((value) => JSON.stringify(value));
+
+/** A git action: a command line, a file written, or a file removed. */
+const gitAction = z.union([
+  z.object({ run: z.string().min(1).max(300) }).strict(),
+  z.object({ write: z.string().min(1), content: z.string() }).strict(),
+  z.object({ remove: z.string().min(1) }).strict(),
+]);
+
+/**
+ * Git steps (Pro): what the student does, as a list of actions (`- run: git add .`,
+ * `- write: index.html` with `content:`). Stored as JSON. The starter is usually `[]`.
+ */
+const gitSteps = z
+  .array(gitAction)
+  .max(400)
+  .transform((value) => JSON.stringify(value));
 
 const code = z
   .object({
@@ -52,6 +127,10 @@ const code = z
     js: z.string().optional(),
     /** A Python program: on its own, never with web page files. */
     py: z.string().optional(),
+    /** A block program: on its own too. */
+    blocks: blocks.optional(),
+    /** Git steps: on their own too. */
+    git: gitSteps.optional(),
   })
   .strict()
   .refine(
@@ -62,7 +141,43 @@ const code = z
     (files) =>
       files.py === undefined || [files.html, files.css, files.js].every((f) => f === undefined),
     'a Python program (py) comes on its own, without html, css or js',
+  )
+  .refine(
+    (files) => files.blocks === undefined || Object.keys(files).length === 1,
+    'a block program (blocks) comes on its own',
+  )
+  .refine(
+    (files) => files.git === undefined || Object.keys(files).length === 1,
+    'git steps (git) come on their own',
   );
+
+/** The practice repository a git challenge starts with (see GitSetup in packages/checks). */
+const repo = z
+  .object({
+    /** The folder's files at the start. */
+    files: z.record(z.string().regex(/^[\w.-]+(?:\/[\w.-]+){0,3}$/), z.string().max(20_000)),
+    /** Steps already taken before the student starts (e.g. an existing history). */
+    setup: z.array(gitAction).max(100).optional(),
+  })
+  .strict();
+
+/** The level of a block challenge or project (see StageLevel in packages/checks). */
+const stage = z
+  .object({
+    mode: z.enum(STAGE_MODES),
+    map: z.array(z.string()).min(2).max(12),
+    toolbox: z.array(z.enum(BLOCK_KINDS)).min(1),
+    theme: z.enum(STAGE_THEMES).optional(),
+    seconds: z.number().int().min(10).max(120).optional(),
+  })
+  .strict()
+  .superRefine((level, ctx) => {
+    try {
+      readGrid(level as StageLevel);
+    } catch (error) {
+      ctx.addIssue({ code: 'custom', message: (error as Error).message });
+    }
+  });
 
 const checkBase = {
   id: contentId,
@@ -139,25 +254,96 @@ const check = z.discriminatedUnion('expect', [
       code: z.string().min(1),
     })
     .strict(),
+  z
+    .object({
+      ...checkBase,
+      expect: z.literal('stage'),
+      keys: z.array(z.enum(DIRECTIONS)).max(100).optional(),
+      seed: z.number().int().min(0).optional(),
+      atGoal: z.boolean().optional(),
+      endsAt: z.tuple([z.number().int().min(0), z.number().int().min(0)]).optional(),
+      gemsLeft: z.number().int().min(0).optional(),
+      minScore: z.number().int().optional(),
+      said: z.string().min(1).optional(),
+      noBump: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      ...checkBase,
+      expect: z.literal('git'),
+      initialized: z.boolean().optional(),
+      commits: z.number().int().min(1).optional(),
+      branches: z.array(z.string().min(1)).min(1).optional(),
+      onBranch: z.string().min(1).optional(),
+      committed: z.array(z.string().min(1)).min(1).optional(),
+      contains: z
+        .object({ path: z.string().min(1), text: z.string().min(1) })
+        .strict()
+        .optional(),
+      clean: z.boolean().optional(),
+      staged: z.array(z.string().min(1)).min(1).optional(),
+      merged: z.string().min(1).optional(),
+      mergeCommit: z.boolean().optional(),
+      resolved: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      ...checkBase,
+      expect: z.literal('blocks'),
+      uses: z.array(z.enum(BLOCK_KINDS)).min(1).optional(),
+      maxBlocks: z.number().int().min(1).optional(),
+      minBlocks: z.number().int().min(1).optional(),
+    })
+    .strict(),
 ]);
 
 const PYTHON_CHECKS = new Set(['output', 'python']);
+const STAGE_CHECKS = new Set(['stage', 'blocks']);
+const GIT_CHECKS = new Set(['git']);
 
-/** Python programs get Python checks (output, python); web pages get the others. */
-const checksFitCode = (value: { starter: { py?: string }; checks: { expect: string }[] }) =>
-  value.checks.every((c) => PYTHON_CHECKS.has(c.expect) === (value.starter.py !== undefined));
-const CHECKS_FIT = 'Python programs use "output" and "python" checks; web pages use the others';
+/**
+ * Python programs get Python checks (output, python), block programs stage checks
+ * (stage, blocks), and web pages the others.
+ */
+const checksFitCode = (value: {
+  starter: { py?: string; blocks?: string; git?: string };
+  checks: { expect: string }[];
+}) =>
+  value.checks.every(
+    (c) =>
+      PYTHON_CHECKS.has(c.expect) === (value.starter.py !== undefined) &&
+      STAGE_CHECKS.has(c.expect) === (value.starter.blocks !== undefined) &&
+      GIT_CHECKS.has(c.expect) === (value.starter.git !== undefined),
+  );
+const CHECKS_FIT =
+  'Python programs use "output" and "python" checks, block programs "stage" and "blocks", git steps "git"; web pages use the others';
+
+/** Git steps need a practice repository (repo), and only they have one. */
+const repoFitsCode = (value: { starter: { git?: string }; repo?: unknown }) =>
+  (value.starter.git !== undefined) === (value.repo !== undefined);
+const REPO_FITS = 'git steps (git) need a "repo", and only they have one';
+
+/** Block programs need a stage (level), and only they have one. */
+const stageFitsCode = (value: { starter: { blocks?: string }; stage?: unknown }) =>
+  (value.starter.blocks !== undefined) === (value.stage !== undefined);
+const STAGE_FITS = 'block programs (blocks) need a "stage", and only they have one';
 
 export const challengeSchema = z
   .object({
     id: contentId,
     order: z.number().int().min(0),
-    type: z.enum(['html', 'css', 'js', 'python']),
+    type: z.enum(['html', 'css', 'js', 'python', 'blocks', 'git']),
     xp: z.number().int().min(0).max(1000),
     starter: code,
     /** Never sent to students; `check` proves it passes every check. */
     solution: code,
     checks: z.array(check).min(1),
+    /** Block challenges: the level. */
+    stage: stage.optional(),
+    /** Git challenges: the practice repository. */
+    repo: repo.optional(),
   })
   .strict()
   .refine(
@@ -168,7 +354,17 @@ export const challengeSchema = z
     (value) => (value.type === 'python') === (value.starter.py !== undefined),
     'Python challenges (type: python) have a py file, and only they do',
   )
-  .refine(checksFitCode, CHECKS_FIT);
+  .refine(
+    (value) => (value.type === 'blocks') === (value.starter.blocks !== undefined),
+    'block challenges (type: blocks) have a blocks program, and only they do',
+  )
+  .refine(
+    (value) => (value.type === 'git') === (value.starter.git !== undefined),
+    'git challenges (type: git) have git steps, and only they do',
+  )
+  .refine(checksFitCode, CHECKS_FIT)
+  .refine(stageFitsCode, STAGE_FITS)
+  .refine(repoFitsCode, REPO_FITS);
 
 /** Text per language code for a quiz; English is required, others fall back to it. */
 const quizText = texts;
@@ -261,13 +457,16 @@ export const projectSchema = z
     /** Never sent to students; `check` proves it meets every requirement. */
     solution: code,
     checks: z.array(check).min(1),
+    /** Block projects (Explorer): the level. */
+    stage: stage.optional(),
   })
   .strict()
   .refine(
     (value) => new Set(value.checks.map((c) => c.id)).size === value.checks.length,
     'check IDs must be unique within a project',
   )
-  .refine(checksFitCode, CHECKS_FIT);
+  .refine(checksFitCode, CHECKS_FIT)
+  .refine(stageFitsCode, STAGE_FITS);
 
 /**
  * What each check looks at, in a few words ("The heading has a colour"), by check ID.
@@ -305,6 +504,7 @@ export const challengeFrontMatter = z
 export type TrackFile = z.infer<typeof trackSchema>;
 export type ModuleFile = z.infer<typeof moduleSchema>;
 export type LessonFile = z.infer<typeof lessonSchema>;
+export type SkillsFile = z.infer<typeof skillsSchema>;
 export type ChallengeFile = z.infer<typeof challengeSchema>;
 export type QuizFile = z.infer<typeof quizSchema>;
 export type ProjectFile = z.infer<typeof projectSchema>;

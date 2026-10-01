@@ -3,14 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../auth/auth_controller.dart';
+import '../features/explorer/explorer_challenge_screen.dart';
 import '../features/leaderboard/leaderboard_screen.dart';
 import '../features/learn/learn_screen.dart';
 import '../features/lesson/lesson_screen.dart';
 import '../features/login/login_screen.dart';
 import '../features/notifications/notifications_screen.dart';
 import '../features/parent/child_screen.dart';
+import '../features/parent/pair_device_screen.dart';
 import '../features/parent/parent_home_screen.dart';
 import '../features/practice/practice_screen.dart';
+import '../features/rooms/room_screen.dart';
 import '../features/settings/feedback_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/student/home_screen.dart';
@@ -19,6 +22,7 @@ import '../features/student/student_shell.dart';
 import '../features/welcome/splash_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/activity_heartbeat.dart';
 import 'deep_links.dart';
 
 /// Tells the router to look again when someone signs in or out.
@@ -136,10 +140,26 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(path: '/practice', builder: (_, _) => const PracticeScreen()),
+      // Minutes learning (for the parents' weekly report) count on these screens.
+      GoRoute(
+        path: '/practice',
+        builder: (_, _) => const ActivityHeartbeat(child: PracticeScreen()),
+      ),
       GoRoute(
         path: '/lesson/:id',
-        builder: (_, state) => LessonScreen(lessonId: state.pathParameters['id']!),
+        builder: (_, state) =>
+            ActivityHeartbeat(child: LessonScreen(lessonId: state.pathParameters['id']!)),
+        routes: [
+          GoRoute(
+            path: 'step/:challengeId',
+            builder: (_, state) => ActivityHeartbeat(
+              child: ExplorerChallengeScreen(
+                lessonId: state.pathParameters['id']!,
+                challengeId: state.pathParameters['challengeId']!,
+              ),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: '/parent',
@@ -148,6 +168,29 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'child/:id',
             builder: (_, state) => ChildScreen(childId: state.pathParameters['id']!),
+            routes: [
+              GoRoute(
+                path: 'rooms/:roomId',
+                builder: (_, state) => RoomScreen(
+                  roomId: state.pathParameters['roomId']!,
+                  childId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'pair',
+            builder: (_, state) => PairDeviceScreen(code: state.uri.queryParameters['code']),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/rooms',
+        builder: (_, _) => const RoomsScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (_, state) => RoomScreen(roomId: state.pathParameters['id']!),
           ),
         ],
       ),

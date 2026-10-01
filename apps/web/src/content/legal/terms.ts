@@ -11,7 +11,7 @@ These terms are an agreement between you and us, the team running Kids Coding Pl
 ## Who can use it
 
 - A **parent or legal guardian** aged 18 or over creates the family account and every child account. You confirm that you are the child's parent or guardian and accept these terms for them.
-- Child accounts are for ages 13 to 16 for now.
+- Child accounts are for ages 13 to 16, and from 9 in countries where verified parental consent is switched on.
 - You are responsible for how your children use the platform, and for keeping your password (and theirs) private.
 
 ## Plans and payment
@@ -59,7 +59,7 @@ If we change these terms in an important way, we will email you before the chang
 ## من يستطيع استخدامها
 
 - ينشئ **وليّ الأمر أو الوصي القانوني** الذي عمره 18 سنة أو أكثر حساب العائلة وكل حسابات الأطفال. أنت تؤكد أنك وليّ أمر الطفل أو الوصي عليه وتقبل هذه الشروط نيابةً عنه.
-- حسابات الأطفال متاحة حاليًا للأعمار من 13 إلى 16 سنة.
+- حسابات الأطفال متاحة للأعمار من 13 إلى 16 سنة، ومن 9 سنوات في البلدان التي فُعّلت فيها موافقة الأهل الموثّقة.
 - أنت مسؤول عن طريقة استخدام أطفالك للمنصة، وعن إبقاء كلمة مرورك (وكلمات مرورهم) سرّية.
 
 ## الخطط والدفع
@@ -107,7 +107,7 @@ If we change these terms in an important way, we will email you before the chang
 ## اسے کون استعمال کر سکتا ہے
 
 - 18 سال یا اس سے زیادہ عمر کے **والدین یا قانونی سرپرست** خاندان کا اکاؤنٹ اور بچوں کے تمام اکاؤنٹس بناتے ہیں۔ آپ تصدیق کرتے ہیں کہ آپ بچے کے والدین یا سرپرست ہیں اور ان کی طرف سے یہ شرائط قبول کرتے ہیں۔
-- فی الحال بچوں کے اکاؤنٹس 13 سے 16 سال کی عمر کے لیے ہیں۔
+- بچوں کے اکاؤنٹس 13 سے 16 سال کی عمر کے لیے ہیں، اور ان ممالک میں 9 سال سے جہاں والدین کی تصدیق شدہ رضامندی فعال ہے۔
 - آپ اس کے ذمہ دار ہیں کہ آپ کے بچے پلیٹ فارم کو کیسے استعمال کرتے ہیں، اور اپنا (اور ان کا) پاس ورڈ خفیہ رکھنے کے بھی۔
 
 ## پلان اور ادائیگی

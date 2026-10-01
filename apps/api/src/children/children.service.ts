@@ -12,8 +12,11 @@ import {
   allowedBirthYears,
   AVATAR_KEYS,
   type ChildConsent,
+  isPictureKey,
   MAX_CHILDREN_PER_PARENT,
   MAX_TRIALS_PER_FAMILY,
+  mayBeUnder13,
+  PICTURE_PASSWORD_LENGTH,
   TRIAL_DAYS,
 } from '@kcp/shared';
 import { AuditService } from '../audit/audit.service.js';
@@ -23,6 +26,7 @@ import { EntitlementsService, type PremiumStatus } from '../billing/entitlements
 import { SessionService } from '../auth/session.service.js';
 import { assertStrongPassword } from '../auth/password-policy.js';
 import { hashPassword } from '../common/crypto/passwords.js';
+import { consentMethodsFor, under13Open } from '../parental-consent/under13-rules.js';
 import type { RequestContext } from '../common/request-context.js';
 import { PrismaService } from '../database/prisma.service.js';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service.js';
@@ -87,6 +91,7 @@ function toChildDto(
     regionId: child.regionId,
     cityId: child.cityId,
     status: child.status,
+    hasPicturePassword: profile.picturePasswordHash !== null,
     consents: {
       publicLeaderboards: profile.showOnPublicBoards,
       publicPortfolio: profile.publicPortfolio,
@@ -154,11 +159,12 @@ export class ChildrenService {
       where: { id: parent.id },
       select: { countryCode: true },
     });
-    const under13Open = await this.flags.isEnabled('under_13_accounts', parentCountry?.countryCode);
+    const open = await under13Open(this.prisma, this.flags, parentCountry?.countryCode);
     return {
-      birthYears: allowedBirthYears(new Date().getUTCFullYear(), under13Open),
+      birthYears: allowedBirthYears(new Date().getUTCFullYear(), open),
       avatarKeys: [...AVATAR_KEYS],
-      under13Open,
+      under13Open: open,
+      under13Methods: open ? await consentMethodsFor(this.prisma, parentCountry?.countryCode) : [],
     };
   }
 
@@ -217,12 +223,25 @@ export class ChildrenService {
       hashPassword(dto.password),
     ]);
     const username = await this.uniqueUsername();
-    const grants: ConsentType[] = [
-      'ACCOUNT',
-      ...(Object.keys(CONSENT_TYPES) as ChildConsent[])
-        .filter((key) => dto.consents[key])
-        .map((key) => CONSENT_TYPES[key]),
-    ];
+    // Under 13: the account stays closed until the parent gives verified consent
+    // (ParentalConsentService), and nothing is public until the parent turns it on
+    // afterwards. The consent is recorded once it is verified.
+    const young = mayBeUnder13(dto.birthYear, new Date().getUTCFullYear());
+    if (young && !(await under13Open(this.prisma, this.flags, dto.countryCode))) {
+      throw new BadRequestException({
+        error: 'BIRTH_YEAR_NOT_ALLOWED',
+        message: 'Accounts for children under 13 are not open in this country yet.',
+      });
+    }
+    const consents = young ? { publicLeaderboards: false, publicPortfolio: false } : dto.consents;
+    const grants: ConsentType[] = young
+      ? []
+      : [
+          'ACCOUNT',
+          ...(Object.keys(CONSENT_TYPES) as ChildConsent[])
+            .filter((key) => consents[key])
+            .map((key) => CONSENT_TYPES[key]),
+        ];
 
     const child = await this.withUniqueUsername(username, (candidate) =>
       this.prisma.$transaction(async (tx) => {
@@ -246,7 +265,7 @@ export class ChildrenService {
         const created = await tx.user.create({
           data: {
             kind: 'STUDENT',
-            status: 'ACTIVE',
+            status: young ? 'PENDING_CONSENT' : 'ACTIVE',
             roleId: studentRole.id,
             username: candidate,
             passwordHash,
@@ -259,8 +278,8 @@ export class ChildrenService {
                 nickname: dto.nickname,
                 avatarKey: dto.avatarKey,
                 birthYear: dto.birthYear,
-                showOnPublicBoards: dto.consents.publicLeaderboards,
-                publicPortfolio: dto.consents.publicPortfolio,
+                showOnPublicBoards: consents.publicLeaderboards,
+                publicPortfolio: consents.publicPortfolio,
                 trialEndsAt: trial ? new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000) : null,
               },
             },
@@ -272,6 +291,17 @@ export class ChildrenService {
           await tx.user.update({
             where: { id: parent.id },
             data: { trialsStarted: { increment: 1 } },
+          });
+        }
+        if (young) {
+          await tx.parentalConsentRequest.create({
+            data: {
+              parentId: parent.id,
+              childId: created.id,
+              policyVersion: TERMS_VERSION,
+              ipAddress: ctx.ip ?? null,
+              userAgent: ctx.userAgent ?? null,
+            },
           });
         }
         await tx.consentRecord.createMany({
@@ -291,7 +321,7 @@ export class ChildrenService {
             action: 'child.create',
             entityType: 'User',
             entityId: created.id,
-            after: { consents: grants },
+            after: { consents: grants, pendingConsent: young },
             context: ctx,
           },
           tx,
@@ -369,7 +399,16 @@ export class ChildrenService {
     ability: AppAbility,
     ctx: RequestContext,
   ): Promise<ChildDto> {
-    await this.loadForParent(id, parent, ability, 'update');
+    const child = await this.loadForParent(id, parent, ability, 'update');
+    if (
+      child.status === 'PENDING_CONSENT' &&
+      (consents.publicLeaderboards || consents.publicPortfolio)
+    ) {
+      throw new ConflictException({
+        error: 'CONSENT_PENDING',
+        message: 'Finish giving your consent for this account first.',
+      });
+    }
 
     const updated = await this.prisma.$transaction(async (tx) => {
       // Read the current switches under a row lock, so two quick toggles can't leave
@@ -536,6 +575,11 @@ export class ChildrenService {
       await tx.certificate.deleteMany({ where: { userId: id } });
       await tx.notification.deleteMany({ where: { userId: id } });
       await tx.notification.deleteMany({ where: { data: { path: ['childId'], equals: id } } });
+      // Friends: the friendships and requests go, and other families' notifications
+      // that name the child.
+      await tx.friendship.deleteMany({ where: { OR: [{ userAId: id }, { userBId: id }] } });
+      await tx.friendRequest.deleteMany({ where: { OR: [{ fromId: id }, { toId: id }] } });
+      await tx.notification.deleteMany({ where: { data: { path: ['friendId'], equals: id } } });
       await tx.user.update({
         where: { id },
         data: {
@@ -573,6 +617,60 @@ export class ChildrenService {
         `Could not delete project files of a deleted child: ${(error as Error).message}`,
       );
     }
+  }
+
+  /**
+   * Sets the child's picture password: four of the twelve pictures, in order (null
+   * removes it). A new one also unlocks it after too many wrong tries.
+   */
+  async setPicturePassword(
+    id: string,
+    pictures: string[] | null,
+    parent: AuthUser,
+    ability: AppAbility,
+    ctx: RequestContext,
+  ): Promise<ChildDto> {
+    await this.loadForParent(id, parent, ability, 'update');
+    if (
+      pictures &&
+      (pictures.length !== PICTURE_PASSWORD_LENGTH || !pictures.every((key) => isPictureKey(key)))
+    ) {
+      throw new BadRequestException({
+        error: 'PICTURE_PASSWORD_INVALID',
+        message: `Choose ${PICTURE_PASSWORD_LENGTH} pictures.`,
+      });
+    }
+    // Four pictures in a row, the same one each time, are too easy to guess.
+    if (pictures && new Set(pictures).size === 1) {
+      throw new BadRequestException({
+        error: 'PICTURE_PASSWORD_WEAK',
+        message: 'Use at least two different pictures.',
+      });
+    }
+    const hash = pictures ? await hashPassword(pictures.join('-')) : null;
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.user.update({
+        where: { id },
+        data: {
+          studentProfile: {
+            update: { picturePasswordHash: hash, pictureFailures: 0, pictureLockedUntil: null },
+          },
+        },
+        include: childInclude,
+      });
+      await this.audit.record(
+        {
+          actor: { id: parent.id, roleKey: parent.roleKey },
+          action: pictures ? 'child.picture_password_set' : 'child.picture_password_removed',
+          entityType: 'User',
+          entityId: id,
+          context: ctx,
+        },
+        tx,
+      );
+      return result;
+    });
+    return this.dto(updated);
   }
 
   /** Checks the caller is this child's parent (404 otherwise), for routes on the child. */

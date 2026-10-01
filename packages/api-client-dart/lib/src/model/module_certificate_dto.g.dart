@@ -13,6 +13,8 @@ abstract class _$ModuleCertificateDtoCWProxy {
 
   ModuleCertificateDto finished(bool finished);
 
+  ModuleCertificateDto awaitingReview(bool awaitingReview);
+
   ModuleCertificateDto certificate(CertificateDto? certificate);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `ModuleCertificateDto(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
@@ -25,6 +27,7 @@ abstract class _$ModuleCertificateDtoCWProxy {
     String moduleId,
     String moduleTitle,
     bool finished,
+    bool awaitingReview,
     CertificateDto? certificate,
   });
 }
@@ -47,6 +50,10 @@ class _$ModuleCertificateDtoCWProxyImpl
   ModuleCertificateDto finished(bool finished) => this(finished: finished);
 
   @override
+  ModuleCertificateDto awaitingReview(bool awaitingReview) =>
+      this(awaitingReview: awaitingReview);
+
+  @override
   ModuleCertificateDto certificate(CertificateDto? certificate) =>
       this(certificate: certificate);
 
@@ -61,6 +68,7 @@ class _$ModuleCertificateDtoCWProxyImpl
     Object? moduleId = const $CopyWithPlaceholder(),
     Object? moduleTitle = const $CopyWithPlaceholder(),
     Object? finished = const $CopyWithPlaceholder(),
+    Object? awaitingReview = const $CopyWithPlaceholder(),
     Object? certificate = const $CopyWithPlaceholder(),
   }) {
     return ModuleCertificateDto(
@@ -76,6 +84,10 @@ class _$ModuleCertificateDtoCWProxyImpl
           ? _value.finished
           // ignore: cast_nullable_to_non_nullable
           : finished as bool,
+      awaitingReview: awaitingReview == const $CopyWithPlaceholder()
+          ? _value.awaitingReview
+          // ignore: cast_nullable_to_non_nullable
+          : awaitingReview as bool,
       certificate: certificate == const $CopyWithPlaceholder()
           ? _value.certificate
           // ignore: cast_nullable_to_non_nullable
@@ -100,12 +112,19 @@ ModuleCertificateDto _$ModuleCertificateDtoFromJson(
 ) => $checkedCreate('ModuleCertificateDto', json, ($checkedConvert) {
   $checkKeys(
     json,
-    requiredKeys: const ['moduleId', 'moduleTitle', 'finished', 'certificate'],
+    requiredKeys: const [
+      'moduleId',
+      'moduleTitle',
+      'finished',
+      'awaitingReview',
+      'certificate',
+    ],
   );
   final val = ModuleCertificateDto(
     moduleId: $checkedConvert('moduleId', (v) => v as String),
     moduleTitle: $checkedConvert('moduleTitle', (v) => v as String),
     finished: $checkedConvert('finished', (v) => v as bool),
+    awaitingReview: $checkedConvert('awaitingReview', (v) => v as bool),
     certificate: $checkedConvert(
       'certificate',
       (v) =>
@@ -121,5 +140,6 @@ Map<String, dynamic> _$ModuleCertificateDtoToJson(
   'moduleId': instance.moduleId,
   'moduleTitle': instance.moduleTitle,
   'finished': instance.finished,
+  'awaitingReview': instance.awaitingReview,
   'certificate': instance.certificate?.toJson(),
 };

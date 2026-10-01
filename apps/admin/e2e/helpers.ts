@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { createHmac, randomUUID } from 'node:crypto';
 import path from 'node:path';
-import { type APIRequestContext, expect } from '@playwright/test';
+import { type APIRequestContext, expect, type Page } from '@playwright/test';
 
 export const API_URL = process.env.API_URL ?? 'http://localhost:3000';
 const MAILPIT_URL = process.env.MAILPIT_URL ?? 'http://localhost:8025';
@@ -11,9 +11,11 @@ const CHILD_PASSWORD = 'kid pass 42';
 const unique = (label: string) => `${label}-${randomUUID().slice(0, 8)}@browser.test`;
 
 /** A staff account made with the same CLI people use (`pnpm staff:create`). */
-export function createStaff(role: 'admin' | 'moderator' | 'super_admin') {
+export function createStaff(
+  role: 'admin' | 'moderator' | 'super_admin' | 'content_creator' | 'mentor',
+  name = `Test ${role}`,
+) {
   const email = unique(role);
-  const name = `Test ${role}`;
   const output = execFileSync(
     'node',
     ['dist/cli/create-staff.js', '--email', email, '--name', name, '--role', role],
@@ -165,4 +167,25 @@ export async function payByCard(request: APIRequestContext, parentEmail: string)
       { timeout: 15_000 },
     )
     .toBe('ACTIVE');
+}
+
+/** First login of a new staff account: password, then setting up the authenticator. */
+export async function firstLogin(
+  page: Page,
+  staff: { email: string; password: string },
+  landing = 'Overview',
+) {
+  await page.goto('/login');
+  await page.getByLabel('Email address').fill(staff.email);
+  await page.getByLabel('Password', { exact: true }).fill(staff.password);
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(
+    page.getByRole('heading', { name: 'Set up two-factor authentication' }),
+  ).toBeVisible();
+  await expect(page.getByRole('img', { name: 'QR code for your authenticator app' })).toBeVisible();
+  const secret = (await page.getByTestId('mfa-secret').textContent())?.replaceAll(' ', '') ?? '';
+  await page.getByLabel('6-digit code').fill(totp(secret));
+  await page.getByRole('button', { name: 'Turn on and log in' }).click();
+  await expect(page.getByRole('heading', { name: landing, exact: true })).toBeVisible();
 }

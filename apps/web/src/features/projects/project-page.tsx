@@ -1,7 +1,14 @@
 'use client';
 
 import type { components } from '@kcp/api-client-ts';
-import type { Check, CheckResult, CodeFileKey, CodeFiles } from '@kcp/checks';
+import {
+  type Check,
+  type CheckResult,
+  type CodeFileKey,
+  type CodeFiles,
+  evaluateStageChecks,
+  type StageLevel,
+} from '@kcp/checks';
 import { clsx } from 'clsx';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -10,8 +17,12 @@ import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { BadgeCelebration } from '../badges/badge-celebration';
+import { BlocksEditor } from '../explorer/blocks-editor';
+import { CodeDialog } from '../explorer/code-view';
+import { STAGE_PANE_CLASS, StagePane } from '../explorer/stage-pane';
 import { hintsFor, ResetDialog } from '../learn/challenge-workspace';
 import { Markdown } from '../learn/markdown';
+import { REVIEW_TONE } from '../reviews/review-result';
 import { PremiumLocked } from '../learn/premium-locked';
 import {
   CheckList,
@@ -22,6 +33,8 @@ import {
   useCodeFiles,
   useLivePreview,
   useSaveText,
+  WORKSPACE_PAGE_CLASS,
+  WORKSPACE_PANE_CLASS,
 } from '../learn/workspace';
 import { useStreak, WorkspaceHeader } from '../learn/workspace-header';
 import { refreshNotifications } from '@/components/notification-bell';
@@ -35,6 +48,8 @@ export const PROJECT_FILE_NAMES: Record<CodeFileKey, string> = {
   css: 'style.css',
   js: 'script.js',
   py: 'main.py',
+  blocks: 'program.blocks.json',
+  git: 'steps.git.json',
 };
 
 async function saveDraft(briefId: string, code: CodeFiles): Promise<boolean> {
@@ -124,15 +139,20 @@ function ProjectWorkspace({ project }: { project: Project }) {
   });
   const { files } = code;
   const python = project.files.includes('py');
+  // Block projects (Explorer) play on the stage; the sandbox isn't used for them.
+  const stage = project.files.includes('blocks') ? (project.stage as StageLevel | null) : null;
+  const [showCode, setShowCode] = useState(false);
+  const te = useTranslations('explorer');
   const {
     sandbox,
     check,
     run: runProgram,
-    canRun,
+    canRun: sandboxReady,
     pythonLoad,
   } = useLivePreview(files, {
     python,
   });
+  const canRun = stage !== null || sandboxReady;
   const saveText = useSaveText(code.saveState);
   const checks = project.checks as unknown as Check[];
   const results = lastCheck?.files === files ? lastCheck.results : null;
@@ -143,6 +163,11 @@ function ProjectWorkspace({ project }: { project: Project }) {
   }, [outcome]);
 
   async function runChecks(): Promise<CheckResult[] | null> {
+    if (stage) {
+      const found = evaluateStageChecks(stage, files.blocks, checks);
+      setLastCheck({ files, results: found });
+      return found;
+    }
     const run = await check(files, checks);
     if (run.status === 'timeout' || !run.results) {
       setOutcome({ kind: 'error', message: tl('timeout') });
@@ -199,8 +224,44 @@ function ProjectWorkspace({ project }: { project: Project }) {
   const cannotCheck = busy !== null || !canRun;
   const cannotShip = cannotCheck || !ready;
 
+  const actions = (
+    <>
+      <Button variant="ghost" onClick={() => setConfirmReset(true)} className="text-muted">
+        <Icon name="undo" />
+        {tl('reset')}
+      </Button>
+      {stage ? (
+        <Button variant="secondary" onClick={() => setShowCode(true)}>
+          <Icon name="code" />
+          {te('showCode')}
+        </Button>
+      ) : null}
+      <span className="ms-auto flex flex-wrap gap-2.5">
+        <Button
+          variant={ready ? 'secondary' : 'primary'}
+          size="lg"
+          onClick={() => void onCheck()}
+          aria-disabled={cannotCheck}
+          aria-busy={busy === 'checking' || undefined}
+        >
+          <Icon name="check" />
+          {busy === 'checking' ? t('checking') : t('check')}
+        </Button>
+        <Button
+          size="lg"
+          onClick={() => void onShip()}
+          aria-disabled={cannotShip}
+          aria-busy={busy === 'shipping' || undefined}
+        >
+          <Icon name="rocket" />
+          {busy === 'shipping' ? t('shipping') : t('ship')}
+        </Button>
+      </span>
+    </>
+  );
+
   return (
-    <article className="flex min-h-dvh flex-1 flex-col xl:h-dvh">
+    <article className={WORKSPACE_PAGE_CLASS} data-mood={stage ? 'explorer' : undefined}>
       <WorkspaceHeader
         context={`${t('label')} · ${project.moduleTitle}`}
         title={project.title}
@@ -216,8 +277,21 @@ function ProjectWorkspace({ project }: { project: Project }) {
         streak={streak}
       />
 
-      <div className="grid min-h-0 flex-1 gap-3.5 px-4 pb-4 sm:px-6 sm:pb-6 md:grid-cols-2 xl:grid-cols-[24rem_minmax(0,1fr)_minmax(0,1fr)]">
-        <aside className="flex flex-col gap-4 rounded-panel bg-surface p-6 md:col-span-2 xl:col-span-1 xl:min-h-0 xl:overflow-y-auto">
+      <div
+        className={clsx(
+          'grid min-h-0 flex-1 gap-3.5 px-4 pb-4 sm:px-6 sm:pb-6 md:grid-cols-2',
+          stage
+            ? 'xl:grid-cols-[22rem_minmax(0,1.5fr)_minmax(0,1fr)]'
+            : 'xl:grid-cols-[24rem_minmax(0,1fr)_minmax(0,1fr)]',
+        )}
+      >
+        {/* Scrolls on its own on wide screens, so it can take focus (keyboards scroll it too). */}
+        <aside
+          aria-labelledby="project-brief"
+          tabIndex={0}
+          className="relative flex flex-col gap-4 rounded-panel bg-surface p-6 md:col-span-2 xl:col-span-1 xl:min-h-0 xl:overflow-y-auto"
+        >
+          {project.review ? <ReviewChip review={project.review} /> : null}
           <section aria-labelledby="project-brief" className="flex flex-col gap-2">
             <h2
               id="project-brief"
@@ -314,55 +388,56 @@ function ProjectWorkspace({ project }: { project: Project }) {
           ) : null}
         </aside>
 
-        <FilesEditor
-          fileKeys={project.files as CodeFileKey[]}
-          labelFor={(key) => PROJECT_FILE_NAMES[key]}
-          files={files}
-          onChange={code.update}
-          className="min-h-[26rem] xl:min-h-0"
-          actions={
-            <>
-              <Button variant="ghost" onClick={() => setConfirmReset(true)} className="text-muted">
-                <Icon name="undo" />
-                {tl('reset')}
-              </Button>
-              <span className="ms-auto flex flex-wrap gap-2.5">
-                <Button
-                  variant={ready ? 'secondary' : 'primary'}
-                  size="lg"
-                  onClick={() => void onCheck()}
-                  aria-disabled={cannotCheck}
-                  aria-busy={busy === 'checking' || undefined}
-                >
-                  <Icon name="check" />
-                  {busy === 'checking' ? t('checking') : t('check')}
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => void onShip()}
-                  aria-disabled={cannotShip}
-                  aria-busy={busy === 'shipping' || undefined}
-                >
-                  <Icon name="rocket" />
-                  {busy === 'shipping' ? t('shipping') : t('ship')}
-                </Button>
-              </span>
-            </>
-          }
-        />
-        <PreviewPane
-          sandbox={sandbox}
-          title={python ? tl('outputTitle') : tl('previewTitle')}
-          python={python}
-          console={python ? [] : sandbox.output.console}
-          className="min-h-[26rem] xl:min-h-0"
-          footer={
-            python ? <PythonControls load={pythonLoad} canRun={canRun} onRun={runProgram} /> : null
-          }
-        />
+        {stage ? (
+          <>
+            <BlocksEditor
+              level={stage}
+              value={files.blocks ?? '[]'}
+              onChange={(value) => code.update('blocks', value)}
+              className={WORKSPACE_PANE_CLASS}
+              actions={actions}
+            />
+            <StagePane
+              level={stage}
+              program={files.blocks ?? '[]'}
+              title={te('stageTitle')}
+              className={STAGE_PANE_CLASS}
+            />
+          </>
+        ) : (
+          <>
+            <FilesEditor
+              fileKeys={project.files as CodeFileKey[]}
+              labelFor={(key) => PROJECT_FILE_NAMES[key]}
+              files={files}
+              onChange={code.update}
+              className={WORKSPACE_PANE_CLASS}
+              actions={actions}
+            />
+            <PreviewPane
+              sandbox={sandbox}
+              title={python ? tl('outputTitle') : tl('previewTitle')}
+              python={python}
+              console={python ? [] : sandbox.output.console}
+              className={WORKSPACE_PANE_CLASS}
+              footer={
+                python ? (
+                  <PythonControls load={pythonLoad} canRun={canRun} onRun={runProgram} />
+                ) : null
+              }
+            />
+          </>
+        )}
       </div>
 
       <BadgeCelebration keys={newBadges} />
+      {stage ? (
+        <CodeDialog
+          open={showCode}
+          onClose={() => setShowCode(false)}
+          program={files.blocks ?? '[]'}
+        />
+      ) : null}
       <ResetDialog
         open={confirmReset}
         onClose={() => setConfirmReset(false)}
@@ -372,5 +447,27 @@ function ProjectWorkspace({ project }: { project: Project }) {
         }}
       />
     </article>
+  );
+}
+
+/** The latest mentor review of this project, with a link to read it once decided. */
+function ReviewChip({ review }: { review: NonNullable<Project['review']> }) {
+  const t = useTranslations('review');
+  const decided = review.status === 'APPROVED' || review.status === 'CHANGES_REQUESTED';
+  return (
+    <div className="flex flex-wrap items-center gap-2.5 rounded-row bg-raised px-4 py-3">
+      <Badge tone={REVIEW_TONE[review.status]}>{t(`status.${review.status}`)}</Badge>
+      {decided ? (
+        <Link
+          href={`/reviews/${review.id}`}
+          className="text-sm font-bold text-brand-text underline-offset-4 hover:underline"
+        >
+          {t('open')}
+          {review.seen ? null : (
+            <span className="ms-1.5 inline-block size-2 rounded-full bg-brand" aria-hidden="true" />
+          )}
+        </Link>
+      ) : null}
+    </div>
   );
 }

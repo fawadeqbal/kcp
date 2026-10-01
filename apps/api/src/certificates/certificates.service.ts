@@ -13,10 +13,12 @@ import { EntitlementsService } from '../billing/entitlements.service.js';
 import type { RequestContext } from '../common/request-context.js';
 import { AppConfigService } from '../config/app-config.service.js';
 import { PrismaService } from '../database/prisma.service.js';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service.js';
 import { activeContent, publishedModule } from '../learning/content.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import type { AppAbility } from '../permissions/ability.factory.js';
 import type { AuthUser } from '../permissions/auth-user.js';
+import { requestProjectReview } from '../reviews/review-request.js';
 import { certificatePdf } from './certificate-pdf.js';
 import type {
   CertificateDto,
@@ -48,7 +50,61 @@ export class CertificatesService {
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
     private readonly config: AppConfigService,
+    private readonly flags: FeatureFlagsService,
   ) {}
+
+  /**
+   * Module projects whose mentor review isn't approved yet, when certificates need an
+   * approval (feature flag, per country). Empty when they don't.
+   */
+  private async awaitingApproval(userId: string): Promise<Set<string>> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { countryCode: true },
+    });
+    if (!(await this.flags.isEnabled('mentor_approval_for_certificates', user?.countryCode))) {
+      return new Set();
+    }
+    const projects = await this.prisma.project.findMany({
+      where: { userId, status: 'SHIPPED' },
+      select: {
+        brief: { select: { moduleId: true } },
+        reviews: { where: { status: 'APPROVED' }, select: { id: true }, take: 1 },
+      },
+    });
+    return new Set(projects.filter((p) => p.reviews.length === 0).map((p) => p.brief.moduleId));
+  }
+
+  /**
+   * Premium students who shipped before mentor reviews existed (or whose review was
+   * cancelled) get one requested now, so their certificate isn't stuck.
+   */
+  private async requestMissingReviews(userId: string, moduleIds: string[]) {
+    if (!moduleIds.length) return;
+    const projects = await this.prisma.project.findMany({
+      where: {
+        userId,
+        status: 'SHIPPED',
+        brief: { moduleId: { in: moduleIds } },
+        reviews: { none: { status: { in: ['WAITING', 'IN_REVIEW', 'CHANGES_REQUESTED'] } } },
+      },
+      select: {
+        id: true,
+        files: true,
+        portfolioItem: { select: { version: true } },
+        user: { select: { languageCode: true } },
+      },
+    });
+    for (const project of projects) {
+      await requestProjectReview(this.prisma, {
+        studentId: userId,
+        projectId: project.id,
+        version: project.portfolioItem?.version ?? 1,
+        files: project.files as Prisma.InputJsonObject,
+        languageCode: project.user.languageCode,
+      });
+    }
+  }
 
   private dto(
     c: {
@@ -132,6 +188,13 @@ export class CertificatesService {
       this.entitlements.status(user.id),
     ]);
     const byModule = new Map(owned.map((c) => [c.moduleId, c]));
+    const awaiting = await this.awaitingApproval(user.id);
+    if (premium.active) {
+      await this.requestMissingReviews(
+        user.id,
+        [...finished].filter((id) => awaiting.has(id) && !byModule.has(id)),
+      );
+    }
     return {
       premium: premium.active,
       modules: modules.map((m) => {
@@ -140,6 +203,7 @@ export class CertificatesService {
           moduleId: m.id,
           moduleTitle: pick(m.titles, language),
           finished: finished.has(m.id),
+          awaitingReview: !certificate && finished.has(m.id) && awaiting.has(m.id),
           certificate: certificate ? this.dto(certificate, language) : null,
         };
       }),
@@ -149,6 +213,24 @@ export class CertificatesService {
   /** Issues the certificate for a finished module (premium). Issuing twice returns the first. */
   async issue(user: AuthUser, moduleId: string, language: string): Promise<CertificateDto> {
     this.assertStudent(user);
+    return this.issueFor(user.id, moduleId, language);
+  }
+
+  /**
+   * After a mentor approves a module project: the certificate, if the student can have
+   * it now (premium, module finished). Never throws.
+   */
+  async issueIfEligible(userId: string, moduleId: string): Promise<boolean> {
+    try {
+      await this.issueFor(userId, moduleId, 'en');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async issueFor(userId: string, moduleId: string, language: string) {
+    const user = { id: userId };
     const existing = await this.prisma.certificate.findUnique({
       where: { userId_moduleId: { userId: user.id, moduleId } },
     });
@@ -163,6 +245,12 @@ export class CertificatesService {
       throw new BadRequestException({
         error: 'MODULE_NOT_FINISHED',
         message: 'Finish every lesson and ship the project first.',
+      });
+    }
+    if ((await this.awaitingApproval(user.id)).has(moduleId)) {
+      throw new ConflictException({
+        error: 'REVIEW_PENDING',
+        message: 'A mentor reviews your project first.',
       });
     }
     const [module, profile] = await Promise.all([

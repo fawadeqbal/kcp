@@ -1,0 +1,29 @@
+id: explorer-m01-l03-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: Why do programmers use loops?
+  ar: لماذا يستخدم المبرمجون الحلقات؟
+  ur: پروگرامرز لوپ کیوں استعمال کرتے ہیں؟
+options:
+  - id: a
+    text:
+      en: To repeat blocks without copying them again and again.
+      ar: لتكرار المكعبات دون نسخها مرة بعد مرة.
+      ur: بلاکس کو بار بار نقل کیے بغیر دہرانے کے لیے۔
+  - id: b
+    text:
+      en: To make Bit move faster.
+      ar: لجعل بِت يتحرك أسرع.
+      ur: بِٹ کو تیز چلانے کے لیے۔
+  - id: c
+    text:
+      en: To stop the program.
+      ar: لإيقاف البرنامج.
+      ur: پروگرام روکنے کے لیے۔
+answer: a
+explanation:
+  en: A loop runs the same blocks many times, so your program stays short.
+  ar: الحلقة تشغّل المكعبات نفسها مرات كثيرة، فيبقى برنامجك قصيرًا.
+  ur: لوپ ایک ہی بلاکس کو کئی بار چلاتا ہے، اس لیے پروگرام چھوٹا رہتا ہے۔

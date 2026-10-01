@@ -1,0 +1,80 @@
+id: explorer-m01-project
+xp: 100
+isPremium: false
+stage:
+  mode: game
+  map:
+    - '.......'
+    - .#...#.
+    - '...S..T'
+    - .#...#.
+    - '.......'
+  theme: space
+  seconds: 30
+  toolbox:
+    - when-run
+    - when-key
+    - when-star
+    - move
+    - say
+    - score
+    - star
+starter:
+  blocks:
+    - when: run
+      do: []
+solution:
+  blocks:
+    - when: run
+      do:
+        - say: Catch the stars!
+    - when: key-up
+      do:
+        - move: up
+    - when: key-down
+      do:
+        - move: down
+    - when: key-left
+      do:
+        - move: left
+    - when: key-right
+      do:
+        - move: right
+    - when: star
+      do:
+        - score: 1
+        - star
+checks:
+  - id: start-message
+    expect: blocks
+    uses:
+      - when-run
+      - say
+    hint: say_start
+  - id: arrows-up-left
+    expect: stage
+    keys:
+      - left
+      - up
+    endsAt: [2, 1]
+    hint: four_arrows
+  - id: arrows-down-right
+    expect: stage
+    keys:
+      - right
+      - down
+    endsAt: [4, 3]
+    hint: four_arrows
+  - id: scores
+    expect: stage
+    keys:
+      - right
+      - right
+      - right
+    minScore: 1
+    hint: score_point
+  - id: star-moves
+    expect: blocks
+    uses:
+      - star
+    hint: move_star

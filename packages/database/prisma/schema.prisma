@@ -39,6 +39,9 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   DELETED
+  /// A child under 13 whose parent hasn't finished verified parental consent yet:
+  /// the account exists but can't be used.
+  PENDING_CONSENT
 }
 
 model User {
@@ -68,6 +71,10 @@ model User {
   termsAcceptedAt      DateTime?   @map("terms_accepted_at")
   /// Parents: the monthly email about their children's progress (they can switch it off).
   monthlySummaryEmails Boolean     @default(true) @map("monthly_summary_emails")
+  /// Parents: the weekly report on Sunday evenings (they can switch it off).
+  weeklyReportEmails   Boolean     @default(true) @map("weekly_report_emails")
+  /// Parents: the code in their invite link (made when first asked for).
+  referralCode         String?     @unique @map("referral_code")
   /// Parents: free trials started for their children, ever (deleted children count
   /// too), so deleting and re-adding a child can't restart the trial again and again.
   trialsStarted        Int         @default(0) @map("trials_started") @db.SmallInt
@@ -82,10 +89,10 @@ model User {
   city     City?    @relation(fields: [cityId], references: [id])
 
   studentProfile     StudentProfile?
-  childLinks         ParentChildLink[]   @relation("ParentLinks")
-  parentLinks        ParentChildLink[]   @relation("ChildLinks")
-  consentsGiven      ConsentRecord[]     @relation("ConsentParent")
-  consentsReceived   ConsentRecord[]     @relation("ConsentChild")
+  childLinks         ParentChildLink[]        @relation("ParentLinks")
+  parentLinks        ParentChildLink[]        @relation("ChildLinks")
+  consentsGiven      ConsentRecord[]          @relation("ConsentParent")
+  consentsReceived   ConsentRecord[]          @relation("ConsentChild")
   sessions           Session[]
   verificationTokens VerificationToken[]
   lessonProgress     LessonProgress[]
@@ -96,15 +103,15 @@ model User {
   xpEvents           XpEvent[]
   streak             Streak?
   feedback           Feedback[]
-  premiumGrants      PremiumGrant[]      @relation("PremiumGrantStudent")
+  premiumGrants      PremiumGrant[]           @relation("PremiumGrantStudent")
   badges             UserBadge[]
   leaderboardResults LeaderboardResult[]
-  premiumGranted     PremiumGrant[]      @relation("PremiumGrantStaff")
-  premiumRevoked     PremiumGrant[]      @relation("PremiumGrantRevoker")
+  premiumGranted     PremiumGrant[]           @relation("PremiumGrantStaff")
+  premiumRevoked     PremiumGrant[]           @relation("PremiumGrantRevoker")
   billingCustomers   BillingCustomer[]
   subscriptions      Subscription[]
-  payments           Payment[]           @relation("PaymentParent")
-  paymentsRecorded   Payment[]           @relation("PaymentRecorder")
+  payments           Payment[]                @relation("PaymentParent")
+  paymentsRecorded   Payment[]                @relation("PaymentRecorder")
   invoices           Invoice[]
   refundsMade        Refund[]
   notifications      Notification[]
@@ -112,6 +119,48 @@ model User {
   quizAttempts       QuizAttempt[]
   practiceSessions   PracticeSession[]
   deviceTokens       DeviceToken[]
+  contentDrafts      ContentDraft[]
+  mentorProfile      MentorProfile?
+  reviewsReceived    Review[]                 @relation("ReviewStudent")
+  reviewsGiven       Review[]                 @relation("ReviewMentor")
+  reviewComments     ReviewComment[]
+  mentorNotesAbout   MentorNote[]             @relation("MentorNoteStudent")
+  mentorNotesWritten MentorNote[]             @relation("MentorNoteAuthor")
+  consentRequests    ParentalConsentRequest[] @relation("ParentalConsentParent")
+  consentChecks      ParentalConsentRequest[] @relation("ParentalConsentChild")
+  consentDecisions   ParentalConsentRequest[] @relation("ParentalConsentStaff")
+  pairingsApproved   DevicePairing[]          @relation("PairingParent")
+  pairingsReceived   DevicePairing[]          @relation("PairingChild")
+  leagueMemberships  LeagueMembership[]
+  friendRequestsSent FriendRequest[]          @relation("FriendRequestFrom")
+  friendRequestsGot  FriendRequest[]          @relation("FriendRequestTo")
+  friendshipsA       Friendship[]             @relation("FriendshipA")
+  friendshipsB       Friendship[]             @relation("FriendshipB")
+  referralsMade      Referral[]               @relation("ReferralReferrer")
+  referredBy         Referral?                @relation("ReferralInvitee")
+  activityDays       StudentActivityDay[]
+  parentReports      ParentReport[]
+  chatMemberships    ChatMember[]
+  gitAccount         GitAccount?
+  eventTeams         EventTeamMember[]        @relation("EventTeamMemberUser")
+  eventApprovals     EventTeamMember[]        @relation("EventTeamMemberApprover")
+  mentoredTeams      EventTeam[]              @relation("EventTeamMentor")
+  eventJudging       EventJudge[]
+  eventScores        EventScore[]
+  eventSubmissions   EventSubmission[]
+  eventsCreated      Event[]
+  chatMessages       ChatMessage[]            @relation("ChatMessageAuthor")
+  chatReportsMade    ChatReport[]             @relation("ChatReportReporter")
+  chatReportsAbout   ChatReport[]             @relation("ChatReportSubject")
+  moderationActions  ModerationAction[]       @relation("ModerationSubject")
+  moderationTaken    ModerationAction[]       @relation("ModerationStaff")
+  schoolsTeaching    SchoolTeacher[]
+  classesTaught      SchoolClass[]            @relation("ClassTeacher")
+  classMemberships   ClassMember[]            @relation("ClassMemberUser")
+  classApprovals     ClassMember[]            @relation("ClassMemberApprover")
+  assignmentsMade    Assignment[]
+  licensesRecorded   SchoolLicense[]
+  readinessChecks    ReadinessCheck[]
 
   @@index([roleId])
   @@index([countryCode, regionId, cityId])
@@ -144,6 +193,18 @@ model StudentProfile {
   /// Evening reminders on the child's phone when today's goal isn't met yet; the
   /// parent can switch them off.
   streakReminders     Boolean   @default(true) @map("streak_reminders")
+  /// Picture password (younger children): argon2 hash of four pictures in order, set by
+  /// the parent. Five wrong tries lock it for an hour (the text password still works).
+  picturePasswordHash String?   @map("picture_password_hash")
+  pictureFailures     Int       @default(0) @map("picture_failures") @db.SmallInt
+  pictureLockedUntil  DateTime? @map("picture_locked_until")
+  /// The student's league (0 = Bronze … 6 = Diamond; LEAGUE_TIERS). Changes when a
+  /// league week closes: top of the group moves up, bottom moves down.
+  leagueTier          Int       @default(0) @map("league_tier") @db.SmallInt
+  /// Given to friends to send a friend request (made when first asked for).
+  friendCode          String?   @unique @map("friend_code")
+  /// Staff muted the student in every room until then (a moderation action).
+  chatMutedUntil      DateTime? @map("chat_muted_until")
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
 
@@ -189,6 +250,67 @@ enum ConsentMethod {
   ID_DOCUMENT
   SIGNED_FORM
   OTHER
+  /// "Email plus": the parent confirms from an email, and a second email follows later.
+  EMAIL_PLUS
+}
+
+/// Verified parental consent for children under 13: the methods a country accepts
+/// (the lawyer decides per country; Admin → Countries sets them).
+enum Under13ConsentMethod {
+  /// The parent confirms a payment card (Stripe checks it; nothing is charged).
+  CARD_CHECK
+  /// The parent signs a form and uploads it; staff check it.
+  SIGNED_FORM
+  /// The parent confirms from an email; a second email follows a day later.
+  EMAIL_PLUS
+}
+
+enum ParentalConsentStatus {
+  /// Waiting for the parent (to pick a method, pay the card check, or click the email).
+  PENDING
+  /// Signed form uploaded, waiting for staff.
+  SUBMITTED
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+/// One attempt at verified parental consent for a child under 13. The child stays
+/// PENDING_CONSENT until one is VERIFIED; the ConsentRecord rows are written then.
+model ParentalConsentRequest {
+  id               String                @id @default(uuid(7)) @db.Uuid
+  parentId         String                @map("parent_id") @db.Uuid
+  childId          String                @map("child_id") @db.Uuid
+  method           Under13ConsentMethod?
+  status           ParentalConsentStatus @default(PENDING)
+  policyVersion    String                @map("policy_version")
+  /// CARD_CHECK: the Stripe Checkout session (setup mode).
+  providerRef      String?               @unique @map("provider_ref")
+  /// SIGNED_FORM: where the upload is kept (deleted 30 days after the decision).
+  formKey          String?               @map("form_key")
+  formContentType  String?               @map("form_content_type")
+  formDeletedAt    DateTime?             @map("form_deleted_at")
+  /// EMAIL_PLUS: when the parent confirmed from the email, and when the follow-up went.
+  emailConfirmedAt DateTime?             @map("email_confirmed_at")
+  followUpSentAt   DateTime?             @map("follow_up_sent_at")
+  submittedAt      DateTime?             @map("submitted_at")
+  decidedAt        DateTime?             @map("decided_at")
+  /// Staff who checked a signed form.
+  decidedById      String?               @map("decided_by_id") @db.Uuid
+  rejectReason     String?               @map("reject_reason")
+  ipAddress        String?               @map("ip_address")
+  userAgent        String?               @map("user_agent")
+  createdAt        DateTime              @default(now()) @map("created_at")
+  updatedAt        DateTime              @updatedAt @map("updated_at")
+
+  parent    User  @relation("ParentalConsentParent", fields: [parentId], references: [id], onDelete: Cascade)
+  child     User  @relation("ParentalConsentChild", fields: [childId], references: [id], onDelete: Cascade)
+  decidedBy User? @relation("ParentalConsentStaff", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([childId, createdAt])
+  @@index([status, submittedAt])
+  @@index([parentId])
+  @@map("parental_consent_requests")
 }
 
 /// Append-only: a new grant is a new row; revoking sets revoked_at.
@@ -240,6 +362,8 @@ model Session {
 enum VerificationPurpose {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+  /// "Email plus" parental consent: the link in the email (the token names the request).
+  PARENTAL_CONSENT
 }
 
 /// One-time links sent by email. Only a SHA-256 hash of the token is stored.
@@ -256,6 +380,30 @@ model VerificationToken {
 
   @@index([userId, purpose])
   @@map("verification_tokens")
+}
+
+/// "Sign in with a parent's phone": a child's device shows a short code (and a QR
+/// code); a parent approves it for one of their children; the device that showed it
+/// then gets the child's session. Only hashes of the code and the device's secret
+/// are stored. Codes last 10 minutes and work once.
+model DevicePairing {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  codeHash     String    @unique @map("code_hash")
+  secretHash   String    @map("secret_hash")
+  userAgent    String?   @map("user_agent")
+  ipAddress    String?   @map("ip_address")
+  childId      String?   @map("child_id") @db.Uuid
+  approvedById String?   @map("approved_by_id") @db.Uuid
+  approvedAt   DateTime? @map("approved_at")
+  claimedAt    DateTime? @map("claimed_at")
+  expiresAt    DateTime  @map("expires_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  child      User? @relation("PairingChild", fields: [childId], references: [id], onDelete: Cascade)
+  approvedBy User? @relation("PairingParent", fields: [approvedById], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("device_pairings")
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -317,24 +465,28 @@ model RolePermission {
 
 model Country {
   /// ISO 3166-1 alpha-2, e.g. "PK".
-  code                  String   @id @db.Char(2)
+  code                  String                 @id @db.Char(2)
   /// Names per language code, e.g. { "en": "Pakistan", "ar": "باكستان", "ur": "پاکستان" }.
   names                 Json
   /// ISO 4217, e.g. "PKR".
-  currency              String   @db.Char(3)
+  currency              String                 @db.Char(3)
   timezone              String
-  defaultLanguageCode   String   @map("default_language_code")
+  defaultLanguageCode   String                 @map("default_language_code")
   /// Countries are switched on one by one from the admin panel.
-  isActive              Boolean  @default(false) @map("is_active")
+  isActive              Boolean                @default(false) @map("is_active")
   /// Each child after the first costs this much less (the family discount).
-  familyDiscountPercent Int      @default(30) @map("family_discount_percent") @db.SmallInt
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
+  familyDiscountPercent Int                    @default(30) @map("family_discount_percent") @db.SmallInt
+  /// How parents of children under 13 can give verified consent here. None: no
+  /// under-13 accounts in this country (even with the under_13_accounts flag on).
+  under13ConsentMethods Under13ConsentMethod[] @default([]) @map("under13_consent_methods")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
 
   defaultLanguage Language    @relation(fields: [defaultLanguageCode], references: [code])
   regions         Region[]
   users           User[]
   prices          PlanPrice[]
+  schools         School[]
 
   @@map("countries")
 }
@@ -394,6 +546,7 @@ model Language {
   lessonTranslations    LessonTranslation[]
   challengeTranslations ChallengeTranslation[]
   briefTranslations     ProjectBriefTranslation[]
+  contentDrafts         ContentDraft[]
 
   @@map("languages")
 }
@@ -413,6 +566,12 @@ enum ChallengeType {
   JS
   /// Runs with Pyodide in a Web Worker on the sandbox origin (Sprint 5).
   PYTHON
+  /// Explorer: a block program on a stage (packages/checks/src/stage). Programs are
+  /// data, so the API checks them itself; no student code runs.
+  BLOCKS
+  /// Pro: git commands in a practice repository (packages/checks/src/git). The steps
+  /// are data, so the API replays them itself; no real git runs.
+  GIT
 }
 
 enum LessonStatus {
@@ -426,11 +585,15 @@ model Track {
   /// Title per language code, e.g. { "en": "Builder", "ar": "…" }.
   titles    Json
   sortOrder Int      @default(0) @map("sort_order")
+  /// Ages the track is made for (e.g. Explorer 9–12): students of those ages see it first.
+  ageFrom   Int?     @map("age_from")
+  ageTo     Int?     @map("age_to")
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   modules Module[]
+  classes SchoolClass[]
 
   @@map("tracks")
 }
@@ -468,6 +631,8 @@ model Lesson {
   xp        Int      @default(0)
   /// Stored from Sprint 3; enforced when plans arrive (Sprint 6).
   isPremium Boolean  @default(false) @map("is_premium")
+  /// What the lesson teaches (Skill keys, from content/skills.yaml): the skill map.
+  skills    String[] @default([])
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -477,21 +642,27 @@ model Lesson {
   challenges   Challenge[]
   quizzes      Quiz[]
   progress     LessonProgress[]
+  assignments  Assignment[]
 
   @@index([moduleId, sortOrder])
   @@map("lessons")
 }
 
 model LessonTranslation {
-  lessonId      String  @map("lesson_id")
-  languageCode  String  @map("language_code")
+  lessonId      String        @map("lesson_id")
+  languageCode  String        @map("language_code")
   title         String
   summary       String
   /// The explainer, in Markdown.
   body          String
   /// Optional video in this language, e.g. provider "youtube" and its video ID.
-  videoProvider String? @map("video_provider")
-  videoId       String? @map("video_id")
+  videoProvider String?       @map("video_provider")
+  videoId       String?       @map("video_id")
+  /// Where the live text came from: the content/ files or the content studio.
+  source        ContentSource @default(IMPORT)
+  /// Hash of the file text last imported, so an import only overwrites studio work
+  /// when the file itself changed.
+  importHash    String?       @map("import_hash")
 
   lesson   Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   language Language @relation(fields: [languageCode], references: [code])
@@ -511,6 +682,10 @@ model Challenge {
   starter   Json
   /// Declarative checks and JavaScript tests (types in packages/checks).
   checks    Json
+  /// BLOCKS: the level (map, toolbox), see StageLevel in packages/checks.
+  stage     Json?
+  /// GIT: the practice repository it starts with (files, setup), see GitSetup.
+  repo      Json?
   isActive  Boolean       @default(true) @map("is_active")
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @updatedAt @map("updated_at")
@@ -525,15 +700,17 @@ model Challenge {
 }
 
 model ChallengeTranslation {
-  challengeId  String @map("challenge_id")
-  languageCode String @map("language_code")
+  challengeId  String        @map("challenge_id")
+  languageCode String        @map("language_code")
   title        String
   /// What to do, in Markdown.
   instructions String
   /// Hint texts by key, e.g. { "add_link": "Use the <a> tag…" }.
   hints        Json
   /// What each check looks at, by check ID, e.g. { "has-link": "The page has a link" }.
-  checkLabels  Json   @default("{}") @map("check_labels")
+  checkLabels  Json          @default("{}") @map("check_labels")
+  source       ContentSource @default(IMPORT)
+  importHash   String?       @map("import_hash")
 
   challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   language  Language  @relation(fields: [languageCode], references: [code])
@@ -650,6 +827,8 @@ model ProjectBrief {
   starter   Json
   /// What the project needs before it can be shipped (see packages/checks).
   checks    Json
+  /// Block projects (Explorer): the level, see StageLevel in packages/checks.
+  stage     Json?
   /// Premium projects need a trial, a subscription or premium given by hand.
   isPremium Boolean  @default(false) @map("is_premium")
   isActive  Boolean  @default(true) @map("is_active")
@@ -664,17 +843,19 @@ model ProjectBrief {
 }
 
 model ProjectBriefTranslation {
-  briefId      String   @map("brief_id")
-  languageCode String   @map("language_code")
+  briefId      String        @map("brief_id")
+  languageCode String        @map("language_code")
   title        String
   summary      String
   /// The brief, in Markdown.
   body         String
   /// Hint texts by key.
-  hints        Json     @default("{}")
+  hints        Json          @default("{}")
   /// What each check looks at, by check ID.
-  checkLabels  Json     @default("{}") @map("check_labels")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  checkLabels  Json          @default("{}") @map("check_labels")
+  source       ContentSource @default(IMPORT)
+  importHash   String?       @map("import_hash")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   brief    ProjectBrief @relation(fields: [briefId], references: [id], onDelete: Cascade)
   language Language     @relation(fields: [languageCode], references: [code])
@@ -698,6 +879,7 @@ model Project {
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   brief         ProjectBrief   @relation(fields: [briefId], references: [id])
   portfolioItem PortfolioItem?
+  reviews       Review[]
 
   @@unique([userId, briefId])
   @@index([briefId])
@@ -902,6 +1084,676 @@ model LeaderboardResult {
   @@map("leaderboard_results")
 }
 
+// ── Leagues and friends ──────────────────────────────────────────────────────
+
+enum LeagueOutcome {
+  PROMOTED
+  STAYED
+  RELEGATED
+}
+
+/// About 30 students of one league tier (and a similar level) competing on XP for one
+/// week. Students join a group of their tier with the first XP they earn that week.
+model LeagueGroup {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  /// "2026-W40": the students' own week (xp_events.day).
+  weekKey     String    @map("week_key")
+  tier        Int       @db.SmallInt
+  /// Students of similar levels compete together (LEAGUE_LEVEL_BANDS).
+  levelBand   Int       @map("level_band") @db.SmallInt
+  memberCount Int       @default(0) @map("member_count")
+  /// Ranks and outcomes are final.
+  closedAt    DateTime? @map("closed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  members LeagueMembership[]
+
+  @@index([weekKey, tier, levelBand, closedAt])
+  @@index([closedAt, weekKey])
+  @@map("league_groups")
+}
+
+/// A student in a league group for a week: their XP that week, then rank and outcome.
+model LeagueMembership {
+  id        String         @id @default(uuid(7)) @db.Uuid
+  groupId   String         @map("group_id") @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  weekKey   String         @map("week_key")
+  /// The tier the student played this week in.
+  tier      Int            @db.SmallInt
+  xp        Int            @default(0)
+  /// Ties go to whoever got there first.
+  lastXpAt  DateTime       @default(now()) @map("last_xp_at")
+  rank      Int?
+  outcome   LeagueOutcome?
+  /// The student saw the result (the league page celebrates it once).
+  seenAt    DateTime?      @map("seen_at")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  group LeagueGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  // No cascade: accounts are anonymised, never removed.
+  user  User        @relation(fields: [userId], references: [id])
+
+  @@unique([userId, weekKey])
+  @@index([groupId, xp])
+  @@map("league_memberships")
+}
+
+enum FriendRequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELLED
+  EXPIRED
+}
+
+/// A student asks another (by their friend code) to be friends. Both children's parents
+/// must approve before they become friends; either can say no.
+model FriendRequest {
+  id                   String              @id @default(uuid(7)) @db.Uuid
+  fromId               String              @map("from_id") @db.Uuid
+  toId                 String              @map("to_id") @db.Uuid
+  status               FriendRequestStatus @default(PENDING)
+  fromParentApprovedAt DateTime?           @map("from_parent_approved_at")
+  fromParentId         String?             @map("from_parent_id") @db.Uuid
+  toParentApprovedAt   DateTime?           @map("to_parent_approved_at")
+  toParentId           String?             @map("to_parent_id") @db.Uuid
+  /// The parent who said no, or the student who cancelled.
+  decidedById          String?             @map("decided_by_id") @db.Uuid
+  decidedAt            DateTime?           @map("decided_at")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  from User @relation("FriendRequestFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   User @relation("FriendRequestTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@index([fromId, status])
+  @@index([toId, status])
+  @@index([status, createdAt])
+  @@map("friend_requests")
+}
+
+/// Two students who are friends (userAId < userBId). Either child or parent can end it.
+model Friendship {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userAId   String   @map("user_a_id") @db.Uuid
+  userBId   String   @map("user_b_id") @db.Uuid
+  requestId String?  @unique @map("request_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userA User @relation("FriendshipA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User @relation("FriendshipB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  @@unique([userAId, userBId])
+  @@index([userBId])
+  @@map("friendships")
+}
+
+// ── Referrals, activity and weekly reports ───────────────────────────────────
+
+enum PremiumGrantSource {
+  STAFF
+  REFERRAL
+  SCHOOL
+}
+
+enum ReferralStatus {
+  PENDING
+  REWARDED
+  NOT_REWARDED
+}
+
+/// A family that signed up with another parent's invite link. It pays off (premium
+/// days for the inviting family's children) when the new family's child ships their
+/// first project, at most REFERRAL_MAX_PER_YEAR times a year.
+model Referral {
+  id                 String         @id @default(uuid(7)) @db.Uuid
+  referrerId         String         @map("referrer_id") @db.Uuid
+  inviteeId          String         @unique @map("invitee_id") @db.Uuid
+  status             ReferralStatus @default(PENDING)
+  /// Why there was no reward: SAME_NETWORK, SAME_FAMILY, YEARLY_LIMIT, REFERRER_GONE.
+  reason             String?
+  /// HMAC of the new parent's network at sign-up (never the address itself).
+  inviteeNetworkHash String?        @map("invitee_network_hash")
+  rewardDays         Int?           @map("reward_days")
+  decidedAt          DateTime?      @map("decided_at")
+  createdAt          DateTime       @default(now()) @map("created_at")
+
+  referrer User           @relation("ReferralReferrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  invitee  User           @relation("ReferralInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+  grants   PremiumGrant[]
+
+  @@index([referrerId, status, decidedAt])
+  @@map("referrals")
+}
+
+/// Minutes a student spent learning on a day (their date), from the apps' heartbeats.
+model StudentActivityDay {
+  userId    String   @map("user_id") @db.Uuid
+  day       DateTime @db.Date
+  minutes   Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, day])
+  @@map("student_activity_days")
+}
+
+/// A parent's weekly report (Sunday evening, their time): each child's week.
+model ParentReport {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  parentId  String    @map("parent_id") @db.Uuid
+  /// "2026-W40".
+  weekKey   String    @map("week_key")
+  /// { children: [{ childId, nickname, avatarKey, minutes, xp, lessons, streak, league, badges, skills }] }
+  data      Json
+  emailedAt DateTime? @map("emailed_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  parent User @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, weekKey])
+  @@map("parent_reports")
+}
+
+/// A skill lessons teach (content/skills.yaml), shown on the skill map.
+model Skill {
+  key       String   @id
+  /// logic, web or python.
+  category  String
+  /// Name per language code.
+  names     Json
+  sortOrder Int      @default(0) @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("skills")
+}
+
+// ── Rooms and moderation ─────────────────────────────────────────────────────
+
+enum ChatRoomKind {
+  TEAM
+  CLASS
+  EVENT
+}
+
+enum ChatMemberRole {
+  MEMBER
+  /// A teacher or mentor in the room (adults: they read and write, never report).
+  ADULT
+}
+
+enum ChatMessageKind {
+  /// A ready-made phrase (every student can send these; the only kind for under-13s).
+  PHRASE
+  /// Typed text (13 and older), filtered before it is stored.
+  TEXT
+}
+
+enum ChatReportReason {
+  UNKIND
+  PERSONAL_INFO
+  SPAM
+  SCARY
+  OTHER
+}
+
+enum ChatReportStatus {
+  OPEN
+  RESOLVED
+}
+
+enum ModerationActionKind {
+  WARN
+  MUTE
+  SUSPEND
+  HIDE
+  DISMISS
+}
+
+/// A room for a team, a class or an event. Only its members see it (and their parents).
+model ChatRoom {
+  id         String       @id @default(uuid(7)) @db.Uuid
+  kind       ChatRoomKind
+  /// The team, class or event it belongs to.
+  refId      String?      @map("ref_id")
+  name       String
+  isArchived Boolean      @default(false) @map("is_archived")
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  members  ChatMember[]
+  messages ChatMessage[]
+  reports  ChatReport[]
+
+  @@unique([kind, refId])
+  @@map("chat_rooms")
+}
+
+model ChatMember {
+  roomId     String         @map("room_id") @db.Uuid
+  userId     String         @map("user_id") @db.Uuid
+  role       ChatMemberRole @default(MEMBER)
+  joinedAt   DateTime       @default(now()) @map("joined_at")
+  lastReadAt DateTime?      @map("last_read_at")
+
+  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([roomId, userId])
+  @@index([userId])
+  @@map("chat_members")
+}
+
+/// A message: a phrase key, or text that passed the filter. Kept CHAT_RETENTION_DAYS.
+model ChatMessage {
+  id         String          @id @default(uuid(7)) @db.Uuid
+  roomId     String          @map("room_id") @db.Uuid
+  authorId   String          @map("author_id") @db.Uuid
+  kind       ChatMessageKind
+  phraseKey  String?         @map("phrase_key")
+  text       String?
+  /// Removed by a moderator: shown as "Message removed".
+  hiddenAt   DateTime?       @map("hidden_at")
+  hiddenById String?         @map("hidden_by_id") @db.Uuid
+  createdAt  DateTime        @default(now()) @map("created_at")
+
+  room    ChatRoom     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  author  User         @relation("ChatMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  reports ChatReport[]
+
+  @@index([roomId, createdAt])
+  @@index([createdAt])
+  @@map("chat_messages")
+}
+
+/// Someone reported a message (or a member). Moderators see it with its context.
+model ChatReport {
+  id           String           @id @default(uuid(7)) @db.Uuid
+  reporterId   String           @map("reporter_id") @db.Uuid
+  roomId       String?          @map("room_id") @db.Uuid
+  messageId    String?          @map("message_id") @db.Uuid
+  /// The student the report is about.
+  subjectId    String           @map("subject_id") @db.Uuid
+  reason       ChatReportReason
+  /// The message as it was when reported (it may be hidden or deleted since).
+  snapshot     String?
+  status       ChatReportStatus @default(OPEN)
+  resolvedById String?          @map("resolved_by_id") @db.Uuid
+  resolvedAt   DateTime?        @map("resolved_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  reporter User               @relation("ChatReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  subject  User               @relation("ChatReportSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+  room     ChatRoom?          @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  message  ChatMessage?       @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  actions  ModerationAction[]
+
+  @@index([status, createdAt])
+  @@index([subjectId])
+  @@map("chat_reports")
+}
+
+/// What a moderator did, and why (also in the audit log).
+model ModerationAction {
+  id        String               @id @default(uuid(7)) @db.Uuid
+  kind      ModerationActionKind
+  subjectId String               @map("subject_id") @db.Uuid
+  reportId  String?              @map("report_id") @db.Uuid
+  messageId String?              @map("message_id") @db.Uuid
+  staffId   String               @map("staff_id") @db.Uuid
+  reason    String
+  /// MUTE: until when.
+  until     DateTime?
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  subject User        @relation("ModerationSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+  staff   User        @relation("ModerationStaff", fields: [staffId], references: [id])
+  report  ChatReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+
+  @@index([subjectId, createdAt])
+  @@map("moderation_actions")
+}
+
+/// Words the text filter refuses, added by staff (on top of the built-in lists).
+model BlockedTerm {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// Stored normalised (lower case, no marks), as the filter compares.
+  term        String   @unique
+  /// en, ar, ur or roman-ur; "any" for names of apps and the like.
+  language    String
+  createdById String?  @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("blocked_terms")
+}
+
+// ── Hackathons and team git (Pro) ───────────────────────────────────────────
+
+enum EventStatus {
+  /// Staff are setting it up: students don't see it.
+  DRAFT
+  /// Teams form (a join code; a parent approves each member).
+  OPEN
+  /// Teams build in their repositories (pushing is allowed).
+  RUNNING
+  /// Submissions are closed; judges score them.
+  JUDGING
+  /// Results are published.
+  FINISHED
+}
+
+/// A hackathon: teams of students build a web project together in a git repository.
+model Event {
+  id          String      @id @default(uuid(7)) @db.Uuid
+  slug        String      @unique
+  title       String
+  description String
+  status      EventStatus @default(DRAFT)
+  startsAt    DateTime    @map("starts_at")
+  endsAt      DateTime    @map("ends_at")
+  teamSize    Int         @default(3) @map("team_size") @db.SmallInt
+  /// Students this age and older can take part.
+  minAge      Int         @default(13) @map("min_age") @db.SmallInt
+  /// Judging criteria: [{ key, label, max }].
+  rubric      Json
+  /// The files each team's repository starts with: { path: content }.
+  starter     Json
+  /// The organisation on the git server that holds the teams' repositories.
+  gitOrg      String?     @map("git_org")
+  createdById String?     @map("created_by_id") @db.Uuid
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  createdBy User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  teams     EventTeam[]
+  judges    EventJudge[]
+
+  @@index([status])
+  @@map("events")
+}
+
+model EventTeam {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
+  /// Chosen by the team (checked like a nickname).
+  name      String
+  /// Given to friends to join the team.
+  joinCode  String   @unique @map("join_code")
+  /// The mentor who reviews the team's pull requests.
+  mentorId  String?  @map("mentor_id") @db.Uuid
+  /// The repository on the git server ("org/name"), made when the team first opens it.
+  repo      String?
+  /// Once results are published.
+  rank      Int?     @db.SmallInt
+  score     Float?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  event      Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  mentor     User?             @relation("EventTeamMentor", fields: [mentorId], references: [id], onDelete: SetNull)
+  members    EventTeamMember[]
+  submission EventSubmission?
+  scores     EventScore[]
+
+  @@unique([eventId, name])
+  @@map("event_teams")
+}
+
+enum EventMemberStatus {
+  /// Waiting for a parent's OK.
+  PENDING
+  APPROVED
+}
+
+model EventTeamMember {
+  teamId       String            @map("team_id") @db.Uuid
+  userId       String            @map("user_id") @db.Uuid
+  /// A student is in one team per event.
+  eventId      String            @map("event_id") @db.Uuid
+  status       EventMemberStatus @default(PENDING)
+  /// Made the team.
+  isCaptain    Boolean           @default(false) @map("is_captain")
+  approvedById String?           @map("approved_by_id") @db.Uuid
+  approvedAt   DateTime?         @map("approved_at")
+  joinedAt     DateTime          @default(now()) @map("joined_at")
+
+  team       EventTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user       User      @relation("EventTeamMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy User?     @relation("EventTeamMemberApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@id([teamId, userId])
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@map("event_team_members")
+}
+
+/// What a team hands in: a title, a short description, and the commit on main.
+model EventSubmission {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  teamId        String   @unique @map("team_id") @db.Uuid
+  title         String
+  description   String
+  /// The commit on main that was handed in.
+  commit        String?
+  submittedById String   @map("submitted_by_id") @db.Uuid
+  submittedAt   DateTime @default(now()) @map("submitted_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  team        EventTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  submittedBy User      @relation(fields: [submittedById], references: [id], onDelete: Cascade)
+
+  @@map("event_submissions")
+}
+
+/// Mentors who score an event's submissions.
+model EventJudge {
+  eventId String @map("event_id") @db.Uuid
+  userId  String @map("user_id") @db.Uuid
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
+  @@map("event_judges")
+}
+
+model EventScore {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  teamId    String   @map("team_id") @db.Uuid
+  judgeId   String   @map("judge_id") @db.Uuid
+  /// Criterion key → points.
+  scores    Json
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  team  EventTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  judge User      @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, judgeId])
+  @@map("event_scores")
+}
+
+/// A student's or mentor's account on the git server (made when first needed).
+model GitAccount {
+  userId    String   @id @map("user_id") @db.Uuid
+  username  String   @unique
+  gitId     Int      @map("git_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("git_accounts")
+}
+
+// ── Schools ──────────────────────────────────────────────────────────────────
+
+/// A school that runs classes on the platform, under a licence it pays for by invoice.
+model School {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  name         String
+  countryCode  String   @map("country_code") @db.Char(2)
+  city         String?
+  /// Who we deal with at the school (invoices, questions). Staff only.
+  contactName  String   @map("contact_name")
+  contactEmail String   @map("contact_email")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  country  Country         @relation(fields: [countryCode], references: [code])
+  teachers SchoolTeacher[]
+  licenses SchoolLicense[]
+  classes  SchoolClass[]
+
+  @@map("schools")
+}
+
+/// A teacher account that teaches at a school (a teacher may teach at several).
+model SchoolTeacher {
+  schoolId String   @map("school_id") @db.Uuid
+  userId   String   @map("user_id") @db.Uuid
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([schoolId, userId])
+  @@index([userId])
+  @@map("school_teachers")
+}
+
+/// A year (or term) of premium for a number of students, invoiced and paid by bank
+/// transfer. Premium applies once it is paid, between its dates, up to its seats.
+model SchoolLicense {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  schoolId         String    @map("school_id") @db.Uuid
+  seats            Int
+  startsAt         DateTime  @map("starts_at")
+  endsAt           DateTime  @map("ends_at")
+  invoiceNumber    String    @unique @map("invoice_number")
+  amountMinor      Int       @map("amount_minor")
+  currency         String    @db.Char(3)
+  paidAt           DateTime? @map("paid_at")
+  /// The bank transfer's reference, when it is paid.
+  paymentReference String?   @map("payment_reference")
+  cancelledAt      DateTime? @map("cancelled_at")
+  createdById      String?   @map("created_by_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  school    School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  createdBy User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  grants    PremiumGrant[]
+
+  @@index([schoolId, endsAt])
+  @@map("school_licenses")
+}
+
+/// A teacher's class: students join with its code, once a parent approves.
+model SchoolClass {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  schoolId   String    @map("school_id") @db.Uuid
+  teacherId  String    @map("teacher_id") @db.Uuid
+  name       String
+  joinCode   String    @unique @map("join_code")
+  /// The track the class follows (for choosing lessons to assign).
+  trackId    String?   @map("track_id")
+  archivedAt DateTime? @map("archived_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  school      School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  teacher     User          @relation("ClassTeacher", fields: [teacherId], references: [id], onDelete: Cascade)
+  track       Track?        @relation(fields: [trackId], references: [id], onDelete: SetNull)
+  members     ClassMember[]
+  assignments Assignment[]
+
+  @@index([teacherId])
+  @@index([schoolId])
+  @@map("classes")
+}
+
+enum ClassMemberStatus {
+  /// Waiting for a parent's OK.
+  PENDING
+  APPROVED
+}
+
+model ClassMember {
+  classId      String            @map("class_id") @db.Uuid
+  userId       String            @map("user_id") @db.Uuid
+  status       ClassMemberStatus @default(PENDING)
+  requestedAt  DateTime          @default(now()) @map("requested_at")
+  approvedById String?           @map("approved_by_id") @db.Uuid
+  approvedAt   DateTime?         @map("approved_at")
+
+  class      SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  user       User        @relation("ClassMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy User?       @relation("ClassMemberApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@id([classId, userId])
+  @@index([userId])
+  @@map("class_members")
+}
+
+/// A lesson a teacher set for the class, with an optional date to finish it by.
+model Assignment {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  classId     String    @map("class_id") @db.Uuid
+  lessonId    String    @map("lesson_id")
+  dueAt       DateTime? @map("due_at")
+  createdById String?   @map("created_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  class     SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  lesson    Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdBy User?       @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([classId, lessonId])
+  @@map("assignments")
+}
+
+// ── Hub readiness ────────────────────────────────────────────────────────────
+
+enum ReadinessStatus {
+  /// The timer is running.
+  STARTED
+  /// Handed in (or the time ran out with work saved): a mentor grades it.
+  SUBMITTED
+  PASSED
+  NOT_PASSED
+  /// The time ran out with nothing saved.
+  EXPIRED
+}
+
+/// The hub readiness check: a timed practical project a mentor grades. Passing records
+/// readiness only; it doesn't make a student eligible for hub work.
+model ReadinessCheck {
+  id          String          @id @default(uuid(7)) @db.Uuid
+  studentId   String          @map("student_id") @db.Uuid
+  status      ReadinessStatus @default(STARTED)
+  startedAt   DateTime        @default(now()) @map("started_at")
+  dueAt       DateTime        @map("due_at")
+  /// The work so far: { html, css, js }.
+  files       Json            @default("{}")
+  submittedAt DateTime?       @map("submitted_at")
+  /// The mentor's review (kind READINESS) once handed in.
+  reviewId    String?         @unique @map("review_id") @db.Uuid
+  /// The rubric total when graded.
+  score       Int?            @db.SmallInt
+  decidedAt   DateTime?       @map("decided_at")
+  passedAt    DateTime?       @map("passed_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  review  Review? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+
+  @@index([studentId, startedAt])
+  @@index([status])
+  @@map("readiness_checks")
+}
+
 // ── Pilot tools ──────────────────────────────────────────────────────────────
 
 enum FeedbackKind {
@@ -940,22 +1792,31 @@ model Feedback {
 
 /// Premium given by hand (pilot families, schools, support). Works next to subscriptions.
 model PremiumGrant {
-  id          String    @id @default(uuid(7)) @db.Uuid
+  id          String             @id @default(uuid(7)) @db.Uuid
   /// The student who gets premium.
-  userId      String    @map("user_id") @db.Uuid
-  grantedById String    @map("granted_by_id") @db.Uuid
+  userId      String             @map("user_id") @db.Uuid
+  /// The staff member; null for grants the platform gives (referral rewards).
+  grantedById String?            @map("granted_by_id") @db.Uuid
+  source      PremiumGrantSource @default(STAFF)
+  /// The referral that earned it (source REFERRAL).
+  referralId  String?            @map("referral_id") @db.Uuid
+  /// The school licence that pays for it (source SCHOOL).
+  licenseId   String?            @map("license_id") @db.Uuid
   reason      String
-  startsAt    DateTime  @default(now()) @map("starts_at")
-  endsAt      DateTime  @map("ends_at")
-  revokedAt   DateTime? @map("revoked_at")
-  revokedById String?   @map("revoked_by_id") @db.Uuid
-  createdAt   DateTime  @default(now()) @map("created_at")
+  startsAt    DateTime           @default(now()) @map("starts_at")
+  endsAt      DateTime           @map("ends_at")
+  revokedAt   DateTime?          @map("revoked_at")
+  revokedById String?            @map("revoked_by_id") @db.Uuid
+  createdAt   DateTime           @default(now()) @map("created_at")
 
-  user      User  @relation("PremiumGrantStudent", fields: [userId], references: [id], onDelete: Cascade)
-  grantedBy User  @relation("PremiumGrantStaff", fields: [grantedById], references: [id])
-  revokedBy User? @relation("PremiumGrantRevoker", fields: [revokedById], references: [id])
+  user      User           @relation("PremiumGrantStudent", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User?          @relation("PremiumGrantStaff", fields: [grantedById], references: [id])
+  referral  Referral?      @relation(fields: [referralId], references: [id])
+  license   SchoolLicense? @relation(fields: [licenseId], references: [id], onDelete: SetNull)
+  revokedBy User?          @relation("PremiumGrantRevoker", fields: [revokedById], references: [id])
 
   @@index([userId, endsAt])
+  @@index([licenseId])
   @@map("premium_grants")
 }
 
@@ -1296,6 +2157,8 @@ model Quiz {
   answer       Json
   /// Per language: { prompt, explanation, options: { <option id>: text } }.
   texts        Json
+  /// Per language: { source: "IMPORT" | "STUDIO", importHash } (see LessonTranslation).
+  textSources  Json     @default("{}") @map("text_sources")
   isActive     Boolean  @default(true) @map("is_active")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -1382,4 +2245,197 @@ model AppCrash {
 
   @@index([createdAt])
   @@map("app_crashes")
+}
+
+// ── Phase 2 · Content studio ─────────────────────────────────────────────────
+//
+// Translators write and review texts in the admin panel. Students keep reading the
+// live translation tables until a reviewer publishes a draft; every published text is
+// kept in content_versions for history and restore.
+
+enum ContentSource {
+  IMPORT
+  STUDIO
+}
+
+enum ContentEntity {
+  LESSON
+  CHALLENGE
+  PROJECT
+  QUIZ
+}
+
+enum ContentDraftStatus {
+  DRAFT
+  IN_REVIEW
+}
+
+enum ContentVersionAction {
+  IMPORT
+  PUBLISH
+}
+
+/// A translation being written: one per text and language.
+model ContentDraft {
+  entityType   ContentEntity      @map("entity_type")
+  entityId     String             @map("entity_id")
+  languageCode String             @map("language_code")
+  /// The translated fields (see apps/api/src/content-studio/texts.ts).
+  data         Json
+  status       ContentDraftStatus @default(DRAFT)
+  /// Who wrote the latest change. A different person publishes it.
+  editedById   String?            @map("edited_by_id") @db.Uuid
+  submittedAt  DateTime?          @map("submitted_at")
+  /// Why a reviewer asked for changes.
+  reviewNote   String?            @map("review_note")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  editedBy User?    @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  language Language @relation(fields: [languageCode], references: [code])
+
+  @@id([entityType, entityId, languageCode])
+  @@index([status, updatedAt])
+  @@map("content_drafts")
+}
+
+/// Every text that went live (imported or published). Append-only.
+model ContentVersion {
+  id           String               @id @default(uuid(7)) @db.Uuid
+  entityType   ContentEntity        @map("entity_type")
+  entityId     String               @map("entity_id")
+  languageCode String               @map("language_code")
+  data         Json
+  action       ContentVersionAction
+  /// The reviewer who published it (none for imports). No foreign keys: the history
+  /// outlives the accounts it mentions.
+  actorId      String?              @map("actor_id") @db.Uuid
+  /// Who wrote it.
+  editedById   String?              @map("edited_by_id") @db.Uuid
+  createdAt    DateTime             @default(now()) @map("created_at")
+
+  @@index([entityType, entityId, languageCode, createdAt])
+  @@map("content_versions")
+}
+
+// ── Phase 2 · Mentors and reviews ────────────────────────────────────────────
+
+enum BackgroundCheckStatus {
+  NOT_STARTED
+  PENDING
+  PASSED
+  FAILED
+}
+
+/// A mentor's onboarding (background check, code of conduct) and workload settings.
+/// Mentors review only once their check passed and they signed the code of conduct.
+model MentorProfile {
+  userId                String                @id @map("user_id") @db.Uuid
+  backgroundCheck       BackgroundCheckStatus @default(NOT_STARTED) @map("background_check")
+  backgroundCheckedAt   DateTime?             @map("background_checked_at")
+  /// Staff's note about the check (provider, reference). Never shown to families.
+  backgroundCheckNote   String?               @map("background_check_note")
+  codeOfConductVersion  String?               @map("code_of_conduct_version")
+  codeOfConductSignedAt DateTime?             @map("code_of_conduct_signed_at")
+  /// Languages they review in (language codes).
+  languages             String[]              @default([])
+  /// Reviews they may have open at once.
+  capacity              Int                   @default(5)
+  isActive              Boolean               @default(true) @map("is_active")
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("mentor_profiles")
+}
+
+enum ReviewKind {
+  /// A shipped module project (premium students).
+  PROJECT
+  /// The hub readiness check (a timed practical project).
+  READINESS
+}
+
+enum ReviewStatus {
+  WAITING
+  IN_REVIEW
+  APPROVED
+  CHANGES_REQUESTED
+  /// No longer needed (e.g. the student's account was closed).
+  CANCELLED
+}
+
+/// A mentor's review of a student's work. Mentors see the nickname only.
+model Review {
+  id              String       @id @default(uuid(7)) @db.Uuid
+  kind            ReviewKind   @default(PROJECT)
+  studentId       String       @map("student_id") @db.Uuid
+  projectId       String?      @map("project_id") @db.Uuid
+  /// The shipped version that is reviewed.
+  version         Int          @default(1)
+  /// The code as shipped: { html, css, js } or { py }.
+  files           Json
+  /// The student's language when they asked (mentors who speak it see it first).
+  languageCode    String       @map("language_code")
+  status          ReviewStatus @default(WAITING)
+  mentorId        String?      @map("mentor_id") @db.Uuid
+  requestedAt     DateTime     @default(now()) @map("requested_at")
+  claimedAt       DateTime?    @map("claimed_at")
+  decidedAt       DateTime?    @map("decided_at")
+  /// Hours from the request to the decision (the target is under 48).
+  turnaroundHours Float?       @map("turnaround_hours")
+  /// Rubric scores by criterion, 1 to 4.
+  scores          Json         @default("{}")
+  /// The mentor's message to the student.
+  summary         String?
+  /// When the student opened the result.
+  seenAt          DateTime?    @map("seen_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  student   User            @relation("ReviewStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  mentor    User?           @relation("ReviewMentor", fields: [mentorId], references: [id], onDelete: SetNull)
+  project   Project?        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  comments  ReviewComment[]
+  readiness ReadinessCheck?
+
+  @@index([status, requestedAt])
+  @@index([studentId, createdAt])
+  @@index([mentorId, status])
+  @@index([projectId])
+  @@map("reviews")
+}
+
+/// A mentor's comment on one line of the student's code.
+model ReviewComment {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  reviewId  String   @map("review_id") @db.Uuid
+  authorId  String?  @map("author_id") @db.Uuid
+  /// html, css, js or py.
+  file      String
+  line      Int
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  author User?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([reviewId])
+  @@map("review_comments")
+}
+
+/// Notes about a student for other mentors (never shown to the student or family).
+model MentorNote {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  studentId String   @map("student_id") @db.Uuid
+  authorId  String?  @map("author_id") @db.Uuid
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  student User  @relation("MentorNoteStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  author  User? @relation("MentorNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([studentId, createdAt])
+  @@map("mentor_notes")
 }

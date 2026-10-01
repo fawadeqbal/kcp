@@ -26,7 +26,11 @@ class LearnScreen extends ConsumerWidget {
             children: [
               for (final track in value.tracks)
                 for (final module in track.modules) ...[
-                  Kicker(track.title),
+                  Kicker(
+                    track.ageFrom != null && track.ageTo != null
+                        ? '${track.title} · ${t.explorerForAges(track.ageFrom!.toInt(), track.ageTo!.toInt())}'
+                        : track.title,
+                  ),
                   const SizedBox(height: 4),
                   Semantics(
                     header: true,

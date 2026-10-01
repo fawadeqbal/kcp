@@ -94,7 +94,7 @@ function Changes({ entry }: { entry: AuditEntry }) {
         {hasBefore ? (
           <div>
             <p className="text-xs font-semibold text-muted uppercase">Before</p>
-            <pre className="overflow-x-auto rounded-well bg-canvas p-3 text-xs">
+            <pre className="max-h-96 overflow-auto rounded-well bg-canvas p-3 text-xs">
               {JSON.stringify(entry.before, null, 2)}
             </pre>
           </div>
@@ -102,7 +102,7 @@ function Changes({ entry }: { entry: AuditEntry }) {
         {hasAfter ? (
           <div>
             <p className="text-xs font-semibold text-muted uppercase">After</p>
-            <pre className="overflow-x-auto rounded-well bg-canvas p-3 text-xs">
+            <pre className="max-h-96 overflow-auto rounded-well bg-canvas p-3 text-xs">
               {JSON.stringify(entry.after, null, 2)}
             </pre>
           </div>

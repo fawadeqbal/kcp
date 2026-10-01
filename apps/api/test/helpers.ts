@@ -183,3 +183,24 @@ export async function staffLogin(ctx: TestContext, roleKey: string) {
     setCookie: done.headers['set-cookie'] as unknown as string[],
   };
 }
+
+/** A mentor or teacher, signed in to the web app with a two-factor code. */
+export async function webTwoFactorLogin(ctx: TestContext, roleKey: 'mentor' | 'teacher') {
+  const user = await createUser(ctx.prisma, roleKey);
+  const login = await ctx
+    .http()
+    .post('/v1/auth/login')
+    .send({ email: user.email, password: PASSWORD, app: 'web' })
+    .expect(200);
+  const setup = await ctx
+    .http()
+    .post('/v1/auth/mfa/setup')
+    .send({ mfaToken: login.body.mfaToken })
+    .expect(200);
+  const done = await ctx
+    .http()
+    .post('/v1/auth/mfa/verify')
+    .send({ mfaToken: login.body.mfaToken, code: totp(setup.body.secret), app: 'web' })
+    .expect(200);
+  return { user, token: done.body.accessToken as string };
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import type { components } from '@kcp/api-client-ts';
-import type { AvatarKey, ChildConsent } from '@kcp/shared';
+import { type AvatarKey, type ChildConsent, mayBeUnder13 } from '@kcp/shared';
 import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import {
@@ -15,7 +15,7 @@ import {
   SelectField,
   TextField,
 } from '@/components/ui';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { errorMessageKey, isNicknameError } from '@/lib/errors';
 import { useAccount } from '@/lib/use-account';
@@ -43,8 +43,9 @@ interface FormState {
 
 export function AddChildForm() {
   const t = useTranslations();
+  const router = useRouter();
   const locale = useLocale();
-  const parent = useAccount('ADULT');
+  const parent = useAccount('PARENT');
   const avatarLabels = useAvatarLabels();
   const countries = useCountries();
   const languages = useLanguages();
@@ -114,9 +115,16 @@ export function AddChildForm() {
           cityId: form.cityId || undefined,
           languageCode: form.languageCode,
           password: form.password,
-          consents: form.consents,
+          consents: mayBeUnder13(Number(form.birthYear), new Date().getUTCFullYear())
+            ? NO_CONSENTS
+            : form.consents,
         },
       });
+      if (data?.status === 'PENDING_CONSENT') {
+        // Under 13: the parent confirms their consent next.
+        router.push(`/children/${data.id}/consent`);
+        return;
+      }
       if (data) {
         setCreated(data);
         window.scrollTo({ top: 0 });
@@ -166,6 +174,9 @@ export function AddChildForm() {
   }
 
   const region = regions.find((r) => r.id === form.regionId);
+  // Under 13: sharing stays off until the parent's consent is verified (next step).
+  const young =
+    form.birthYear !== '' && mayBeUnder13(Number(form.birthYear), new Date().getUTCFullYear());
   const setConsent = (consent: ChildConsent, on: boolean) =>
     update('consents', { ...form.consents, [consent]: on });
 
@@ -323,10 +334,17 @@ export function AddChildForm() {
           />
         </Card>
 
-        <Card title={t('addChild.sharingTitle')}>
-          <p className="-mt-2 mb-4 text-sm text-muted">{t('addChild.sharingHint')}</p>
-          <ConsentSwitches value={form.consents} onChange={setConsent} />
-        </Card>
+        {young ? (
+          <Alert>
+            {t('consent.under13Note', { nickname: isolate(form.nickname.trim() || '…') })}{' '}
+            {t('consent.under13Next')}
+          </Alert>
+        ) : (
+          <Card title={t('addChild.sharingTitle')}>
+            <p className="-mt-2 mb-4 text-sm text-muted">{t('addChild.sharingHint')}</p>
+            <ConsentSwitches value={form.consents} onChange={setConsent} />
+          </Card>
+        )}
 
         <p className="text-sm text-muted">{t('addChild.consentNote')}</p>
         {formError ? <Alert tone="error">{formError}</Alert> : null}

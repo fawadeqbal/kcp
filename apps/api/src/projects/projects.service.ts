@@ -1,4 +1,4 @@
-import type { Check, CodeFiles } from '@kcp/checks';
+import type { Check, CodeFiles, StageLevel } from '@kcp/checks';
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@kcp/database';
 import { CODE_FILE_KEYS, type CodeFileKey } from '@kcp/shared';
@@ -28,10 +28,12 @@ import {
   publishedModule,
   type Texts,
 } from '../learning/content.js';
-import type { CheckResultDto, CodeFilesDto } from '../learning/dto/learning.dto.js';
+import type { CheckResultDto, CodeFilesDto, StageDto } from '../learning/dto/learning.dto.js';
 import type { AuthUser } from '../permissions/auth-user.js';
 import { ProgressService } from '../progress/progress.service.js';
 import { REDIS } from '../redis/redis.constants.js';
+import { requestProjectReview } from '../reviews/review-request.js';
+import { ReviewsService } from '../reviews/reviews.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import type {
   ChildPortfolioDto,
@@ -42,6 +44,7 @@ import type {
   ShipResultDto,
 } from './dto/projects.dto.js';
 import { confirmResults, isUnchanged } from '../learning/server-checks.js';
+import { ReferralsService } from '../referrals/referrals.service.js';
 
 /** The file names students see (and that the portfolio stores). */
 export const PROJECT_FILE_NAMES: Record<CodeFileKey, string> = {
@@ -49,12 +52,17 @@ export const PROJECT_FILE_NAMES: Record<CodeFileKey, string> = {
   css: 'style.css',
   js: 'script.js',
   py: 'main.py',
+  blocks: 'program.blocks.json',
+  // Git steps belong to lessons, never to projects.
+  git: 'steps.git.json',
 };
 const CONTENT_TYPES: Record<CodeFileKey, string> = {
   html: 'text/html; charset=utf-8',
   css: 'text/css; charset=utf-8',
   js: 'text/javascript; charset=utf-8',
   py: 'text/x-python; charset=utf-8',
+  blocks: 'application/json; charset=utf-8',
+  git: 'application/json; charset=utf-8',
 };
 
 const DRAFTS_PER_MINUTE = 120;
@@ -95,6 +103,8 @@ export class ProjectsService {
     private readonly audit: AuditService,
     private readonly entitlements: EntitlementsService,
     private readonly notifications: NotificationsService,
+    private readonly reviews: ReviewsService,
+    private readonly referrals: ReferralsService,
     @Inject(REDIS) private readonly redis: Redis,
   ) {}
 
@@ -158,6 +168,9 @@ export class ProjectsService {
       where: { userId_briefId: { userId: user.id, briefId } },
       include: { portfolioItem: { select: { version: true } } },
     });
+    const review = project
+      ? (await this.reviews.summaries([project.id])).get(project.id)
+      : undefined;
     const text = pickTranslation(brief.translations, language);
     const english = brief.translations.find((t) => t.languageCode === FALLBACK_LANGUAGE);
     const starter = brief.starter as CodeFilesDto;
@@ -177,6 +190,7 @@ export class ProjectsService {
       xp: brief.xp,
       files: CODE_FILE_KEYS.filter((key) => typeof starter[key] === 'string'),
       starter,
+      stage: (brief.stage as StageDto | null) ?? null,
       checks: brief.checks as Record<string, unknown>[],
       hints: { ...(english?.hints as Texts), ...(text?.hints as Texts) },
       checkLabels: { ...(english?.checkLabels as Texts), ...(text?.checkLabels as Texts) },
@@ -184,6 +198,7 @@ export class ProjectsService {
       status,
       shippedAt: project?.shippedAt ?? null,
       version: project?.portfolioItem?.version ?? null,
+      review: review ?? null,
     };
   }
 
@@ -238,8 +253,13 @@ export class ProjectsService {
     const byId = new Map(reported.map((result) => [result.id, result.passed]));
     const files = cleanCode(code, brief.starter);
     const checks = brief.checks as unknown as Check[];
-    const confirmed = await confirmResults(briefId, files, checks, byId, (message) =>
-      this.logger.warn(message),
+    const confirmed = await confirmResults(
+      briefId,
+      files,
+      checks,
+      byId,
+      (message) => this.logger.warn(message),
+      { stage: brief.stage as StageLevel | null },
     );
     const results = checks.map((check) => ({
       id: check.id,
@@ -305,7 +325,23 @@ export class ProjectsService {
         return { item, award };
       });
       const badgesEarned = await this.progress.settle(user.id, [outcome.award]);
+      // Premium students' projects go to a mentor for review.
+      if ((await this.entitlements.status(user.id, now)).active) {
+        const student = await this.prisma.user.findUnique({
+          where: { id: user.id },
+          select: { languageCode: true },
+        });
+        await requestProjectReview(this.prisma, {
+          studentId: user.id,
+          projectId: project.id,
+          version,
+          files: files as Prisma.InputJsonObject,
+          languageCode: student?.languageCode ?? 'en',
+        });
+      }
       if (version === 1) {
+        // A family that signed up with an invite link: the inviting family's reward.
+        await this.referrals.childShipped(user.id, now);
         // The family hears about a project the first time it ships.
         const profile = await this.prisma.studentProfile.findUnique({
           where: { userId: user.id },
@@ -380,15 +416,23 @@ export class ProjectsService {
   }
 
   /** Shipped projects with their files, newest module last. */
-  private async items(userId: string, language: string): Promise<PortfolioItemDto[]> {
+  private async items(
+    userId: string,
+    language: string,
+    { withReviews = true }: { withReviews?: boolean } = {},
+  ): Promise<PortfolioItemDto[]> {
     const items = await this.prisma.portfolioItem.findMany({
       where: { userId },
       orderBy: [{ module: { sortOrder: 'asc' } }, { publishedAt: 'asc' }],
       include: {
         module: { select: { titles: true } },
-        project: { select: { brief: { select: { translations: true } } } },
+        project: { select: { brief: { select: { translations: true, stage: true } } } },
       },
     });
+    // Reviews are for the family; the public page never shows them.
+    const reviews = withReviews
+      ? await this.reviews.summaries(items.map((item) => item.projectId))
+      : new Map();
     return Promise.all(
       items.map(async (item) => {
         const keys = item.files as Partial<Record<CodeFileKey, string>>;
@@ -405,6 +449,8 @@ export class ProjectsService {
           version: item.version,
           publishedAt: item.publishedAt,
           files,
+          stage: (item.project.brief.stage as StageDto | null) ?? null,
+          review: reviews.get(item.projectId) ?? null,
         };
       }),
     );
@@ -506,7 +552,7 @@ export class ProjectsService {
     return {
       nickname: profile.nickname,
       avatarKey: profile.avatarKey,
-      items: await this.items(profile.userId, language),
+      items: await this.items(profile.userId, language, { withReviews: false }),
     };
   }
 }

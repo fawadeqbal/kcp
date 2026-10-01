@@ -1,9 +1,11 @@
+import { CONSENT_FORM_MAX_BYTES, CONSENT_FORM_TYPES } from '@kcp/shared';
 import { ValidationPipe } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { type NextFunction, raw, type Request, type Response } from 'express';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
+import { RedisIoAdapter } from './chat/redis-io.adapter.js';
 import { AllExceptionsFilter } from './common/all-exceptions.filter.js';
 import { REQUEST_ID_HEADER } from './common/request-id.js';
 import { AppConfigService } from './config/app-config.service.js';
@@ -39,6 +41,14 @@ export function configureApp(app: NestExpressApplication, options: ConfigureAppO
   app.set('trust proxy', config.get('TRUST_PROXY_HOPS'));
 
   app.setGlobalPrefix(API_PREFIX);
+  // A parent's signed consent form is sent as the file itself (PDF, PNG or JPEG);
+  // nothing else under /children is read raw (JSON stays JSON).
+  app.use(
+    `/${API_PREFIX}/children`,
+    raw({ type: [...CONSENT_FORM_TYPES], limit: CONSENT_FORM_MAX_BYTES + 1024 }),
+  );
+  // Git over HTTP (team repositories) sends packs as they are.
+  app.use(`/${API_PREFIX}/git`, raw({ type: () => true, limit: '25mb' }));
   // Stripe signs the exact bytes it sends: its webhooks keep their raw body.
   app.use(`/${API_PREFIX}/payments/webhooks`, raw({ type: '*/*', limit: '1mb' }));
   // A shared portfolio is read by the page on the user-content domain (apps/sandbox),
@@ -77,6 +87,9 @@ export function configureApp(app: NestExpressApplication, options: ConfigureAppO
     }),
   );
   app.useGlobalFilters(new AllExceptionsFilter());
+  // Rooms are live over Socket.IO (/socket.io, namespace /chat), shared across servers
+  // through Redis.
+  app.useWebSocketAdapter(new RedisIoAdapter(app));
 
   if (options.swagger ?? config.get('SWAGGER_ENABLED')) {
     setupSwagger(app);

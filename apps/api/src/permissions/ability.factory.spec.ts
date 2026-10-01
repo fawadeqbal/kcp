@@ -179,6 +179,268 @@ describe('permission matrix', () => {
         expect(abilityFor(role).can('read', 'Content')).toBe(false);
       }
     });
+
+    it('lets content creators and admins translate in the studio, and no one else', () => {
+      for (const role of [ROLE_KEYS.CONTENT_CREATOR, ROLE_KEYS.ADMIN]) {
+        for (const action of ['create', 'read', 'update'] as const) {
+          expect(abilityFor(role).can(action, 'ContentText')).toBe(true);
+        }
+      }
+      expect(abilityFor(ROLE_KEYS.CONTENT_CREATOR).can('delete', 'ContentText')).toBe(false);
+      for (const role of [
+        ROLE_KEYS.STUDENT,
+        ROLE_KEYS.PARENT,
+        ROLE_KEYS.MODERATOR,
+        ROLE_KEYS.MENTOR,
+        ROLE_KEYS.TEACHER,
+      ]) {
+        expect(abilityFor(role).can('read', 'ContentText')).toBe(false);
+      }
+    });
+
+    it('never shows content creators student data', () => {
+      const creator = abilityFor(ROLE_KEYS.CONTENT_CREATOR);
+      expect(creator.can('read', subject('User', { id: 'a-student', roleKey: 'student' }))).toBe(
+        false,
+      );
+      for (const target of ['Child', 'Submission', 'Project', 'Feedback'] as const) {
+        expect(creator.can('read', target)).toBe(false);
+      }
+    });
+  });
+
+  describe('mentor reviews', () => {
+    const mine = subject('Review', { studentId: ME, parentIds: [] });
+    const myChilds = subject('Review', { studentId: 'child-1', parentIds: [ME] });
+    const anothers = subject('Review', { studentId: 'child-2', parentIds: [OTHER_PARENT] });
+
+    it('lets mentors review and keep notes, and see only their own profile', () => {
+      const mentor = abilityFor(ROLE_KEYS.MENTOR);
+      expect(mentor.can('read', anothers)).toBe(true);
+      expect(mentor.can('update', anothers)).toBe(true);
+      expect(mentor.can('create', 'MentorNote')).toBe(true);
+      expect(mentor.can('read', subject('MentorProfile', { userId: ME }))).toBe(true);
+      expect(mentor.can('read', subject('MentorProfile', { userId: 'another-mentor' }))).toBe(
+        false,
+      );
+      expect(mentor.can('update', subject('MentorProfile', { userId: ME }), 'codeOfConduct')).toBe(
+        true,
+      );
+      expect(
+        mentor.can('update', subject('MentorProfile', { userId: ME }), 'backgroundCheck'),
+      ).toBe(false);
+      // Mentors never see accounts, families or payments.
+      for (const target of ['Child', 'Billing', 'Payment', 'ConsentRecord'] as const) {
+        expect(mentor.can('read', target)).toBe(false);
+      }
+    });
+
+    it('lets students read their own reviews and parents their children’s', () => {
+      expect(abilityFor(ROLE_KEYS.STUDENT).can('read', mine)).toBe(true);
+      expect(abilityFor(ROLE_KEYS.STUDENT).can('read', anothers)).toBe(false);
+      expect(abilityFor(ROLE_KEYS.STUDENT).can('update', mine)).toBe(false);
+      expect(abilityFor(ROLE_KEYS.PARENT).can('read', myChilds)).toBe(true);
+      expect(abilityFor(ROLE_KEYS.PARENT).can('read', anothers)).toBe(false);
+      for (const role of [ROLE_KEYS.STUDENT, ROLE_KEYS.PARENT]) {
+        expect(abilityFor(role).can('read', 'MentorNote')).toBe(false);
+      }
+    });
+
+    it('lets admins run mentors’ onboarding but not read their notes', () => {
+      const admin = abilityFor(ROLE_KEYS.ADMIN);
+      expect(admin.can('update', 'MentorProfile')).toBe(true);
+      expect(admin.can('read', 'Review')).toBe(true);
+      expect(admin.can('update', 'Review')).toBe(false);
+      expect(admin.can('read', 'MentorNote')).toBe(false);
+      for (const role of [ROLE_KEYS.MODERATOR, ROLE_KEYS.CONTENT_CREATOR, ROLE_KEYS.TEACHER]) {
+        expect(abilityFor(role).can('read', 'Review')).toBe(false);
+      }
+    });
+  });
+
+  describe('verified parental consent (under 13)', () => {
+    it('lets admins check signed forms and set the methods per country', () => {
+      const admin = abilityFor(ROLE_KEYS.ADMIN);
+      expect(admin.can('read', 'ParentalConsent')).toBe(true);
+      expect(admin.can('update', 'ParentalConsent')).toBe(true);
+      expect(admin.can('update', 'Country', 'under13ConsentMethods')).toBe(true);
+      for (const role of [
+        ROLE_KEYS.STUDENT,
+        ROLE_KEYS.PARENT,
+        ROLE_KEYS.MENTOR,
+        ROLE_KEYS.TEACHER,
+        ROLE_KEYS.MODERATOR,
+        ROLE_KEYS.CONTENT_CREATOR,
+      ]) {
+        expect(abilityFor(role).can('read', 'ParentalConsent')).toBe(false);
+        expect(abilityFor(role).can('update', 'Country', 'under13ConsentMethods')).toBe(false);
+      }
+    });
+  });
+
+  describe('friends', () => {
+    const ours = subject('Friendship', { userIds: [ME, 'child-9'], parentIds: [] });
+    const myChilds = subject('Friendship', {
+      userIds: ['child-1', 'child-9'],
+      parentIds: [ME, OTHER_PARENT],
+    });
+    const others = subject('Friendship', {
+      userIds: ['child-2', 'child-9'],
+      parentIds: [OTHER_PARENT],
+    });
+
+    it('lets students ask, see and end only their own friendships', () => {
+      const student = abilityFor(ROLE_KEYS.STUDENT);
+      expect(student.can('create', 'Friendship')).toBe(true);
+      expect(student.can('read', ours)).toBe(true);
+      expect(student.can('delete', ours)).toBe(true);
+      expect(student.can('read', others)).toBe(false);
+      expect(student.can('update', ours)).toBe(false);
+    });
+
+    it('lets parents decide only for their own children', () => {
+      const parent = abilityFor(ROLE_KEYS.PARENT);
+      expect(parent.can('update', myChilds)).toBe(true);
+      expect(parent.can('delete', myChilds)).toBe(true);
+      expect(parent.can('update', others)).toBe(false);
+      expect(parent.can('read', others)).toBe(false);
+      expect(parent.can('create', 'Friendship')).toBe(false);
+    });
+
+    it('lets moderators and admins end a reported friendship, and no one else', () => {
+      for (const role of [ROLE_KEYS.MODERATOR, ROLE_KEYS.ADMIN]) {
+        expect(abilityFor(role).can('delete', others)).toBe(true);
+        expect(abilityFor(role).can('create', 'Friendship')).toBe(false);
+      }
+      for (const role of [ROLE_KEYS.MENTOR, ROLE_KEYS.TEACHER, ROLE_KEYS.CONTENT_CREATOR]) {
+        expect(abilityFor(role).can('read', 'Friendship')).toBe(false);
+      }
+    });
+  });
+
+  describe('hackathons', () => {
+    const myTeam = subject('EventTeam', { memberIds: [ME], parentIds: [], mentorId: null });
+    const childTeam = subject('EventTeam', {
+      memberIds: ['child-1'],
+      parentIds: [ME],
+      mentorId: null,
+    });
+    const mentored = subject('EventTeam', { memberIds: ['child-2'], parentIds: [], mentorId: ME });
+    const other = subject('EventTeam', {
+      memberIds: ['child-3'],
+      parentIds: [OTHER_PARENT],
+      mentorId: null,
+    });
+
+    it('lets students work in their own team, parents approve theirs, mentors review theirs', () => {
+      const student = abilityFor(ROLE_KEYS.STUDENT);
+      expect(student.can('read', 'Event')).toBe(true);
+      expect(student.can('create', 'Event')).toBe(false);
+      expect(student.can('update', myTeam)).toBe(true);
+      expect(student.can('read', other)).toBe(false);
+      const parent = abilityFor(ROLE_KEYS.PARENT);
+      expect(parent.can('update', childTeam)).toBe(true);
+      expect(parent.can('update', other)).toBe(false);
+      const mentor = abilityFor(ROLE_KEYS.MENTOR);
+      expect(mentor.can('update', mentored)).toBe(true);
+      expect(mentor.can('read', other)).toBe(false);
+      expect(mentor.can('create', 'EventScore')).toBe(true);
+      expect(student.can('create', 'EventScore')).toBe(false);
+    });
+
+    it('lets only admins run events', () => {
+      expect(abilityFor(ROLE_KEYS.ADMIN).can('create', 'Event')).toBe(true);
+      expect(abilityFor(ROLE_KEYS.ADMIN).can('update', other)).toBe(true);
+      expect(abilityFor(ROLE_KEYS.MODERATOR).can('read', other)).toBe(true);
+      expect(abilityFor(ROLE_KEYS.MODERATOR).can('update', 'Event')).toBe(false);
+    });
+  });
+
+  describe('schools and the readiness check', () => {
+    const myClass = subject('SchoolClass', { teacherId: ME, memberIds: [], parentIds: [] });
+    const joined = subject('SchoolClass', { teacherId: 't-2', memberIds: [ME], parentIds: [] });
+    const childClass = subject('SchoolClass', {
+      teacherId: 't-2',
+      memberIds: ['child-1'],
+      parentIds: [ME],
+    });
+    const otherClass = subject('SchoolClass', {
+      teacherId: 't-3',
+      memberIds: ['child-3'],
+      parentIds: [OTHER_PARENT],
+    });
+    const childPlace = subject('ClassMember', { userId: 'child-1', parentIds: [ME] });
+    const otherPlace = subject('ClassMember', { userId: 'child-3', parentIds: [OTHER_PARENT] });
+
+    it('lets teachers run their own classes only, students join, parents approve', () => {
+      const teacher = abilityFor(ROLE_KEYS.TEACHER);
+      expect(teacher.can('create', 'SchoolClass')).toBe(true);
+      expect(teacher.can('update', myClass)).toBe(true);
+      expect(teacher.can('read', otherClass)).toBe(false);
+      expect(teacher.can('read', subject('School', { teacherIds: [ME] }))).toBe(true);
+      expect(teacher.can('read', subject('School', { teacherIds: ['t-3'] }))).toBe(false);
+      const student = abilityFor(ROLE_KEYS.STUDENT);
+      expect(student.can('create', 'ClassMember')).toBe(true);
+      expect(student.can('read', joined)).toBe(true);
+      expect(student.can('read', otherClass)).toBe(false);
+      expect(student.can('create', 'SchoolClass')).toBe(false);
+      const parent = abilityFor(ROLE_KEYS.PARENT);
+      expect(parent.can('update', childPlace)).toBe(true);
+      expect(parent.can('update', otherPlace)).toBe(false);
+      expect(parent.can('read', childClass)).toBe(true);
+    });
+
+    it('keeps licences to staff, and readiness checks to the student and their parents', () => {
+      expect(abilityFor(ROLE_KEYS.ADMIN).can('update', 'School')).toBe(true);
+      expect(abilityFor(ROLE_KEYS.MODERATOR).can('update', 'School')).toBe(false);
+      expect(abilityFor(ROLE_KEYS.TEACHER).can('update', 'School')).toBe(false);
+      const mine = subject('ReadinessCheck', { studentId: ME, parentIds: [] });
+      const childs = subject('ReadinessCheck', { studentId: 'child-1', parentIds: [ME] });
+      const other = subject('ReadinessCheck', { studentId: 'child-3', parentIds: [OTHER_PARENT] });
+      expect(abilityFor(ROLE_KEYS.STUDENT).can('update', mine)).toBe(true);
+      expect(abilityFor(ROLE_KEYS.STUDENT).can('read', other)).toBe(false);
+      expect(abilityFor(ROLE_KEYS.PARENT).can('read', childs)).toBe(true);
+      expect(abilityFor(ROLE_KEYS.PARENT).can('read', other)).toBe(false);
+    });
+  });
+
+  describe('rooms and moderation', () => {
+    const mine = subject('Chat', { memberIds: [ME, 'child-9'], parentIds: [] });
+    const myChilds = subject('Chat', { memberIds: ['child-1'], parentIds: [ME] });
+    const others = subject('Chat', { memberIds: ['child-2'], parentIds: [OTHER_PARENT] });
+
+    it('lets students read and write only in their own rooms, and parents read their children’s', () => {
+      const student = abilityFor(ROLE_KEYS.STUDENT);
+      expect(student.can('read', mine)).toBe(true);
+      expect(student.can('create', mine)).toBe(true);
+      expect(student.can('read', others)).toBe(false);
+      expect(student.can('read', 'Moderation')).toBe(false);
+      const parent = abilityFor(ROLE_KEYS.PARENT);
+      expect(parent.can('read', myChilds)).toBe(true);
+      expect(parent.can('create', myChilds)).toBe(false);
+      expect(parent.can('read', others)).toBe(false);
+    });
+
+    it('gives moderators and admins the queue; only admins change the word list', () => {
+      for (const role of [ROLE_KEYS.MODERATOR, ROLE_KEYS.ADMIN]) {
+        const staff = abilityFor(role);
+        expect(staff.can('read', 'Moderation')).toBe(true);
+        expect(staff.can('update', 'Moderation')).toBe(true);
+        expect(staff.can('read', others)).toBe(true);
+        expect(staff.can('create', others)).toBe(false);
+        expect(staff.can('read', 'BlockedTerm')).toBe(true);
+      }
+      expect(abilityFor(ROLE_KEYS.MODERATOR).can('create', 'BlockedTerm')).toBe(false);
+      expect(abilityFor(ROLE_KEYS.ADMIN).can('create', 'BlockedTerm')).toBe(true);
+      for (const role of [ROLE_KEYS.MENTOR, ROLE_KEYS.TEACHER, ROLE_KEYS.CONTENT_CREATOR]) {
+        expect(abilityFor(role).can('read', 'Moderation')).toBe(false);
+      }
+      // Mentors and teachers write in the rooms they're members of.
+      for (const role of [ROLE_KEYS.MENTOR, ROLE_KEYS.TEACHER]) {
+        expect(abilityFor(role).can('create', mine)).toBe(true);
+        expect(abilityFor(role).can('read', others)).toBe(false);
+      }
+    });
   });
 
   describe('certificates and the waitlist', () => {

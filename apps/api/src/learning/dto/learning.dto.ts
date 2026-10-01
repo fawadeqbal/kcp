@@ -44,6 +44,51 @@ export class CodeFilesDto {
   @IsString()
   @MaxLength(MAX_CODE_FILE_LENGTH)
   py?: string;
+
+  /** Explorer lessons: the block program, as JSON (see packages/checks, stage). */
+  @IsOptional()
+  @IsString()
+  @MaxLength(MAX_CODE_FILE_LENGTH)
+  blocks?: string;
+
+  /** Git lessons: the steps taken in the practice repository, as JSON (packages/checks, git). */
+  @IsOptional()
+  @IsString()
+  @MaxLength(MAX_CODE_FILE_LENGTH)
+  git?: string;
+}
+
+/** A git lesson's practice repository at the start (see GitSetup in packages/checks). */
+export class GitSetupDto {
+  /** The folder's files: path → content. */
+  files!: Record<string, string>;
+  /** Steps already taken before the student starts: { run } | { write, content } | { remove }. */
+  setup?: Record<string, string>[];
+}
+
+/** An Explorer level: where Bit plays (see StageLevel in packages/checks). */
+export class StageDto {
+  mode!: 'maze' | 'game';
+  /** Rows, top to bottom: "#" wall, "." floor, "S" start, "G" flag, "*" gem, "T" star. */
+  map!: string[];
+  /** The blocks in the toolbox, in order. */
+  toolbox!: (
+    | 'when-run'
+    | 'when-key'
+    | 'when-star'
+    | 'move'
+    | 'collect'
+    | 'say'
+    | 'repeat'
+    | 'until-goal'
+    | 'if'
+    | 'if-else'
+    | 'score'
+    | 'star'
+  )[];
+  theme?: 'meadow' | 'space' | 'sea';
+  /** Games: seconds per round. */
+  seconds?: number;
 }
 
 export class SaveDraftDto {
@@ -118,6 +163,9 @@ export class ModuleDto {
 export class TrackDto {
   id!: string;
   title!: string;
+  /** Ages the track is made for (Explorer: 9–12), or null for everyone. */
+  ageFrom!: number | null;
+  ageTo!: number | null;
   modules!: ModuleDto[];
 }
 
@@ -149,11 +197,15 @@ export class ChallengeDto {
   title!: string;
   /** Markdown. */
   instructions!: string;
-  type!: 'HTML' | 'CSS' | 'JS' | 'PYTHON';
+  type!: 'HTML' | 'CSS' | 'JS' | 'PYTHON' | 'BLOCKS' | 'GIT';
   xp!: number;
   /** The editor tabs, in order. */
-  files!: ('html' | 'css' | 'js' | 'py')[];
+  files!: ('html' | 'css' | 'js' | 'py' | 'blocks' | 'git')[];
   starter!: CodeFilesDto;
+  /** BLOCKS: the level. */
+  stage!: StageDto | null;
+  /** GIT: the practice repository. */
+  repo!: GitSetupDto | null;
   /** Checks for the browser sandbox (see packages/checks). */
   checks!: Record<string, unknown>[];
   /** Hint texts by key, in the requested language with English filling gaps. */

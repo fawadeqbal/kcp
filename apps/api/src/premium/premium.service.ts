@@ -90,7 +90,12 @@ export class PremiumService {
       startsAt: row.startsAt,
       endsAt: row.endsAt,
       revokedAt: row.revokedAt,
-      grantedBy: row.grantedBy.displayName ?? row.grantedBy.email,
+      // Grants the platform gave (referral rewards) have no staff member.
+      grantedBy: row.grantedBy
+        ? (row.grantedBy.displayName ?? row.grantedBy.email)
+        : row.source === 'REFERRAL'
+          ? 'Referral reward'
+          : null,
       active: !row.revokedAt && row.startsAt <= now && row.endsAt > now,
     };
   }

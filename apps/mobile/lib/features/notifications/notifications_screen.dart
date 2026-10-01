@@ -8,6 +8,7 @@ import '../../l10n/app_localizations.dart';
 import '../../l10n/badge_texts.g.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common.dart';
+import '../social/social_data.dart';
 
 final notificationsProvider = FutureProvider.autoDispose<NotificationListDto>((ref) async {
   final api = ref.watch(apiProvider);
@@ -141,7 +142,63 @@ String describeNotification(BuildContext context, String language, NotificationD
         _str(d['nickname']),
         _titleIn(d['moduleTitles'], language),
       );
+    case 'league_result':
+      final tier = leagueTierName(t, _str(d['tier']));
+      return d['outcome'] == 'PROMOTED'
+          ? t.notificationLeagueUp(tier)
+          : t.notificationLeagueDown(tier);
+    case 'friend_request':
+      return t.notificationFriendRequest(_str(d['nickname']), _str(d['friendNickname']));
+    case 'friend_added':
+      return t.notificationFriendAdded(_str(d['nickname']));
+    case 'referral_rewarded':
+      return t.notificationReferralRewarded('${d['days'] ?? ''}');
+    case 'weekly_report':
+      return t.notificationWeeklyReport;
+    case 'chat_warning':
+      return t.notificationChatWarning;
+    case 'chat_muted':
+      return t.notificationChatMuted(_when(context, d['until']));
+    case 'child_chat_action':
+      final nickname = _str(d['nickname']);
+      return switch (d['action']) {
+        'MUTE' => t.notificationChildChatMuted(nickname, _when(context, d['until'])),
+        'SUSPEND' => t.notificationChildChatSuspended(nickname),
+        _ => t.notificationChildChatWarned(nickname),
+      };
+    case 'chat_report_done':
+      return t.notificationChatReportDone;
+    case 'event_join_request':
+      return t.notificationEventJoinRequest(_str(d['nickname']), _str(d['team']), _str(d['event']));
+    case 'event_joined':
+      return t.notificationEventJoined(_str(d['team']), _str(d['event']));
+    case 'event_results':
+      return t.notificationEventResults(_str(d['event']));
+    case 'class_join_request':
+      return t.notificationClassJoinRequest(
+        _str(d['nickname']),
+        _str(d['className']),
+        _str(d['school']),
+      );
+    case 'class_joined':
+      return t.notificationClassJoined(_str(d['className']));
+    case 'assignment_new':
+      return t.notificationAssignmentNew(_str(d['className']));
+    case 'readiness_result':
+      return d['passed'] == true ? t.notificationReadinessPassed : t.notificationReadinessNotYet;
+    case 'child_readiness':
+      return d['passed'] == true
+          ? t.notificationChildReadinessPassed(_str(d['nickname']))
+          : t.notificationChildReadinessNotYet(_str(d['nickname']));
     default:
       return t.notificationOther;
   }
+}
+
+/// A moment in the notification's data, as the phone shows dates and times.
+String _when(BuildContext context, Object? value) {
+  final at = DateTime.tryParse(_str(value))?.toLocal();
+  if (at == null) return '';
+  final l = MaterialLocalizations.of(context);
+  return '${l.formatMediumDate(at)} ${l.formatTimeOfDay(TimeOfDay.fromDateTime(at))}';
 }

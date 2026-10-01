@@ -1,0 +1,29 @@
+id: explorer-m01-l04-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: When do the blocks inside "if there is a gem here" run?
+  ar: متى تعمل المكعبات داخل «إذا توجد جوهرة هنا»؟
+  ur: '"اگر یہاں جوہر ہے" کے اندر والے بلاکس کب چلتے ہیں؟'
+options:
+  - id: a
+    text:
+      en: Only when Bit is standing on a gem.
+      ar: فقط عندما يقف بِت فوق جوهرة.
+      ur: صرف تب جب بِٹ کسی جوہر پر کھڑا ہو۔
+  - id: b
+    text:
+      en: Every time, no matter what.
+      ar: في كل مرة، مهما حدث.
+      ur: ہر بار، چاہے کچھ بھی ہو۔
+  - id: c
+    text:
+      en: Never.
+      ar: أبدًا.
+      ur: کبھی نہیں۔
+answer: a
+explanation:
+  en: '"if" checks first. Its blocks run only when the answer is yes.'
+  ar: «إذا» يتحقق أولًا. مكعباته تعمل فقط عندما يكون الجواب نعم.
+  ur: '"اگر" پہلے دیکھتا ہے۔ اس کے بلاکس صرف تب چلتے ہیں جب جواب ہاں ہو۔'

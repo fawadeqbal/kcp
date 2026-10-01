@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../database/prisma.service.js';
 import type { AuthUser } from '../permissions/auth-user.js';
 import { Authenticated, CurrentUser } from '../permissions/permission.decorators.js';
-import { EmailPreferencesDto } from './family-emails.dto.js';
+import { EmailPreferencesDto, UpdateEmailPreferencesDto } from './family-emails.dto.js';
 
 /** Which optional emails a parent gets (receipts and security emails always go). */
 @ApiTags('account')
@@ -27,23 +27,33 @@ export class FamilyEmailsController {
     this.assertAdult(user);
     const account = await this.prisma.user.findUniqueOrThrow({
       where: { id: user.id },
-      select: { monthlySummaryEmails: true },
+      select: { monthlySummaryEmails: true, weeklyReportEmails: true },
     });
-    return { monthlySummary: account.monthlySummaryEmails };
+    return {
+      monthlySummary: account.monthlySummaryEmails,
+      weeklyReport: account.weeklyReportEmails,
+    };
   }
 
   @Put()
   @Authenticated()
   @ApiOkResponse({ type: EmailPreferencesDto })
   async update(
-    @Body() dto: EmailPreferencesDto,
+    @Body() dto: UpdateEmailPreferencesDto,
     @CurrentUser() user: AuthUser,
   ): Promise<EmailPreferencesDto> {
     this.assertAdult(user);
-    await this.prisma.user.update({
+    const account = await this.prisma.user.update({
       where: { id: user.id },
-      data: { monthlySummaryEmails: dto.monthlySummary },
+      data: {
+        ...(dto.monthlySummary === undefined ? {} : { monthlySummaryEmails: dto.monthlySummary }),
+        ...(dto.weeklyReport === undefined ? {} : { weeklyReportEmails: dto.weeklyReport }),
+      },
+      select: { monthlySummaryEmails: true, weeklyReportEmails: true },
     });
-    return { monthlySummary: dto.monthlySummary };
+    return {
+      monthlySummary: account.monthlySummaryEmails,
+      weeklyReport: account.weeklyReportEmails,
+    };
   }
 }

@@ -10,13 +10,15 @@ Kids Coding Platform is built for children, so safety comes first in everything 
 
 - Only a parent or guardian can create a child's account. Children never sign up on their own.
 - The parent chooses the child's nickname, avatar and password, and can change them, reset the password or delete the account at any time.
-- For now, child accounts are for ages 13 to 16. Younger children will join once a stronger parental consent process is ready.
+- Child accounts are for ages 13 to 16. Where we have switched it on in your country, children from 9 to 12 can join too, once a parent confirms with a verified consent step (a small card check, a signed form, or an email confirmation).
 
 ## Children stay anonymous
 
 - Other people only ever see a **nickname** and one of our **preset avatars**. Never a real name, photo, school or exact location.
 - Our nickname check blocks names that look like real names, rude words, links and phone numbers.
-- There is **no chat** of any kind: children can't message each other, and no adult can message a child.
+- There are **no private messages**: no adult can message a child, and children can't message each other one to one. Children talk only in **team rooms**, for a team, class or event they are part of. Under-13s send ready-made phrases only; from 13, typed messages pass a filter that blocks links, phone numbers, email addresses, other apps and unkind words. Parents can read their child's rooms, anyone in a room can report a message, and moderators deal with every report. Room messages are deleted after 90 days.
+- **Hackathons** are team events for older students. A parent approves each child's place in a team. Teams build in a private repository that only the team, its mentor (an adult whose background check passed), the judges and our staff can open, and talk in their moderated team room. Only nicknames appear in the team's work, and our staff can take a student out of a team at any time.
+- **Teachers** are adults our team adds for a school with an agreement with us; they sign in with two-factor codes. They see nicknames only, and a child joins a class only once a parent approves. Teachers and classmates talk in a moderated class room, never privately.
 
 ## Sharing is off until a parent turns it on
 
@@ -42,13 +44,15 @@ Tell us straight away with the **Feedback** button (at the bottom of every page 
 
 - وليّ الأمر وحده يستطيع إنشاء حساب للطفل. لا يسجّل الأطفال بأنفسهم أبدًا.
 - يختار وليّ الأمر الاسم المستعار للطفل وصورته الرمزية وكلمة مروره، ويستطيع تغييرها أو إعادة تعيين كلمة المرور أو حذف الحساب في أي وقت.
-- حاليًا، حسابات الأطفال متاحة للأعمار من 13 إلى 16 سنة. سينضم الأطفال الأصغر عندما تصبح إجراءات موافقة الأهل الأقوى جاهزة.
+- حسابات الأطفال متاحة للأعمار من 13 إلى 16 سنة. وحيث نفعّل ذلك في بلدك، يمكن للأطفال من 9 إلى 12 سنة الانضمام أيضًا بعد أن يؤكد وليّ الأمر موافقته بخطوة تحقق (فحص بطاقة بسيط، أو نموذج موقّع، أو تأكيد بالبريد الإلكتروني).
 
 ## يبقى الأطفال مجهولي الهوية
 
 - لا يرى الآخرون إلا **اسمًا مستعارًا** وإحدى **صورنا الرمزية الجاهزة**. لا اسم حقيقي ولا صورة ولا مدرسة ولا موقع دقيق أبدًا.
 - يمنع فحص الأسماء المستعارة الأسماءَ التي تشبه الأسماء الحقيقية والكلمات المسيئة والروابط وأرقام الهواتف.
-- **لا توجد دردشة** من أي نوع: لا يستطيع الأطفال مراسلة بعضهم، ولا يستطيع أي بالغ مراسلة طفل.
+- **لا توجد رسائل خاصة**: لا يستطيع أي بالغ مراسلة طفل، ولا يستطيع الأطفال مراسلة بعضهم على انفراد. يتحدث الأطفال فقط في **غرف الفرق** الخاصة بفريق أو صف أو فعالية يشاركون فيها. من هم دون 13 سنة يرسلون عبارات جاهزة فقط، ومن عمر 13 تمرّ الرسائل المكتوبة عبر مرشّح يمنع الروابط وأرقام الهواتف وعناوين البريد الإلكتروني والتطبيقات الأخرى والكلمات المسيئة. يستطيع الأهل قراءة غرف أطفالهم، ويستطيع أي عضو في الغرفة الإبلاغ عن رسالة، ويتعامل المشرفون مع كل بلاغ. تُحذف رسائل الغرف بعد 90 يومًا.
+- **الهاكاثونات** فعاليات جماعية للطلاب الأكبر سنًا. يوافق أحد الوالدين على مكان كل طفل في الفريق. تبني الفرق في مستودع خاص لا يفتحه إلا الفريق ومرشده (شخص بالغ اجتاز التحقق من خلفيته) والحكّام وفريقنا، وتتحدث في غرفة فريقها الخاضعة للإشراف. لا تظهر في عمل الفريق إلا الأسماء المستعارة، ويستطيع فريقنا إخراج أي طالب من فريق في أي وقت.
+- **المعلّمون** بالغون يضيفهم فريقنا لمدرسة لديها اتفاق معنا، ويسجّلون الدخول برموز التحقق بخطوتين. لا يرون إلا الأسماء المستعارة، ولا ينضم الطفل إلى صف إلا بعد موافقة أحد والديه. يتحدث المعلّمون وزملاء الصف في غرفة صف خاضعة للإشراف، وليس بشكل خاص أبدًا.
 
 ## المشاركة مغلقة حتى يفعّلها وليّ الأمر
 
@@ -74,13 +78,15 @@ Kids Coding Platform بچوں کے لیے بنایا گیا ہے، اس لیے �
 
 - صرف والدین یا سرپرست ہی بچے کا اکاؤنٹ بنا سکتے ہیں۔ بچے کبھی خود سائن اپ نہیں کرتے۔
 - والدین بچے کا فرضی نام، اوتار اور پاس ورڈ چنتے ہیں، اور کسی بھی وقت انہیں بدل سکتے ہیں، پاس ورڈ نیا کر سکتے ہیں یا اکاؤنٹ حذف کر سکتے ہیں۔
-- فی الحال بچوں کے اکاؤنٹس 13 سے 16 سال کی عمر کے لیے ہیں۔ چھوٹے بچے اس وقت شامل ہوں گے جب والدین کی رضامندی کا زیادہ مضبوط طریقہ تیار ہو جائے گا۔
+- بچوں کے اکاؤنٹس 13 سے 16 سال کی عمر کے لیے ہیں۔ جہاں ہم نے آپ کے ملک میں اسے فعال کیا ہے، وہاں 9 سے 12 سال کے بچے بھی شامل ہو سکتے ہیں، جب والدین تصدیق شدہ رضامندی کا ایک مرحلہ مکمل کر لیں (کارڈ کی چھوٹی سی جانچ، دستخط شدہ فارم، یا ای میل کے ذریعے تصدیق)۔
 
 ## بچے گمنام رہتے ہیں
 
 - دوسرے لوگ صرف ایک **فرضی نام** اور ہمارے **تیار اوتاروں** میں سے ایک دیکھتے ہیں۔ کبھی اصلی نام، تصویر، اسکول یا صحیح مقام نہیں۔
 - ہماری فرضی نام کی جانچ اصلی ناموں جیسے نام، نامناسب الفاظ، لنکس اور فون نمبر روکتی ہے۔
-- کسی بھی قسم کی **چیٹ نہیں**: بچے ایک دوسرے کو پیغام نہیں بھیج سکتے، اور کوئی بالغ کسی بچے کو پیغام نہیں بھیج سکتا۔
+- **کوئی نجی پیغامات نہیں**: کوئی بالغ کسی بچے کو پیغام نہیں بھیج سکتا، اور بچے ایک دوسرے کو الگ سے پیغام نہیں بھیج سکتے۔ بچے صرف **ٹیم رومز** میں بات کرتے ہیں، جو اس ٹیم، کلاس یا ایونٹ کے ہوتے ہیں جس کا وہ حصہ ہیں۔ 13 سال سے کم عمر بچے صرف تیار جملے بھیجتے ہیں؛ 13 سال سے لکھے گئے پیغامات ایک فلٹر سے گزرتے ہیں جو لنکس، فون نمبر، ای میل ایڈریس، دوسری ایپس اور برے الفاظ روکتا ہے۔ والدین اپنے بچے کے رومز پڑھ سکتے ہیں، روم کا کوئی بھی ممبر پیغام کی رپورٹ کر سکتا ہے، اور ماڈریٹرز ہر رپورٹ پر کارروائی کرتے ہیں۔ رومز کے پیغامات 90 دن بعد حذف ہو جاتے ہیں۔
+- **ہیکاتھون** بڑی عمر کے طلبہ کے لیے ٹیم ایونٹس ہیں۔ والدین ٹیم میں ہر بچے کی جگہ منظور کرتے ہیں۔ ٹیمیں ایک نجی ریپوزٹری میں بناتی ہیں جسے صرف ٹیم، اس کا مینٹور (ایک بالغ جس کی بیک گراؤنڈ چیک پاس ہو چکی ہو)، جج اور ہمارا عملہ کھول سکتے ہیں، اور اپنے نگرانی والے ٹیم روم میں بات کرتی ہیں۔ ٹیم کے کام میں صرف فرضی نام نظر آتے ہیں، اور ہمارا عملہ کسی بھی وقت کسی طالب علم کو ٹیم سے نکال سکتا ہے۔
+- **اساتذہ** وہ بالغ ہیں جنہیں ہماری ٹیم ہمارے ساتھ معاہدے والے اسکول کے لیے شامل کرتی ہے؛ وہ دو مرحلہ کوڈ سے سائن ان کرتے ہیں۔ وہ صرف فرضی نام دیکھتے ہیں، اور بچہ والدین کی منظوری کے بعد ہی کلاس میں شامل ہوتا ہے۔ اساتذہ اور ہم جماعت نگرانی والے کلاس روم میں بات کرتے ہیں، کبھی نجی طور پر نہیں۔
 
 ## شیئرنگ بند رہتی ہے جب تک والدین اسے آن نہ کریں
 

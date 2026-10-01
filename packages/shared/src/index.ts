@@ -38,6 +38,14 @@ export const CHILD_MAX_AGE = 16;
 export const PARENTAL_CONSENT_AGE = 13;
 
 /**
+ * Whether a child born in `birthYear` may be under 13 today (we only know the year,
+ * so a child who turns 13 this year counts as under 13 until next year).
+ */
+export function mayBeUnder13(birthYear: number, currentYear: number): boolean {
+  return currentYear - birthYear <= PARENTAL_CONSENT_AGE;
+}
+
+/**
  * We only store the birth year (data minimisation), so ages are known to within a
  * year. The years a parent can pick are chosen so that no child can be younger than
  * the limit — and, while under-13 accounts are closed, no child can be under 13.
@@ -85,6 +93,63 @@ export function isAvatarKey(value: string): value is AvatarKey {
   return (AVATAR_KEYS as readonly string[]).includes(value);
 }
 
+// ── Younger children: picture passwords and signing in with a parent's phone ──
+
+/**
+ * The twelve pictures of a picture password (their icons are in packages/ui). A
+ * picture password is four of them in order, repeats allowed; the parent sets it.
+ */
+export const PICTURE_KEYS = [
+  'cat',
+  'dog',
+  'fish',
+  'bird',
+  'rabbit',
+  'sun',
+  'moon',
+  'star',
+  'tree',
+  'flower',
+  'apple',
+  'car',
+] as const;
+export type PictureKey = (typeof PICTURE_KEYS)[number];
+export const PICTURE_PASSWORD_LENGTH = 4;
+/** Wrong picture passwords in a row before the picture password is locked for a while. */
+export const PICTURE_MAX_FAILURES = 5;
+export const PICTURE_LOCK_MINUTES = 60;
+
+export function isPictureKey(value: string): value is PictureKey {
+  return (PICTURE_KEYS as readonly string[]).includes(value);
+}
+
+/**
+ * The code a child's device shows to be signed in from a parent's phone: letters and
+ * digits that can't be mixed up (no 0/O, 1/I/L), in two groups, e.g. "K7MQ-4XPR".
+ */
+export const PAIRING_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+export const PAIRING_CODE_LENGTH = 8;
+export const PAIRING_MINUTES = 10;
+
+/** "k7mq 4xpr" → "K7MQ4XPR" (what the parent typed, or read from the QR code). */
+export function normalizePairingCode(value: string): string {
+  return value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+}
+
+// ── Verified parental consent (under 13) ─────────────────────────────────────
+
+export const UNDER13_CONSENT_METHODS = ['CARD_CHECK', 'SIGNED_FORM', 'EMAIL_PLUS'] as const;
+export type Under13ConsentMethod = (typeof UNDER13_CONSENT_METHODS)[number];
+/** A signed consent form: a photo or scan, up to 5 MB. */
+export const CONSENT_FORM_TYPES = ['application/pdf', 'image/png', 'image/jpeg'] as const;
+export const CONSENT_FORM_MAX_BYTES = 5 * 1024 * 1024;
+/** A child account waiting for consent this long is deleted. */
+export const CONSENT_PENDING_DAYS = 30;
+/** Uploaded forms are deleted this long after staff decided. */
+export const CONSENT_FORM_KEEP_DAYS = 30;
+/** "Email plus": the second email goes this long after the parent confirmed. */
+export const EMAIL_PLUS_FOLLOW_UP_HOURS = 24;
+
 // ── Consent ──────────────────────────────────────────────────────────────────
 
 /** What a parent can switch on or off for each child. Both start off. */
@@ -94,7 +159,7 @@ export type ChildConsent = (typeof CHILD_CONSENTS)[number];
 // ── Code challenges ──────────────────────────────────────────────────────────
 
 /** Files a student can edit in a challenge: a web page (html, css, js) or a Python program (py). */
-export const CODE_FILE_KEYS = ['html', 'css', 'js', 'py'] as const;
+export const CODE_FILE_KEYS = ['html', 'css', 'js', 'py', 'blocks', 'git'] as const;
 export type CodeFileKey = (typeof CODE_FILE_KEYS)[number];
 
 /**
@@ -129,6 +194,131 @@ export type BoardPeriod = (typeof BOARD_PERIODS)[number];
 export const AREA_BOARD_MIN_STUDENTS = 20;
 /** Places kept from each finished week or season (the "Top 10" badge counts these). */
 export const BOARD_RESULTS_SIZE = 10;
+
+// ── Leagues and friends ──────────────────────────────────────────────────────
+
+/** League tiers, lowest first (StudentProfile.leagueTier is the index). */
+export const LEAGUE_TIERS = [
+  'bronze',
+  'silver',
+  'gold',
+  'sapphire',
+  'ruby',
+  'emerald',
+  'diamond',
+] as const;
+export type LeagueTier = (typeof LEAGUE_TIERS)[number];
+/** Students per league group (a new group opens when one is full). */
+export const LEAGUE_GROUP_SIZE = 30;
+/** How many move up from the top, and down from the bottom, when the week closes. */
+export const LEAGUE_PROMOTE = 5;
+export const LEAGUE_RELEGATE = 5;
+/** Smaller groups than this send no one down (a quiet week isn't a punishment). */
+export const LEAGUE_RELEGATE_MIN_GROUP = 12;
+/**
+ * Levels that compete together: a band is the index of the last start level at or
+ * below the student's level (levels 1–2, 3–5, 6–9, 10 and up).
+ */
+export const LEAGUE_LEVEL_BANDS = [1, 3, 6, 10] as const;
+
+export function leagueLevelBand(level: number): number {
+  let band = 0;
+  for (const [index, start] of LEAGUE_LEVEL_BANDS.entries()) if (level >= start) band = index;
+  return band;
+}
+
+export type LeagueOutcomeKey = 'PROMOTED' | 'STAYED' | 'RELEGATED';
+
+/**
+ * Where each place in a closed group goes (ranks start at 1). The top LEAGUE_PROMOTE
+ * with XP move up (not from the top tier); in groups of at least
+ * LEAGUE_RELEGATE_MIN_GROUP, the bottom LEAGUE_RELEGATE move down (not from the lowest
+ * tier, and never someone who is moving up).
+ */
+export function leagueOutcome(
+  rank: number,
+  groupSize: number,
+  tier: number,
+  xp: number,
+): LeagueOutcomeKey {
+  if (rank <= LEAGUE_PROMOTE && xp > 0 && tier < LEAGUE_TIERS.length - 1) return 'PROMOTED';
+  if (
+    groupSize >= LEAGUE_RELEGATE_MIN_GROUP &&
+    rank > groupSize - LEAGUE_RELEGATE &&
+    rank > LEAGUE_PROMOTE &&
+    tier > 0
+  ) {
+    return 'RELEGATED';
+  }
+  return 'STAYED';
+}
+
+/** Friend codes: easy to read out and type (no 0/O, 1/I/L). */
+export const FRIEND_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+export const FRIEND_CODE_LENGTH = 6;
+/** Most friends a student can have, and open requests they can send. */
+export const MAX_FRIENDS = 50;
+export const MAX_PENDING_FRIEND_REQUESTS = 10;
+/** Requests not approved by both parents in this many days expire. */
+export const FRIEND_REQUEST_DAYS = 14;
+
+/** "k7mq 4x" → "K7MQ4X". */
+export function normalizeFriendCode(value: string): string {
+  return value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+}
+
+// ── Referrals, activity, reports and skills ─────────────────────────────────
+
+/** Premium days each child of the inviting family gets when an invited family's child ships their first project. */
+export const REFERRAL_REWARD_DAYS = 14;
+/** Rewarded invitations per family in any 365 days. */
+export const REFERRAL_MAX_PER_YEAR = 5;
+export const REFERRAL_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+export const REFERRAL_CODE_LENGTH = 8;
+export const REFERRAL_CODE_PATTERN = /^[2-9A-HJ-NP-Z]{8}$/;
+
+/** The apps say "still learning" this often while a student works (seconds). */
+export const ACTIVITY_HEARTBEAT_SECONDS = 60;
+/** Most minutes counted for one day (a tab left open all day doesn't count). */
+export const MAX_ACTIVITY_MINUTES_PER_DAY = 240;
+
+/** Skill map groups (content/skills.yaml). */
+export const SKILL_CATEGORIES = ['logic', 'web', 'python', 'teamwork'] as const;
+export type SkillCategory = (typeof SKILL_CATEGORIES)[number];
+
+// ── Rooms (team, class and event chat) ─────────────────────────────────────
+
+/** Ready-made phrases: under-13s send only these; everyone can. Texts are in the apps' languages. */
+export const CHAT_PHRASES = [
+  'hello',
+  'thanks',
+  'great-job',
+  'lets-go',
+  'i-need-help',
+  'can-you-check',
+  'i-have-an-idea',
+  'my-part-is-done',
+  'good-idea',
+  'give-me-a-minute',
+  'yes',
+  'no',
+  'see-you',
+] as const;
+export type ChatPhrase = (typeof CHAT_PHRASES)[number];
+/** Students this age and older may also type (filtered) text. */
+export const CHAT_TEXT_MIN_AGE = 13;
+export const CHAT_MESSAGE_MAX_LENGTH = 300;
+/** Messages are deleted after this many days. */
+export const CHAT_RETENTION_DAYS = 90;
+export const CHAT_REPORT_REASONS = ['UNKIND', 'PERSONAL_INFO', 'SPAM', 'SCARY', 'OTHER'] as const;
+export type ChatReportReasonKey = (typeof CHAT_REPORT_REASONS)[number];
+/** How long a moderator can mute a student for (hours). */
+export const CHAT_MUTE_HOURS = [1, 24, 72, 168] as const;
+
+/** Whether a student of this birth year may type text (by the end of this year's birthday). */
+export function mayTypeInRooms(birthYear: number, currentYear: number): boolean {
+  return currentYear - birthYear >= CHAT_TEXT_MIN_AGE;
+}
 
 // ── Badges ───────────────────────────────────────────────────────────────────
 
@@ -297,3 +487,14 @@ export function familyPrice(
     totalMinor: unitMinor + extraUnitMinor * extraChildren,
   };
 }
+
+/**
+ * What mentors score in a review, from 1 to REVIEW_SCORE_MAX, by kind of review. Their
+ * names and descriptions are in the web messages (review.criteria.*).
+ */
+export const REVIEW_CRITERIA = {
+  PROJECT: ['works', 'code', 'design', 'creativity'],
+  READINESS: ['works', 'code', 'design', 'independence'],
+} as const;
+export type ReviewCriterion = (typeof REVIEW_CRITERIA)[keyof typeof REVIEW_CRITERIA][number];
+export const REVIEW_SCORE_MAX = 4;

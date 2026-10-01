@@ -18,12 +18,14 @@ import {
 import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
+import { BlocksChallenge } from '../explorer/blocks-challenge';
+import { GitChallenge } from '../pro/git-challenge';
 import { ChallengeWorkspace } from './challenge-workspace';
 import { LessonQuizzes } from './lesson-quizzes';
 import { Markdown } from './markdown';
 import { PremiumLocked } from './premium-locked';
 import { onTabKeyDown } from './tabs';
-import { type SaveState, useSaveText } from './workspace';
+import { type SaveState, useSaveText, WORKSPACE_PAGE_CLASS } from './workspace';
 import { useStreak, WorkspaceHeader } from './workspace-header';
 
 type Lesson = components['schemas']['LessonDto'];
@@ -179,7 +181,11 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
   ) : null;
 
   return (
-    <article className="flex min-h-dvh flex-1 flex-col xl:h-dvh">
+    <article
+      className={WORKSPACE_PAGE_CLASS}
+      // Block lessons (Explorer) get their own, brighter look.
+      data-mood={lesson.challenges.some((c) => c.type === 'BLOCKS') ? 'explorer' : undefined}
+    >
       <WorkspaceHeader
         context={`${t('lessonOf', {
           number: String(lesson.number),
@@ -229,7 +235,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
           />
         ) : null}
         {challenge && typeof view === 'number' ? (
-          <ChallengeWorkspace
+          <StepWorkspace
             key={challenge.id}
             challenge={challenge}
             kicker={`${t('step', { number: String(view + 1) })} · ${t('tryIt')}`}
@@ -259,7 +265,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
           />
         ) : null}
         {view === 'quiz' ? (
-          <div className="flex-1 overflow-y-auto px-4 pb-10 sm:px-6">
+          <div className="relative flex-1 overflow-y-auto px-4 pb-10 sm:px-6">
             <div className="mx-auto flex max-w-3xl flex-col gap-6 pt-4">
               {completion}
               <LessonQuizzes quizzes={lesson.quizzes} language={locale} textProps={text} />
@@ -268,6 +274,16 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
         ) : null}
       </div>
     </article>
+  );
+}
+
+/** A step's workspace: blocks and Bit's world for Explorer steps, else code and a preview. */
+function StepWorkspace(props: Parameters<typeof ChallengeWorkspace>[0]) {
+  if (props.challenge.type === 'GIT' && props.challenge.repo) return <GitChallenge {...props} />;
+  return props.challenge.type === 'BLOCKS' && props.challenge.stage ? (
+    <BlocksChallenge {...props} />
+  ) : (
+    <ChallengeWorkspace {...props} />
   );
 }
 
@@ -353,7 +369,7 @@ function IntroPanel({
   const t = useTranslations('lesson');
   const video = lesson.video ? videoUrl(lesson.video) : null;
   return (
-    <div className="flex-1 overflow-y-auto px-4 pb-10 sm:px-6">
+    <div className="relative flex-1 overflow-y-auto px-4 pb-10 sm:px-6">
       <div className="mx-auto flex max-w-3xl flex-col gap-5 pt-2">
         {completion}
         <p className="text-lg text-muted" {...textProps}>

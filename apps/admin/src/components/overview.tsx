@@ -4,12 +4,13 @@ import { Alert, buttonClass, Card, Icon, inputClass, PageSpinner } from '@kcp/ui
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { canOnAll } from '@/lib/ability';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { handOffSearch, useLoad } from '@/lib/hooks';
 import { RecentActivity } from './audit-entries';
-import { PageHeader } from './shell';
+import { firstPage, PageHeader } from './shell';
 
 function Stat({
   label,
@@ -75,6 +76,18 @@ function FindUser() {
 }
 
 export function Overview() {
+  const { state } = useAuth();
+  const router = useRouter();
+  const allowed = state.status === 'authenticated' && canOnAll(state.ability, 'read', 'User');
+  useEffect(() => {
+    // Staff who can't see accounts (content creators) start on their own first page.
+    if (state.status === 'authenticated' && !allowed) router.replace(firstPage(state.ability));
+  }, [state, allowed, router]);
+  if (!allowed) return <PageSpinner label="Loading" />;
+  return <OverviewPanel />;
+}
+
+function OverviewPanel() {
   const { state } = useAuth();
   const { data, error } = useLoad(() => api.GET('/v1/admin/overview'), 'overview');
   const canReadAudit = state.status === 'authenticated' && state.ability.can('read', 'AuditLog');

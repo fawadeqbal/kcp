@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:">
+<title>Explorer</title>
+<style>
+:root{--bg:#f5ead8;--surface:#ebddc5;--ink:#201e1d;--muted:#645c50;--primary:#1c6b62;--on-primary:#fffaf3;--line:rgba(32,30,29,.14)}
+body.dark{--bg:#1a1815;--surface:#25221e;--ink:#f2e8d8;--muted:#b9ae9c;--primary:#5cc4b5;--on-primary:#1a1815;--line:rgba(242,232,216,.13)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+#app{display:flex;flex-direction:column;height:100%}
+.tabs{display:flex;gap:4px;padding:8px;background:var(--surface)}
+.tabs button{flex:1;min-height:44px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:15px}
+.tabs button[aria-selected="true"]{background:var(--bg);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+main{position:relative;flex:1;min-height:0;display:flex}
+#blocks-pane,#stage-pane,#code-pane{position:relative;flex:1;min-width:0;min-height:0;display:none;flex-direction:column}
+#blocks{position:absolute;inset:0}
+body[data-view="blocks"] #blocks-pane,body[data-view="stage"] #stage-pane,body[data-view="code"] #code-pane{display:flex}
+#stage-pane{padding:12px;gap:12px;background:var(--surface)}
+#stage{flex:1;min-height:0}
+.buttons{display:flex;flex-wrap:wrap;gap:10px}
+.buttons button{min-height:48px;padding:0 22px;border-radius:999px;font:inherit;font-weight:800;font-size:16px;border:2px solid var(--primary);background:transparent;color:var(--primary)}
+.buttons #run{background:var(--primary);color:var(--on-primary)}
+#code-pane{padding:12px;gap:10px;overflow:auto}
+#code-pane p{margin:0;color:var(--muted)}
+#code-text{margin:0;padding:12px;border-radius:16px;background:var(--surface);direction:ltr;text-align:left;font:14px/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap}
+#too-many{position:absolute;inset-inline:8px;bottom:8px;margin:0;padding:8px 12px;border-radius:12px;background:#fbe8c4;color:#6b4508;font-weight:700}
+/* Tablets on their side: blocks and Bit's world next to each other. */
+@media (min-width:820px){
+  .tabs button[data-view="stage"]{display:none}
+  body[data-view="blocks"] #stage-pane,body[data-view="stage"] #blocks-pane,body[data-view="stage"] #stage-pane{display:flex}
+  #stage-pane{flex:0 0 42%}
+}
+</style>
+</head>
+<body data-view="blocks">
+<div id="app">
+  <div class="tabs" role="tablist">
+    <button id="tab-blocks" role="tab" data-view="blocks" aria-selected="true" aria-controls="blocks-pane">Blocks</button>
+    <button id="tab-stage" role="tab" data-view="stage" aria-selected="false" aria-controls="stage-pane" tabindex="-1">Stage</button>
+    <button id="tab-code" role="tab" data-view="code" aria-selected="false" aria-controls="code-pane" tabindex="-1">Code</button>
+  </div>
+  <main>
+    <section id="blocks-pane" role="tabpanel" aria-labelledby="tab-blocks"><div id="blocks"></div><p id="too-many" role="alert" hidden></p></section>
+    <section id="stage-pane" role="tabpanel" aria-labelledby="tab-stage">
+      <div id="stage"></div>
+      <div class="buttons"><button id="run" type="button">Run</button><button id="stop" type="button" hidden>Stop</button><button id="reset" type="button">Start over</button></div>
+    </section>
+    <section id="code-pane" role="tabpanel" aria-labelledby="tab-code"><p id="code-help"></p><pre id="code-text"></pre></section>
+  </main>
+</div>
+<script src="explorer.js"></script>
+</body>
+</html>

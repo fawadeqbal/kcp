@@ -1,5 +1,19 @@
-import { Prisma, type PrismaClient } from '@kcp/database';
+import {
+  challengeText,
+  type ContentEntityKey,
+  importDecision,
+  lessonText,
+  Prisma,
+  type PrismaClient,
+  projectText,
+  quizText,
+  type QuizTextSources,
+  textHash,
+} from '@kcp/database';
 import type { LoadedTrack } from './load.js';
+import type { SkillsFile } from './schema.js';
+
+type Tx = Prisma.TransactionClient;
 
 export interface ImportSummary {
   tracks: number;
@@ -12,10 +26,15 @@ export interface ImportSummary {
   deactivated: number;
   /** Modules imported for the first time (published, or waiting with --hold-new). */
   newModules: string[];
+  /**
+   * Texts published in the content studio that stayed live because their files didn't
+   * change (`pnpm content:export` writes them back into content/).
+   */
+  studioTexts: number;
 }
 
-const upper = (type: 'html' | 'css' | 'js' | 'python') =>
-  type.toUpperCase() as 'HTML' | 'CSS' | 'JS' | 'PYTHON';
+const upper = (type: 'html' | 'css' | 'js' | 'python' | 'blocks' | 'git') =>
+  type.toUpperCase() as 'HTML' | 'CSS' | 'JS' | 'PYTHON' | 'BLOCKS' | 'GIT';
 
 type QuizData = LoadedTrack['modules'][number]['lessons'][number]['quizzes'][number]['data'];
 
@@ -57,6 +76,99 @@ export interface ImportOptions {
    * already keep whatever staff chose.
    */
   holdNew?: boolean;
+  /** content/skills.yaml: written (and skills no longer listed switched off) when given. */
+  skills?: SkillsFile['skills'] | null;
+}
+
+/** Keeps a live text in the history. */
+function recordVersion(
+  tx: Tx,
+  entityType: ContentEntityKey,
+  entityId: string,
+  languageCode: string,
+  data: unknown,
+) {
+  return tx.contentVersion.create({
+    data: { entityType, entityId, languageCode, data: data as object, action: 'IMPORT' },
+  });
+}
+
+/**
+ * Writes one translated text the way the content studio expects: a file that didn't
+ * change since the last import leaves the live text alone (it may have been published
+ * in the studio since); a changed file goes live and into the history.
+ */
+async function syncText<T>(
+  tx: Tx,
+  entity: { type: ContentEntityKey; id: string; languageCode: string },
+  current: { source: 'IMPORT' | 'STUDIO'; importHash: string | null; data: unknown } | null,
+  data: T,
+  write: (
+    mode: 'create' | 'update' | 'rehash',
+    meta: { source: 'IMPORT'; importHash: string },
+  ) => Promise<unknown>,
+): Promise<'kept-studio' | 'written' | 'same'> {
+  const decision = importDecision(current, data);
+  if (decision === 'keep') return current?.source === 'STUDIO' ? 'kept-studio' : 'same';
+  await write(decision, { source: 'IMPORT', importHash: textHash(data) });
+  if (decision === 'rehash') return 'same';
+  await recordVersion(tx, entity.type, entity.id, entity.languageCode, data);
+  return 'written';
+}
+
+/**
+ * A quiz's texts after the import: each language from its file, unless the file didn't
+ * change and the studio published a newer text; studio-only languages stay.
+ */
+async function mergeQuizTexts(
+  tx: Tx,
+  quizId: string,
+  fileTexts: Record<string, unknown>,
+  count: (result: 'kept-studio' | 'written' | 'same') => void,
+) {
+  const current = await tx.quiz.findUnique({
+    where: { id: quizId },
+    select: { texts: true, textSources: true },
+  });
+  const liveTexts = (current?.texts ?? {}) as Record<string, unknown>;
+  const liveSources = (current?.textSources ?? {}) as QuizTextSources;
+  const texts: Record<string, unknown> = {};
+  const textSources: QuizTextSources = {};
+  for (const [language, meta] of Object.entries(liveSources)) {
+    if (meta.source === 'STUDIO' && !(language in fileTexts) && liveTexts[language]) {
+      texts[language] = liveTexts[language];
+      textSources[language] = meta;
+      count('kept-studio');
+    }
+  }
+  for (const [language, fileText] of Object.entries(fileTexts)) {
+    const data = quizText(fileText);
+    const live = liveTexts[language];
+    const meta = liveSources[language];
+    const result = await syncText(
+      tx,
+      { type: 'QUIZ', id: quizId, languageCode: language },
+      live
+        ? {
+            source: meta?.source ?? 'IMPORT',
+            importHash: meta?.importHash ?? null,
+            data: quizText(live),
+          }
+        : null,
+      data,
+      async (mode, written) => {
+        texts[language] = mode === 'rehash' ? live : data;
+        textSources[language] = written;
+      },
+    );
+    if (!(language in texts)) {
+      // Kept: the live text stays, with where it came from.
+      texts[language] = live;
+      textSources[language] = meta ?? { source: 'IMPORT', importHash: null };
+    }
+    count(result);
+  }
+  return { texts, textSources };
 }
 
 /**
@@ -104,6 +216,10 @@ export async function importContent(
     projects: 0,
     deactivated: 0,
     newModules: [],
+    studioTexts: 0,
+  };
+  const count = (result: 'kept-studio' | 'written' | 'same') => {
+    if (result === 'kept-studio') summary.studioTexts += 1;
   };
   const seen = {
     tracks: [] as string[],
@@ -120,8 +236,20 @@ export async function importContent(
         const t = track.data;
         await tx.track.upsert({
           where: { id: t.id },
-          create: { id: t.id, titles: t.titles, sortOrder: t.order },
-          update: { titles: t.titles, sortOrder: t.order, isActive: true },
+          create: {
+            id: t.id,
+            titles: t.titles,
+            sortOrder: t.order,
+            ageFrom: t.ages?.[0] ?? null,
+            ageTo: t.ages?.[1] ?? null,
+          },
+          update: {
+            titles: t.titles,
+            sortOrder: t.order,
+            ageFrom: t.ages?.[0] ?? null,
+            ageTo: t.ages?.[1] ?? null,
+            isActive: true,
+          },
         });
         seen.tracks.push(t.id);
 
@@ -152,6 +280,7 @@ export async function importContent(
               isPremium: p.isPremium,
               starter: p.starter,
               checks: p.checks,
+              stage: p.stage ?? Prisma.DbNull,
               isActive: true,
             };
             await tx.projectBrief.upsert({
@@ -160,15 +289,36 @@ export async function importContent(
               update: briefData,
             });
             seen.projects.push(p.id);
+            // Only imported texts go when their file goes: studio translations stay.
             await tx.projectBriefTranslation.deleteMany({
-              where: { briefId: p.id, languageCode: { notIn: Object.keys(mod.project.texts) } },
+              where: {
+                briefId: p.id,
+                source: 'IMPORT',
+                languageCode: { notIn: Object.keys(mod.project.texts) },
+              },
+            });
+            const briefRows = await tx.projectBriefTranslation.findMany({
+              where: { briefId: p.id },
             });
             for (const [languageCode, text] of Object.entries(mod.project.texts)) {
-              await tx.projectBriefTranslation.upsert({
-                where: { briefId_languageCode: { briefId: p.id, languageCode } },
-                create: { briefId: p.id, languageCode, ...text },
-                update: text,
-              });
+              const row = briefRows.find((r) => r.languageCode === languageCode);
+              const data = projectText(text);
+              count(
+                await syncText(
+                  tx,
+                  { type: 'PROJECT', id: p.id, languageCode },
+                  row
+                    ? { source: row.source, importHash: row.importHash, data: projectText(row) }
+                    : null,
+                  data,
+                  (mode, meta) =>
+                    tx.projectBriefTranslation.upsert({
+                      where: { briefId_languageCode: { briefId: p.id, languageCode } },
+                      create: { briefId: p.id, languageCode, ...data, ...meta },
+                      update: mode === 'rehash' ? meta : { ...data, ...meta },
+                    }),
+                ),
+              );
             }
           }
 
@@ -180,6 +330,7 @@ export async function importContent(
               sortOrder: l.order,
               xp: l.xp,
               isPremium: l.isPremium,
+              skills: l.skills,
               isActive: true,
             };
             await tx.lesson.upsert({
@@ -189,22 +340,39 @@ export async function importContent(
             });
             seen.lessons.push(l.id);
             await tx.lessonTranslation.deleteMany({
-              where: { lessonId: l.id, languageCode: { notIn: Object.keys(lesson.texts) } },
+              where: {
+                lessonId: l.id,
+                source: 'IMPORT',
+                languageCode: { notIn: Object.keys(lesson.texts) },
+              },
             });
+            const lessonRows = await tx.lessonTranslation.findMany({ where: { lessonId: l.id } });
             for (const [languageCode, text] of Object.entries(lesson.texts)) {
               const video = l.video?.[languageCode];
-              const translation = {
+              const translation = lessonText({
                 title: text.title,
                 summary: text.summary,
                 body: text.body,
                 videoProvider: video?.provider ?? null,
                 videoId: video?.id ?? null,
-              };
-              await tx.lessonTranslation.upsert({
-                where: { lessonId_languageCode: { lessonId: l.id, languageCode } },
-                create: { lessonId: l.id, languageCode, ...translation },
-                update: translation,
               });
+              const row = lessonRows.find((r) => r.languageCode === languageCode);
+              count(
+                await syncText(
+                  tx,
+                  { type: 'LESSON', id: l.id, languageCode },
+                  row
+                    ? { source: row.source, importHash: row.importHash, data: lessonText(row) }
+                    : null,
+                  translation,
+                  (mode, meta) =>
+                    tx.lessonTranslation.upsert({
+                      where: { lessonId_languageCode: { lessonId: l.id, languageCode } },
+                      create: { lessonId: l.id, languageCode, ...translation, ...meta },
+                      update: mode === 'rehash' ? meta : { ...translation, ...meta },
+                    }),
+                ),
+              );
             }
 
             for (const challenge of lesson.challenges) {
@@ -216,6 +384,8 @@ export async function importContent(
                 xp: c.xp,
                 starter: c.starter,
                 checks: c.checks,
+                stage: c.stage ?? Prisma.DbNull,
+                repo: c.repo ?? Prisma.DbNull,
                 isActive: true,
               };
               await tx.challenge.upsert({
@@ -225,19 +395,40 @@ export async function importContent(
               });
               seen.challenges.push(c.id);
               await tx.challengeTranslation.deleteMany({
-                where: { challengeId: c.id, languageCode: { notIn: Object.keys(challenge.texts) } },
+                where: {
+                  challengeId: c.id,
+                  source: 'IMPORT',
+                  languageCode: { notIn: Object.keys(challenge.texts) },
+                },
+              });
+              const challengeRows = await tx.challengeTranslation.findMany({
+                where: { challengeId: c.id },
               });
               for (const [languageCode, text] of Object.entries(challenge.texts)) {
-                await tx.challengeTranslation.upsert({
-                  where: { challengeId_languageCode: { challengeId: c.id, languageCode } },
-                  create: { challengeId: c.id, languageCode, ...text },
-                  update: text,
-                });
+                const data = challengeText(text);
+                const row = challengeRows.find((r) => r.languageCode === languageCode);
+                count(
+                  await syncText(
+                    tx,
+                    { type: 'CHALLENGE', id: c.id, languageCode },
+                    row
+                      ? { source: row.source, importHash: row.importHash, data: challengeText(row) }
+                      : null,
+                    data,
+                    (mode, meta) =>
+                      tx.challengeTranslation.upsert({
+                        where: { challengeId_languageCode: { challengeId: c.id, languageCode } },
+                        create: { challengeId: c.id, languageCode, ...data, ...meta },
+                        update: mode === 'rehash' ? meta : { ...data, ...meta },
+                      }),
+                  ),
+                );
               }
             }
 
             for (const quiz of lesson.quizzes) {
               const q = quiz.data;
+              const { texts, textSources } = await mergeQuizTexts(tx, q.id, quizTexts(q), count);
               const quizData = {
                 lessonId: l.id,
                 sortOrder: q.order,
@@ -249,7 +440,8 @@ export async function importContent(
                 options:
                   q.options?.map((o) => (o.code === undefined ? { id: o.id } : o)) ?? Prisma.DbNull,
                 answer: quizAnswer(q) as object,
-                texts: quizTexts(q) as object,
+                texts: texts as object,
+                textSources: textSources as object,
                 isActive: true,
               };
               await tx.quiz.upsert({
@@ -261,6 +453,26 @@ export async function importContent(
             }
           }
         }
+      }
+
+      if (options.skills) {
+        for (const [index, skill] of options.skills.entries()) {
+          const data = {
+            category: skill.category,
+            names: skill.names,
+            sortOrder: index,
+            isActive: true,
+          };
+          await tx.skill.upsert({
+            where: { key: skill.key },
+            create: { key: skill.key, ...data },
+            update: data,
+          });
+        }
+        await tx.skill.updateMany({
+          where: { key: { notIn: options.skills.map((skill) => skill.key) }, isActive: true },
+          data: { isActive: false },
+        });
       }
 
       const off = { isActive: false };

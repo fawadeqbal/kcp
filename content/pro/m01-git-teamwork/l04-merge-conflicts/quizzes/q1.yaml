@@ -1,0 +1,22 @@
+id: pro-m01-l04-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: After fixing a conflict in index.html, what's left to finish the merge?
+  ar: بعد إصلاح تعارض في index.html، ما الذي بقي لإنهاء الدمج؟
+  ur: index.html میں کنفلکٹ ٹھیک کرنے کے بعد مرج مکمل کرنے کے لیے کیا باقی ہے؟
+options:
+  - id: a
+    code: 'git merge --abort'
+  - id: b
+    code: |-
+      git add index.html
+      git commit -m "Merge"
+  - id: c
+    code: 'git switch main'
+answer: b
+explanation:
+  en: git add marks the file as fixed; the commit finishes the merge. git merge --abort would throw the merge away instead.
+  ar: يعلن git add أن الملف أُصلح، والإيداع ينهي الدمج. أما git merge --abort فيلغي الدمج كله.
+  ur: git add بتاتا ہے کہ فائل ٹھیک ہو گئی؛ کمٹ مرج مکمل کرتا ہے۔ git merge --abort اس کے بجائے پورا مرج ختم کر دیتا۔

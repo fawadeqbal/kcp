@@ -162,7 +162,12 @@ export async function evaluateChecks(
           break;
         case 'output':
         case 'python':
-          // Python programs are checked with runPythonChecks (python.ts), not as pages.
+        case 'stage':
+        case 'blocks':
+        case 'git':
+          // Python programs are checked with runPythonChecks (python.ts), block
+          // programs with evaluateStageChecks (stage/checks.ts) and git lessons with
+          // evaluateGitChecks (git/checks.ts), not as pages.
           passed = false;
           break;
       }

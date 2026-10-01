@@ -3,6 +3,7 @@
 import type { components } from '@kcp/api-client-ts';
 import { Alert, Badge, PageSpinner, SelectField, TextField } from '@kcp/ui';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { api } from '@/lib/api';
 import { formatDateTime, humanize } from '@/lib/format';
 import { useLoad, useUrlFilters } from '@/lib/hooks';
@@ -44,7 +45,7 @@ function PersonLink({ person }: { person: Person }) {
  * Every consent a parent gave, and when they withdrew it. Records are never edited or
  * deleted (a database rule), so this is the evidence if a regulator asks.
  */
-export function ConsentList() {
+export function ConsentList({ queue }: { queue?: ReactNode }) {
   const filters = useUrlFilters(FILTERS, PRIVATE_FILTERS);
   const { applied, page } = filters;
   const consents = useLoad(
@@ -69,6 +70,7 @@ export function ConsentList() {
         title="Parental consent"
         description="Every consent a parent has given for a child, and when it was withdrawn. These records can’t be changed or deleted."
       />
+      {queue}
       <FilterBar onSubmit={filters.apply} onReset={filters.reset}>
         <div className="min-w-60 flex-1">
           <TextField

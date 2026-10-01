@@ -8,6 +8,13 @@ export interface RequestContext {
   requestId: string | undefined;
 }
 
+/** Work that no request started (a job, a webhook): nothing to record about a client. */
+export const NO_REQUEST: RequestContext = {
+  ip: undefined,
+  userAgent: undefined,
+  requestId: undefined,
+};
+
 export function requestContextFrom(req: Request & { id?: unknown }): RequestContext {
   return {
     ip: req.ip,

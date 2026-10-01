@@ -189,6 +189,8 @@ void main() {
               'xp': 10,
               'files': ['html'],
               'starter': {'html': '', 'css': null, 'js': null, 'py': null},
+              'stage': null,
+              'repo': null,
               'checks': <Object>[],
               'hints': <String, String>{},
               'checkLabels': <String, String>{},

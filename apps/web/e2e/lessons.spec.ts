@@ -3,6 +3,7 @@ import { directionOf, type Locale } from '@kcp/i18n';
 import { type Locator, type Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 import { loadModule, loadProject } from './content';
+import { checkFullScreen } from './full-screen';
 import {
   API_URL,
   createStudent,
@@ -15,9 +16,20 @@ import {
 /** Module 1 of the Builder track, straight from content/. */
 const MODULE = loadModule('builder/m01-first-website');
 /** Every lesson on the home page (Module 1, then Python). */
-const ALL_LESSONS = MODULE.length + loadModule('builder/m02-python-first-steps').length;
+const ALL_LESSONS =
+  MODULE.length +
+  loadModule('builder/m02-python-first-steps').length +
+  loadModule('explorer/m01-meet-bit').length +
+  loadModule('pro/m01-git-teamwork').length;
 const PROJECT_ID = loadProject('builder/m01-first-website').id;
-const FILE_TABS = { html: 'fileHtml', css: 'fileCss', js: 'fileJs', py: 'filePy' } as const;
+const FILE_TABS = {
+  html: 'fileHtml',
+  css: 'fileCss',
+  js: 'fileJs',
+  py: 'filePy',
+  blocks: 'fileBlocks',
+  git: 'fileGit',
+} as const;
 
 const fill = (template: string, values: Record<string, string | number>) =>
   template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
@@ -198,3 +210,48 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
     expect(child?.lessonsCompleted).toBe(MODULE.length);
   });
 }
+
+test('the editor and the preview fit on the screen, and the preview opens full screen', async ({
+  page,
+  request,
+}, info) => {
+  const m = MESSAGES.en;
+  const touch = info.project.use.hasTouch === true;
+  const screen = new LessonScreen(page, m, touch);
+  const student = await createStudent(request, { locale: 'en' });
+  await logInAsStudent(page, 'en', student.username);
+  await page.goto(`/en/learn/${MODULE[0]!.id}`);
+  await screen.press(page.getByRole('button', { name: m.lesson.startSteps }));
+
+  // Far more code than fits on the screen.
+  const lines = Array.from({ length: 150 }, (_, i) => `<p>Line ${i + 1}</p>`);
+  await screen.paste('html', lines.join('\n'));
+  const { height } = await page.evaluate(() => ({ height: window.innerHeight }));
+  const editor = page.getByTestId('editor-html');
+  const preview = page.getByTitle(m.lesson.previewTitle, { exact: true });
+  await expect(preview).toBeVisible();
+
+  // The editor and the preview are never taller than the screen: they scroll inside.
+  expect((await editor.boundingBox())!.height).toBeLessThanOrEqual(height);
+  expect((await preview.boundingBox())!.height).toBeLessThanOrEqual(height);
+  expect(
+    await editor.locator('.cm-scroller').evaluate((node) => node.scrollHeight > node.clientHeight),
+  ).toBe(true);
+  // The last line is reached by scrolling the editor, not the page.
+  await editor.locator('.cm-scroller').evaluate((node) => node.scrollTo(0, node.scrollHeight));
+  await expect(editor.locator('.cm-line', { hasText: 'Line 150<' })).toBeInViewport();
+  if (!touch) {
+    // On a laptop the whole workspace fits on one screen.
+    expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(
+      height,
+    );
+  }
+
+  await checkFullScreen(page, {
+    scope: page.getByRole('main'),
+    frame: preview,
+    enter: m.lesson.fullScreen,
+    exit: m.lesson.exitFullScreen,
+    press: (target) => screen.press(target),
+  });
+});

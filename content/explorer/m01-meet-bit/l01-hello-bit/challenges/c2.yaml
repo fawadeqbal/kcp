@@ -1,0 +1,36 @@
+id: explorer-m01-l01-c2
+order: 2
+type: blocks
+xp: 10
+stage:
+  mode: maze
+  map:
+    - '######'
+    - '#S..##'
+    - '###.##'
+    - '###G##'
+    - '######'
+  toolbox:
+    - when-run
+    - move
+starter:
+  blocks:
+    - when: run
+      do: []
+solution:
+  blocks:
+    - when: run
+      do:
+        - move: right
+        - move: right
+        - move: down
+        - move: down
+checks:
+  - id: reach-flag
+    expect: stage
+    atGoal: true
+    hint: turn
+  - id: no-bump
+    expect: stage
+    noBump: true
+    hint: no_walls

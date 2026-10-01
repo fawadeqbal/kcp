@@ -1,0 +1,29 @@
+id: pro-m01-l03-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: Why do teams work on branches instead of committing straight to main?
+  ar: لماذا تعمل الفرق على فروع بدل الإيداع مباشرة في main؟
+  ur: ٹیمیں سیدھا main پر کمٹ کرنے کے بجائے برانچز پر کیوں کام کرتی ہیں؟
+options:
+  - id: a
+    text:
+      en: Branches make the website load faster.
+      ar: الفروع تجعل الموقع يُحمَّل أسرع.
+      ur: برانچز ویب سائٹ کو تیز لوڈ کرتی ہیں۔
+  - id: b
+    text:
+      en: So main keeps working while new ideas are tried and checked before they're merged.
+      ar: ليبقى main يعمل بينما تُجرَّب الأفكار الجديدة وتُراجَع قبل دمجها.
+      ur: تاکہ main کام کرتی رہے جبکہ نئے آئیڈیاز آزمائے جائیں اور مرج سے پہلے چیک ہوں۔
+  - id: c
+    text:
+      en: Git only allows one commit on main.
+      ar: يسمح git بإيداع واحد فقط في main.
+      ur: git صرف main پر ایک کمٹ کی اجازت دیتا ہے۔
+answer: b
+explanation:
+  en: Work on a branch doesn't touch main until it's merged, so the working version stays safe — and teammates can review the work first.
+  ar: العمل على فرع لا يمسّ main حتى يُدمَج، فتبقى النسخة العاملة آمنة — ويستطيع الزملاء مراجعة العمل أولًا.
+  ur: برانچ پر کام مرج ہونے تک main کو نہیں چھوتا، اس لیے کام کرنے والا ورژن محفوظ رہتا ہے — اور ساتھی پہلے کام دیکھ سکتے ہیں۔

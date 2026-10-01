@@ -1,0 +1,37 @@
+id: pro-m01-l03-c2
+order: 2
+type: git
+xp: 10
+repo:
+  files:
+    index.html: |
+      <h1>Our club</h1>
+      <p>We meet every Saturday.</p>
+    style.css: |
+      body { background-color: white; color: black; }
+  setup:
+    - run: git init
+    - run: git add .
+    - run: git commit -m "Add the club page"
+    - run: git switch -c footer
+    - write: footer.html
+      content: |
+        <footer>Made by the coding club</footer>
+    - run: git add footer.html
+    - run: git commit -m "Add a footer"
+    - run: git switch main
+starter:
+  git: []
+solution:
+  git:
+    - run: git merge footer
+checks:
+  - id: on-main
+    expect: git
+    onBranch: main
+    hint: main
+  - id: merged
+    expect: git
+    merged: footer
+    committed: [footer.html]
+    hint: merge

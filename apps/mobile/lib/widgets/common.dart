@@ -23,6 +23,54 @@ String errorText(AppLocalizations t, Object error) {
       return t.errorEmailNotVerified;
     case 'PREMIUM_REQUIRED':
       return t.errorPremium;
+    case 'CONSENT_PENDING':
+      return t.errorConsentPending;
+    case 'PICTURE_LOCKED':
+      return t.errorPictureLocked;
+    case 'PAIRING_NOT_FOUND':
+      return t.errorPairingNotFound;
+    case 'FRIEND_CODE_NOT_FOUND':
+      return t.errorFriendCodeNotFound;
+    case 'FRIEND_SELF':
+      return t.errorFriendSelf;
+    case 'ALREADY_FRIENDS':
+      return t.errorAlreadyFriends;
+    case 'FRIEND_REQUEST_EXISTS':
+      return t.errorFriendRequestExists;
+    case 'TOO_MANY_FRIEND_REQUESTS':
+      return t.errorTooManyFriendRequests;
+    case 'TOO_MANY_FRIENDS':
+      return t.errorTooManyFriends;
+    case 'FRIEND_REQUEST_CLOSED':
+      return t.errorFriendRequestClosed;
+    case 'PHRASES_ONLY':
+      return t.errorPhrasesOnly;
+    case 'CHAT_MUTED':
+      return t.errorChatMuted;
+    case 'EVENT_CLOSED':
+      return t.errorEventClosed;
+    case 'TEAM_FULL':
+      return t.errorTeamFull;
+    case 'ALREADY_IN_TEAM':
+      return t.errorChildInTeam;
+    case 'CLASS_FULL':
+      return t.errorClassFull;
+    case 'REQUEST_NOT_FOUND':
+      return t.errorRequestAnswered;
+    case 'TOO_MANY_MESSAGES':
+      return t.errorTooManyMessages;
+    case 'ROOM_ARCHIVED':
+      return t.errorRoomArchived;
+    case 'REPORT_SELF':
+      return t.errorReportSelf;
+    case 'MESSAGE_BLOCKED':
+      return switch (apiError.details?['reason']) {
+        'LINK' => t.roomBlockedLink,
+        'EMAIL' => t.roomBlockedEmail,
+        'PHONE' => t.roomBlockedPhone,
+        'CONTACT' => t.roomBlockedContact,
+        _ => t.roomBlockedWords,
+      };
   }
   if (apiError.isTooManyRequests) return t.errorTooMany;
   return t.errorGeneric;
@@ -243,14 +291,26 @@ class RowCard extends StatelessWidget {
 
 /// Loading, with a label for screen readers.
 class LoadingView extends StatelessWidget {
-  const LoadingView({super.key});
+  const LoadingView({super.key, this.label});
+
+  /// Shown under the spinner (e.g. "Getting the blocks ready…").
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
+    final spinner = Semantics(
+      label: label ?? AppLocalizations.of(context).loading,
+      child: const CircularProgressIndicator(strokeCap: StrokeCap.round),
+    );
+    if (label == null) return Center(child: spinner);
     return Center(
-      child: Semantics(
-        label: AppLocalizations.of(context).loading,
-        child: const CircularProgressIndicator(strokeCap: StrokeCap.round),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          spinner,
+          const SizedBox(height: 14),
+          ExcludeSemantics(child: Text(label!, textAlign: TextAlign.center)),
+        ],
       ),
     );
   }

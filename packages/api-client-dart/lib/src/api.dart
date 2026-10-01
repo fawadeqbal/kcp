@@ -14,11 +14,17 @@ import 'package:kcp_api/src/api/billing_api.dart';
 import 'package:kcp_api/src/api/certificates_api.dart';
 import 'package:kcp_api/src/api/children_api.dart';
 import 'package:kcp_api/src/api/devices_api.dart';
+import 'package:kcp_api/src/api/events_api.dart';
 import 'package:kcp_api/src/api/feedback_api.dart';
+import 'package:kcp_api/src/api/friends_api.dart';
 import 'package:kcp_api/src/api/learning_api.dart';
 import 'package:kcp_api/src/api/notifications_api.dart';
 import 'package:kcp_api/src/api/progress_api.dart';
+import 'package:kcp_api/src/api/projects_api.dart';
 import 'package:kcp_api/src/api/reference_api.dart';
+import 'package:kcp_api/src/api/reports_api.dart';
+import 'package:kcp_api/src/api/rooms_api.dart';
+import 'package:kcp_api/src/api/schools_api.dart';
 
 class KcpApi {
   static const String basePath = r'http://localhost';
@@ -182,10 +188,22 @@ class KcpApi {
     return DevicesApi(dio);
   }
 
+  /// Get EventsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  EventsApi getEventsApi() {
+    return EventsApi(dio);
+  }
+
   /// Get FeedbackApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   FeedbackApi getFeedbackApi() {
     return FeedbackApi(dio);
+  }
+
+  /// Get FriendsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  FriendsApi getFriendsApi() {
+    return FriendsApi(dio);
   }
 
   /// Get LearningApi instance, base route and serializer can be overridden by a given but be careful,
@@ -206,9 +224,33 @@ class KcpApi {
     return ProgressApi(dio);
   }
 
+  /// Get ProjectsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ProjectsApi getProjectsApi() {
+    return ProjectsApi(dio);
+  }
+
   /// Get ReferenceApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   ReferenceApi getReferenceApi() {
     return ReferenceApi(dio);
+  }
+
+  /// Get ReportsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ReportsApi getReportsApi() {
+    return ReportsApi(dio);
+  }
+
+  /// Get RoomsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  RoomsApi getRoomsApi() {
+    return RoomsApi(dio);
+  }
+
+  /// Get SchoolsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  SchoolsApi getSchoolsApi() {
+    return SchoolsApi(dio);
   }
 }

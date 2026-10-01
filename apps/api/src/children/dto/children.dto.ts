@@ -3,9 +3,14 @@ import {
   CHILD_PASSWORD_MIN_LENGTH,
   NICKNAME_PATTERN,
   PASSWORD_MAX_LENGTH,
+  PICTURE_KEYS,
+  PICTURE_PASSWORD_LENGTH,
 } from '@kcp/shared';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsIn,
   IsInt,
@@ -124,7 +129,10 @@ export class ChildDto {
   countryCode!: string | null;
   regionId!: string | null;
   cityId!: string | null;
-  status!: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+  /** PENDING_CONSENT: under 13 and waiting for the parent's verified consent. */
+  status!: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED' | 'PENDING_CONSENT';
+  /** The child can sign in with a picture password (set by the parent). */
+  hasPicturePassword!: boolean;
   consents!: ChildConsentsDto;
   createdAt!: Date;
   lastLoginAt!: Date | null;
@@ -153,6 +161,18 @@ export class ChildRulesDto {
   avatarKeys!: string[];
   /** Whether accounts for children under 13 are open. */
   under13Open!: boolean;
+  /** How parents in the parent's country can give verified consent for under-13s. */
+  under13Methods!: ('CARD_CHECK' | 'SIGNED_FORM' | 'EMAIL_PLUS')[];
+}
+
+export class PicturePasswordDto {
+  /** Four picture keys in order (see PICTURE_KEYS), or null to remove the picture password. */
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(PICTURE_PASSWORD_LENGTH)
+  @ArrayMaxSize(PICTURE_PASSWORD_LENGTH)
+  @IsIn([...PICTURE_KEYS], { each: true })
+  pictures!: (typeof PICTURE_KEYS)[number][] | null;
 }
 
 export class NicknameSuggestionsDto {

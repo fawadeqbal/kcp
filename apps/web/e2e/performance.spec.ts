@@ -124,7 +124,7 @@ test('the student login page is usable within 10 seconds on slow 3G and a mid-ra
   await page.goto('/en/login/student', { waitUntil: 'commit', timeout: 60_000 });
   // Usable: the page's code has started (hydrated), so its buttons respond. "Show
   // password" only works once it has.
-  const password = page.getByLabel(m.auth.password, { exact: true });
+  const password = page.getByRole('textbox', { name: m.auth.password, exact: true });
   await expect(password).toBeVisible({ timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('button', { name: m.auth.showPassword }).click({ timeout: 1000 });

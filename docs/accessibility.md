@@ -35,6 +35,15 @@ The other browser tests find elements by their accessible role and name (for exa
 - **Right to left:** the whole page follows `dir` from the language; direction arrows (previous and next lesson) are mirrored; the code editor is always left to right; a project written in another language is marked with its `lang`.
 - **Motion:** animations and transitions are switched off when the device asks for reduced motion.
 
+## Explorer: the block editor (Phase 2)
+
+Explorer lessons (ages 9–12) use [Blockly](https://developers.google.com/blockly) for blocks and our own stage for Bit's world.
+
+- **Bit's world** is an SVG picture with a name ("Bit's world"); what happens (a bump, a gem, the flag, what Bit says) is announced in a live region. Games are played with the arrow keys (once the stage has focus) or with four on-screen buttons that have names. Reduced motion turns the gliding off.
+- **"Show the code"** shows every program as plain text (the JavaScript it stands for), so the program can be read without the blocks.
+- **Blockly's own markup:** its toolbox is a list whose options sit inside presentational groups, which axe reports as `aria-required-children`. That one finding is skipped in `apps/web/e2e/accessibility.spec.ts`; everything else on the page is checked.
+- **Not verified yet:** building a program with the keyboard alone, and with a screen reader. Blockly's keyboard navigation is still changing; until it is tested, a student who can't drag needs an adult's help with the blocks. Add this to the keyboard walk-through below.
+
 ## Still to do
 
 - **A keyboard-only walk-through** of sign-up, adding a child, a whole lesson, shipping a project and paying, and a check at **200% zoom**, in all three languages, before the pilot.

@@ -14,9 +14,22 @@ export interface ErrorBody {
   statusCode: number;
   error: string;
   message: string | string[];
+  /** A few plain values some errors carry for the apps (e.g. why a message was refused). */
+  details?: Record<string, string | number | boolean | null>;
   requestId?: string;
   path: string;
   timestamp: string;
+}
+
+/** `details` only when it is a small object of plain values (never nested data). */
+function plainDetails(value: unknown): ErrorBody['details'] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const entries = Object.entries(value);
+  if (entries.length > 8) return undefined;
+  const plain = entries.every(
+    ([, v]) => v === null || ['string', 'number', 'boolean'].includes(typeof v),
+  );
+  return plain ? (value as ErrorBody['details']) : undefined;
 }
 
 const isTooLarge = (exception: unknown) =>
@@ -36,6 +49,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     let message: string | string[] = 'Internal server error';
     let error = 'Internal Server Error';
+    let details: ErrorBody['details'];
     if (isTooLarge(exception)) {
       // From the body parser: a request over the size limit is the caller's mistake.
       status = HttpStatus.PAYLOAD_TOO_LARGE;
@@ -47,7 +61,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = response;
         error = exception.name;
       } else {
-        const body = response as { message?: unknown; error?: unknown };
+        const body = response as { message?: unknown; error?: unknown; details?: unknown };
         // Only plain strings reach the client: some libraries (health checks) put
         // internal details in these fields.
         message =
@@ -56,6 +70,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
             ? (body.message as string | string[])
             : exception.message;
         error = typeof body.error === 'string' ? body.error : exception.name;
+        details = plainDetails(body.details);
       }
     }
 
@@ -71,6 +86,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: status,
       error,
       message,
+      ...(details && status < 500 ? { details } : {}),
       requestId: req.id,
       path: req.originalUrl ?? req.url,
       timestamp: new Date().toISOString(),

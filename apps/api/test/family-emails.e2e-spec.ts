@@ -116,13 +116,13 @@ describe('emails to families and the waitlist (e2e)', () => {
       .get('/v1/account/email-preferences')
       .set(auth(quiet.parent.accessToken))
       .expect(200);
-    expect(prefs.body).toEqual({ monthlySummary: true });
+    expect(prefs.body).toEqual({ monthlySummary: true, weeklyReport: true });
     await t
       .http()
       .put('/v1/account/email-preferences')
       .set(auth(quiet.parent.accessToken))
       .send({ monthlySummary: false })
-      .expect(200, { monthlySummary: false });
+      .expect(200, { monthlySummary: false, weeklyReport: true });
     await t
       .http()
       .put('/v1/account/email-preferences')

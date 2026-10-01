@@ -53,7 +53,9 @@ test('a parent changes their password, downloads the family’s data and deletes
   // Gone: logging in again fails.
   await page.goto('/en/login');
   await page.getByLabel(m.auth.email).fill(family.email);
-  await page.getByLabel(m.auth.password, { exact: true }).fill('purple tiger jumps 7');
+  await page
+    .getByRole('textbox', { name: m.auth.password, exact: true })
+    .fill('purple tiger jumps 7');
   await page.getByRole('main').getByRole('button', { name: m.auth.login.submit }).click();
   await expect(page.getByText(m.errors.INVALID_CREDENTIALS)).toBeVisible();
 });

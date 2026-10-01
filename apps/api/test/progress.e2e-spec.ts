@@ -2,7 +2,7 @@ import { DAILY_XP_CAP } from '@kcp/shared';
 import { LearningService } from '../src/learning/learning.service.js';
 import { ProgressService } from '../src/progress/progress.service.js';
 import { LeaderboardJobsService } from '../src/progress/leaderboard-jobs.service.js';
-import { weekAt } from '../src/progress/xp-rules.js';
+import { localDay, weekAt } from '../src/progress/xp-rules.js';
 import { createTestApp, resetRateLimits, staffLogin, type TestContext } from './helpers.js';
 import {
   auth,
@@ -137,17 +137,32 @@ describe('XP, streaks and leaderboards (e2e)', () => {
   });
 
   it('ranks only students whose parent switched on public leaderboards', async () => {
+    // A quiet city (no other test uses it), so the board is short enough to list them.
+    const quiet = await t.prisma.city.findFirstOrThrow({
+      where: { region: { countryCode: 'PK' } },
+      orderBy: { id: 'desc' },
+    });
+    const place = { regionId: quiet.regionId, cityId: quiet.id };
+    await t.redis.set(`lbarea:city:${quiet.id}`, '25', 'EX', 120);
     const shown = await family(t, {
+      ...place,
       consents: { publicLeaderboards: true, publicPortfolio: false },
     });
-    const hidden = await family(t);
+    const hidden = await family(t, place);
     await submit(shown.student, 'e2e-m01-l01-c1', H1_CHECKS);
     await submit(hidden.student, 'e2e-m01-l01-c1', H1_CHECKS);
 
-    const board = await t.http().get('/v1/leaderboards').set(auth(shown.student)).expect(200);
-    expect(board.body.scope).toBe('global');
-    expect(board.body).toMatchObject({ period: 'week', available: true });
-    expect(board.body.week.key).toMatch(/^\d{4}-W\d{2}$/);
+    const global = await t.http().get('/v1/leaderboards').set(auth(shown.student)).expect(200);
+    expect(global.body.scope).toBe('global');
+    expect(global.body).toMatchObject({ period: 'week', available: true });
+    expect(global.body.week.key).toMatch(/^\d{4}-W\d{2}$/);
+    expect(global.body.me).toMatchObject({ xp: 10, hidden: false });
+    expect(global.body.me.rank).toBeGreaterThan(0);
+    const board = await t
+      .http()
+      .get('/v1/leaderboards?scope=city')
+      .set(auth(shown.student))
+      .expect(200);
     const me = board.body.entries.find((e: { isMe: boolean }) => e.isMe);
     expect(me).toMatchObject({ nickname: shown.child.nickname, avatarKey: 'rocket', xp: 10 });
     // Nickname, avatar and XP only.
@@ -162,7 +177,7 @@ describe('XP, streaks and leaderboards (e2e)', () => {
       .set(auth(shown.student))
       .expect(200);
     expect(country.body.countryCode).toBe('PK');
-    expect(country.body.entries.some((e: { isMe: boolean }) => e.isMe)).toBe(true);
+    expect(country.body.me.rank).toBeGreaterThan(0);
 
     // The hidden student sees the board, and their own XP, but isn't on it.
     const theirView = await t.http().get('/v1/leaderboards').set(auth(hidden.student)).expect(200);
@@ -183,10 +198,11 @@ describe('XP, streaks and leaderboards (e2e)', () => {
     expect(after.body.me.rank).toBeGreaterThan(0);
     expect((await progressOf(hidden.student)).week.globalRank).toBe(after.body.me.rank);
     await setBoards(false);
-    after = await t.http().get('/v1/leaderboards').set(auth(shown.student)).expect(200);
+    after = await t.http().get('/v1/leaderboards?scope=city').set(auth(shown.student)).expect(200);
     expect(after.body.entries.map((e: { nickname: string }) => e.nickname)).not.toContain(
       hidden.child.nickname,
     );
+    expect((await progressOf(hidden.student)).week.globalRank).toBeNull();
   });
 
   it('takes suspended students off the boards until they are reactivated', async () => {
@@ -287,6 +303,9 @@ describe('XP, streaks and leaderboards (e2e)', () => {
       consents: { publicLeaderboards: true, publicPortfolio: false },
     });
     await submit(student, 'e2e-m01-l01-c1', H1_CHECKS);
+    // Few students in the city (the count is cached in Redis; a database used for many
+    // runs has more test students there than a fresh one).
+    await t.redis.set(`lbarea:city:${city.id}`, '3', 'EX', 60);
     const cityBoard = () =>
       t.http().get('/v1/leaderboards?scope=city&lang=ur').set(auth(student)).expect(200);
     let board = await cityBoard();
@@ -461,6 +480,8 @@ describe('XP, streaks and leaderboards (e2e)', () => {
       .expect(200);
     expect(ended.body.status).toBe('ENDED');
     expect(ended.body.endDay > today).toBe(true);
+    // Today counts in full where it's already tomorrow too (Karachi, late in the UTC day).
+    expect(ended.body.endDay > localDay(new Date(), 'Asia/Karachi')).toBe(true);
     const seasonResults = await t
       .http()
       .get('/v1/admin/leaderboards/results?period=SEASON')

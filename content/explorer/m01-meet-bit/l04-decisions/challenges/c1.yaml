@@ -1,0 +1,47 @@
+id: explorer-m01-l04-c1
+order: 1
+type: blocks
+xp: 10
+stage:
+  mode: maze
+  map:
+    - '#########'
+    - '#S*.**.G#'
+    - '#########'
+  toolbox:
+    - when-run
+    - move
+    - collect
+    - repeat
+    - if
+starter:
+  blocks:
+    - when: run
+      do:
+        - repeat: 6
+          do:
+            - move: right
+solution:
+  blocks:
+    - when: run
+      do:
+        - repeat: 6
+          do:
+            - move: right
+            - if: gem
+              do:
+                - collect
+checks:
+  - id: all-gems
+    expect: stage
+    gemsLeft: 0
+    hint: check_each
+  - id: reach-flag
+    expect: stage
+    atGoal: true
+    hint: six_steps
+  - id: uses-if
+    expect: blocks
+    uses:
+      - if
+    hint: use_if

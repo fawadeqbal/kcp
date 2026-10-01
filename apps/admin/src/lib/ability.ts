@@ -24,7 +24,22 @@ export type Subject =
   | 'Waitlist'
   | 'Certificate'
   | 'Content'
+  | 'ContentText'
+  | 'Review'
+  | 'MentorNote'
+  | 'MentorProfile'
+  | 'ParentalConsent'
+  | 'Friendship'
+  | 'Chat'
+  | 'Moderation'
+  | 'BlockedTerm'
   | 'AppCrash'
+  | 'Event'
+  | 'EventTeam'
+  | 'EventScore'
+  | 'School'
+  | 'SchoolClass'
+  | 'ReadinessCheck'
   | 'Country'
   | 'Language';
 export type AdminAbility = MongoAbility<[Action, Subject | ReturnType<typeof subject>]>;
@@ -46,4 +61,15 @@ export function userSubject(user: {
     status: user.status,
     roleKey: user.role.key,
   });
+}
+
+/**
+ * Whether a rule allows the action on every record of the subject (no conditions, no
+ * field limits): what list pages and the overview need. `ability.can(action, 'User')`
+ * alone is also true for "only my own account".
+ */
+export function canOnAll(ability: AdminAbility, action: Action, subjectType: Subject): boolean {
+  return ability
+    .rulesFor(action, subjectType)
+    .some((rule) => !rule.inverted && !rule.conditions && !rule.fields);
 }

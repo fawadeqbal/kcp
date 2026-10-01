@@ -19,6 +19,17 @@ void main() {
       expect(appRouteFor(Uri.parse('https://app.test/en')), '/');
     });
 
+    test('a child’s sign-in QR code opens the parent’s pairing screen with its code', () {
+      expect(
+        appRouteFor(Uri.parse('https://app.test/ur/pair?code=K7MQ4XPR')),
+        '/parent/pair?code=K7MQ4XPR',
+      );
+      expect(appRouteFor(Uri.parse('https://app.test/en/pair')), '/parent/pair');
+      expect(appRouteFor(Uri.parse('https://app.test/en/pair?code=%3Cscript%3E')), '/parent/pair');
+      expect(isParentRoute('/parent/pair'), isTrue);
+      expect(isStudentRoute('/lesson/explorer-m01-l01/step/c1'), isTrue);
+    });
+
     test('anything else is not the app’s', () {
       expect(appRouteFor(Uri.parse('https://app.test/en/billing')), isNull);
       expect(appRouteFor(Uri.parse('https://app.test/en/learn/Bad_ID!')), isNull);
@@ -28,6 +39,7 @@ void main() {
       expect(appRouteFor(Uri.parse('https://app.test/en/learn/projects')), isNull);
       expect(appRouteFor(Uri.parse('https://app.test/en/learn/leaderboard')), '/leaderboard');
       expect(appRouteFor(Uri.parse('https://app.test/en/learn/badges')), '/me');
+      expect(appRouteFor(Uri.parse('https://app.test/ar/learn/rooms')), '/rooms');
     });
   });
 

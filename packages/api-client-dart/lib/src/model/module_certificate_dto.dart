@@ -25,6 +25,8 @@ class ModuleCertificateDto {
 
     required this.finished,
 
+    required this.awaitingReview,
+
     required this.certificate,
   });
 
@@ -38,6 +40,10 @@ class ModuleCertificateDto {
   @JsonKey(name: r'finished', required: true, includeIfNull: false)
   final bool finished;
 
+  /// Finished, but a mentor hasn't approved the module project yet (premium students get their certificate once the review is approved).
+  @JsonKey(name: r'awaitingReview', required: true, includeIfNull: false)
+  final bool awaitingReview;
+
   @JsonKey(name: r'certificate', required: true, includeIfNull: true)
   final CertificateDto? certificate;
 
@@ -48,6 +54,7 @@ class ModuleCertificateDto {
           other.moduleId == moduleId &&
           other.moduleTitle == moduleTitle &&
           other.finished == finished &&
+          other.awaitingReview == awaitingReview &&
           other.certificate == certificate;
 
   @override
@@ -55,6 +62,7 @@ class ModuleCertificateDto {
       moduleId.hashCode +
       moduleTitle.hashCode +
       finished.hashCode +
+      awaitingReview.hashCode +
       (certificate == null ? 0 : certificate.hashCode);
 
   factory ModuleCertificateDto.fromJson(Map<String, dynamic> json) =>

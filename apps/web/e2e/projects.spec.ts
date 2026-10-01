@@ -3,6 +3,7 @@ import { directionOf, type Locale, LOCALES } from '@kcp/i18n';
 import { type Browser, type Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 import { loadProject } from './content';
+import { checkFullScreen } from './full-screen';
 import {
   API_URL,
   createParent,
@@ -25,6 +26,8 @@ const FILE_NAMES = {
   css: 'style.css',
   js: 'script.js',
   py: 'main.py',
+  blocks: 'program.blocks.json',
+  git: 'steps.git.json',
 } as const;
 
 const SANDBOX_URL = process.env.NEXT_PUBLIC_SANDBOX_URL ?? 'http://localhost:3004';
@@ -74,7 +77,7 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
     ).toHaveAttribute('href', `/${locale}/terms`);
     await page.getByLabel(m.auth.signUp.name).fill('Test Parent');
     await page.getByLabel(m.auth.email).fill(email);
-    await page.getByLabel(m.auth.password, { exact: true }).fill(PARENT_PASSWORD);
+    await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(PARENT_PASSWORD);
     await page.getByLabel(m.auth.signUp.country).selectOption('PK');
     await page.getByLabel(m.auth.signUp.acceptTerms).check();
     await page.getByRole('button', { name: m.auth.signUp.submit }).click();
@@ -83,7 +86,7 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
     await expect(page.getByText(m.auth.verify.success)).toBeVisible();
     await page.goto(`/${locale}/login`);
     await page.getByLabel(m.auth.email).fill(email);
-    await page.getByLabel(m.auth.password, { exact: true }).fill(PARENT_PASSWORD);
+    await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(PARENT_PASSWORD);
     await page.getByRole('main').getByRole('button', { name: m.auth.login.submit }).click();
     await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
 
@@ -111,6 +114,10 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
     await kid.getByRole('link').filter({ hasText: title }).click();
     await expect(kid).toHaveURL(new RegExp(`/${locale}/learn/projects/${PROJECT.id}$`));
     await expect(kid.getByRole('heading', { level: 1, name: title })).toBeVisible();
+    // On a laptop the workspace is one screen: the long brief scrolls inside its panel.
+    expect(
+      await kid.evaluate(() => document.documentElement.scrollHeight - window.innerHeight),
+    ).toBeLessThanOrEqual(0);
 
     // The starter code isn't enough: the hints say what's missing, and nothing ships.
     const check = kid.getByRole('button', { name: m.project.check });
@@ -153,6 +160,13 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
         .locator('h1'),
     ).toHaveText('All about me');
     await kid.screenshot({ path: `test-results/screens/portfolio-${locale}.png`, fullPage: true });
+    // Any project opens full screen, and comes back.
+    await checkFullScreen(kid, {
+      scope: kid.getByRole('main'),
+      frame: kid.getByTitle(fill(m.portfolio.previewTitle, { title }), { exact: true }),
+      enter: m.lesson.fullScreen,
+      exit: m.lesson.exitFullScreen,
+    });
     await kid.goto(`/${locale}/learn`);
     await expect(
       kid.getByText(fill(m.progress.level, { level: 2 }), { exact: true }),
@@ -172,6 +186,9 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
     ).toBeVisible();
     await card.getByRole('button', { name: m.dashboard.manage }).click();
     await expect(card.getByRole('heading', { name: title })).toBeVisible();
+    await expect(
+      card.getByRole('button', { name: m.lesson.fullScreen, exact: true }),
+    ).toBeVisible();
     await expect(
       card.getByText(fill(m.dashboard.shareOff, { nickname: isolate(nickname) })),
     ).toBeVisible();
@@ -202,6 +219,12 @@ for (const locale of ['en', 'ar'] as const satisfies Locale[]) {
     await expect(friend.locator('html')).toHaveAttribute('dir', directionOf(locale));
     await expect(friend.getByText(username)).toHaveCount(0);
     await friend.screenshot({ path: `test-results/screens/shared-${locale}.png`, fullPage: true });
+    await checkFullScreen(friend, {
+      scope: friend.getByRole('article'),
+      frame: friend.getByTitle(fill(m.portfolio.previewTitle, { title }), { exact: true }),
+      enter: m.lesson.fullScreen,
+      exit: m.lesson.exitFullScreen,
+    });
 
     // 8. "Stop sharing" ends the link at once.
     await card.getByRole('button', { name: m.dashboard.shareStop }).click();
@@ -239,8 +262,9 @@ test('leaderboards show a student only when their family allows it', async ({ pa
   await celebrate(page, m, ['first-ship']);
   await page
     .getByRole('navigation', { name: m.nav.main })
-    .getByRole('link', { name: m.nav.leaderboard })
+    .getByRole('link', { name: m.nav.league })
     .click();
+  await page.getByRole('link', { name: m.league.allBoards }).click();
   await expect(page).toHaveURL(/\/en\/learn\/leaderboard$/);
   await expect(page.getByRole('tab', { name: m.leaderboard.global, selected: true })).toBeVisible();
   await expect(

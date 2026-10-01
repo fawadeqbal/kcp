@@ -10,7 +10,7 @@ describe('security headers', () => {
   it('lets the page talk only to itself, the API and the sandbox', () => {
     const csp = contentSecurityPolicy(options);
     expect(csp).toContain(
-      "connect-src 'self' https://api.example.com https://sandbox.example-usercontent.com;",
+      "connect-src 'self' https://api.example.com wss://api.example.com https://sandbox.example-usercontent.com;",
     );
     expect(csp).toContain(
       'frame-src https://sandbox.example-usercontent.com https://www.youtube-nocookie.com',

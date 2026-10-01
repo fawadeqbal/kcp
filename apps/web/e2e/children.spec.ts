@@ -105,7 +105,7 @@ test('a parent adds two children with different sharing settings, and a child lo
   ).toBeVisible();
   await page.getByRole('main').getByRole('button', { name: m.auth.student.logOutFirst }).click();
   await page.getByLabel(m.auth.student.username).fill(firstUsername.toUpperCase());
-  await page.getByLabel(m.auth.password, { exact: true }).fill(CHILD_PASSWORD);
+  await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(CHILD_PASSWORD);
   await page.getByRole('button', { name: m.auth.student.submit }).click();
   await expect(page).toHaveURL(/\/en\/learn$/);
   await expect(
@@ -159,12 +159,12 @@ test('in Urdu, a parent changes a child’s password and deletes the account', a
   const kidPage = await kid.newPage();
   await kidPage.goto('/ur/login/student');
   await kidPage.getByLabel(m.auth.student.username).fill(username);
-  await kidPage.getByLabel(m.auth.password, { exact: true }).fill(CHILD_PASSWORD);
+  await kidPage.getByRole('textbox', { name: m.auth.password, exact: true }).fill(CHILD_PASSWORD);
   await kidPage.getByRole('button', { name: m.auth.student.submit }).click();
   await expect(
     kidPage.getByRole('alert').filter({ hasText: m.auth.student.invalid }),
   ).toBeVisible();
-  await kidPage.getByLabel(m.auth.password, { exact: true }).fill(newPassword);
+  await kidPage.getByRole('textbox', { name: m.auth.password, exact: true }).fill(newPassword);
   await kidPage.getByRole('button', { name: m.auth.student.submit }).click();
   await expect(kidPage).toHaveURL(/\/ur\/learn$/);
   await expect(

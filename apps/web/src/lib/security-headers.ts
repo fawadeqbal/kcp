@@ -21,13 +21,16 @@ const VIDEO_FRAMES = ['https://www.youtube-nocookie.com', 'https://iframe.videod
  * page needs to start (`self.__next_f.push(…)`), and nonces would make every page
  * render on each request instead of being prebuilt (slower for families on slow
  * connections, and no CDN caching). What keeps this tight: scripts only from this
- * site, no eval, the network only to this site, the API and the sandbox, frames only
+ * site, no eval, the network only to this site, the API (and its WebSocket for the
+ * rooms) and the sandbox, frames only
  * from the sandbox and the two video players, no plugins, no <base> tricks, no
  * forms to other sites, and never framed by anyone. Children's code never runs here:
  * it runs in the sandbox, on another domain. The admin panel (staff) uses nonces.
  */
 export function contentSecurityPolicy({ apiUrl, sandboxUrl, dev }: CspOptions): string {
   const api = new URL(apiUrl).origin;
+  // The rooms' live connection (Socket.IO over a WebSocket to the API).
+  const socket = api.replace(/^http/, 'ws');
   const sandbox = new URL(sandboxUrl).origin;
   const https = api.startsWith('https:');
   return [
@@ -37,7 +40,7 @@ export function contentSecurityPolicy({ apiUrl, sandboxUrl, dev }: CspOptions): 
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
-    `connect-src 'self' ${api} ${sandbox}`,
+    `connect-src 'self' ${api} ${socket} ${sandbox}`,
     `frame-src ${sandbox} ${VIDEO_FRAMES.join(' ')}`,
     "worker-src 'none'",
     "media-src 'none'",

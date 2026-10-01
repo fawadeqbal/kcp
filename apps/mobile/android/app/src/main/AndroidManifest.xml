@@ -34,8 +34,9 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- App Links: lesson links (IDs like builder-m01-l03), the lesson list
-                 and the parent dashboard on the website open the app (verified with
+            <!-- App Links: lesson links (IDs like builder-m01-l03), the lesson list,
+                 the parent dashboard and /pair (a child's sign-in QR code) on the
+                 website open the app (verified with
                  https://<host>/.well-known/assetlinks.json). Other pages, such as
                  projects, stay on the website. -->
             <intent-filter android:autoVerify="true">
@@ -52,6 +53,9 @@
                 <data android:path="/en/dashboard" />
                 <data android:path="/ar/dashboard" />
                 <data android:path="/ur/dashboard" />
+                <data android:path="/en/pair" />
+                <data android:path="/ar/pair" />
+                <data android:path="/ur/pair" />
             </intent-filter>
         </activity>
         <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />

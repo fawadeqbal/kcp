@@ -6,55 +6,81 @@ import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/common.dart';
+import '../social/friends_view.dart';
+import '../social/league_view.dart';
 import '../student/student_data.dart';
 
-/// This week's leaderboard: the world, or the student's country, region or city.
-class LeaderboardScreen extends ConsumerStatefulWidget {
+/// Competing with others: the student's league this week, their friends, and the
+/// boards for everyone (the world, or their country, region or city).
+class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
 
   @override
-  ConsumerState<LeaderboardScreen> createState() => _LeaderboardScreenState();
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(t.tabLeaderboard),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: t.socialTabLeague),
+              Tab(text: t.socialTabFriends),
+              Tab(text: t.socialTabEveryone),
+            ],
+          ),
+        ),
+        body: const TabBarView(children: [LeagueView(), FriendsView(), _EveryoneBoards()]),
+      ),
+    );
+  }
 }
 
-class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
+/// This week's boards: the world, or the student's country, region or city.
+class _EveryoneBoards extends ConsumerStatefulWidget {
+  const _EveryoneBoards();
+
+  @override
+  ConsumerState<_EveryoneBoards> createState() => _EveryoneBoardsState();
+}
+
+class _EveryoneBoardsState extends ConsumerState<_EveryoneBoards> {
   String _scope = 'global';
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final board = ref.watch(leaderboardProvider(_scope));
-    return Scaffold(
-      appBar: AppBar(title: Text(t.leaderboardTitle)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SegmentedButton<String>(
-              segments: [
-                ButtonSegment(value: 'global', label: Text(t.boardGlobal)),
-                ButtonSegment(value: 'country', label: Text(t.boardCountry)),
-                ButtonSegment(value: 'region', label: Text(t.boardRegion)),
-                ButtonSegment(value: 'city', label: Text(t.boardCity)),
-              ],
-              selected: {_scope},
-              showSelectedIcon: false,
-              onSelectionChanged: (value) => setState(() => _scope = value.first),
-            ),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SegmentedButton<String>(
+            segments: [
+              ButtonSegment(value: 'global', label: Text(t.boardGlobal)),
+              ButtonSegment(value: 'country', label: Text(t.boardCountry)),
+              ButtonSegment(value: 'region', label: Text(t.boardRegion)),
+              ButtonSegment(value: 'city', label: Text(t.boardCity)),
+            ],
+            selected: {_scope},
+            showSelectedIcon: false,
+            onSelectionChanged: (value) => setState(() => _scope = value.first),
           ),
-          const SizedBox(height: 8),
-          Text(t.boardWeek, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 12),
-          switch (board) {
-            AsyncData(:final value) => _Board(board: value),
-            AsyncError(:final error) => ErrorView(
-              error: error,
-              onRetry: () => ref.invalidate(leaderboardProvider(_scope)),
-            ),
-            _ => const SizedBox(height: 200, child: LoadingView()),
-          },
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        Text(t.boardWeek, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 12),
+        switch (board) {
+          AsyncData(:final value) => _Board(board: value),
+          AsyncError(:final error) => ErrorView(
+            error: error,
+            onRetry: () => ref.invalidate(leaderboardProvider(_scope)),
+          ),
+          _ => const SizedBox(height: 200, child: LoadingView()),
+        },
+      ],
     );
   }
 }

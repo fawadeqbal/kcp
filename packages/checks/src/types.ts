@@ -1,3 +1,5 @@
+import type { BlockKind, Direction } from './stage/types.js';
+
 /**
  * Challenge checks. Authors write them in content/…/challenges/*.yaml; the API
  * serves them with the challenge; the sandbox runs them against the student's page.
@@ -10,6 +12,10 @@ export interface CodeFiles {
   js?: string;
   /** A Python program (Python lessons): runs with Pyodide instead of as a page. */
   py?: string;
+  /** A block program (Explorer lessons): JSON, see stage/types.ts. Never runs as code. */
+  blocks?: string;
+  /** Git lessons: the steps taken in the practice repository (JSON, see git/types.ts). */
+  git?: string;
 }
 
 export { CODE_FILE_KEYS, type CodeFileKey, MAX_CODE_FILE_LENGTH } from '@kcp/shared';
@@ -99,14 +105,98 @@ export interface PythonCheck extends CheckBase {
   code: string;
 }
 
+/**
+ * Explorer: where Bit ends up after the program runs on the level. In games, `keys`
+ * are pressed one after another once the program started (the star moves the same
+ * way every time for a given `seed`). Every condition given must hold, and a program
+ * stopped for looping too long fails.
+ */
+export interface StageCheck extends CheckBase {
+  expect: 'stage';
+  keys?: Direction[];
+  seed?: number;
+  /** Bit ends on the flag. */
+  atGoal?: boolean;
+  /** Bit ends on this square: [column, row], counting from 0 at the top left. */
+  endsAt?: [number, number];
+  /** Gems still on the map at the end (0: all collected). */
+  gemsLeft?: number;
+  /** The score is at least this. */
+  minScore?: number;
+  /** Bit said this (case-insensitive, part of what was said). */
+  said?: string;
+  /** Bit never bumped into a wall. */
+  noBump?: boolean;
+}
+
+/**
+ * Explorer: which blocks the program uses, counting the scripts that run (a stack
+ * with a "when" block on top), hats included.
+ */
+export interface BlocksCheck extends CheckBase {
+  expect: 'blocks';
+  uses?: BlockKind[];
+  /** At most this many blocks: rewards using a loop instead of copies. */
+  maxBlocks?: number;
+  minBlocks?: number;
+}
+
+/**
+ * Git lessons: the practice repository after the student's steps. Every condition
+ * given must hold.
+ */
+export interface GitCheck extends CheckBase {
+  expect: 'git';
+  /** `git init` was run (or not). */
+  initialized?: boolean;
+  /** At least this many commits in the current branch's history. */
+  commits?: number;
+  /** These branches exist (with at least one commit). */
+  branches?: string[];
+  /** The current branch. */
+  onBranch?: string;
+  /** These files are in the latest commit. */
+  committed?: string[];
+  /** A file in the latest commit contains this text (case-insensitive). */
+  contains?: { path: string; text: string };
+  /** Nothing left to commit: the folder and the staging area match the latest commit. */
+  clean?: boolean;
+  /** These files have changes staged for the next commit. */
+  staged?: string[];
+  /** This branch's commits are part of the current branch (it was merged). */
+  merged?: string;
+  /** The history has a merge commit. */
+  mergeCommit?: boolean;
+  /** No merge in progress, and no conflict markers left in the latest commit. */
+  resolved?: boolean;
+}
+
 export type Check =
-  ExistsCheck | TextCheck | AttributeCheck | CssCheck | TestCheck | OutputCheck | PythonCheck;
+  | ExistsCheck
+  | TextCheck
+  | AttributeCheck
+  | CssCheck
+  | TestCheck
+  | OutputCheck
+  | PythonCheck
+  | StageCheck
+  | BlocksCheck
+  | GitCheck;
 export type CheckKind = Check['expect'];
 
 /** Checks for Python programs; the others check web pages. */
 export const PYTHON_CHECK_KINDS = ['output', 'python'] as const satisfies readonly CheckKind[];
 export const isPythonCheck = (check: Check): check is OutputCheck | PythonCheck =>
   check.expect === 'output' || check.expect === 'python';
+
+/** Checks for block programs (Explorer). */
+export const STAGE_CHECK_KINDS = ['stage', 'blocks'] as const satisfies readonly CheckKind[];
+export const isStageCheck = (check: Check): check is StageCheck | BlocksCheck =>
+  check.expect === 'stage' || check.expect === 'blocks';
+
+/** Checks for git lessons. */
+export const GIT_CHECK_KINDS = ['git'] as const satisfies readonly CheckKind[];
+export const isGitCheck = (check: Check): check is GitCheck => check.expect === 'git';
 
 export interface CheckResult {
   id: string;

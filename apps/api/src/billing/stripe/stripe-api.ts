@@ -96,6 +96,21 @@ export interface CheckoutSessionParams {
   locale?: 'auto' | 'en';
 }
 
+/**
+ * A card check with nothing charged (Checkout in setup mode): the parent enters a
+ * card and Stripe confirms it with the bank. Used for verified parental consent.
+ */
+export interface SetupSessionParams {
+  mode: 'setup';
+  currency: string;
+  payment_method_types: ['card'];
+  success_url: string;
+  cancel_url: string;
+  client_reference_id: string;
+  metadata: Metadata;
+  locale?: 'auto' | 'en';
+}
+
 export interface SubscriptionUpdateParams {
   cancel_at_period_end?: boolean;
   /** Replace or change items: an `id` updates that item, `deleted` removes it. */
@@ -124,7 +139,7 @@ export interface StripeApi {
   checkout: {
     sessions: {
       create(
-        params: CheckoutSessionParams,
+        params: CheckoutSessionParams | SetupSessionParams,
         options?: { idempotencyKey?: string },
       ): Promise<StripeCheckoutSession>;
       /** Closes an open checkout page (fails if it was completed or expired already). */

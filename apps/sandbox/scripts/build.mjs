@@ -86,6 +86,14 @@ async function portfolioMessages() {
       previewTitle: all.portfolio.previewTitle,
       run: all.lesson.runProgram,
       pythonInput: all.lesson.pythonInput,
+      fullScreen: all.lesson.fullScreen,
+      exitFullScreen: all.lesson.exitFullScreen,
+      play: all.explorer.play,
+      stop: all.explorer.stop,
+      // The stage's texts keep their {placeholders}: the stage fills them in.
+      ...Object.fromEntries(
+        Object.entries(all.explorer.stage).map(([key, value]) => [`stage.${key}`, value]),
+      ),
     };
   }
   return result;

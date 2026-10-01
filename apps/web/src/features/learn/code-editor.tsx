@@ -26,11 +26,22 @@ import {
   keymap,
   lineNumbers,
 } from '@codemirror/view';
-import { type CodeFileKey, MAX_CODE_FILE_LENGTH } from '@kcp/checks';
+import { MAX_CODE_FILE_LENGTH } from '@kcp/checks';
 import { tags as t } from '@lezer/highlight';
 import { useEffect, useRef } from 'react';
 
-const LANGUAGES = { html, css, js: javascript, py: python } as const;
+// A block program is only ever shown as the JavaScript it stands for. Git steps are
+// never edited as text; plain text (git lessons' other files) has no highlighting.
+const LANGUAGES = {
+  html,
+  css,
+  js: javascript,
+  py: python,
+  blocks: javascript,
+  git: javascript,
+  text: () => [],
+} as const;
+export type EditorLanguage = keyof typeof LANGUAGES;
 
 /**
  * Code colours from the design system's code tokens: each at least 4.5:1 (WCAG AA) on
@@ -68,6 +79,9 @@ const theme = EditorView.theme({
   '.cm-scroller': {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
     lineHeight: '1.85',
+    // Long code scrolls here, with a scroll bar that has room of its own.
+    scrollbarGutter: 'stable',
+    scrollbarColor: 'color-mix(in srgb, var(--color-ink) 30%, transparent) transparent',
   },
   '.cm-content': { paddingBlock: '6px', caretColor: 'var(--color-brand)' },
   '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--color-brand)', borderLeftWidth: '2px' },
@@ -107,7 +121,7 @@ export function CodeEditor({
   onChange,
 }: {
   value: string;
-  language: CodeFileKey;
+  language: EditorLanguage;
   label: string;
   describedBy?: string;
   onChange: (value: string) => void;

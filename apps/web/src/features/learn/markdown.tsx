@@ -13,7 +13,7 @@ const components: Components = {
   pre: ({ children }) => (
     <pre
       dir="ltr"
-      className="elev-sm mt-3 overflow-x-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm leading-relaxed text-ink [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit"
+      className="elev-sm mt-3 max-h-[70dvh] overflow-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm leading-relaxed text-ink [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit"
     >
       {children}
     </pre>

@@ -23,6 +23,11 @@ export class ModuleCertificateDto {
   moduleTitle!: string;
   /** Every lesson done and the module's project shipped. */
   finished!: boolean;
+  /**
+   * Finished, but a mentor hasn't approved the module project yet (premium students
+   * get their certificate once the review is approved).
+   */
+  awaitingReview!: boolean;
   certificate!: CertificateDto | null;
 }
 

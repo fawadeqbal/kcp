@@ -1,15 +1,19 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AppConfigService } from '../config/app-config.service.js';
+import { ReferralsModule } from '../referrals/referrals.module.js';
 import { AccessTokenService } from './access-token.service.js';
+import { AdultInvitesService } from './adult-invites.service.js';
 import { AuthController } from './auth.controller.js';
 import { AuthGuard } from './auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { SessionService } from './session.service.js';
 import { VerificationTokenService } from './verification-token.service.js';
+import { YoungLoginService } from './young-login.service.js';
 
 @Module({
   imports: [
+    ReferralsModule,
     JwtModule.registerAsync({
       inject: [AppConfigService],
       useFactory: (config: AppConfigService) => ({
@@ -19,7 +23,21 @@ import { VerificationTokenService } from './verification-token.service.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenService, SessionService, VerificationTokenService, AuthGuard],
-  exports: [AuthGuard, SessionService, AccessTokenService],
+  providers: [
+    YoungLoginService,
+    AuthService,
+    AccessTokenService,
+    SessionService,
+    VerificationTokenService,
+    AuthGuard,
+    AdultInvitesService,
+  ],
+  exports: [
+    AuthGuard,
+    SessionService,
+    AccessTokenService,
+    AdultInvitesService,
+    VerificationTokenService,
+  ],
 })
 export class AuthModule {}

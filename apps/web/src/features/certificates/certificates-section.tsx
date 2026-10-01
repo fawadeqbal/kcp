@@ -89,7 +89,9 @@ export function CertificatesSection() {
                       })
                     : module.finished
                       ? list.premium
-                        ? t('ready')
+                        ? module.awaitingReview
+                          ? t('awaitingReview')
+                          : t('ready')
                         : t('premiumOnly')
                       : t('notFinished')}
                 </span>
@@ -106,7 +108,7 @@ export function CertificatesSection() {
                     {t('download')}
                   </Button>
                 )
-              ) : module.finished && list.premium ? (
+              ) : module.finished && list.premium && !module.awaitingReview ? (
                 <Button
                   loading={busy === module.moduleId}
                   onClick={() => void issue(module.moduleId)}

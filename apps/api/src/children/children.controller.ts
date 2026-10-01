@@ -30,6 +30,7 @@ import {
   CreateChildDto,
   DeleteChildDto,
   NicknameSuggestionsDto,
+  PicturePasswordDto,
   ResetChildPasswordDto,
   UpdateChildDto,
 } from './dto/children.dto.js';
@@ -189,6 +190,20 @@ export class ChildrenController {
     @ReqContext() ctx: RequestContext,
   ): Promise<void> {
     return this.children.resetPassword(id, dto.password, parent, ability, ctx);
+  }
+
+  /** Sets (or, with null, removes) the child's picture password. */
+  @Put(':id/picture-password')
+  @Can('update', 'Child')
+  @ApiOkResponse({ type: ChildDto })
+  setPicturePassword(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: PicturePasswordDto,
+    @CurrentUser() parent: AuthUser,
+    @CurrentAbility() ability: AppAbility,
+    @ReqContext() ctx: RequestContext,
+  ): Promise<ChildDto> {
+    return this.children.setPicturePassword(id, dto.pictures ?? null, parent, ability, ctx);
   }
 
   /** Deletes the child's account and personal data. Confirm with the nickname. */

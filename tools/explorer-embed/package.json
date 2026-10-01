@@ -1,0 +1,29 @@
+{
+  "name": "@kcp/explorer-embed",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Explorer block editor and stage for the mobile app: one page (Blockly and the stage from packages/checks), built into apps/mobile/assets/explorer and shown in a WebView. Nothing is loaded from the network.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings src build.mjs"
+  },
+  "dependencies": {
+    "@kcp/checks": "workspace:*",
+    "blockly": "^13.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{workspaceRoot}/apps/mobile/assets/explorer"
+        ]
+      }
+    }
+  }
+}

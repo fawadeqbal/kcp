@@ -17,19 +17,29 @@ part 'email_preferences_dto.g.dart';
 )
 class EmailPreferencesDto {
   /// Returns a new [EmailPreferencesDto] instance.
-  EmailPreferencesDto({required this.monthlySummary});
+  EmailPreferencesDto({
+    required this.monthlySummary,
+
+    required this.weeklyReport,
+  });
 
   /// The monthly email about the children's progress.
   @JsonKey(name: r'monthlySummary', required: true, includeIfNull: false)
   final bool monthlySummary;
 
+  /// The weekly report on Sunday evenings.
+  @JsonKey(name: r'weeklyReport', required: true, includeIfNull: false)
+  final bool weeklyReport;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EmailPreferencesDto && other.monthlySummary == monthlySummary;
+      other is EmailPreferencesDto &&
+          other.monthlySummary == monthlySummary &&
+          other.weeklyReport == weeklyReport;
 
   @override
-  int get hashCode => monthlySummary.hashCode;
+  int get hashCode => monthlySummary.hashCode + weeklyReport.hashCode;
 
   factory EmailPreferencesDto.fromJson(Map<String, dynamic> json) =>
       _$EmailPreferencesDtoFromJson(json);

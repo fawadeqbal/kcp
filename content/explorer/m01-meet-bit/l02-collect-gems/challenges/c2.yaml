@@ -1,0 +1,44 @@
+id: explorer-m01-l02-c2
+order: 2
+type: blocks
+xp: 10
+stage:
+  mode: maze
+  map:
+    - '######'
+    - '#S*..#'
+    - '####*#'
+    - '####G#'
+    - '######'
+  toolbox:
+    - when-run
+    - move
+    - collect
+starter:
+  blocks:
+    - when: run
+      do: []
+solution:
+  blocks:
+    - when: run
+      do:
+        - move: right
+        - collect
+        - move: right
+        - move: right
+        - move: down
+        - collect
+        - move: down
+checks:
+  - id: all-gems
+    expect: stage
+    gemsLeft: 0
+    hint: two_gems
+  - id: reach-flag
+    expect: stage
+    atGoal: true
+    hint: then_flag
+  - id: no-bump
+    expect: stage
+    noBump: true
+    hint: no_walls

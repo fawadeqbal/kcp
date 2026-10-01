@@ -43,6 +43,17 @@ import {
   ResetPasswordDto,
   TokenDto,
 } from './dto/sign-up.dto.js';
+import {
+  PairingApproveDto,
+  PairingCodeDto,
+  PairingDeviceDto,
+  PairingInfoDto,
+  PairingStartDto,
+  PairingStartedDto,
+  PairingStatusDto,
+  PictureLoginDto,
+} from './dto/young-login.dto.js';
+import { YoungLoginService } from './young-login.service.js';
 
 const MINUTE = 60;
 
@@ -73,6 +84,7 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly config: AppConfigService,
+    private readonly young: YoungLoginService,
   ) {}
 
   /** Parent sign-up. Sends a confirmation email; the account works once it is confirmed. */
@@ -187,6 +199,91 @@ export class AuthController {
     return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
   }
 
+  /** Younger children: four pictures instead of a password (set by the parent). */
+  @Post('students/picture-login')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @RateLimit(
+    { name: 'picture-login-ip', limit: 300, windowSeconds: 15 * MINUTE, key: byIp },
+    {
+      name: 'picture-login-username',
+      limit: 10,
+      windowSeconds: 15 * MINUTE,
+      key: byBodyField('username'),
+    },
+  )
+  @ApiOkResponse({ type: LoginResponseDto })
+  async pictureLogin(
+    @Body() dto: PictureLoginDto,
+    @ReqContext() ctx: RequestContext,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponseDto> {
+    const result = await this.young.pictureLogin(dto.username, dto.pictures, ctx);
+    return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
+  }
+
+  /** A child's device asks for a code to show, to be signed in from a parent's phone. */
+  @Post('pairing')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @RateLimit({ name: 'pairing-ip', limit: 30, windowSeconds: 15 * MINUTE, key: byIp })
+  @ApiOkResponse({ type: PairingStartedDto })
+  startPairing(@Body() _dto: PairingStartDto, @ReqContext() ctx: RequestContext) {
+    return this.young.startPairing(ctx);
+  }
+
+  /** The child's device checks whether a parent approved it yet. */
+  @Post('pairing/status')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @RateLimit({ name: 'pairing-status-ip', limit: 600, windowSeconds: 15 * MINUTE, key: byIp })
+  @ApiOkResponse({ type: PairingStatusDto })
+  pairingStatus(@Body() dto: PairingDeviceDto): Promise<PairingStatusDto> {
+    return this.young.pairingStatus(dto.pairingId, dto.secret);
+  }
+
+  /** Once approved: the child's session, for the device that showed the code. */
+  @Post('pairing/claim')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @RateLimit({ name: 'pairing-claim-ip', limit: 60, windowSeconds: 15 * MINUTE, key: byIp })
+  @ApiOkResponse({ type: LoginResponseDto })
+  async claimPairing(
+    @Body() dto: PairingDeviceDto,
+    @ReqContext() ctx: RequestContext,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponseDto> {
+    const result = await this.young.claimPairing(dto.pairingId, dto.secret, ctx);
+    return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
+  }
+
+  /** A parent looks at a code before approving it: which device asked. */
+  @Post('pairing/lookup')
+  @Authenticated()
+  @HttpCode(HttpStatus.OK)
+  @RateLimit({ name: 'pairing-lookup-ip', limit: 30, windowSeconds: 15 * MINUTE, key: byIp })
+  @ApiOkResponse({ type: PairingInfoDto })
+  pairingInfo(
+    @Body() dto: PairingCodeDto,
+    @CurrentUser() parent: AuthUser,
+  ): Promise<PairingInfoDto> {
+    return this.young.pairingInfo(dto.code, parent);
+  }
+
+  /** A parent signs one of their children in on the device that shows the code. */
+  @Post('pairing/approve')
+  @Authenticated()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @RateLimit({ name: 'pairing-approve-ip', limit: 30, windowSeconds: 15 * MINUTE, key: byIp })
+  @ApiNoContentResponse()
+  async approvePairing(
+    @Body() dto: PairingApproveDto,
+    @CurrentUser() parent: AuthUser,
+    @ReqContext() ctx: RequestContext,
+  ): Promise<void> {
+    await this.young.approvePairing(dto.code, dto.childId, parent, ctx);
+  }
+
   /** Staff without two-factor yet: returns a secret to add to an authenticator app. */
   @Post('mfa/setup')
   @Public()
@@ -211,7 +308,7 @@ export class AuthController {
     @ReqContext() ctx: RequestContext,
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
-    const result = await this.auth.verifyMfa(dto.mfaToken, dto.code, ctx);
+    const result = await this.auth.verifyMfa(dto.mfaToken, dto.code, ctx, dto.app ?? 'admin');
     return this.deliver(result, dto.app === 'mobile' ? 'body' : dto.tokenDelivery, res, dto.app);
   }
 

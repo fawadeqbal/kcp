@@ -20,3 +20,5 @@ export {
 export { guardHtmlScripts, guardLoops, type GuardResult } from './loop-guard.js';
 export { installLoopGuard, LOOP_GUARD, LOOP_LIMIT_ERROR } from './runtime.js';
 export * from './types.js';
+export * from './stage/index.js';
+export * from './git/index.js';

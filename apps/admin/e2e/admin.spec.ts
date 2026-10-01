@@ -1,23 +1,6 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 import { endTrial, giveCertificate, joinWaitlist } from './database';
-import { API_URL, createFamily, createStaff, earnXp, payByCard, totp } from './helpers';
-
-/** First login of a new staff account: password, then setting up the authenticator. */
-async function firstLogin(page: Page, staff: { email: string; password: string }) {
-  await page.goto('/login');
-  await page.getByLabel('Email address').fill(staff.email);
-  await page.getByLabel('Password', { exact: true }).fill(staff.password);
-  await page.getByRole('button', { name: 'Continue' }).click();
-
-  await expect(
-    page.getByRole('heading', { name: 'Set up two-factor authentication' }),
-  ).toBeVisible();
-  await expect(page.getByRole('img', { name: 'QR code for your authenticator app' })).toBeVisible();
-  const secret = (await page.getByTestId('mfa-secret').textContent())?.replaceAll(' ', '') ?? '';
-  await page.getByLabel('6-digit code').fill(totp(secret));
-  await page.getByRole('button', { name: 'Turn on and log in' }).click();
-  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
-}
+import { API_URL, createFamily, createStaff, earnXp, firstLogin, payByCard } from './helpers';
 
 test('an admin sets up two-factor, suspends a parent and finds it in the audit log', async ({
   page,

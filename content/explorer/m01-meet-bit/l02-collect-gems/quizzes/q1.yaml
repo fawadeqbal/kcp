@@ -1,0 +1,29 @@
+id: explorer-m01-l02-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: What is a bug?
+  ar: ما هو الخطأ البرمجي؟
+  ur: بگ کیا ہوتا ہے؟
+options:
+  - id: a
+    text:
+      en: A mistake that makes a program do something you didn't expect.
+      ar: خطأ يجعل البرنامج يفعل شيئًا لم تتوقعه.
+      ur: ایسی غلطی جس سے پروگرام وہ کرے جو آپ نے نہیں سوچا تھا۔
+  - id: b
+    text:
+      en: A block that collects gems.
+      ar: مكعب يجمع الجواهر.
+      ur: ایک بلاک جو جوہر اٹھاتا ہے۔
+  - id: c
+    text:
+      en: The flag at the end of the path.
+      ar: العلم في نهاية الطريق.
+      ur: راستے کے آخر میں جھنڈا۔
+answer: a
+explanation:
+  en: A bug is a mistake in a program. Debugging means finding it and fixing it.
+  ar: الخطأ البرمجي غلطة في البرنامج. تصحيح الأخطاء يعني إيجادها وإصلاحها.
+  ur: بگ پروگرام میں غلطی ہے۔ ڈیبگنگ کا مطلب ہے اسے ڈھونڈنا اور ٹھیک کرنا۔

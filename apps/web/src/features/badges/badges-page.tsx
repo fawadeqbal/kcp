@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Alert, Icon, PageSpinner } from '@/components/ui';
+import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { BadgeCelebration, badgeIcon } from './badge-celebration';
@@ -15,6 +16,7 @@ type Badge = components['schemas']['BadgeDto'];
 /** Every badge, grouped by kind: earned ones in colour, the rest waiting to be earned. */
 export function BadgesPage() {
   const t = useTranslations('badges');
+  const ts = useTranslations('skills');
   const format = useFormatter();
   const user = useAccount('STUDENT');
   const signedIn = user !== null;
@@ -50,6 +52,13 @@ export function BadgesPage() {
         <div>
           <h1 className="text-4xl">{t('title')}</h1>
           <p className="mt-1.5 text-lg text-muted">{t('subtitle')}</p>
+          <Link
+            href="/learn/skills"
+            className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-brand-text hover:underline"
+          >
+            {ts('link')}
+            <Icon name="arrow" />
+          </Link>
         </div>
         {badges ? (
           <p className="flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 font-bold text-brand-800">

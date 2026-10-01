@@ -1,0 +1,38 @@
+id: explorer-m01-l05-c1
+order: 1
+type: blocks
+xp: 10
+stage:
+  mode: maze
+  map:
+    - '######'
+    - '#S..G#'
+    - '######'
+  toolbox:
+    - when-run
+    - move
+    - say
+    - repeat
+starter:
+  blocks:
+    - when: run
+      do: []
+solution:
+  blocks:
+    - when: run
+      do:
+        - say: Hello!
+        - repeat: 3
+          do:
+            - move: right
+        - say: I made it!
+checks:
+  - id: says
+    expect: blocks
+    uses:
+      - say
+    hint: add_say
+  - id: reach-flag
+    expect: stage
+    atGoal: true
+    hint: walk

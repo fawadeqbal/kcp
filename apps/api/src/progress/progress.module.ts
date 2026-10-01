@@ -4,6 +4,7 @@ import { LeaderboardJobsService } from './leaderboard-jobs.service.js';
 import { LeaderboardService } from './leaderboard.service.js';
 import { LeaderboardsAdminController } from './leaderboards-admin.controller.js';
 import { LeaderboardsAdminService } from './leaderboards-admin.service.js';
+import { LeaguesService } from './leagues.service.js';
 import { ProgressController } from './progress.controller.js';
 import { ProgressService } from './progress.service.js';
 
@@ -15,7 +16,8 @@ import { ProgressService } from './progress.service.js';
     BadgesService,
     LeaderboardsAdminService,
     LeaderboardJobsService,
+    LeaguesService,
   ],
-  exports: [ProgressService, LeaderboardService, BadgesService],
+  exports: [ProgressService, LeaderboardService, BadgesService, LeaguesService],
 })
 export class ProgressModule {}

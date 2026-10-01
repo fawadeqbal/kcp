@@ -10,6 +10,8 @@ import {
   MarkBadgesSeenDto,
   ProgressDto,
 } from './dto/progress.dto.js';
+import { LeagueDto } from './dto/leagues.dto.js';
+import { LeaguesService } from './leagues.service.js';
 import { ProgressService } from './progress.service.js';
 
 @ApiTags('progress')
@@ -18,6 +20,7 @@ export class ProgressController {
   constructor(
     private readonly progress: ProgressService,
     private readonly badges: BadgesService,
+    private readonly leagues: LeaguesService,
   ) {}
 
   /** The student's XP, level, daily goal, streak, badges and this week's ranks. */
@@ -42,6 +45,23 @@ export class ProgressController {
       user,
       query.lang ?? 'en',
     );
+  }
+
+  /** The student's league this week: their group of about 30, and last week's result. */
+  @Get('league')
+  @Can('read', 'Leaderboard')
+  @ApiOkResponse({ type: LeagueDto })
+  league(@CurrentUser() user: AuthUser): Promise<LeagueDto> {
+    return this.leagues.forStudent(user);
+  }
+
+  /** The student saw last week's league result. */
+  @Post('league/seen')
+  @Can('read', 'Leaderboard')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse()
+  async leagueSeen(@CurrentUser() user: AuthUser): Promise<void> {
+    await this.leagues.markSeen(user);
   }
 
   /** Every badge, with the ones the student has earned. */

@@ -302,6 +302,8 @@ export class AccountService {
           regionId: null,
           cityId: null,
           monthlySummaryEmails: false,
+          weeklyReportEmails: false,
+          referralCode: null,
         },
       });
       await this.audit.record(

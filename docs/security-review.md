@@ -60,6 +60,37 @@ Also fixed: certificate codes are redacted from request logs, and the API accept
 | V13 API                    | OK     | Exact CORS origins; JSON only; no mass assignment.                                                                                                                                                        |
 | V14 Configuration          | OK     | Fails closed on insecure configuration; CSP and HSTS; non-root image; frozen lockfile; install-script allow-list; SHA-pinned actions; dependency audit.                                                   |
 
+## Phase 2 additions
+
+New attack surface since the review, and how it is handled. Review these again with the rest before launch.
+
+**Team rooms (Sprint 7).**
+
+- Only members read or write a room; parents read their children's rooms (read only); staff read through the moderation queue. Room IDs are checked against membership on every call, over HTTP and on the Socket.IO `/chat` namespace (the socket authenticates with the same access token, and joins only the member's rooms).
+- Under 13: ready-made phrases only (the API refuses typed text). From 13 and adults: a filter refuses links, email addresses, phone numbers (also spelled out or with spaces), other apps' names and a list of unkind words in English, Arabic, Urdu and Roman Urdu; staff add words in the admin panel. Send limits: 5 messages per 10 seconds and 60 per hour.
+- Reports keep a copy of the message and the ones around it; moderators' actions are audited. Messages are deleted after 90 days.
+- The web app's CSP allows the API's WebSocket origin only.
+
+**Hackathons and team repositories (Sprint 8).**
+
+- **Forgejo is private.** It has no public address; the API is the only client. Registration, SSH, mail, OpenID and webhooks are off; repositories are private. Students never get Forgejo credentials.
+- **Git over HTTP goes through the API** (`/v1/git/teams/:id/...`). The API checks the student's access token and that they are an approved member of that team (or its mentor, a judge or staff: they may fetch; only members and the mentor push), then forwards to Forgejo with the admin's credentials. Pull requests, reviews and merges use the admin token with a `Sudo` header naming the person's own Forgejo account, so Forgejo records who did what. Before forwarding a push, the API reads the ref updates (pkt-lines) and refuses a push to `main`, deleting a branch, anything outside `refs/heads/`, a student pushing any branch but their own, and any push while the event isn't running. `main` is also protected in Forgejo. Request bodies are limited to 25 MB.
+- **Merging** needs an approval of the branch's latest commit from someone other than the author (a teammate or the mentor), unless the team is one student without a mentor: new commits after an approval need a new one. Reviews of one's own pull request are refused.
+- **Mentors and judges are checked on every request**, not only when staff assign them: a mentor whose background check fails, or who is paused, loses their teams, judging and team rooms at once.
+- **Parents approve** each child's place in a team (and are told by bell, email and push); staff can take a student out of a team at any time (audited), which removes their repository access too.
+- **Names:** Forgejo accounts are `kcp-<id>` with a `@noreply.kcp.invalid` address; commits carry the student's nickname. Team names and pull request titles, comments and hand-in texts pass the same filter as rooms.
+- **Not filtered:** file contents and commit messages. They are visible only to the team, its mentor, the event's judges and staff, and the safety runbook covers removing them. A future step could scan pushes with the same filter.
+- **The admin token** can act as any team member: keep it with the database password, rotate it if it leaks (`pnpm forgejo:setup` makes a new one), and never log it (the API redacts `Authorization` headers).
+- Git lessons in the Pro track run a small git simulator in the browser; the server replays the same steps to confirm the checks, like the HTML and CSS lessons.
+
+**Schools, teachers and the readiness check (Sprint 9).**
+
+- **Teachers** are adults staff invite for a school (never self sign-up); they sign in with two-factor codes on the web app. They see only their own classes (another teacher's class answers 404), and only nicknames, avatars, progress on the lessons they set, and a weekly XP board. They can't look students up or message them outside the class room.
+- **Joining a class** needs the class's code and a parent's approval (like teams and friends). Codes are 6 characters from the friend-code alphabet; teachers can make a new one, and archived classes' codes stop working. Classes hold at most 60 students.
+- **School premium** comes from a licence staff mark paid (bank transfer): grants are tied to the licence, limited to its seats, end with it, and are taken back when a student leaves or the licence is cancelled. Only admins manage schools and licences (a subject families and teachers can't use on all records), and every change is audited.
+- **The readiness check** runs its timer on the server: saving and handing in are refused after the time plus 5 minutes; what was saved is handed in automatically. Only the page's three files are kept. A mentor grades it through the same review flow as projects. Passing records readiness only.
+- **Hardening:** the route permission test covers every new route (staff routes, 404 for others' classes); the demo data now fills every table (`pnpm demo:data` fails otherwise).
+
 ## Dependency audit
 
 `pnpm audit` flagged three transitive packages (`mysql2`, `deepmerge-ts`, `smol-toml`, pulled in by development tooling); `pnpm-workspace.yaml` overrides them to fixed versions, and the audit is now clean (30 September 2026). CI now fails on any new high or critical advisory. Dependabot keeps packages and actions current.

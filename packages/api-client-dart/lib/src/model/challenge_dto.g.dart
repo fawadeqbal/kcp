@@ -21,6 +21,10 @@ abstract class _$ChallengeDtoCWProxy {
 
   ChallengeDto starter(CodeFilesDto starter);
 
+  ChallengeDto stage(StageDto? stage);
+
+  ChallengeDto repo(GitSetupDto? repo);
+
   ChallengeDto checks(List<Object> checks);
 
   ChallengeDto hints(Map<String, String> hints);
@@ -45,6 +49,8 @@ abstract class _$ChallengeDtoCWProxy {
     num xp,
     List<ChallengeDtoFilesEnum> files,
     CodeFilesDto starter,
+    StageDto? stage,
+    GitSetupDto? repo,
     List<Object> checks,
     Map<String, String> hints,
     Map<String, String> checkLabels,
@@ -82,6 +88,12 @@ class _$ChallengeDtoCWProxyImpl implements _$ChallengeDtoCWProxy {
   ChallengeDto starter(CodeFilesDto starter) => this(starter: starter);
 
   @override
+  ChallengeDto stage(StageDto? stage) => this(stage: stage);
+
+  @override
+  ChallengeDto repo(GitSetupDto? repo) => this(repo: repo);
+
+  @override
   ChallengeDto checks(List<Object> checks) => this(checks: checks);
 
   @override
@@ -112,6 +124,8 @@ class _$ChallengeDtoCWProxyImpl implements _$ChallengeDtoCWProxy {
     Object? xp = const $CopyWithPlaceholder(),
     Object? files = const $CopyWithPlaceholder(),
     Object? starter = const $CopyWithPlaceholder(),
+    Object? stage = const $CopyWithPlaceholder(),
+    Object? repo = const $CopyWithPlaceholder(),
     Object? checks = const $CopyWithPlaceholder(),
     Object? hints = const $CopyWithPlaceholder(),
     Object? checkLabels = const $CopyWithPlaceholder(),
@@ -147,6 +161,14 @@ class _$ChallengeDtoCWProxyImpl implements _$ChallengeDtoCWProxy {
           ? _value.starter
           // ignore: cast_nullable_to_non_nullable
           : starter as CodeFilesDto,
+      stage: stage == const $CopyWithPlaceholder()
+          ? _value.stage
+          // ignore: cast_nullable_to_non_nullable
+          : stage as StageDto?,
+      repo: repo == const $CopyWithPlaceholder()
+          ? _value.repo
+          // ignore: cast_nullable_to_non_nullable
+          : repo as GitSetupDto?,
       checks: checks == const $CopyWithPlaceholder()
           ? _value.checks
           // ignore: cast_nullable_to_non_nullable
@@ -194,6 +216,8 @@ ChallengeDto _$ChallengeDtoFromJson(
       'xp',
       'files',
       'starter',
+      'stage',
+      'repo',
       'checks',
       'hints',
       'checkLabels',
@@ -230,6 +254,14 @@ ChallengeDto _$ChallengeDtoFromJson(
       'starter',
       (v) => CodeFilesDto.fromJson(v as Map<String, dynamic>),
     ),
+    stage: $checkedConvert(
+      'stage',
+      (v) => v == null ? null : StageDto.fromJson(v as Map<String, dynamic>),
+    ),
+    repo: $checkedConvert(
+      'repo',
+      (v) => v == null ? null : GitSetupDto.fromJson(v as Map<String, dynamic>),
+    ),
     checks: $checkedConvert(
       'checks',
       (v) => (v as List<dynamic>).map((e) => e as Object).toList(),
@@ -260,6 +292,8 @@ Map<String, dynamic> _$ChallengeDtoToJson(ChallengeDto instance) =>
           .map((e) => _$ChallengeDtoFilesEnumEnumMap[e]!)
           .toList(),
       'starter': instance.starter.toJson(),
+      'stage': instance.stage?.toJson(),
+      'repo': instance.repo?.toJson(),
       'checks': instance.checks,
       'hints': instance.hints,
       'checkLabels': instance.checkLabels,
@@ -272,6 +306,8 @@ const _$ChallengeDtoTypeEnumEnumMap = {
   ChallengeDtoTypeEnum.CSS: 'CSS',
   ChallengeDtoTypeEnum.JS: 'JS',
   ChallengeDtoTypeEnum.PYTHON: 'PYTHON',
+  ChallengeDtoTypeEnum.BLOCKS: 'BLOCKS',
+  ChallengeDtoTypeEnum.GIT: 'GIT',
   ChallengeDtoTypeEnum.unknownDefaultOpenApi: 'unknown_default_open_api',
 };
 
@@ -280,5 +316,7 @@ const _$ChallengeDtoFilesEnumEnumMap = {
   ChallengeDtoFilesEnum.css: 'css',
   ChallengeDtoFilesEnum.js: 'js',
   ChallengeDtoFilesEnum.py: 'py',
+  ChallengeDtoFilesEnum.blocks: 'blocks',
+  ChallengeDtoFilesEnum.git: 'git',
   ChallengeDtoFilesEnum.unknownDefaultOpenApi: 'unknown_default_open_api',
 };

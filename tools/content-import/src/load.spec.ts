@@ -217,6 +217,61 @@ describe('verifyContent', () => {
   });
 });
 
+/** A block challenge file: a two-square corridor, with these extra lines. */
+const blockChallenge = (lines: string[]) =>
+  [
+    'id: t-m01-l01-c1',
+    'order: 1',
+    'type: blocks',
+    'xp: 5',
+    'stage:',
+    '  mode: maze',
+    '  map: ["#####", "#S.G#", "#####"]',
+    '  toolbox: [when-run, move]',
+    'starter:',
+    '  blocks:',
+    '    - when: run',
+    '      do: []',
+    ...lines,
+    'checks:',
+    '  - id: has-h1',
+    '    expect: stage',
+    '    atGoal: true',
+    '    hint: add_h1',
+    '',
+  ].join('\n');
+
+describe('block challenges (Explorer)', () => {
+  it('loads a block program and proves the solution reaches the flag', async () => {
+    await put(
+      `${LESSON}/challenges/c1.yaml`,
+      blockChallenge(['solution:', '  blocks:', '    - when: run', '      do: [{ move: right }]']),
+    );
+    const { tracks, issues } = await loadContent(root);
+    expect(errors(issues)).toEqual([]);
+    const challenge = tracks[0]?.modules[0]?.lessons[0]?.challenges[0]?.data;
+    // Stored as the JSON the editor saves.
+    expect(challenge?.starter.blocks).toBe('[{"when":"run","do":[]}]');
+    // One step isn't enough: the flag is two squares away.
+    expect(errors(await verifyContent(tracks, root))).toEqual([
+      'the solution fails check "has-h1"',
+    ]);
+  });
+
+  it('refuses unknown blocks, broken maps and web checks', async () => {
+    await put(
+      `${LESSON}/challenges/c1.yaml`,
+      blockChallenge(['solution:', '  blocks:', '    - when: run', '      do: [{ jump: 3 }]'])
+        .replace('"#S.G#"', '"#S.G"')
+        .replace('expect: stage\n    atGoal: true', 'expect: exists\n    selector: h1'),
+    );
+    const messages = errors((await loadContent(root)).issues).join('\n');
+    expect(messages).toMatch(/not a block program/);
+    expect(messages).toMatch(/same length/);
+    expect(messages).toMatch(/block programs "stage" and "blocks"/);
+  });
+});
+
 describe('markdown helpers', () => {
   it('splits front matter', () => {
     expect(splitFrontMatter('---\ntitle: A\n---\n\nBody')).toEqual({
@@ -229,5 +284,49 @@ describe('markdown helpers', () => {
   it('spots HTML outside code', () => {
     expect(hasBareHtml('Use `<h1>` here\n\n```html\n<p>x</p>\n```')).toBe(false);
     expect(hasBareHtml('Use <h1> here')).toBe(true);
+  });
+});
+
+describe('skills', () => {
+  const skills = [
+    'skills:',
+    '  - key: html',
+    '    category: web',
+    '    names:',
+    '      en: Web pages',
+    '      ar: صفحات الويب',
+    '      ur: ویب صفحات',
+    '',
+  ].join('\n');
+
+  it('reads skills.yaml and the skills lessons teach', async () => {
+    await put('skills.yaml', skills);
+    await put(`${LESSON}/lesson.yaml`, 'id: t-m01-l01\norder: 1\nxp: 10\nskills: [html]\n');
+    const result = await loadContent(root);
+    expect(errors(result.issues)).toEqual([]);
+    expect(result.skills).toEqual([
+      {
+        key: 'html',
+        category: 'web',
+        names: { en: 'Web pages', ar: 'صفحات الويب', ur: 'ویب صفحات' },
+      },
+    ]);
+    expect(result.tracks[0]!.modules[0]!.lessons[0]!.data.skills).toEqual(['html']);
+  });
+
+  it('refuses skills that are not in skills.yaml, or without it', async () => {
+    await put(`${LESSON}/lesson.yaml`, 'id: t-m01-l01\norder: 1\nxp: 10\nskills: [loops]\n');
+    expect(errors((await loadContent(root)).issues)).toContain(
+      'lessons name skills, but there is no skills.yaml',
+    );
+    await put('skills.yaml', skills);
+    expect(errors((await loadContent(root)).issues)).toContain(
+      'unknown skill "loops" (not in skills.yaml)',
+    );
+    await put(
+      'skills.yaml',
+      `${skills}  - key: html\n    category: web\n    names:\n      en: Again\n`,
+    );
+    expect(errors((await loadContent(root)).issues).join()).toMatch(/skill "html" is listed twice/);
   });
 });

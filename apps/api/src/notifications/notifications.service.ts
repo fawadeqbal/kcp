@@ -16,7 +16,45 @@ export type NotificationType =
   | 'plan_ended'
   | 'trial_ending'
   | 'child_shipped'
-  | 'child_certificate';
+  | 'child_certificate'
+  /** A mentor finished reviewing the student's project: { reviewId, decision }. */
+  | 'review_done'
+  /** The same, for the parents: { reviewId, childId, nickname, decision }. */
+  | 'child_reviewed'
+  /** The student moved up or down a league: { outcome, tier }. */
+  | 'league_result'
+  /** A friend request for the parent to approve: { requestId, childId, nickname, friendNickname }. */
+  | 'friend_request'
+  /** Both parents approved: the students are friends: { nickname } (the new friend). */
+  | 'friend_added'
+  /** A family the parent invited made it: their children got premium days: { days }. */
+  | 'referral_rewarded'
+  /** The parent's weekly report is ready: { weekKey }. */
+  | 'weekly_report'
+  /** A moderator reminded the student of the room rules: {}. */
+  | 'chat_warning'
+  /** A moderator paused the student's messages: { until }. */
+  | 'chat_muted'
+  /** The same, for the parents: { childId, nickname, action: WARN|MUTE|SUSPEND, until? }. */
+  | 'child_chat_action'
+  /** A moderator looked at what the student (or adult) reported: {}. */
+  | 'chat_report_done'
+  /** A child asks to join a hackathon team: { teamId, childId, nickname, event, team }. */
+  | 'event_join_request'
+  /** A parent approved: the student is in the team: { slug, event, team }. */
+  | 'event_joined'
+  /** An event's results are out: { slug, event, rank }. */
+  | 'event_results'
+  /** A child asks to join a class: { classId, childId, nickname, className, school }. */
+  | 'class_join_request'
+  /** A parent approved: the student is in the class: { classId, className }. */
+  | 'class_joined'
+  /** The teacher set a lesson: { classId, className, lessonId, dueAt? }. */
+  | 'assignment_new'
+  /** The student's readiness check was graded: { reviewId, passed }. */
+  | 'readiness_result'
+  /** The same, for the parents: { reviewId, childId, nickname, passed }. */
+  | 'child_readiness';
 
 /** Kept per account; older ones go (nightly). */
 const KEEP_DAYS = 90;

@@ -3,6 +3,7 @@ import type { Redis } from 'ioredis';
 import { Stripe } from 'stripe';
 import type {
   CheckoutSessionParams,
+  SetupSessionParams,
   Metadata,
   StripeApi,
   StripeCharge,
@@ -32,6 +33,7 @@ const KEEP_SECONDS = 60 * 24 * 60 * 60;
 export type WebhookDelivery = (payload: string, signature: string) => Promise<void>;
 
 interface StoredSession extends StripeCheckoutSession {
+  mode: 'subscription' | 'setup';
   line_items: CheckoutSessionParams['line_items'];
   success_url: string;
   cancel_url: string;
@@ -203,8 +205,29 @@ export class MockStripe implements StripeApi {
 
   checkout = {
     sessions: {
-      create: async (params: CheckoutSessionParams) => {
+      create: async (params: CheckoutSessionParams | SetupSessionParams) => {
         const id = newId('cs');
+        if (params.mode === 'setup') {
+          const setup: StoredSession = {
+            id,
+            object: 'checkout.session',
+            url: `${this.options.apiPublicUrl}/v1/payments/mock-stripe/checkout/${id}`,
+            mode: 'setup',
+            customer: null,
+            subscription: null,
+            client_reference_id: params.client_reference_id,
+            metadata: params.metadata,
+            line_items: [],
+            success_url: params.success_url,
+            cancel_url: params.cancel_url,
+            subscription_metadata: {},
+            status: 'open',
+            amount_total: 0,
+            currency: params.currency,
+          };
+          await this.save('session', id, setup);
+          return setup;
+        }
         let amount = 0;
         let currency = 'usd';
         for (const item of params.line_items) {
@@ -251,6 +274,13 @@ export class MockStripe implements StripeApi {
   async completeSession(id: string): Promise<StoredSession> {
     const session = await this.load<StoredSession>('session', id);
     if (session.status !== 'open') return session;
+    if (session.mode === 'setup') {
+      // A card check: nothing to charge.
+      session.status = 'complete';
+      await this.save('session', id, session);
+      this.emit([{ type: 'checkout.session.completed', object: this.publicSession(session) }]);
+      return session;
+    }
     const start = now();
     const items: StripeSubscriptionItem[] = [];
     for (const line of session.line_items) {

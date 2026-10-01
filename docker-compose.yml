@@ -53,6 +53,41 @@ services:
     volumes:
       - storage-data:/data
 
+  # Team repositories for hackathons (Forgejo, a self-hosted git server). Only the API
+  # talks to it: students' browsers go through the API's git proxy. After the first
+  # start, `pnpm forgejo:setup` makes the admin account and prints FORGEJO_URL and
+  # FORGEJO_TOKEN for .env.
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:11
+    restart: unless-stopped
+    environment:
+      USER_UID: '1000'
+      USER_GID: '1000'
+      FORGEJO__database__DB_TYPE: sqlite3
+      FORGEJO__security__INSTALL_LOCK: 'true'
+      FORGEJO__server__ROOT_URL: http://localhost:3005/
+      FORGEJO__server__HTTP_PORT: '3000'
+      FORGEJO__server__DISABLE_SSH: 'true'
+      FORGEJO__server__OFFLINE_MODE: 'true'
+      FORGEJO__service__DISABLE_REGISTRATION: 'true'
+      FORGEJO__service__REQUIRE_SIGNIN_VIEW: 'true'
+      FORGEJO__service__DEFAULT_KEEP_EMAIL_PRIVATE: 'true'
+      FORGEJO__repository__DEFAULT_PRIVATE: private
+      FORGEJO__repository__DEFAULT_BRANCH: main
+      FORGEJO__openid__ENABLE_OPENID_SIGNIN: 'false'
+      FORGEJO__mailer__ENABLED: 'false'
+      FORGEJO__webhook__ALLOWED_HOST_LIST: 'none'
+      FORGEJO__api__ENABLE_SWAGGER: 'false'
+    ports:
+      - '127.0.0.1:3005:3000'
+    volumes:
+      - forgejo-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-sf', 'http://localhost:3000/api/healthz']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
   # Runs the API in a container, built from apps/api/Dockerfile — the same image
   # that is deployed. Optional: day-to-day you run the API with `pnpm dev`.
   # Start with: docker compose --profile api up -d --build
@@ -114,3 +149,4 @@ volumes:
   postgres-data:
   redis-data:
   storage-data:
+  forgejo-data:

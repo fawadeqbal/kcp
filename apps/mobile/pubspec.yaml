@@ -26,8 +26,10 @@ dependencies:
     path: ../../packages/api-client-dart
   markdown: ^7.3.1
   package_info_plus: ^10.2.1
+  qr_flutter: ^4.1.0
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:
@@ -37,6 +39,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  # The Explorer block editor and Bit's world, shown in a WebView. Built from
+  # tools/explorer-embed (pnpm --filter @kcp/explorer-embed build); licences in
+  # assets/explorer/LICENSES.md.
+  assets:
+    - assets/explorer/
+    - assets/explorer/media/
   # The Organic design system's type, as on the web (licences: assets/fonts/*-OFL.txt).
   # Caprasimo has one weight; it is listed as bold too, so bold headings (Arabic,
   # Urdu) never get a faked bold on their Latin letters.

@@ -1,0 +1,29 @@
+id: explorer-m01-l03-q2
+order: 2
+kind: choice
+xp: 5
+prompt:
+  en: '"repeat 4 times" holds "move right" and "move down". How many squares does Bit move in all?'
+  ar: مكعب «كرّر 4 مرات» يحوي «تحرّك لليمين» و«تحرّك للأسفل». كم مربعًا يتحرك بِت في المجموع؟
+  ur: '"4 بار دہراؤ" کے اندر "دائیں چلو" اور "نیچے چلو" ہیں۔ بِٹ کل کتنے خانے چلے گا؟'
+options:
+  - id: a
+    text:
+      en: '4'
+      ar: '4'
+      ur: '4'
+  - id: b
+    text:
+      en: '8'
+      ar: '8'
+      ur: '8'
+  - id: c
+    text:
+      en: '6'
+      ar: '6'
+      ur: '6'
+answer: b
+explanation:
+  en: Each time round the loop Bit moves twice. Four times two is eight.
+  ar: في كل دورة يتحرك بِت مرتين. أربعة في اثنين تساوي ثمانية.
+  ur: لوپ کے ہر چکر میں بِٹ دو بار چلتا ہے۔ چار ضرب دو، آٹھ۔

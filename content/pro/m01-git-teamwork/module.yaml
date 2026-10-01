@@ -1,0 +1,10 @@
+id: pro-m01
+order: 1
+titles:
+  en: Git and teamwork
+  ar: git والعمل الجماعي
+  ur: git اور ٹیم ورک
+descriptions:
+  en: Save versions of your work with git, try ideas on branches, merge them and fix conflicts — the tools every coding team uses, and what you need for hackathons.
+  ar: احفظ نسخًا من عملك باستخدام git، وجرّب الأفكار على فروع، وادمجها، وحلّ التعارضات — أدوات يستخدمها كل فريق برمجة، وما تحتاجه في الهاكاثونات.
+  ur: git سے اپنے کام کے ورژن محفوظ کریں، برانچز پر آئیڈیاز آزمائیں، انہیں مرج کریں اور کنفلکٹس حل کریں — وہ ٹولز جو ہر کوڈنگ ٹیم استعمال کرتی ہے، اور ہیکاتھون کے لیے ضروری ہیں۔

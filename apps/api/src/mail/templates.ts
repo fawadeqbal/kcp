@@ -19,7 +19,17 @@ export type MailTemplate =
   | 'monthlySummary'
   | 'passwordChanged'
   | 'twoFactorEnabled'
-  | 'accountDeleted';
+  | 'accountDeleted'
+  | 'adultInvite'
+  | 'parentalConsent'
+  | 'parentalConsentFollowUp'
+  | 'parentalConsentDone'
+  | 'parentalConsentRejected'
+  | 'friendRequest'
+  | 'referralRewarded'
+  | 'weeklyReport'
+  | 'eventJoin'
+  | 'classJoin';
 
 /** Values a template fills in, e.g. { nickname: "Rocket", date: "14 October 2026" }. */
 export type MailVars = Record<string, string>;
@@ -30,6 +40,17 @@ interface TemplateCopy {
   intro: Text;
   button: string;
   outro: Text;
+}
+
+/** One child's week in the weekly report. */
+export interface ChildWeek {
+  nickname: string;
+  minutes: number;
+  xp: number;
+  lessons: number;
+  streak: number;
+  /** Skills learned this week, in the parent's language. */
+  skills: string[];
 }
 
 /** One child's month in the monthly summary. */
@@ -49,6 +70,8 @@ interface LanguageCopy {
   signOff: string;
   /** One line of the monthly summary per child. */
   childMonth: (child: ChildMonth) => string;
+  /** One line of the weekly report per child. */
+  childWeek: (child: ChildWeek) => string;
   templates: Record<MailTemplate, TemplateCopy>;
 }
 
@@ -60,6 +83,8 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
     signOff: `The ${BRAND_NAME} team`,
     childMonth: (c) =>
       `${c.nickname} — lessons finished: ${c.lessons}, XP earned: ${c.xp}, projects shipped: ${c.projects}, longest streak (days): ${c.streak}`,
+    childWeek: (c) =>
+      `${c.nickname} — time learning: ${c.minutes} min, XP: ${c.xp}, lessons finished: ${c.lessons}, streak (days): ${c.streak}${c.skills.length ? `, new skills: ${c.skills.join(', ')}` : ''}`,
     templates: {
       verifyEmail: {
         subject: 'Confirm your email address',
@@ -149,6 +174,85 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
         outro:
           "We keep invoices and consent records for as long as the law asks us to. If you didn't ask for this, write to us straight away.",
       },
+      adultInvite: {
+        subject: (v) =>
+          v['role'] === 'teacher'
+            ? `You're invited to teach on ${BRAND_NAME}`
+            : `You're invited to mentor on ${BRAND_NAME}`,
+        intro: (v) =>
+          v['role'] === 'teacher'
+            ? 'Our team made you a teacher account: you can set up classes and follow your students. Choose a password to start; you will also set up two-factor login.'
+            : "Our team made you a mentor account: you'll review students' projects. Choose a password to start; you will also set up two-factor login and read the code of conduct.",
+        button: 'Choose your password',
+        outro:
+          "This link expires in 3 days. If you weren't expecting this, you can ignore this email.",
+      },
+      parentalConsent: {
+        subject: (v) => `Your consent for ${v['nickname']}'s account`,
+        intro: (v) =>
+          `You added ${v['nickname']}, who is under 13. Before they can start, we need your consent as their parent. Their account keeps only a nickname, an avatar, their birth year and their learning; nothing about them is public unless you switch it on. Press the button to give your consent.`,
+        button: 'I give my consent',
+        outro:
+          "This link expires in 7 days. If you didn't add a child, ignore this email and the account will be deleted.",
+      },
+      parentalConsentFollowUp: {
+        subject: (v) => `You gave consent for ${v['nickname']}`,
+        intro: (v) =>
+          `Yesterday you gave your consent for ${v['nickname']}'s account. If that wasn't you, or you've changed your mind, delete the account from your dashboard and everything about them is removed.`,
+        button: 'Open your dashboard',
+        outro: 'You can change what is shared, or delete the account, at any time.',
+      },
+      parentalConsentDone: {
+        subject: (v) => `${v['nickname']} is ready to start`,
+        intro: (v) =>
+          `Thank you: your consent is confirmed and ${v['nickname']}'s account is ready. They can log in now.`,
+        button: 'Open your dashboard',
+        outro: 'You can change what is shared, or delete the account, at any time.',
+      },
+      parentalConsentRejected: {
+        subject: (v) => `We couldn't confirm your consent for ${v['nickname']}`,
+        intro: (v) =>
+          `We checked the form you sent for ${v['nickname']} and couldn't accept it: ${v['reason']}. You can send it again, or choose another way to confirm.`,
+        button: 'Try again',
+        outro: 'Until your consent is confirmed, the account stays closed.',
+      },
+      friendRequest: {
+        subject: (v) => `${v['nickname']} and ${v['friend']} want to be friends`,
+        intro: (v) =>
+          `${v['nickname']} and ${v['friend']} want to be friends on the platform. Friends see each other's nickname, avatar and weekly XP, nothing else. They become friends only once a parent of each child has approved.`,
+        button: 'Approve or decline',
+        outro:
+          'If you do nothing, the request expires in 14 days. You can end a friendship at any time.',
+      },
+      classJoin: {
+        subject: (v) => `${v['nickname']} wants to join a class at ${v['school']}`,
+        intro: (v) =>
+          `${v['nickname']} wants to join the class "${v['className']}" at ${v['school']}, taught by ${v['teacher']}. The teacher sees your child's nickname, avatar and progress on the lessons they set, and the class sees a weekly board of nicknames and XP. Classmates talk only in a moderated class room.`,
+        button: 'Approve or decline',
+        outro:
+          'Your child joins the class only once you approve. If the school has a licence, your child gets premium while they are in the class.',
+      },
+      eventJoin: {
+        subject: (v) => `${v['nickname']} wants to join a team in ${v['event']}`,
+        intro: (v) =>
+          `${v['nickname']} wants to join the team "${v['team']}" in ${v['event']}, a hackathon on the platform. Teams of up to three build a website together in a private repository, with a mentor. Teammates see each other's nickname and avatar, work in a moderated team room, and never share contact details.`,
+        button: 'Approve or decline',
+        outro:
+          'Your child joins the team only once you approve. You can take them out of the team at any time.',
+      },
+      referralRewarded: {
+        subject: (v) => `Your children got ${v['days']} days of premium`,
+        intro: (v) =>
+          `A family you invited is learning with us: their child just shipped their first project. As a thank-you, each of your children gets ${v['days']} days of premium.`,
+        button: 'Open your dashboard',
+        outro: 'Thank you for telling other families about us.',
+      },
+      weeklyReport: {
+        subject: (v) => `Your children's week: ${v['week']}`,
+        intro: (v) => `Here's how your children's week went (${v['week']}):`,
+        button: 'See the full report',
+        outro: 'You get this report every Sunday evening. You can switch it off on your dashboard.',
+      },
       monthlySummary: {
         subject: (v) => `Your children's month: ${v['month']}`,
         intro: (v) => `Here's what your children did in ${v['month']}:`,
@@ -164,6 +268,8 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
     signOff: `فريق ${BRAND_NAME}`,
     childMonth: (c) =>
       `${c.nickname} — الدروس المكتملة: ${c.lessons}، نقاط الخبرة: ${c.xp}، المشاريع المنشورة: ${c.projects}، أطول سلسلة (بالأيام): ${c.streak}`,
+    childWeek: (c) =>
+      `${c.nickname} — وقت التعلّم: ${c.minutes} دقيقة، نقاط الخبرة: ${c.xp}، الدروس المكتملة: ${c.lessons}، السلسلة (بالأيام): ${c.streak}${c.skills.length ? `، مهارات جديدة: ${c.skills.join('، ')}` : ''}`,
     templates: {
       verifyEmail: {
         subject: 'أكّد بريدك الإلكتروني',
@@ -252,6 +358,82 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
         outro:
           'نحتفظ بالفواتير وسجلات الموافقة للمدة التي يطلبها القانون. إذا لم تطلب ذلك، فراسلنا فورًا.',
       },
+      adultInvite: {
+        subject: (v) =>
+          v['role'] === 'teacher'
+            ? `ندعوك للتدريس على ${BRAND_NAME}`
+            : `ندعوك لتكون مرشدًا على ${BRAND_NAME}`,
+        intro: (v) =>
+          v['role'] === 'teacher'
+            ? 'أنشأ فريقنا لك حساب معلّم: يمكنك إنشاء الفصول ومتابعة طلابك. اختر كلمة مرور للبدء، وستفعّل أيضًا التحقق بخطوتين.'
+            : 'أنشأ فريقنا لك حساب مرشد: ستراجع مشاريع الطلاب. اختر كلمة مرور للبدء، وستفعّل أيضًا التحقق بخطوتين وتقرأ قواعد السلوك.',
+        button: 'اختر كلمة المرور',
+        outro: 'تنتهي صلاحية هذا الرابط بعد 3 أيام. إذا لم تكن تتوقع هذه الرسالة، يمكنك تجاهلها.',
+      },
+      parentalConsent: {
+        subject: (v) => `موافقتك على حساب ${v['nickname']}`,
+        intro: (v) =>
+          `أضفت ${v['nickname']}، وعمره أقل من 13 سنة. قبل أن يبدأ، نحتاج إلى موافقتك بصفتك وليّ أمره. لا يحفظ حسابه إلا اسمًا مستعارًا وصورة رمزية وسنة الميلاد وتعلّمه؛ ولا يظهر شيء عنه للعموم إلا إذا فعّلتَه أنت. اضغط الزر لتعطي موافقتك.`,
+        button: 'أوافق',
+        outro:
+          'تنتهي صلاحية هذا الرابط بعد 7 أيام. إذا لم تضف طفلًا، تجاهل هذه الرسالة وسيُحذف الحساب.',
+      },
+      parentalConsentFollowUp: {
+        subject: (v) => `أعطيت موافقتك على حساب ${v['nickname']}`,
+        intro: (v) =>
+          `أعطيت أمس موافقتك على حساب ${v['nickname']}. إذا لم تكن أنت، أو غيّرت رأيك، احذف الحساب من لوحة التحكم وسيُحذف كل ما يخصّه.`,
+        button: 'افتح لوحة التحكم',
+        outro: 'يمكنك تغيير ما يُشارك، أو حذف الحساب، في أي وقت.',
+      },
+      parentalConsentDone: {
+        subject: (v) => `${v['nickname']} جاهز للبدء`,
+        intro: (v) =>
+          `شكرًا لك: تأكدت موافقتك وأصبح حساب ${v['nickname']} جاهزًا. يمكنه تسجيل الدخول الآن.`,
+        button: 'افتح لوحة التحكم',
+        outro: 'يمكنك تغيير ما يُشارك، أو حذف الحساب، في أي وقت.',
+      },
+      parentalConsentRejected: {
+        subject: (v) => `لم نتمكن من تأكيد موافقتك على حساب ${v['nickname']}`,
+        intro: (v) =>
+          `راجعنا النموذج الذي أرسلته لـ${v['nickname']} ولم نتمكن من قبوله: ${v['reason']}. يمكنك إرساله مرة أخرى، أو اختيار طريقة أخرى للتأكيد.`,
+        button: 'حاول مرة أخرى',
+        outro: 'يبقى الحساب مغلقًا حتى تتأكد موافقتك.',
+      },
+      friendRequest: {
+        subject: (v) => `${v['nickname']} و${v['friend']} يريدان أن يصبحا صديقين`,
+        intro: (v) =>
+          `يريد ${v['nickname']} و${v['friend']} أن يصبحا صديقين على المنصة. يرى الأصدقاء الاسم المستعار والصورة الرمزية ونقاط الخبرة الأسبوعية لبعضهم فقط، ولا شيء غير ذلك. لا يصبحان صديقين إلا بعد موافقة وليّ أمر كل منهما.`,
+        button: 'وافق أو ارفض',
+        outro: 'إن لم تفعل شيئًا، ينتهي الطلب بعد 14 يومًا. يمكنك إنهاء الصداقة في أي وقت.',
+      },
+      classJoin: {
+        subject: (v) => `${v['nickname']} يريد الانضمام إلى صف في ${v['school']}`,
+        intro: (v) =>
+          `يريد ${v['nickname']} الانضمام إلى الصف "${v['className']}" في ${v['school']}، مع المعلّم ${v['teacher']}. يرى المعلّم الاسم المستعار لطفلك وصورته الرمزية وتقدّمه في الدروس التي يحددها، ويرى الصف لوحة أسبوعية بالأسماء المستعارة ونقاط الخبرة. يتحدث زملاء الصف فقط في غرفة صف خاضعة للإشراف.`,
+        button: 'وافق أو ارفض',
+        outro:
+          'لا ينضم طفلك إلى الصف إلا بعد موافقتك. إذا كان لدى المدرسة ترخيص، يحصل طفلك على المحتوى المميز ما دام في الصف.',
+      },
+      eventJoin: {
+        subject: (v) => `${v['nickname']} يريد الانضمام إلى فريق في ${v['event']}`,
+        intro: (v) =>
+          `يريد ${v['nickname']} الانضمام إلى الفريق "${v['team']}" في ${v['event']}، وهو هاكاثون على المنصة. تبني فرق من ثلاثة أعضاء على الأكثر موقعًا معًا في مستودع خاص، مع مرشد. يرى أعضاء الفريق الاسم المستعار والصورة الرمزية لبعضهم، ويعملون في غرفة فريق خاضعة للإشراف، ولا يتبادلون معلومات التواصل أبدًا.`,
+        button: 'وافق أو ارفض',
+        outro: 'لا ينضم طفلك إلى الفريق إلا بعد موافقتك. يمكنك إخراجه من الفريق في أي وقت.',
+      },
+      referralRewarded: {
+        subject: (v) => `حصل أطفالك على ${v['days']} يومًا من المحتوى المميز`,
+        intro: (v) =>
+          `عائلة دعوتَها تتعلّم معنا الآن: نشر طفلها أول مشروع له للتو. شكرًا لك، يحصل كل طفل من أطفالك على ${v['days']} يومًا من المحتوى المميز.`,
+        button: 'افتح لوحة التحكم',
+        outro: 'شكرًا لإخبارك العائلات الأخرى عنّا.',
+      },
+      weeklyReport: {
+        subject: (v) => `أسبوع أطفالك: ${v['week']}`,
+        intro: (v) => `إليك كيف مرّ أسبوع أطفالك (${v['week']}):`,
+        button: 'اطّلع على التقرير كاملًا',
+        outro: 'يصلك هذا التقرير كل مساء أحد. يمكنك إيقافه من لوحة التحكم.',
+      },
       monthlySummary: {
         subject: (v) => `شهر أطفالك: ${v['month']}`,
         intro: (v) => `هذا ما أنجزه أطفالك في ${v['month']}:`,
@@ -267,6 +449,8 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
     signOff: `${BRAND_NAME} ٹیم`,
     childMonth: (c) =>
       `${c.nickname} — مکمل اسباق: ${c.lessons}، XP: ${c.xp}، شائع پروجیکٹس: ${c.projects}، سب سے لمبی اسٹریک (دن): ${c.streak}`,
+    childWeek: (c) =>
+      `${c.nickname} — سیکھنے کا وقت: ${c.minutes} منٹ، XP: ${c.xp}، مکمل اسباق: ${c.lessons}، اسٹریک (دن): ${c.streak}${c.skills.length ? `، نئی مہارتیں: ${c.skills.join('، ')}` : ''}`,
     templates: {
       verifyEmail: {
         subject: 'اپنا ای میل ایڈریس تصدیق کریں',
@@ -356,6 +540,85 @@ export const MAIL_COPY: Record<MailLanguage, LanguageCopy> = {
         button: `${BRAND_NAME} دیکھیں`,
         outro:
           'ہم انوائسز اور رضامندی کے ریکارڈ اتنی دیر رکھتے ہیں جتنی قانون تقاضا کرتا ہے۔ اگر آپ نے یہ درخواست نہیں کی تو فوراً ہمیں لکھیں۔',
+      },
+      adultInvite: {
+        subject: (v) =>
+          v['role'] === 'teacher'
+            ? `${BRAND_NAME} پر پڑھانے کی دعوت`
+            : `${BRAND_NAME} پر مینٹور بننے کی دعوت`,
+        intro: (v) =>
+          v['role'] === 'teacher'
+            ? 'ہماری ٹیم نے آپ کا استاد اکاؤنٹ بنایا ہے: آپ کلاسیں بنا سکتے ہیں اور اپنے طلبہ کی پیش رفت دیکھ سکتے ہیں۔ شروع کرنے کے لیے پاس ورڈ چنیں؛ آپ دو مرحلوں والا لاگ اِن بھی سیٹ کریں گے۔'
+            : 'ہماری ٹیم نے آپ کا مینٹور اکاؤنٹ بنایا ہے: آپ طلبہ کے پروجیکٹس کا جائزہ لیں گے۔ شروع کرنے کے لیے پاس ورڈ چنیں؛ آپ دو مرحلوں والا لاگ اِن بھی سیٹ کریں گے اور ضابطۂ اخلاق پڑھیں گے۔',
+        button: 'اپنا پاس ورڈ چنیں',
+        outro:
+          'یہ لنک 3 دن میں ختم ہو جائے گا۔ اگر آپ کو اس کی توقع نہیں تھی تو اس ای میل کو نظر انداز کر دیں۔',
+      },
+      parentalConsent: {
+        subject: (v) => `${v['nickname']} کے اکاؤنٹ کے لیے آپ کی رضامندی`,
+        intro: (v) =>
+          `آپ نے ${v['nickname']} کو شامل کیا ہے، جس کی عمر 13 سال سے کم ہے۔ شروع کرنے سے پہلے ہمیں بطور والدین آپ کی رضامندی چاہیے۔ اکاؤنٹ میں صرف ایک فرضی نام، اوتار، پیدائش کا سال اور سیکھنے کا ریکارڈ رہتا ہے؛ جب تک آپ خود آن نہ کریں، ان کے بارے میں کچھ بھی عوامی نہیں ہوتا۔ رضامندی دینے کے لیے بٹن دبائیں۔`,
+        button: 'میں رضامندی دیتا/دیتی ہوں',
+        outro:
+          'یہ لنک 7 دن میں ختم ہو جائے گا۔ اگر آپ نے کوئی بچہ شامل نہیں کیا تو یہ ای میل نظرانداز کریں، اکاؤنٹ حذف ہو جائے گا۔',
+      },
+      parentalConsentFollowUp: {
+        subject: (v) => `آپ نے ${v['nickname']} کے لیے رضامندی دی`,
+        intro: (v) =>
+          `کل آپ نے ${v['nickname']} کے اکاؤنٹ کے لیے رضامندی دی۔ اگر یہ آپ نہیں تھے، یا آپ نے ارادہ بدل لیا ہے، تو ڈیش بورڈ سے اکاؤنٹ حذف کر دیں اور ان کا سب کچھ ہٹ جائے گا۔`,
+        button: 'اپنا ڈیش بورڈ کھولیں',
+        outro: 'آپ کسی بھی وقت شیئرنگ بدل سکتے ہیں یا اکاؤنٹ حذف کر سکتے ہیں۔',
+      },
+      parentalConsentDone: {
+        subject: (v) => `${v['nickname']} شروع کرنے کے لیے تیار ہے`,
+        intro: (v) =>
+          `شکریہ: آپ کی رضامندی کی تصدیق ہو گئی ہے اور ${v['nickname']} کا اکاؤنٹ تیار ہے۔ وہ اب لاگ اِن کر سکتے ہیں۔`,
+        button: 'اپنا ڈیش بورڈ کھولیں',
+        outro: 'آپ کسی بھی وقت شیئرنگ بدل سکتے ہیں یا اکاؤنٹ حذف کر سکتے ہیں۔',
+      },
+      parentalConsentRejected: {
+        subject: (v) => `ہم ${v['nickname']} کے لیے آپ کی رضامندی کی تصدیق نہیں کر سکے`,
+        intro: (v) =>
+          `ہم نے ${v['nickname']} کے لیے آپ کا بھیجا ہوا فارم دیکھا لیکن اسے قبول نہیں کر سکے: ${v['reason']}۔ آپ اسے دوبارہ بھیج سکتے ہیں، یا تصدیق کا کوئی اور طریقہ چن سکتے ہیں۔`,
+        button: 'دوبارہ کوشش کریں',
+        outro: 'جب تک آپ کی رضامندی کی تصدیق نہ ہو، اکاؤنٹ بند رہے گا۔',
+      },
+      friendRequest: {
+        subject: (v) => `${v['nickname']} اور ${v['friend']} دوست بننا چاہتے ہیں`,
+        intro: (v) =>
+          `${v['nickname']} اور ${v['friend']} پلیٹ فارم پر دوست بننا چاہتے ہیں۔ دوست ایک دوسرے کا عرفی نام، اوتار اور ہفتہ وار XP دیکھتے ہیں، اس کے سوا کچھ نہیں۔ دونوں بچوں کے والدین میں سے ایک ایک کی منظوری کے بعد ہی وہ دوست بنتے ہیں۔`,
+        button: 'منظور کریں یا انکار کریں',
+        outro:
+          'اگر آپ کچھ نہ کریں تو درخواست 14 دن بعد ختم ہو جائے گی۔ آپ کسی بھی وقت دوستی ختم کر سکتے ہیں۔',
+      },
+      classJoin: {
+        subject: (v) => `${v['nickname']} ${v['school']} کی ایک کلاس میں شامل ہونا چاہتا ہے`,
+        intro: (v) =>
+          `${v['nickname']} ${v['school']} کی کلاس "${v['className']}" میں شامل ہونا چاہتا ہے، جسے ${v['teacher']} پڑھاتے ہیں۔ استاد آپ کے بچے کا فرضی نام، اوتار اور ان کے دیے گئے اسباق میں پیش رفت دیکھتے ہیں، اور کلاس فرضی ناموں اور XP کا ہفتہ وار بورڈ دیکھتی ہے۔ ہم جماعت صرف نگرانی والے کلاس روم میں بات کرتے ہیں۔`,
+        button: 'منظور یا انکار کریں',
+        outro:
+          'آپ کا بچہ آپ کی منظوری کے بعد ہی کلاس میں شامل ہوتا ہے۔ اگر اسکول کے پاس لائسنس ہے تو کلاس میں رہنے تک آپ کے بچے کو پریمیم ملتا ہے۔',
+      },
+      eventJoin: {
+        subject: (v) => `${v['nickname']} ${v['event']} میں ایک ٹیم میں شامل ہونا چاہتا ہے`,
+        intro: (v) =>
+          `${v['nickname']} پلیٹ فارم کے ہیکاتھون ${v['event']} میں ٹیم "${v['team']}" میں شامل ہونا چاہتا ہے۔ زیادہ سے زیادہ تین ممبرز کی ٹیمیں ایک مینٹور کے ساتھ ایک نجی ریپوزٹری میں مل کر ویب سائٹ بناتی ہیں۔ ٹیم کے ممبرز ایک دوسرے کا عرفی نام اور اوتار دیکھتے ہیں، نگرانی والے ٹیم روم میں کام کرتے ہیں، اور کبھی رابطے کی معلومات شیئر نہیں کرتے۔`,
+        button: 'منظور کریں یا انکار کریں',
+        outro:
+          'آپ کی منظوری کے بعد ہی آپ کا بچہ ٹیم میں شامل ہوتا ہے۔ آپ کسی بھی وقت اسے ٹیم سے نکال سکتے ہیں۔',
+      },
+      referralRewarded: {
+        subject: (v) => `آپ کے بچوں کو ${v['days']} دن کا پریمیم ملا`,
+        intro: (v) =>
+          `جس خاندان کو آپ نے دعوت دی تھی وہ ہمارے ساتھ سیکھ رہا ہے: ان کے بچے نے ابھی اپنا پہلا پروجیکٹ شائع کیا۔ شکریے کے طور پر آپ کے ہر بچے کو ${v['days']} دن کا پریمیم ملا ہے۔`,
+        button: 'اپنا ڈیش بورڈ کھولیں',
+        outro: 'دوسرے خاندانوں کو ہمارے بارے میں بتانے کا شکریہ۔',
+      },
+      weeklyReport: {
+        subject: (v) => `آپ کے بچوں کا ہفتہ: ${v['week']}`,
+        intro: (v) => `آپ کے بچوں کا ہفتہ (${v['week']}) ایسا رہا:`,
+        button: 'پوری رپورٹ دیکھیں',
+        outro: 'یہ رپورٹ آپ کو ہر اتوار کی شام ملتی ہے۔ آپ اسے ڈیش بورڈ سے بند کر سکتے ہیں۔',
       },
       monthlySummary: {
         subject: (v) => `آپ کے بچوں کا مہینہ: ${v['month']}`,

@@ -1,7 +1,10 @@
+import { UNDER13_CONSENT_METHODS } from '@kcp/shared';
 import {
   ArrayMaxSize,
+  ArrayUnique,
   IsArray,
   IsBoolean,
+  IsIn,
   IsOptional,
   IsString,
   Matches,
@@ -34,12 +37,23 @@ export class UpdateCountryDto {
   @IsOptional()
   @Matches(/^[A-Z]{3}$/)
   currency?: string;
+
+  /**
+   * How parents of children under 13 can give verified consent here (the lawyer
+   * decides). None: no under-13 accounts in this country.
+   */
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsIn([...UNDER13_CONSENT_METHODS], { each: true })
+  under13ConsentMethods?: ('CARD_CHECK' | 'SIGNED_FORM' | 'EMAIL_PLUS')[];
 }
 
 export class CountryAdminDto {
   code!: string;
   isActive!: boolean;
   currency!: string;
+  under13ConsentMethods!: ('CARD_CHECK' | 'SIGNED_FORM' | 'EMAIL_PLUS')[];
 }
 
 export class LanguageAdminDto {

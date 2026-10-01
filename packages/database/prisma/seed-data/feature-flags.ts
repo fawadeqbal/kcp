@@ -10,8 +10,14 @@ export const featureFlags = [
     enabled: true,
   },
   {
+    key: 'mentor_approval_for_certificates',
+    description:
+      'A module certificate needs a mentor to approve the module project first (premium students).',
+    enabled: true,
+  },
+  {
     key: 'under_13_accounts',
     description:
-      'Allow child accounts for ages 9–12. Keep off until the lawyer-approved parental consent method ships (Phase 2).',
+      'Allow child accounts for ages 9–12, in countries with at least one verified parental consent method (Admin → Countries). Switch on per country once the lawyer approves its methods.',
   },
 ];

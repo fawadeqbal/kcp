@@ -17,7 +17,7 @@ async function staffToken(t: TestContext, roleKey: string) {
   const login = await t
     .http()
     .post('/v1/auth/login')
-    .send({ email: user.email, password: PASSWORD })
+    .send({ email: user.email, password: PASSWORD, app: 'admin' })
     .expect(200);
   const setup = await t
     .http()
@@ -27,7 +27,7 @@ async function staffToken(t: TestContext, roleKey: string) {
   const done = await t
     .http()
     .post('/v1/auth/mfa/verify')
-    .send({ mfaToken: login.body.mfaToken, code: totp(setup.body.secret) })
+    .send({ mfaToken: login.body.mfaToken, code: totp(setup.body.secret), app: 'admin' })
     .expect(200);
   return { user, token: done.body.accessToken as string };
 }

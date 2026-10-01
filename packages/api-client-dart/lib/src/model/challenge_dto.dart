@@ -3,7 +3,9 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:kcp_api/src/model/git_setup_dto.dart';
 import 'package:kcp_api/src/model/code_files_dto.dart';
+import 'package:kcp_api/src/model/stage_dto.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -32,6 +34,10 @@ class ChallengeDto {
     required this.files,
 
     required this.starter,
+
+    required this.stage,
+
+    required this.repo,
 
     required this.checks,
 
@@ -77,6 +83,14 @@ class ChallengeDto {
   @JsonKey(name: r'starter', required: true, includeIfNull: false)
   final CodeFilesDto starter;
 
+  /// BLOCKS: the level.
+  @JsonKey(name: r'stage', required: true, includeIfNull: true)
+  final StageDto? stage;
+
+  /// GIT: the practice repository.
+  @JsonKey(name: r'repo', required: true, includeIfNull: true)
+  final GitSetupDto? repo;
+
   /// Checks for the browser sandbox (see packages/checks).
   @JsonKey(name: r'checks', required: true, includeIfNull: false)
   final List<Object> checks;
@@ -108,6 +122,8 @@ class ChallengeDto {
           other.xp == xp &&
           other.files == files &&
           other.starter == starter &&
+          other.stage == stage &&
+          other.repo == repo &&
           other.checks == checks &&
           other.hints == hints &&
           other.checkLabels == checkLabels &&
@@ -123,6 +139,8 @@ class ChallengeDto {
       xp.hashCode +
       files.hashCode +
       starter.hashCode +
+      (stage == null ? 0 : stage.hashCode) +
+      (repo == null ? 0 : repo.hashCode) +
       checks.hashCode +
       hints.hashCode +
       checkLabels.hashCode +
@@ -149,6 +167,10 @@ enum ChallengeDtoTypeEnum {
   JS(r'JS'),
   @JsonValue(r'PYTHON')
   PYTHON(r'PYTHON'),
+  @JsonValue(r'BLOCKS')
+  BLOCKS(r'BLOCKS'),
+  @JsonValue(r'GIT')
+  GIT(r'GIT'),
   @JsonValue(r'unknown_default_open_api')
   unknownDefaultOpenApi(r'unknown_default_open_api');
 
@@ -169,6 +191,10 @@ enum ChallengeDtoFilesEnum {
   js(r'js'),
   @JsonValue(r'py')
   py(r'py'),
+  @JsonValue(r'blocks')
+  blocks(r'blocks'),
+  @JsonValue(r'git')
+  git(r'git'),
   @JsonValue(r'unknown_default_open_api')
   unknownDefaultOpenApi(r'unknown_default_open_api');
 

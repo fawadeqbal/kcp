@@ -16,3 +16,5 @@ packages/api-client-dart/*.yaml
 apps/mobile/android
 apps/mobile/ios
 apps/mobile/build
+# Built from tools/explorer-embed (checked by its test target)
+apps/mobile/assets/explorer

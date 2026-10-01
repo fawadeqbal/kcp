@@ -7,13 +7,19 @@
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { createPrismaClient, STAFF_ROLE_KEYS, ROLE_KEYS } from '@kcp/database';
+import {
+  createPrismaClient,
+  ROLE_KEYS,
+  STAFF_ROLE_KEYS,
+  TWO_FACTOR_ROLE_KEYS,
+} from '@kcp/database';
 import { config as loadEnv } from 'dotenv';
 import { hashPassword } from '../common/crypto/passwords.js';
 
 loadEnv({ path: path.resolve(process.cwd(), '../../.env'), quiet: true });
 
-const STAFF_ROLES = [...STAFF_ROLE_KEYS, ROLE_KEYS.MENTOR] as string[];
+// Staff, and the adults who sign in to the web app with two-factor (mentors, teachers).
+const STAFF_ROLES = [...TWO_FACTOR_ROLE_KEYS] as string[];
 
 const { values } = parseArgs({
   // pnpm may pass a literal "--" through; ignore it.
@@ -63,7 +69,9 @@ try {
     console.info(`Created ${role.name} ${email}`);
     console.info(`Temporary password: ${password}`);
     console.info(
-      'Log in to the admin panel (http://localhost:3002 locally), set up two-factor authentication, then change the password (forgot-password link on the web app).',
+      (STAFF_ROLE_KEYS as readonly string[]).includes(role.key)
+        ? 'Log in to the admin panel (http://localhost:3002 locally), set up two-factor authentication, then change the password (forgot-password link on the web app).'
+        : 'Log in to the web app (http://localhost:3001/en/login locally) and set up two-factor authentication, then change the password (forgot-password link).',
     );
   }
 } finally {

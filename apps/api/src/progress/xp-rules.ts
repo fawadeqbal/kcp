@@ -49,6 +49,19 @@ export function addDays(day: string, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+/**
+ * The end (the first day not counted) of a season ended now: today counts in full
+ * everywhere, including where it's already tomorrow (late in the UTC day, Karachi is
+ * a day ahead), unless the planned end comes sooner.
+ */
+export function seasonEndDay(at: Date, timeZones: string[], plannedEnd?: string | null): string {
+  const latest = timeZones
+    .map((zone) => localDay(at, zone))
+    .reduce((a, b) => (b > a ? b : a), at.toISOString().slice(0, 10));
+  const end = addDays(latest, 1);
+  return plannedEnd && plannedEnd <= end ? plannedEnd : end;
+}
+
 export interface StreakState {
   current: number;
   longest: number;

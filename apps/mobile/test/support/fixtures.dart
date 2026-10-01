@@ -140,6 +140,8 @@ Map<String, dynamic> overviewJson() => {
     {
       'id': 'builder',
       'title': 'Builder',
+      'ageFrom': null,
+      'ageTo': null,
       'modules': [
         {
           'id': 'builder-m01',
@@ -195,6 +197,7 @@ Map<String, dynamic> childJson({
   'streak': 4,
   'badges': 2,
   'streakReminders': reminders,
+  'hasPicturePassword': false,
 };
 
 Map<String, dynamic> billingJson() => {

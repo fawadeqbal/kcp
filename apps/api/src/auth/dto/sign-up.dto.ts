@@ -1,5 +1,14 @@
 import { Transform } from 'class-transformer';
-import { Equals, IsEmail, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  Equals,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { ADULT_PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH } from '@kcp/shared';
 
 const trimLower = ({ value }: { value: unknown }) =>
@@ -38,6 +47,12 @@ export class ParentSignUpDto {
   /** Must be true: the parent accepts the terms and privacy policy. */
   @Equals(true, { message: 'You need to accept the terms and privacy policy.' })
   acceptTerms!: boolean;
+
+  /** The code from another family's invite link (…/sign-up?ref=CODE); unknown codes are ignored. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  referralCode?: string;
 }
 
 export class EmailDto {

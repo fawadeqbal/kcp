@@ -5,6 +5,7 @@
  *
  *   pnpm content:check     validate every file and prove each challenge can be solved
  *   pnpm content:import    validate, then write everything into the database
+ *   pnpm content:export    write texts published in the content studio back into the files
  *
  * With --hold-new (staging and production), new modules are imported unpublished:
  * staff preview and publish them in the admin panel.
@@ -32,12 +33,31 @@ async function main() {
   const args = process.argv.slice(2).filter((arg) => arg !== '--');
   const holdNew = args.includes('--hold-new');
   const [command, dir = 'content'] = args.filter((arg) => !arg.startsWith('--'));
-  if (command !== 'check' && command !== 'import') {
-    console.error('Usage: content-import <check|import> [content folder] [--hold-new]');
+  if (command !== 'check' && command !== 'import' && command !== 'export') {
+    console.error('Usage: content-import <check|import|export> [content folder] [--hold-new]');
     process.exit(2);
   }
   const root = path.resolve(dir);
-  const { tracks, issues } = await loadContent(root);
+  const { tracks, skills, issues } = await loadContent(root);
+  if (command === 'export') {
+    if (report(issues)) process.exit(1);
+    const { exportStudioTexts } = await import('./export.js');
+    const prisma = createPrismaClient();
+    try {
+      const summary = await exportStudioTexts(prisma, tracks, root);
+      for (const file of summary.files) console.log(`wrote    ${file}`);
+      for (const item of summary.skipped)
+        console.log(`skipped  ${item} (not in the files any more)`);
+      console.log(
+        summary.files.length
+          ? `Wrote ${summary.files.length} file(s): commit them, then run pnpm content:check.`
+          : 'Nothing to export: every live text already comes from the files.',
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+    return;
+  }
   if (command === 'check') {
     const { verifyContent } = await import('./verify.js');
     issues.push(...(await verifyContent(tracks, root)));
@@ -67,12 +87,17 @@ async function main() {
   }
   const prisma = createPrismaClient();
   try {
-    const summary = await importContent(prisma, tracks, { holdNew });
+    const summary = await importContent(prisma, tracks, { holdNew, skills });
     console.log(
       `Imported ${summary.tracks} track(s), ${summary.modules} module(s), ${summary.lessons} lessons, ` +
         `${summary.challenges} challenges, ${summary.quizzes} quizzes, ${summary.projects} project(s); ` +
         `switched off ${summary.deactivated} removed item(s).`,
     );
+    if (summary.studioTexts) {
+      console.log(
+        `${summary.studioTexts} text(s) published in the content studio stay live (pnpm content:export writes them into the files).`,
+      );
+    }
     if (summary.newModules.length) {
       console.log(
         holdNew

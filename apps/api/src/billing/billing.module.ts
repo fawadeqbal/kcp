@@ -29,6 +29,13 @@ import { StripeGateway } from './stripe/stripe.gateway.js';
     StripeWebhooksService,
     BillingJobsService,
   ],
-  exports: [EntitlementsService, BillingService, BillingNotifier, BillingRecordsService],
+  exports: [
+    EntitlementsService,
+    BillingService,
+    BillingNotifier,
+    BillingRecordsService,
+    StripeGateway,
+    StripeWebhooksService,
+  ],
 })
 export class BillingModule {}

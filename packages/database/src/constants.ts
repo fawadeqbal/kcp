@@ -24,6 +24,25 @@ export const STAFF_ROLE_KEYS: readonly RoleKey[] = [
   ROLE_KEYS.SUPER_ADMIN,
 ];
 
+/**
+ * Accounts that sign in with a two-factor code: staff (in the admin panel), and the
+ * adults who see children's work in the web app (mentors and teachers).
+ */
+export const TWO_FACTOR_ROLE_KEYS: readonly RoleKey[] = [
+  ...STAFF_ROLE_KEYS,
+  ROLE_KEYS.MENTOR,
+  ROLE_KEYS.TEACHER,
+];
+
+export const requiresTwoFactor = (roleKey: string): boolean =>
+  (TWO_FACTOR_ROLE_KEYS as readonly string[]).includes(roleKey);
+
+/** The code of conduct mentors sign before their first review (web: mentor.conduct). */
+export const MENTOR_CODE_OF_CONDUCT_VERSION = '2026-10';
+
+/** Mentor reviews should be decided within this many hours of the request. */
+export const REVIEW_TARGET_HOURS = 48;
+
 /** Languages available at launch. Others are seeded but switched off. */
 export const LAUNCH_LANGUAGES = ['en', 'ar', 'ur'] as const;
 export type LaunchLanguage = (typeof LAUNCH_LANGUAGES)[number];
@@ -48,8 +67,30 @@ export const SUBJECTS = [
   'Submission',
   /** A student's module project and its portfolio item. */
   'Project',
-  /** The weekly leaderboards (nickname and avatar only). */
+  /** The weekly leaderboards (nickname and avatar only), and the student's league. */
   'Leaderboard',
+  /** Friends between students, and friend requests (both parents approve). */
+  'Friendship',
+  /** Team, class and event rooms (members, and their parents, read them). */
+  'Chat',
+  /** Reports about messages and students, and what moderators did about them. */
+  'Moderation',
+  /** Words the room filter refuses, on top of the built-in lists. */
+  'BlockedTerm',
+  /** Hackathons: set up and run by staff; students take part in teams. */
+  'Event',
+  /** A team in an event: its members (a parent approves each), repository and pull requests. */
+  'EventTeam',
+  /** Judges' scores for the teams' submissions. */
+  'EventScore',
+  /** Schools and their licences (staff); teachers see the schools they teach at. */
+  'School',
+  /** A teacher's class: its students, assignments, progress and board. */
+  'SchoolClass',
+  /** A student's place in a class (they join with a code, a parent approves). */
+  'ClassMember',
+  /** The hub readiness check: a timed project a mentor grades. */
+  'ReadinessCheck',
   /** Messages sent with the in-app feedback button. */
   'Feedback',
   /** Premium given by hand to pilot families. */
@@ -76,6 +117,16 @@ export const SUBJECTS = [
   'Content',
   /** Crash reports sent by the mobile app (no account or device in them). */
   'AppCrash',
+  /** Translations written, reviewed and published in the content studio. */
+  'ContentText',
+  /** Mentors' reviews of students' projects (`studentId`, `parentIds`). */
+  'Review',
+  /** Mentors' notes about a student, for other mentors only. */
+  'MentorNote',
+  /** A mentor's onboarding: background check, code of conduct, languages (`userId`). */
+  'MentorProfile',
+  /** Verified parental consent for children under 13 (signed forms staff check). */
+  'ParentalConsent',
 ] as const;
 export type Subject = (typeof SUBJECTS)[number];
 

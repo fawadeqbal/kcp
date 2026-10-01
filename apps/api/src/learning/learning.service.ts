@@ -1,4 +1,4 @@
-import type { Check, CodeFiles } from '@kcp/checks';
+import type { Check, CodeFiles, GitSetup, StageLevel } from '@kcp/checks';
 import type { Prisma } from '@kcp/database';
 import {
   ForbiddenException,
@@ -35,6 +35,8 @@ import type {
   LessonStatusValue,
   SubmissionResultDto,
   TrackDto,
+  StageDto,
+  GitSetupDto,
 } from './dto/learning.dto.js';
 
 /** "Check my code" presses per student per minute. */
@@ -54,6 +56,26 @@ const DRAFTS_PER_MINUTE = 120;
  * progress: drafts, submissions and lesson status. Checks run in the browser
  * sandbox; the API stores what they found.
  */
+/**
+ * Tracks made for the student's age come first (Explorer for 9–12), then tracks for
+ * everyone, then the rest; otherwise in their usual order. Parents and staff (no age)
+ * see the usual order.
+ */
+export function orderForAge<T extends { ageFrom: number | null; ageTo: number | null }>(
+  tracks: T[],
+  age: number | null,
+): T[] {
+  if (age === null) return tracks;
+  const rank = (track: T) => {
+    if (track.ageFrom === null && track.ageTo === null) return 1;
+    return age >= (track.ageFrom ?? 0) && age <= (track.ageTo ?? 99) ? 0 : 2;
+  };
+  return tracks
+    .map((track, index) => ({ track, index }))
+    .toSorted((a, b) => rank(a.track) - rank(b.track) || a.index - b.index)
+    .map(({ track }) => track);
+}
+
 @Injectable()
 export class LearningService {
   private readonly logger = new Logger(LearningService.name);
@@ -97,7 +119,7 @@ export class LearningService {
 
   async overview(user: AuthUser, language: string): Promise<LearningOverviewDto> {
     const isStudent = user.kind === 'STUDENT';
-    const [tracks, statuses, premium] = await Promise.all([
+    const [allTracks, statuses, premium, profile] = await Promise.all([
       this.prisma.track.findMany({
         where: activeContent,
         orderBy: { sortOrder: 'asc' },
@@ -126,7 +148,17 @@ export class LearningService {
       }),
       this.statuses(user),
       isStudent ? this.entitlements.status(user.id) : null,
+      isStudent
+        ? this.prisma.studentProfile.findUnique({
+            where: { userId: user.id },
+            select: { birthYear: true },
+          })
+        : null,
     ]);
+    const tracks = orderForAge(
+      allTracks,
+      profile ? new Date().getFullYear() - profile.birthYear : null,
+    );
     // Premium lessons and projects are locked for students without premium.
     const locked = (isPremium: boolean) => isPremium && premium !== null && !premium.active;
     const projects =
@@ -141,11 +173,15 @@ export class LearningService {
           )
         : new Map<string, 'DRAFT' | 'SHIPPED'>();
 
-    let nextLessonId: string | null = null;
     let lessonsCompleted = 0;
+    /** Per track, the first lesson not completed yet; and whether it was started at all. */
+    const nextIn = new Map<string, string>();
+    const startedTracks = new Set<string>();
     const result: TrackDto[] = tracks.map((track) => ({
       id: track.id,
       title: pick(track.titles, language),
+      ageFrom: track.ageFrom,
+      ageTo: track.ageTo,
       modules: track.modules.map((mod) => ({
         id: mod.id,
         title: pick(mod.titles, language),
@@ -153,8 +189,9 @@ export class LearningService {
         lessons: mod.lessons.map((lesson) => {
           const text = pickTranslation(lesson.translations, language);
           const status = statuses.get(lesson.id) ?? 'NOT_STARTED';
+          if (status !== 'NOT_STARTED') startedTracks.add(track.id);
           if (status === 'COMPLETED') lessonsCompleted++;
-          else nextLessonId ??= lesson.id;
+          else if (!nextIn.has(track.id)) nextIn.set(track.id, lesson.id);
           return {
             id: lesson.id,
             title: text?.title ?? lesson.id,
@@ -181,6 +218,12 @@ export class LearningService {
             : null,
       })),
     }));
+    // "Continue" stays in a track the student has started; otherwise the first track
+    // (the one made for their age).
+    const next =
+      tracks.find((track) => startedTracks.has(track.id) && nextIn.has(track.id)) ??
+      tracks.find((track) => nextIn.has(track.id));
+    const nextLessonId = next ? (nextIn.get(next.id) ?? null) : null;
     return {
       tracks: result,
       nextLessonId,
@@ -254,6 +297,8 @@ export class LearningService {
         xp: challenge.xp,
         files: CODE_FILE_KEYS.filter((key) => typeof starter[key] === 'string'),
         starter,
+        stage: (challenge.stage as StageDto | null) ?? null,
+        repo: (challenge.repo as GitSetupDto | null) ?? null,
         checks: challenge.checks as Record<string, unknown>[],
         hints: { ...(english?.hints as Texts), ...(translation?.hints as Texts) },
         checkLabels: {
@@ -445,7 +490,11 @@ export class LearningService {
       checks,
       byId,
       (message) => this.logger.warn(message),
-      { scriptsMayChangePage: challenge.type === 'JS' },
+      {
+        scriptsMayChangePage: challenge.type === 'JS',
+        stage: challenge.stage as StageLevel | null,
+        repo: challenge.repo as GitSetup | null,
+      },
     );
     const results = checks.map((check) => ({
       id: check.id,

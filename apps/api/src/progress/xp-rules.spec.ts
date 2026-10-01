@@ -6,6 +6,7 @@ import {
   localDay,
   meetGoal,
   previousDay,
+  seasonEndDay,
   visibleStreak,
   weekAt,
   weekOfDay,
@@ -105,6 +106,17 @@ describe('xp rules', () => {
     const at = new Date('2026-10-04T20:30:00Z');
     expect(weekAt(at, 'Asia/Karachi').key).toBe('2026-W41');
     expect(weekAt(at, 'Africa/Cairo').key).toBe('2026-W40');
+  });
+
+  it('ends a season early after today everywhere, even where it is already tomorrow', () => {
+    // 21:00 UTC on Sep 30 is 02:00 on Oct 1 in Karachi: that day's XP must count.
+    const late = new Date('2026-09-30T21:00:00Z');
+    expect(seasonEndDay(late, ['Africa/Cairo', 'Asia/Karachi'])).toBe('2026-10-02');
+    expect(seasonEndDay(new Date('2026-09-30T12:00:00Z'), ['Asia/Karachi'])).toBe('2026-10-01');
+    expect(seasonEndDay(late, [])).toBe('2026-10-01');
+    // A planned end that comes sooner stays as planned.
+    expect(seasonEndDay(late, ['Asia/Karachi'], '2026-10-01')).toBe('2026-10-01');
+    expect(seasonEndDay(late, ['Asia/Karachi'], '2026-12-01')).toBe('2026-10-02');
   });
 
   it('finds the level for an XP total', () => {

@@ -77,7 +77,10 @@ class SettingsScreen extends ConsumerWidget {
                       }
                     },
                   ),
-                if (isParent) const _MonthlySummarySwitch(),
+                if (isParent) ...[
+                  const _EmailSwitch(weekly: false),
+                  const _EmailSwitch(weekly: true),
+                ],
               ],
             ),
           ),
@@ -159,27 +162,31 @@ class _Group extends StatelessWidget {
   }
 }
 
-/// The monthly progress email (parents), behind the parental gate.
-class _MonthlySummarySwitch extends ConsumerStatefulWidget {
-  const _MonthlySummarySwitch();
+/// The family emails (parents), behind the parental gate: the monthly progress email
+/// or the weekly report.
+class _EmailSwitch extends ConsumerStatefulWidget {
+  const _EmailSwitch({required this.weekly});
+
+  /// The weekly report; otherwise the monthly progress email.
+  final bool weekly;
 
   @override
-  ConsumerState<_MonthlySummarySwitch> createState() => _MonthlySummarySwitchState();
+  ConsumerState<_EmailSwitch> createState() => _EmailSwitchState();
 }
 
-class _MonthlySummarySwitchState extends ConsumerState<_MonthlySummarySwitch> {
+class _EmailSwitchState extends ConsumerState<_EmailSwitch> {
   bool? _value;
   bool _busy = false;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final prefs = ref.watch(emailPreferencesProvider);
-    final value = _value ?? prefs.value?.monthlySummary;
+    final prefs = ref.watch(emailPreferencesProvider).value;
+    final value = _value ?? (widget.weekly ? prefs?.weeklyReport : prefs?.monthlySummary);
     return SwitchListTile(
-      secondary: const KcpIcon('mail'),
-      title: Text(t.monthlySummary),
-      subtitle: Text(t.monthlySummaryBody),
+      secondary: KcpIcon(widget.weekly ? 'chart' : 'mail'),
+      title: Text(widget.weekly ? t.weeklyReportEmail : t.monthlySummary),
+      subtitle: Text(widget.weekly ? t.weeklyReportEmailBody : t.monthlySummaryBody),
       value: value ?? false,
       onChanged: value == null || _busy
           ? null
@@ -189,9 +196,14 @@ class _MonthlySummarySwitchState extends ConsumerState<_MonthlySummarySwitch> {
               try {
                 final api = ref.read(apiProvider);
                 final response = await api.getAccountApi().familyEmailsUpdate(
-                  emailPreferencesDto: EmailPreferencesDto(monthlySummary: on),
+                  updateEmailPreferencesDto: widget.weekly
+                      ? UpdateEmailPreferencesDto(weeklyReport: on)
+                      : UpdateEmailPreferencesDto(monthlySummary: on),
                 );
-                if (mounted) setState(() => _value = response.data?.monthlySummary ?? on);
+                final saved = widget.weekly
+                    ? response.data?.weeklyReport
+                    : response.data?.monthlySummary;
+                if (mounted) setState(() => _value = saved ?? on);
               } catch (_) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(

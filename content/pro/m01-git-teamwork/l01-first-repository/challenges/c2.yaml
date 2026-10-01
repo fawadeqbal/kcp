@@ -1,0 +1,42 @@
+id: pro-m01-l01-c2
+order: 2
+type: git
+xp: 10
+repo:
+  files:
+    index.html: |
+      <h1>My hobbies</h1>
+      <p>I like football and drawing.</p>
+  setup:
+    - run: git init
+    - run: git add .
+    - run: git commit -m "Add my hobbies page"
+starter:
+  git: []
+solution:
+  git:
+    - write: index.html
+      content: |
+        <h1>My hobbies</h1>
+        <p>I like football and drawing.</p>
+        <ul>
+          <li>Football on Fridays</li>
+          <li>Drawing robots</li>
+        </ul>
+    - run: git add index.html
+    - run: git commit -m "Add a list of hobbies"
+checks:
+  - id: has-list
+    expect: git
+    contains:
+      path: index.html
+      text: '<ul'
+    hint: add_list
+  - id: second-commit
+    expect: git
+    commits: 2
+    hint: commit
+  - id: clean
+    expect: git
+    clean: true
+    hint: status

@@ -21,6 +21,12 @@ const EXPECTED_PUBLIC_ROUTES = [
   'POST /auth/password/reset',
   'POST /auth/login',
   'POST /auth/students/login',
+  // Young learners: picture passwords, and a device a parent signs in from their own
+  // phone (the device holds a secret; the parent approves with their own session).
+  'POST /auth/students/picture-login',
+  'POST /auth/pairing',
+  'POST /auth/pairing/status',
+  'POST /auth/pairing/claim',
   'POST /auth/mfa/setup',
   'POST /auth/mfa/verify',
   'POST /auth/refresh',
@@ -40,6 +46,8 @@ const EXPECTED_PUBLIC_ROUTES = [
   // The marketing site's waitlist (double opt-in).
   'POST /waitlist',
   'POST /waitlist/confirm',
+  // A parent confirms under-13 consent from the link in their email (email plus).
+  'POST /parental-consent/confirm',
   // Anyone can check a certificate by the code printed on it.
   'GET /public/certificates/:code',
   // The mobile app: crash reports (it may crash before anyone signs in), and turning

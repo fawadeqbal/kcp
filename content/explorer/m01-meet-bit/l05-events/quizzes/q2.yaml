@@ -1,0 +1,29 @@
+id: explorer-m01-l05-q2
+order: 2
+kind: choice
+xp: 5
+prompt:
+  en: Which of these is safe for Bit to say in a game others can see?
+  ar: أيّ مما يلي آمن ليقوله بِت في لعبة يراها الآخرون؟
+  ur: ان میں سے کون سی بات بِٹ ایسے گیم میں محفوظ طریقے سے کہہ سکتا ہے جو دوسرے دیکھیں؟
+options:
+  - id: a
+    text:
+      en: '"Catch the stars!"'
+      ar: «التقط النجوم!»
+      ur: '"ستارے پکڑو!"'
+  - id: b
+    text:
+      en: Your home address.
+      ar: عنوان منزلك.
+      ur: آپ کے گھر کا پتا۔
+  - id: c
+    text:
+      en: Your school's name and your class.
+      ar: اسم مدرستك وصفّك.
+      ur: آپ کے اسکول کا نام اور آپ کی جماعت۔
+answer: a
+explanation:
+  en: Keep personal details private. Fun messages about the game are great!
+  ar: احتفظ بمعلوماتك الشخصية لنفسك. الرسائل الممتعة عن اللعبة رائعة!
+  ur: ذاتی معلومات اپنے پاس رکھیں۔ گیم کے بارے میں مزے دار پیغامات بہت اچھے ہیں!

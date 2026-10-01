@@ -12,6 +12,8 @@ import 'package:dio/dio.dart';
 import 'package:kcp_api/src/model/child_consents_dto.dart';
 import 'package:kcp_api/src/model/child_dto.dart';
 import 'package:kcp_api/src/model/consent_record_dto.dart';
+import 'package:kcp_api/src/model/parental_consent_status_dto.dart';
+import 'package:kcp_api/src/model/picture_password_dto.dart';
 import 'package:kcp_api/src/model/update_child_dto.dart';
 
 class ChildrenApi {
@@ -357,6 +359,105 @@ class ChildrenApi {
     );
   }
 
+  /// Sets (or, with null, removes) the child&#39;s picture password.
+  ///
+  ///
+  /// Parameters:
+  /// * [id]
+  /// * [picturePasswordDto]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [ChildDto] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<ChildDto>> childrenSetPicturePassword({
+    required String id,
+    required PicturePasswordDto picturePasswordDto,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/v1/children/{id}/picture-password'.replaceAll(
+      '{'
+      r'id'
+      '}',
+      id.toString(),
+    );
+    final _options = Options(
+      method: r'PUT',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      _bodyData = jsonEncode(picturePasswordDto);
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _options.compose(_dio.options, _path),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    ChildDto? _responseData;
+
+    try {
+      final rawData = _response.data;
+      _responseData = rawData == null
+          ? null
+          : deserialize<ChildDto, ChildDto>(
+              rawData,
+              'ChildDto',
+              growable: true,
+            );
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<ChildDto>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
   /// Change nickname, avatar, language or location.
   ///
   ///
@@ -445,6 +546,88 @@ class ChildrenApi {
     }
 
     return Response<ChildDto>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// parentalConsentStatus
+  ///
+  ///
+  /// Parameters:
+  /// * [id]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [ParentalConsentStatusDto] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<ParentalConsentStatusDto>> parentalConsentStatus({
+    required String id,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/v1/children/{id}/parental-consent'.replaceAll(
+      '{'
+      r'id'
+      '}',
+      id.toString(),
+    );
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    ParentalConsentStatusDto? _responseData;
+
+    try {
+      final rawData = _response.data;
+      _responseData = rawData == null
+          ? null
+          : deserialize<ParentalConsentStatusDto, ParentalConsentStatusDto>(
+              rawData,
+              'ParentalConsentStatusDto',
+              growable: true,
+            );
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<ParentalConsentStatusDto>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

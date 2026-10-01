@@ -1,6 +1,7 @@
 import { AxeBuilder } from '@axe-core/playwright';
 import type { Locale } from '@kcp/i18n';
 import { type APIRequestContext, type Page } from '@playwright/test';
+import { roomWith } from './database';
 import { expect, test } from './fixtures';
 import { createStudent, logInAsParent, logInAsStudent, MESSAGES } from './helpers';
 
@@ -27,10 +28,26 @@ const STUDENT_PAGES = [
   '/learn',
   '/learn/builder-m01-l01',
   '/learn/projects/builder-m01-project',
+  '/learn/explorer-m01-l01',
+  // The block editor (Blockly) and Bit's world.
+  '/learn/projects/explorer-m01-project',
   '/learn/portfolio',
   '/learn/leaderboard',
+  '/learn/league',
+  '/learn/friends',
+  '/learn/rooms',
+  '/learn/classes',
+  '/learn/readiness',
   '/learn/badges',
 ];
+
+/**
+ * Blockly's toolbox (the block editor, Explorer lessons) is a list whose options sit
+ * inside presentational groups, which axe doesn't accept. It is Blockly's own markup
+ * (v13); docs/accessibility.md notes how the editor was checked by hand.
+ */
+const blocklyToolbox = (rule: string, html: string) =>
+  rule === 'aria-required-children' && html.includes('blocklyBlockCanvas');
 
 async function audit(page: Page, path: string) {
   // Let the page settle (data loads, fonts) before checking it.
@@ -43,6 +60,8 @@ async function audit(page: Page, path: string) {
     .analyze();
   const serious = results.violations
     .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+    .map((v) => ({ ...v, nodes: v.nodes.filter((n) => !blocklyToolbox(v.id, n.html)) }))
+    .filter((v) => v.nodes.length > 0)
     .map(
       (v) =>
         `${path}: ${v.id} (${v.impact}) — ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`,
@@ -59,6 +78,8 @@ async function auditAll(page: Page, request: APIRequestContext, locale: Locale) 
   }
 
   const student = await createStudent(request, { locale });
+  // A team room, so the rooms page shows a room (phrases and the text box).
+  await roomWith('Team Audit', [student.username]);
   await logInAsParent(page, locale, student.email);
   for (const path of PARENT_PAGES) {
     await page.goto(`/${locale}${path}`);
@@ -117,7 +138,10 @@ test.describe('right to left, on a small phone', () => {
       for (const path of PARENT_PAGES) await check(path);
       await page.context().clearCookies();
       await logInAsStudent(page, locale, student.username);
-      for (const path of ['/learn', '/learn/portfolio', '/learn/leaderboard']) await check(path);
+      await roomWith('Team RTL', [student.username]);
+      for (const path of ['/learn', '/learn/portfolio', '/learn/leaderboard', '/learn/rooms']) {
+        await check(path);
+      }
       expect(pages).toEqual([]);
 
       if (locale === 'ur') {

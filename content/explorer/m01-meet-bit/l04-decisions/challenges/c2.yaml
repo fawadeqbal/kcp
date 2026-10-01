@@ -1,0 +1,54 @@
+id: explorer-m01-l04-c2
+order: 2
+type: blocks
+xp: 15
+stage:
+  mode: maze
+  map:
+    - '#######'
+    - '#S..###'
+    - '###.###'
+    - '###...#'
+    - '#####G#'
+    - '#######'
+  toolbox:
+    - when-run
+    - move
+    - until-goal
+    - if-else
+starter:
+  blocks:
+    - when: run
+      do:
+        - until: goal
+          do: []
+solution:
+  blocks:
+    - when: run
+      do:
+        - until: goal
+          do:
+            - if: path-right
+              do:
+                - move: right
+              else:
+                - move: down
+checks:
+  - id: reach-flag
+    expect: stage
+    atGoal: true
+    hint: right_or_down
+  - id: no-bump
+    expect: stage
+    noBump: true
+    hint: right_or_down
+  - id: decides
+    expect: blocks
+    uses:
+      - until-goal
+      - if-else
+    hint: if_else
+  - id: short
+    expect: blocks
+    maxBlocks: 6
+    hint: let_bit_decide

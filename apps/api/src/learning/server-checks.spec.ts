@@ -97,3 +97,49 @@ describe('isUnchanged', () => {
     expect(isUnchanged({ html: '<h1></h1>', css: 'h1{}' }, { html: '<h1></h1>' })).toBe(false);
   });
 });
+
+/** A block program that moves Bit right `moves` times. */
+const program = (moves: number) =>
+  JSON.stringify([{ when: 'run', do: Array.from({ length: moves }, () => ({ move: 'right' })) }]);
+
+describe('confirmResults for block programs', () => {
+  const stage = {
+    mode: 'maze' as const,
+    map: ['#####', '#S.G#', '#####'],
+    toolbox: ['when-run' as const, 'move' as const],
+  };
+  const checks = [
+    { id: 'flag', expect: 'stage', atGoal: true },
+    { id: 'few', expect: 'blocks', maxBlocks: 3 },
+  ] as Check[];
+
+  it('works the results out itself, whatever the browser reported', async () => {
+    const warnings: string[] = [];
+    const warn = (message: string) => warnings.push(message);
+    const claimed = new Map([
+      ['flag', true],
+      ['few', true],
+    ]);
+    const short = await confirmResults('c', { blocks: program(1) }, checks, claimed, warn, {
+      stage,
+    });
+    expect(Object.fromEntries(short)).toEqual({ flag: false, few: true });
+    expect(warnings).toEqual(['Check c/flag passed in the browser but not on the server']);
+
+    const solved = await confirmResults('c', { blocks: program(2) }, checks, new Map(), warn, {
+      stage,
+    });
+    expect(Object.fromEntries(solved)).toEqual({ flag: true, few: true });
+  });
+
+  it('fails a block file sent where there is no stage', async () => {
+    const results = await confirmResults(
+      'c',
+      { blocks: program(2) },
+      checks,
+      new Map([['flag', true]]),
+      () => undefined,
+    );
+    expect(Object.fromEntries(results)).toEqual({ flag: false, few: false });
+  });
+});

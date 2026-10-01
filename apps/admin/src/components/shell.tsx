@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { type ReactNode, useEffect, useState } from 'react';
-import type { AdminAbility } from '@/lib/ability';
+import { type AdminAbility, canOnAll } from '@/lib/ability';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
@@ -15,15 +15,33 @@ const NAV: {
   icon: IconName;
   allowed: (ability: AdminAbility) => boolean;
 }[] = [
-  { href: '/', label: 'Overview', icon: 'grid', allowed: (a) => a.can('read', 'User') },
+  { href: '/', label: 'Overview', icon: 'grid', allowed: (a) => canOnAll(a, 'read', 'User') },
   {
     href: '/pilot',
     label: 'Pilot numbers',
     icon: 'chart',
     allowed: (a) => a.can('read', 'Metrics'),
   },
-  { href: '/users', label: 'Users', icon: 'users', allowed: (a) => a.can('read', 'User') },
+  { href: '/users', label: 'Users', icon: 'users', allowed: (a) => canOnAll(a, 'read', 'User') },
   { href: '/feedback', label: 'Feedback', icon: 'msg', allowed: (a) => a.can('read', 'Feedback') },
+  {
+    href: '/moderation',
+    label: 'Room moderation',
+    icon: 'flag',
+    allowed: (a) => a.can('read', 'Moderation'),
+  },
+  {
+    href: '/events',
+    label: 'Hackathons',
+    icon: 'rocket',
+    allowed: (a) => canOnAll(a, 'read', 'EventTeam'),
+  },
+  {
+    href: '/schools',
+    label: 'Schools',
+    icon: 'graduation',
+    allowed: (a) => canOnAll(a, 'read', 'School'),
+  },
   {
     href: '/app-crashes',
     label: 'App crashes',
@@ -43,6 +61,12 @@ const NAV: {
     allowed: (a) => a.can('read', 'Waitlist'),
   },
   { href: '/content', label: 'Content', icon: 'book', allowed: (a) => a.can('read', 'Content') },
+  {
+    href: '/mentors',
+    label: 'Mentors and tutors',
+    icon: 'award',
+    allowed: (a) => canOnAll(a, 'read', 'MentorProfile'),
+  },
   {
     href: '/countries',
     label: 'Countries and languages',
@@ -65,10 +89,15 @@ const NAV: {
     href: '/consents',
     label: 'Parental consent',
     icon: 'shield',
-    allowed: (a) => a.can('read', 'ConsentRecord'),
+    allowed: (a) => a.can('read', 'ConsentRecord') || a.can('read', 'ParentalConsent'),
   },
   { href: '/audit', label: 'Audit log', icon: 'file', allowed: (a) => a.can('read', 'AuditLog') },
 ];
+
+/** The first page this staff member may open (the overview needs user access). */
+export function firstPage(ability: AdminAbility): string {
+  return NAV.find((item) => item.allowed(ability))?.href ?? '/content';
+}
 
 /** Unread feedback, for the count next to "Feedback" (checked again on every page). */
 function useUnreadFeedback(enabled: boolean, pathname: string) {

@@ -1,4 +1,13 @@
-import { type Check, type CodeFiles, composeDocument, evaluateChecks } from '@kcp/checks';
+import {
+  type Check,
+  type CodeFiles,
+  composeDocument,
+  evaluateChecks,
+  evaluateGitChecks,
+  evaluateStageChecks,
+  type GitSetup,
+  type StageLevel,
+} from '@kcp/checks';
 import { Window } from 'happy-dom';
 
 /** Checks that only read the page (no script needs to run to answer them). */
@@ -26,6 +35,13 @@ export interface VerifyOptions {
    * HTML and CSS themselves, and they are checked with scripts off.
    */
   scriptsMayChangePage?: boolean;
+  /**
+   * Block programs (Explorer): the level. Programs are data, so the server works out
+   * every result itself with the same interpreter as the browser.
+   */
+  stage?: StageLevel | null;
+  /** Git lessons: the practice repository. The steps are data too: the server replays them. */
+  repo?: GitSetup | null;
 }
 
 /**
@@ -47,7 +63,7 @@ export async function verifyStaticChecks(
   checks: Check[],
   options: VerifyOptions = {},
 ): Promise<Map<string, boolean> | null> {
-  if (files.py !== undefined) return null;
+  if (files.py !== undefined || files.blocks !== undefined || files.git !== undefined) return null;
   if (options.scriptsMayChangePage && hasScript(files.js)) return null;
   const readable = checks.filter((check) => STATIC_CHECKS.has(check.expect));
   if (readable.length === 0) return null;
@@ -104,6 +120,25 @@ export async function confirmResults(
   warn: (message: string) => void,
   options: VerifyOptions = {},
 ): Promise<Map<string, boolean>> {
+  if (files.blocks !== undefined || files.git !== undefined) {
+    // No stage (or repo) means a file sent to something that isn't a block (or git)
+    // challenge (cleanCode drops it first); nothing passes then.
+    const results =
+      files.blocks !== undefined
+        ? options.stage
+          ? evaluateStageChecks(options.stage, files.blocks, checks)
+          : []
+        : options.repo
+          ? evaluateGitChecks(options.repo, files.git, checks)
+          : [];
+    const byId = new Map(results.map((result) => [result.id, result.passed]));
+    for (const check of checks) {
+      if (reported.get(check.id) === true && byId.get(check.id) !== true) {
+        warn(`Check ${label}/${check.id} passed in the browser but not on the server`);
+      }
+    }
+    return new Map(checks.map((check) => [check.id, byId.get(check.id) === true]));
+  }
   const confirmed = new Map(checks.map((check) => [check.id, reported.get(check.id) === true]));
   let verified: Map<string, boolean> | null = null;
   try {

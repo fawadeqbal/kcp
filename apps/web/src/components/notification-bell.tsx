@@ -33,6 +33,7 @@ const titleIn = (titles: unknown, locale: string) => {
 function useDescribe() {
   const t = useTranslations('notifications');
   const tb = useTranslations('badges');
+  const tl = useTranslations('league');
   const format = useFormatter();
   const locale = useLocale();
   return (item: Item): { text: string; href: string } => {
@@ -82,6 +83,126 @@ function useDescribe() {
             module: titleIn(d['moduleTitles'], locale),
           }),
           href: '/dashboard',
+        };
+      case 'review_done':
+        return {
+          text: t(d['decision'] === 'APPROVED' ? 'reviewApproved' : 'reviewChanges'),
+          href: `/reviews/${str(d['reviewId'])}`,
+        };
+      case 'child_reviewed':
+        return {
+          text: t('childReviewed', { nickname: isolate(str(d['nickname'])) }),
+          href: `/reviews/${str(d['reviewId'])}`,
+        };
+      case 'league_result': {
+        const tier = tl(`tiers.${str(d['tier'])}` as 'tiers.bronze');
+        return {
+          text: t(d['outcome'] === 'PROMOTED' ? 'leagueUp' : 'leagueDown', { tier }),
+          href: '/learn/league',
+        };
+      }
+      case 'friend_request':
+        return {
+          text: t('friendRequest', {
+            nickname: isolate(str(d['nickname'])),
+            friend: isolate(str(d['friendNickname'])),
+          }),
+          href: '/dashboard',
+        };
+      case 'friend_added':
+        return {
+          text: t('friendAdded', { nickname: isolate(str(d['nickname'])) }),
+          href: '/learn/friends',
+        };
+      case 'referral_rewarded':
+        return {
+          text: t('referralRewarded', { days: String(d['days'] ?? '') }),
+          href: '/dashboard',
+        };
+      case 'weekly_report':
+        return { text: t('weeklyReport'), href: '/reports' };
+      case 'chat_warning':
+        return { text: t('chatWarning'), href: '/learn/rooms' };
+      case 'chat_muted':
+        return {
+          text: t('chatMuted', {
+            until: format.dateTime(new Date(str(d['until'])), {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            }),
+          }),
+          href: '/learn/rooms',
+        };
+      case 'child_chat_action': {
+        const nickname = isolate(str(d['nickname']));
+        const text =
+          d['action'] === 'MUTE'
+            ? t('childChatMuted', {
+                nickname,
+                until: format.dateTime(new Date(str(d['until'])), {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }),
+              })
+            : d['action'] === 'SUSPEND'
+              ? t('childChatSuspended', { nickname })
+              : t('childChatWarned', { nickname });
+        return { text, href: `/children/${str(d['childId'])}/rooms` };
+      }
+      case 'chat_report_done':
+        return { text: t('chatReportDone'), href: '/learn/rooms' };
+      case 'event_join_request':
+        return {
+          text: t('eventJoinRequest', {
+            nickname: isolate(str(d['nickname'])),
+            team: isolate(str(d['team'])),
+            event: isolate(str(d['event'])),
+          }),
+          href: '/dashboard',
+        };
+      case 'event_joined':
+        return {
+          text: t('eventJoined', {
+            team: isolate(str(d['team'])),
+            event: isolate(str(d['event'])),
+          }),
+          href: `/learn/events/${str(d['slug'])}`,
+        };
+      case 'event_results':
+        return {
+          text: t('eventResults', { event: isolate(str(d['event'])) }),
+          href: `/learn/events/${str(d['slug'])}`,
+        };
+      case 'class_join_request':
+        return {
+          text: t('classJoinRequest', {
+            nickname: isolate(str(d['nickname'])),
+            className: isolate(str(d['className'])),
+            school: isolate(str(d['school'])),
+          }),
+          href: '/dashboard',
+        };
+      case 'class_joined':
+        return {
+          text: t('classJoined', { className: isolate(str(d['className'])) }),
+          href: '/learn/classes',
+        };
+      case 'assignment_new':
+        return {
+          text: t('assignmentNew', { className: isolate(str(d['className'])) }),
+          href: '/learn/classes',
+        };
+      case 'readiness_result':
+        return {
+          text: t(d['passed'] === true ? 'readinessPassed' : 'readinessNotYet'),
+          href: `/reviews/${str(d['reviewId'])}`,
+        };
+      case 'child_readiness':
+        return {
+          text: t(d['passed'] === true ? 'childReadinessPassed' : 'childReadinessNotYet', {
+            nickname: isolate(str(d['nickname'])),
+          }),
+          href: `/reviews/${str(d['reviewId'])}`,
         };
       default:
         return { text: t('other'), href: '/' };

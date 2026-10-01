@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kcp_api/kcp_api.dart';
 
 import '../../api/api.dart';
+import '../../api/api_error.dart';
 import '../../config/app_config.dart';
 import '../../config/preferences.dart';
 import '../../l10n/app_localizations.dart';
@@ -10,6 +11,10 @@ import '../../theme/app_theme.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/common.dart';
 import '../../widgets/parental_gate.dart';
+import '../../widgets/pictures.dart';
+import '../rooms/room_screen.dart';
+import '../social/growth.dart';
+import '../social/parent_friends.dart';
 import 'parent_data.dart';
 import 'premium_text.dart';
 
@@ -42,6 +47,60 @@ class _ChildScreenState extends ConsumerState<ChildScreen> {
       ref.invalidate(childrenProvider);
     } catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(errorText(t, error))));
+    } finally {
+      if (mounted) setState(() => _busy = null);
+    }
+  }
+
+  /// Sets (or, with null, removes) the child's picture password, after the gate.
+  Future<void> _setPictures(ChildDto child, {required bool remove}) async {
+    if (!await passParentalGate(context)) return;
+    if (!mounted) return;
+    List<String>? pictures;
+    if (!remove) {
+      pictures = await showModalBottomSheet<List<String>>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (context) => _PicturePasswordSheet(nickname: child.nickname),
+      );
+      if (pictures == null || !mounted) return;
+    }
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = 'pictures');
+    try {
+      final response = await ref
+          .read(apiProvider)
+          .getChildrenApi()
+          .childrenSetPicturePassword(
+            id: child.id,
+            picturePasswordDto: PicturePasswordDto(
+              pictures: pictures == null
+                  ? null
+                  : [
+                      for (final picture in pictures)
+                        PicturePasswordDtoPicturesEnum.values.firstWhere(
+                          (value) => value.value == picture,
+                        ),
+                    ],
+            ),
+          );
+      if (!mounted) return;
+      setState(() => _child = response.data);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(remove ? t.childPictureRemoved : t.childPictureSaved(child.nickname)),
+        ),
+      );
+      ref.invalidate(childrenProvider);
+    } catch (error) {
+      final code = ApiError.from(error).code;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(code == 'PICTURE_PASSWORD_WEAK' ? t.childPictureWeak : errorText(t, error)),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _busy = null);
     }
@@ -183,6 +242,53 @@ class _ChildScreenState extends ConsumerState<ChildScreen> {
           ),
         ),
         const SizedBox(height: 16),
+        ChildFriendsCard(childId: child.id, nickname: child.nickname),
+        ChildRoomsCard(childId: child.id),
+        if (ref.watch(childSkillMapProvider(child.id)).value case final map?) ...[
+          const SizedBox(height: 16),
+          SkillMapCard(map: map, title: t.childSkillsTitle),
+        ],
+        const SizedBox(height: 16),
+        SectionCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(
+                header: true,
+                child: Text(t.childPictureTitle, style: Theme.of(context).textTheme.titleMedium),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                t.childPictureBody(child.nickname),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              if (child.hasPicturePassword) ...[
+                const SizedBox(height: 8),
+                Text(
+                  t.childPictureHas(child.nickname),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 10,
+                runSpacing: 8,
+                children: [
+                  FilledButton(
+                    onPressed: _busy == null ? () => _setPictures(child, remove: false) : null,
+                    child: Text(t.childPictureChoose),
+                  ),
+                  if (child.hasPicturePassword)
+                    TextButton(
+                      onPressed: _busy == null ? () => _setPictures(child, remove: true) : null,
+                      child: Text(t.childPictureRemove),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
         SectionCard(
           color: context.kcp.raised,
           child: Column(
@@ -198,6 +304,54 @@ class _ChildScreenState extends ConsumerState<ChildScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Four pictures, in order, for a child's picture password.
+class _PicturePasswordSheet extends StatefulWidget {
+  const _PicturePasswordSheet({required this.nickname});
+
+  final String nickname;
+
+  @override
+  State<_PicturePasswordSheet> createState() => _PicturePasswordSheetState();
+}
+
+class _PicturePasswordSheetState extends State<_PicturePasswordSheet> {
+  final List<String> _picked = [];
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(t.childPictureTitle, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 6),
+            Text(t.childPictureBody(widget.nickname)),
+            const SizedBox(height: 14),
+            PickedPictures(picked: _picked, onUndo: () => setState(_picked.removeLast)),
+            const SizedBox(height: 14),
+            PicturePad(
+              onPick: (picture) {
+                if (_picked.length < picturePasswordLength) setState(() => _picked.add(picture));
+              },
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _picked.length == picturePasswordLength
+                  ? () => Navigator.pop(context, [..._picked])
+                  : null,
+              child: Text(t.childPictureSave),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

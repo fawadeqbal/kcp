@@ -1,7 +1,9 @@
 'use client';
 
 import type { components } from '@kcp/api-client-ts';
+import { REFERRAL_CODE_PATTERN } from '@kcp/shared';
 import { useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useState } from 'react';
 import {
   Alert,
@@ -26,6 +28,9 @@ export function SignUpForm() {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+  // Another family's invite link: /sign-up?ref=CODE.
+  const ref = useSearchParams().get('ref')?.trim().toUpperCase() ?? '';
+  const invited = REFERRAL_CODE_PATTERN.test(ref);
   const [countries, setCountries] = useState<Country[]>([]);
   const [form, setForm] = useState({
     displayName: '',
@@ -74,6 +79,7 @@ export function SignUpForm() {
           countryCode: form.countryCode,
           languageCode: locale,
           acceptTerms: true,
+          ...(invited ? { referralCode: ref } : {}),
         },
       });
       if (error) {
@@ -91,6 +97,7 @@ export function SignUpForm() {
 
   return (
     <AuthCard title={t('auth.signUp.title')} subtitle={t('auth.signUp.subtitle')}>
+      {invited ? <Alert tone="success">{t('auth.signUp.invited')}</Alert> : null}
       <Alert>{t('auth.signUp.safetyNote')}</Alert>
       <form className="flex flex-col gap-5" onSubmit={onSubmit} noValidate>
         <TextField

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kcp_api/kcp_api.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -9,13 +10,14 @@ import '../../config/preferences.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common.dart';
+import '../explorer/explorer_challenge_screen.dart';
 import '../quiz/quiz_model.dart';
 import '../quiz/quiz_view.dart';
 import '../student/home_screen.dart';
 import '../student/student_data.dart';
 
-/// A lesson on the phone: the explainer and the quick questions. The code
-/// challenges need a keyboard, so they wait on the laptop.
+/// A lesson on the phone: the explainer and the quick questions. Explorer steps
+/// (blocks) open here; code challenges need a keyboard, so they wait on the laptop.
 class LessonScreen extends ConsumerWidget {
   const LessonScreen({super.key, required this.lessonId});
 
@@ -173,23 +175,42 @@ class _LessonBody extends ConsumerWidget {
           const SizedBox(height: 12),
           Semantics(
             header: true,
-            child: Text(t.lessonChallenges, style: theme.textTheme.headlineSmall),
+            child: Text(
+              lesson.challenges.every(isAppStep) ? t.explorerSteps : t.lessonChallenges,
+              style: theme.textTheme.headlineSmall,
+            ),
           ),
           const SizedBox(height: 8),
+          if (lesson.challenges.any(isAppStep)) ...[
+            Text(t.explorerTapStep, style: theme.textTheme.bodySmall),
+            const SizedBox(height: 4),
+          ],
           for (final (index, challenge) in lesson.challenges.indexed)
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: IconDisc(
-                challenge.passed ? 'check' : 'code',
+                challenge.passed ? 'check' : (isAppStep(challenge) ? 'grid' : 'code'),
                 size: 36,
                 background: challenge.passed ? p.sage600 : p.sand200,
                 color: challenge.passed ? p.sage100 : p.muted,
               ),
               title: Text(t.lessonStep(index + 1)),
               subtitle: Text(challenge.passed ? t.lessonStepDone : challenge.title),
+              trailing: isAppStep(challenge)
+                  ? KcpIcon(
+                      Directionality.of(context) == TextDirection.rtl ? 'chevL' : 'chevR',
+                      size: 20,
+                      color: p.muted,
+                    )
+                  : null,
+              onTap: isAppStep(challenge)
+                  ? () => context.push('/lesson/${lesson.id}/step/${challenge.id}')
+                  : null,
             ),
-          const SizedBox(height: 8),
-          LaptopHint(path: '/$language/learn/${lesson.id}'),
+          if (!lesson.challenges.every(isAppStep)) ...[
+            const SizedBox(height: 8),
+            LaptopHint(path: '/$language/learn/${lesson.id}'),
+          ],
         ],
         const SizedBox(height: 24),
       ],

@@ -43,7 +43,7 @@ For parents
 • Check the family plan's status (plans are managed on the website).
 
 Safe by design
-• No ads, no tracking, no chat between children.
+• No ads, no tracking, no private messages: children talk only in moderated team rooms.
 • Accounts are created by a parent on our website, with verified consent.
 • Links out of the app and every change to settings are behind a question for grown-ups.
 • Reminders only when someone turns them on.
@@ -83,7 +83,7 @@ You need an account from our website to sign in.
 • اطّلع على حالة خطة العائلة (تُدار الخطط على الموقع).
 
 آمن من الأساس
-• بلا إعلانات ولا تتبّع ولا محادثات بين الأطفال.
+• بلا إعلانات ولا تتبّع ولا رسائل خاصة: يتحدث الأطفال فقط في غرف فرق خاضعة للإشراف.
 • ينشئ وليّ الأمر الحسابات على موقعنا بموافقة موثّقة.
 • الروابط خارج التطبيق وكل تغيير في الإعدادات محمية بسؤال للكبار.
 • لا تذكيرات إلا إذا شغّلها أحد.
@@ -123,7 +123,7 @@ You need an account from our website to sign in.
 • خاندانی پلان کی صورتحال دیکھیں (پلان ویب سائٹ پر سنبھالے جاتے ہیں)۔
 
 شروع سے محفوظ
-• کوئی اشتہار نہیں، کوئی ٹریکنگ نہیں، بچوں کے درمیان کوئی چیٹ نہیں۔
+• کوئی اشتہار نہیں، کوئی ٹریکنگ نہیں، کوئی نجی پیغامات نہیں: بچے صرف نگرانی والے ٹیم رومز میں بات کرتے ہیں۔
 • اکاؤنٹ والدین ہماری ویب سائٹ پر تصدیق شدہ رضامندی کے ساتھ بناتے ہیں۔
 • ایپ سے باہر کے لنک اور ترتیبات کی ہر تبدیلی بڑوں کے ایک سوال کے پیچھے ہے۔
 • یاد دہانیاں صرف تب جب کوئی انہیں آن کرے۔

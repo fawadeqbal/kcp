@@ -9,6 +9,7 @@ Short steps for running the Kids Coding Platform in staging and production. Pick
 | [outage.md](outage.md)                   | Something is down or slow; telling families; writing the review                            |
 | [safety-incident.md](safety-incident.md) | A child may be at risk, or children's data may be exposed                                  |
 | [backup-restore.md](backup-restore.md)   | Data was lost or damaged; the restore drill                                                |
+| [schools.md](schools.md)                 | A school signs up, pays or leaves; a teacher leaves; the hub readiness check               |
 
 One-time setup lives in [docs/deployment.md](../deployment.md). Placeholders used here: `<api>` is the API's public URL (for example `https://api.yourdomain.com`), `<web>` the web app, `<admin>` the admin panel, `<sandbox>` the code sandbox, `<owner>` the GitHub owner of the images.
 
@@ -24,8 +25,8 @@ Phone numbers and the lawyer's contacts live in the shared password manager, not
 
 What each staff role can do in the admin panel (from the permission matrix):
 
-- **Moderator:** suspend, reactivate and sign out students and parents; read feedback.
-- **Admin:** all of that, plus revoke certificates, premium by hand, refunds and manual payments, leaderboard rebuilds, and the audit log. Cannot change other admins.
+- **Moderator:** suspend, reactivate and sign out students and parents; read feedback; the room reports queue (warn, mute, remove a message, suspend, dismiss) and the blocked-words list (read only).
+- **Admin:** all of that, plus schools (teachers, licences: invoiced, paid, cancelled), hackathons (plan, move step by step, judges, team mentors, taking a student out of a team), changing the blocked-words list, revoke certificates, premium by hand, refunds and manual payments, leaderboard rebuilds, and the audit log. Cannot change other admins.
 - **Super admin:** everything, including staff accounts.
 
 ## Severity levels
@@ -46,6 +47,7 @@ Any safety report is at least SEV2. If a specific child may be at risk, it is SE
 | `GET <api>/v1/health/ready`          | PostgreSQL and Redis both answer within 2 seconds. On `503`, the API log says which one is down (the public answer doesn't). |
 | `GET <api>/v1/health/storage`        | Cloudflare R2 answers. Not part of readiness: a storage outage only breaks projects.                                         |
 | `curl -sI https://<sandbox>/`        | Must show `Content-Security-Policy` with `connect-src blob:` and your `frame-ancestors`.                                     |
+| Forgejo (team repositories)          | From the API's network: `GET <forgejo>/api/healthz`. Not part of readiness: an outage only stops hackathon teams' git.       |
 | Web app, admin panel, marketing site | Load the home page. They have no health endpoint of their own.                                                               |
 | Stripe                               | Stripe Dashboard, the webhook endpoint for `<api>/v1/payments/webhooks/stripe`: recent deliveries should be 2xx.             |
 

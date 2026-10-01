@@ -16,7 +16,7 @@ export function InvoicePage({ invoiceId }: { invoiceId: string }) {
   const t = useTranslations('billing');
   const format = useFormatter();
   const locale = useLocale();
-  const user = useAccount('ADULT');
+  const user = useAccount('PARENT');
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [failed, setFailed] = useState(false);
 

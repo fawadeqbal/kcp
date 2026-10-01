@@ -1,0 +1,29 @@
+id: pro-m01-l02-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: git status says style.css is under "Changes not staged for commit". What does that mean?
+  ar: يقول git status إن style.css تحت "Changes not staged for commit". ماذا يعني ذلك؟
+  ur: git status کہتا ہے کہ style.css "Changes not staged for commit" کے نیچے ہے۔ اس کا مطلب کیا ہے؟
+options:
+  - id: a
+    text:
+      en: The file changed, but the next commit won't include the change until you git add it.
+      ar: تغيّر الملف، لكن الإيداع التالي لن يتضمّن التغيير حتى تنفّذ git add له.
+      ur: فائل بدل گئی ہے، لیکن اگلے کمٹ میں یہ تبدیلی تب تک شامل نہیں ہوگی جب تک آپ اسے git add نہ کریں۔
+  - id: b
+    text:
+      en: The change is already saved in a commit.
+      ar: التغيير محفوظ بالفعل في إيداع.
+      ur: تبدیلی پہلے سے ایک کمٹ میں محفوظ ہے۔
+  - id: c
+    text:
+      en: Git deleted the file.
+      ar: حذف git الملف.
+      ur: git نے فائل حذف کر دی۔
+answer: a
+explanation:
+  en: Only staged changes go into a commit. "Not staged" means the change is in your folder but not in the staging area yet.
+  ar: التغييرات المجهّزة فقط تدخل في الإيداع. و"غير مُجهَّز" يعني أن التغيير في مجلدك لكنه ليس في منطقة التجهيز بعد.
+  ur: صرف اسٹیج شدہ تبدیلیاں کمٹ میں جاتی ہیں۔ "Not staged" کا مطلب ہے کہ تبدیلی آپ کے فولڈر میں ہے لیکن ابھی اسٹیجنگ ایریا میں نہیں۔

@@ -1,0 +1,29 @@
+id: explorer-m01-l05-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: What is an event in a program?
+  ar: ما هو الحدث في البرنامج؟
+  ur: پروگرام میں ایونٹ کیا ہوتا ہے؟
+options:
+  - id: a
+    text:
+      en: Something that happens, like a key press, that starts a script.
+      ar: شيء يحدث، مثل ضغط مفتاح، فيبدأ نصًا برمجيًا.
+      ur: کوئی بات جو ہوتی ہے، جیسے کی دبانا، اور اسکرپٹ شروع کرتی ہے۔
+  - id: b
+    text:
+      en: A party for robots.
+      ar: حفلة للروبوتات.
+      ur: روبوٹس کی پارٹی۔
+  - id: c
+    text:
+      en: A block that moves Bit.
+      ar: مكعب يحرّك بِت.
+      ur: بِٹ کو چلانے والا بلاک۔
+answer: a
+explanation:
+  en: 'Events start scripts: clicking Run, pressing a key, or Bit touching the star.'
+  ar: 'الأحداث تبدأ النصوص البرمجية: الضغط على تشغيل، أو ضغط مفتاح، أو لمس بِت للنجمة.'
+  ur: 'ایونٹس اسکرپٹس شروع کرتے ہیں: چلائیں دبانا، کی دبانا، یا بِٹ کا ستارہ چھونا۔'

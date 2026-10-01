@@ -6,6 +6,7 @@ import { Alert, AuthCard, Avatar, Button, Icon, PasswordField, TextField } from 
 import { Link, useRouter } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { homePath, useAuth } from '@/lib/auth-provider';
+import { TwoFactorStep } from './two-factor-step';
 import { errorMessageKey } from '@/lib/errors';
 import { isEmail } from './validation';
 
@@ -13,6 +14,10 @@ export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
   const { login } = useAuth();
+  const [twoFactor, setTwoFactor] = useState<{
+    stage: 'setup' | 'verify';
+    mfaToken: string;
+  } | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -44,6 +49,10 @@ export function LoginForm() {
       setNotice(t('auth.login.staffNote'));
       return;
     }
+    if (result.twoFactor) {
+      setTwoFactor(result.twoFactor);
+      return;
+    }
     setUnverified(result.code === 'EMAIL_NOT_VERIFIED');
     setFormError(t(`errors.${errorMessageKey(result.code, result.network)}`));
   }
@@ -53,6 +62,18 @@ export function LoginForm() {
     setUnverified(false);
     setFormError(null);
     setNotice(t('auth.checkEmail.resent'));
+  }
+
+  if (twoFactor) {
+    return (
+      <TwoFactorStep
+        {...twoFactor}
+        onStartOver={() => {
+          setTwoFactor(null);
+          setPassword('');
+        }}
+      />
+    );
   }
 
   return (

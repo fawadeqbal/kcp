@@ -19,14 +19,24 @@ String? appRouteFor(Uri uri) {
     ['learn'] => '/learn',
     ['learn', 'leaderboard'] || ['leaderboard'] => '/leaderboard',
     ['learn', 'badges'] => '/me',
+    ['learn', 'rooms'] => '/rooms',
     ['learn', final id] when _lessonId.hasMatch(id) => '/lesson/$id',
     ['lesson', final id] when _lessonId.hasMatch(id) => '/lesson/$id',
     ['practice'] => '/practice',
     ['dashboard'] || ['parent'] => '/parent',
+    // A child's device shows a QR code of the website's /pair page: a parent's
+    // phone with the app opens it here.
+    ['pair'] => _pairRoute(uri.queryParameters['code']),
     ['notifications'] => '/notifications',
     _ => null,
   };
 }
+
+/// Pairing codes are letters and digits (the API checks them).
+final _pairingCode = RegExp(r'^[A-Za-z0-9-]{1,16}$');
+
+String _pairRoute(String? code) =>
+    code != null && _pairingCode.hasMatch(code) ? '/parent/pair?code=$code' : '/parent/pair';
 
 /// Routes only students see, and routes only parents see.
 bool isStudentRoute(String location) =>
@@ -35,6 +45,8 @@ bool isStudentRoute(String location) =>
     location == '/leaderboard' ||
     location == '/me' ||
     location == '/practice' ||
+    location == '/rooms' ||
+    location.startsWith('/rooms/') ||
     location.startsWith('/lesson/');
 
 bool isParentRoute(String location) => location == '/parent' || location.startsWith('/parent/');

@@ -30,7 +30,7 @@ export function BillingPage() {
   const t = useTranslations('billing');
   const format = useFormatter();
   const locale = useLocale();
-  const user = useAccount('ADULT');
+  const user = useAccount('PARENT');
   const params = useSearchParams();
   const returned = params.get('checkout');
   const [billing, setBilling] = useState<Billing | null>(null);

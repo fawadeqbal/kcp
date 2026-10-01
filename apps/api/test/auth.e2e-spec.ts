@@ -348,7 +348,7 @@ describe('auth (e2e)', () => {
       const first = await t
         .http()
         .post('/v1/auth/login')
-        .send({ email: admin.email, password: PASSWORD })
+        .send({ email: admin.email, password: PASSWORD, app: 'admin' })
         .expect(200);
       expect(first.body.status).toBe('mfa_setup_required');
       expect(first.body.accessToken).toBeUndefined();
@@ -366,7 +366,7 @@ describe('auth (e2e)', () => {
       const bad = await t
         .http()
         .post('/v1/auth/mfa/verify')
-        .send({ mfaToken: first.body.mfaToken, code: '000000' })
+        .send({ mfaToken: first.body.mfaToken, code: '000000', app: 'admin' })
         .expect(401);
       expect(bad.body.error).toBe('INVALID_CODE');
 
@@ -375,7 +375,7 @@ describe('auth (e2e)', () => {
       const done = await t
         .http()
         .post('/v1/auth/mfa/verify')
-        .send({ mfaToken: first.body.mfaToken, code })
+        .send({ mfaToken: first.body.mfaToken, code, app: 'admin' })
         .expect(200);
       expect(done.body.status).toBe('authenticated');
       expect(done.body.user.twoFactorEnabled).toBe(true);
@@ -384,19 +384,19 @@ describe('auth (e2e)', () => {
       const second = await t
         .http()
         .post('/v1/auth/login')
-        .send({ email: admin.email, password: PASSWORD })
+        .send({ email: admin.email, password: PASSWORD, app: 'admin' })
         .expect(200);
       expect(second.body.status).toBe('mfa_required');
       await t
         .http()
         .post('/v1/auth/mfa/verify')
-        .send({ mfaToken: second.body.mfaToken, code })
+        .send({ mfaToken: second.body.mfaToken, code, app: 'admin' })
         .expect(401);
       const nextCode = totp(setup.body.secret, now + 30_000);
       await t
         .http()
         .post('/v1/auth/mfa/verify')
-        .send({ mfaToken: second.body.mfaToken, code: nextCode })
+        .send({ mfaToken: second.body.mfaToken, code: nextCode, app: 'admin' })
         .expect(200);
 
       const actions = await t.prisma.auditLog.findMany({
@@ -406,6 +406,52 @@ describe('auth (e2e)', () => {
       expect(actions.map((a) => a.action)).toEqual(
         expect.arrayContaining(['auth.mfa_enabled', 'auth.staff_login']),
       );
+    });
+
+    it('sends staff to the admin panel, and mentors and teachers through two-factor on the web', async () => {
+      const admin = await createUser(t.prisma, 'admin');
+      const refused = await t
+        .http()
+        .post('/v1/auth/login')
+        .send({ email: admin.email, password: PASSWORD, app: 'web' })
+        .expect(403);
+      expect(refused.body.error).toBe('STAFF_ACCOUNT');
+
+      for (const role of ['mentor', 'teacher']) {
+        const adult = await createUser(t.prisma, role);
+        const first = await t
+          .http()
+          .post('/v1/auth/login')
+          .send({ email: adult.email, password: PASSWORD, app: 'web' })
+          .expect(200);
+        expect(first.body.status).toBe('mfa_setup_required');
+        const setup = await t
+          .http()
+          .post('/v1/auth/mfa/setup')
+          .send({ mfaToken: first.body.mfaToken })
+          .expect(200);
+        // Not in the admin panel…
+        const inAdmin = await t
+          .http()
+          .post('/v1/auth/mfa/verify')
+          .send({ mfaToken: first.body.mfaToken, code: totp(setup.body.secret), app: 'admin' })
+          .expect(403);
+        expect(inAdmin.body.error).toBe('NOT_STAFF');
+        // …but in the web app, with the web cookie.
+        const done = await t
+          .http()
+          .post('/v1/auth/mfa/verify')
+          .send({ mfaToken: first.body.mfaToken, code: totp(setup.body.secret), app: 'web' })
+          .expect(200);
+        expect(done.body.user.role.key).toBe(role);
+        expect(String(done.headers['set-cookie'])).toContain('kcp_refresh=');
+        // The app is for families only.
+        await t
+          .http()
+          .post('/v1/auth/login')
+          .send({ email: adult.email, password: PASSWORD, app: 'mobile' })
+          .expect(403);
+      }
     });
 
     it('refuses an expired or forged two-factor token', async () => {

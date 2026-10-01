@@ -1,0 +1,39 @@
+id: explorer-m01-l03-c1
+order: 1
+type: blocks
+xp: 10
+stage:
+  mode: maze
+  map:
+    - '##########'
+    - '#S......G#'
+    - '##########'
+  toolbox:
+    - when-run
+    - move
+    - repeat
+starter:
+  blocks:
+    - when: run
+      do: []
+solution:
+  blocks:
+    - when: run
+      do:
+        - repeat: 7
+          do:
+            - move: right
+checks:
+  - id: reach-flag
+    expect: stage
+    atGoal: true
+    hint: count
+  - id: uses-repeat
+    expect: blocks
+    uses:
+      - repeat
+    hint: use_repeat
+  - id: short
+    expect: blocks
+    maxBlocks: 3
+    hint: three_blocks

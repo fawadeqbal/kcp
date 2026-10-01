@@ -56,13 +56,28 @@ describe('certificates and notifications (e2e)', () => {
       skipDuplicates: true,
     });
 
-  const ship = (token: string) =>
-    t
+  /**
+   * Ships the project; a premium student's project goes to a mentor for review, and
+   * (unless `review: 'wait'`) this approves it straight away, as a mentor would.
+   */
+  const ship = async (
+    token: string,
+    { review = 'approve' }: { review?: 'approve' | 'wait' } = {},
+  ) => {
+    const res = await t
       .http()
       .post(`/v1/projects/${BRIEF}/ship`)
       .set(auth(token))
       .send({ code: PAGE, results: allPassed })
       .expect(200);
+    if (review === 'approve') {
+      await t.prisma.review.updateMany({
+        where: { project: { portfolioItem: { id: res.body.portfolioItemId } } },
+        data: { status: 'APPROVED', decidedAt: new Date(), turnaroundHours: 1 },
+      });
+    }
+    return res;
+  };
 
   const notificationsOf = async (token: string) =>
     (await t.http().get('/v1/notifications').set(auth(token)).expect(200)).body as {
@@ -83,14 +98,26 @@ describe('certificates and notifications (e2e)', () => {
       moduleId: MODULE,
       moduleTitle: 'Module one',
       finished: false,
+      awaitingReview: false,
       certificate: null,
     });
     await finishLessons(child.id);
     const early = await issue(student).expect(400);
     expect(early.body.error).toBe('MODULE_NOT_FINISHED');
 
-    // Shipping the project finishes the module, and tells the parent.
-    await ship(student);
+    // Shipping the project finishes the module, and tells the parent; a mentor reviews
+    // it before the certificate.
+    await ship(student, { review: 'wait' });
+    const waiting = await issue(student).expect(409);
+    expect(waiting.body.error).toBe('REVIEW_PENDING');
+    const listed = await t.http().get('/v1/certificates').set(auth(student)).expect(200);
+    expect(listed.body.modules).toContainEqual(
+      expect.objectContaining({ moduleId: MODULE, finished: true, awaitingReview: true }),
+    );
+    await t.prisma.review.updateMany({
+      where: { studentId: child.id },
+      data: { status: 'APPROVED', decidedAt: new Date(), turnaroundHours: 1 },
+    });
     const parentBell = await notificationsOf(parent.accessToken);
     expect(parentBell.items[0]).toMatchObject({
       type: 'child_shipped',

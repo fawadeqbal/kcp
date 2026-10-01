@@ -49,7 +49,9 @@ export class SettingsAdminService {
     ability: AppAbility,
     ctx: RequestContext,
   ): Promise<CountryAdminDto> {
-    const fields = (['isActive', 'currency'] as const).filter((field) => dto[field] !== undefined);
+    const fields = (['isActive', 'currency', 'under13ConsentMethods'] as const).filter(
+      (field) => dto[field] !== undefined,
+    );
     if (fields.length === 0) {
       throw new BadRequestException({ error: 'NOTHING_TO_CHANGE', message: 'Nothing to change.' });
     }
@@ -116,22 +118,35 @@ export class SettingsAdminService {
         // Prices were in the old currency: they're set again in the new one.
         await tx.planPrice.deleteMany({ where: { countryCode: code } });
       }
-      const row = await tx.country.update({ where: { code }, data: { isActive, currency } });
+      const methods = dto.under13ConsentMethods ?? country.under13ConsentMethods;
+      const row = await tx.country.update({
+        where: { code },
+        data: { isActive, currency, under13ConsentMethods: methods },
+      });
       await this.audit.record(
         {
           actor: { id: staff.id, roleKey: staff.roleKey },
           action: 'country.update',
           entityType: 'Country',
           entityId: code,
-          before: { isActive: country.isActive, currency: country.currency },
-          after: { isActive, currency },
+          before: {
+            isActive: country.isActive,
+            currency: country.currency,
+            under13ConsentMethods: country.under13ConsentMethods,
+          },
+          after: { isActive, currency, under13ConsentMethods: methods },
           context: ctx,
         },
         tx,
       );
       return row;
     });
-    return { code: updated.code, isActive: updated.isActive, currency: updated.currency };
+    return {
+      code: updated.code,
+      isActive: updated.isActive,
+      currency: updated.currency,
+      under13ConsentMethods: updated.under13ConsentMethods,
+    };
   }
 
   // ── Languages ──────────────────────────────────────────────────────────────

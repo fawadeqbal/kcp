@@ -23,6 +23,14 @@ This policy explains what we collect about families on Kids Coding Platform, why
 
 **Messages:** anything sent to us with the Feedback button, with the page it was sent from.
 
+**Team rooms:** what children send in the rooms of their teams, classes and events (ready-made phrases, and from 13 typed messages), and reports about messages with what moderators did. Room messages are deleted after 90 days.
+
+**Hackathon teams:** the team's name, who is in it (each child only with a parent's approval), and the team's work in a private repository on our own git server: files, commits (with the child's nickname as the author), pull requests, reviews, comments, what was handed in, and the judges' scores and rank.
+
+**Classes and schools:** the classes a child joins (each only with a parent's approval), the lessons their teacher set and whether they were done. For schools with a licence: the school's name and city, a contact person's name and email for invoices, the licence and its payments.
+
+**The hub readiness check:** the page a student builds in the timed check, when they started and handed it in, and the mentor's scores and comments.
+
 **Waitlist:** if you join the waitlist on our website, your email address, country, language and your child's age range.
 
 **Security records:** when someone signs in, and the internet address and browser used, so we can protect accounts and investigate problems.
@@ -40,6 +48,8 @@ We don't show advertising, we don't use trackers or third-party analytics, and w
 ## Who can see it
 
 - **Other users** only ever see a child's nickname, avatar and XP on public leaderboards, and their projects through a share link — each only if the parent switches it on. Shared projects open on a separate website address used only for children's code.
+- **Teammates in a hackathon** see each other's nickname and avatar and the team's work. The team's repository is private: only the team, its mentor, the event's judges and our team can open it.
+- **A child's teacher** (an adult our team added for their school, who signs in with two-factor codes) sees the nicknames and avatars in their class, progress on the lessons they set, and a weekly board of nicknames and XP. Classmates see that board too.
 - **Anyone with a certificate's code** can check it: they see the nickname, the module and the date, nothing else.
 - **Our team**: only the people who need it to run the service and keep it safe, and what they do is recorded.
 - **Service providers** that host the site, store files, send emails and take card payments (Stripe) for us, only to do that job for us and under contract.
@@ -84,6 +94,14 @@ If we change this policy in an important way, we will email parents before the c
 
 **الرسائل:** كل ما يُرسل إلينا بزر الملاحظات، مع الصفحة التي أُرسل منها.
 
+**غرف الفرق:** ما يرسله الأطفال في غرف فرقهم وصفوفهم وفعالياتهم (عبارات جاهزة، ومن عمر 13 رسائل مكتوبة)، والبلاغات عن الرسائل مع ما فعله المشرفون. تُحذف رسائل الغرف بعد 90 يومًا.
+
+**فرق الهاكاثون:** اسم الفريق، ومن فيه (كل طفل بموافقة أحد والديه فقط)، وعمل الفريق في مستودع خاص على خادم git الخاص بنا: الملفات، والإيداعات (commits) باسم الطفل المستعار كمؤلف، وطلبات السحب، والمراجعات، والتعليقات، وما سُلِّم، ودرجات الحكّام والترتيب.
+
+**الصفوف والمدارس:** الصفوف التي ينضم إليها الطفل (كل صف بموافقة أحد الوالدين فقط)، والدروس التي حددها معلّمه وهل أُنجزت. وللمدارس التي لديها ترخيص: اسم المدرسة ومدينتها، واسم شخص للتواصل وبريده الإلكتروني للفواتير، والترخيص ومدفوعاته.
+
+**اختبار الجاهزية للمركز:** الصفحة التي يبنيها الطالب في الاختبار المحدد بوقت، ومتى بدأ وسلّم، ودرجات المرشد وتعليقاته.
+
 **قائمة الانتظار:** إذا انضممت إلى قائمة الانتظار على موقعنا، فبريدك الإلكتروني وبلدك ولغتك والفئة العمرية لطفلك.
 
 **سجلات الأمان:** وقت تسجيل الدخول، وعنوان الإنترنت والمتصفح المستخدم، لنحمي الحسابات ونتحقق من المشكلات.
@@ -101,6 +119,8 @@ If we change this policy in an important way, we will email parents before the c
 ## من يستطيع رؤيتها
 
 - **المستخدمون الآخرون** لا يرون إلا الاسم المستعار للطفل وصورته الرمزية ونقاط خبرته في لوحات الصدارة العامة، ومشاريعه عبر رابط مشاركة، وكلٌّ منها فقط إذا فعّله وليّ الأمر. تُفتح المشاريع المشتركة على عنوان موقع منفصل مخصّص لكود الأطفال فقط.
+- **أعضاء فريق الهاكاثون** يرون الاسم المستعار والصورة الرمزية لبعضهم وعمل الفريق. مستودع الفريق خاص: لا يفتحه إلا الفريق ومرشده وحكّام الفعالية وفريقنا.
+- **معلّم الطفل** (شخص بالغ أضافه فريقنا لمدرسته، ويسجّل الدخول برموز التحقق بخطوتين) يرى الأسماء المستعارة والصور الرمزية في صفه، والتقدّم في الدروس التي يحددها، ولوحة أسبوعية بالأسماء المستعارة ونقاط الخبرة. ويرى زملاء الصف تلك اللوحة أيضًا.
 - **أي شخص لديه رمز شهادة** يمكنه التحقق منها: يرى الاسم المستعار والوحدة والتاريخ، ولا شيء غير ذلك.
 - **فريقنا**: فقط الأشخاص الذين يحتاجونها لتشغيل الخدمة وحمايتها، وكل ما يفعلونه مسجّل.
 - **مزوّدو الخدمات** الذين يستضيفون الموقع ويحفظون الملفات ويرسلون الرسائل ويحصّلون المدفوعات بالبطاقة (Stripe) نيابةً عنا، فقط لأداء هذا العمل لنا وبموجب عقد.
@@ -145,6 +165,14 @@ If we change this policy in an important way, we will email parents before the c
 
 **پیغامات:** جو کچھ بھی رائے کے بٹن سے ہمیں بھیجا جائے، اس صفحے کے ساتھ جہاں سے بھیجا گیا۔
 
+**ٹیم رومز:** بچے اپنی ٹیموں، کلاسوں اور ایونٹس کے رومز میں جو بھیجتے ہیں (تیار جملے، اور 13 سال سے لکھے گئے پیغامات)، اور پیغامات کی رپورٹس اور ان پر ماڈریٹرز کی کارروائی۔ رومز کے پیغامات 90 دن بعد حذف ہو جاتے ہیں۔
+
+**ہیکاتھون ٹیمیں:** ٹیم کا نام، اس میں کون ہے (ہر بچہ صرف والدین کی منظوری سے)، اور ہمارے اپنے git سرور پر ایک نجی ریپوزٹری میں ٹیم کا کام: فائلیں، کمٹس (بچے کے فرضی نام کے ساتھ بطور مصنف)، پُل ریکویسٹس، ریویوز، تبصرے، جمع کرایا گیا کام، اور ججوں کے نمبر اور پوزیشن۔
+
+**کلاسیں اور اسکول:** وہ کلاسیں جن میں بچہ شامل ہوتا ہے (ہر ایک صرف والدین کی منظوری سے)، استاد کے دیے گئے اسباق اور آیا وہ مکمل ہوئے۔ لائسنس والے اسکولوں کے لیے: اسکول کا نام اور شہر، انوائس کے لیے رابطے کے شخص کا نام اور ای میل، اور لائسنس اور اس کی ادائیگیاں۔
+
+**ہب کے لیے تیاری کا امتحان:** وہ صفحہ جو طالب علم وقت والے امتحان میں بناتا ہے، کب شروع کیا اور کب جمع کرایا، اور مینٹور کے نمبر اور تبصرے۔
+
 **ویٹ لسٹ:** اگر آپ ہماری ویب سائٹ پر ویٹ لسٹ میں شامل ہوں تو آپ کا ای میل پتہ، ملک، زبان اور آپ کے بچے کی عمر کا گروپ۔
 
 **حفاظتی ریکارڈ:** کوئی کب سائن اِن کرتا ہے، اور استعمال ہونے والا انٹرنیٹ پتہ اور براؤزر، تاکہ ہم اکاؤنٹس کی حفاظت کر سکیں اور مسائل کی جانچ کر سکیں۔
@@ -162,6 +190,8 @@ If we change this policy in an important way, we will email parents before the c
 ## اسے کون دیکھ سکتا ہے
 
 - **دوسرے صارفین** عوامی لیڈر بورڈز پر صرف بچے کا فرضی نام، اوتار اور XP دیکھتے ہیں، اور شیئر لنک کے ذریعے اس کے پروجیکٹس، اور ان میں سے ہر ایک صرف تب جب والدین اسے آن کریں۔ شیئر کیے گئے پروجیکٹس ایک الگ ویب سائٹ پتے پر کھلتے ہیں جو صرف بچوں کے کوڈ کے لیے ہے۔
+- **ہیکاتھون ٹیم کے ساتھی** ایک دوسرے کا فرضی نام، اوتار اور ٹیم کا کام دیکھتے ہیں۔ ٹیم کی ریپوزٹری نجی ہے: اسے صرف ٹیم، اس کا مینٹور، ایونٹ کے جج اور ہماری ٹیم کھول سکتے ہیں۔
+- **بچے کا استاد** (ایک بالغ جسے ہماری ٹیم نے اس کے اسکول کے لیے شامل کیا، اور جو دو مرحلہ کوڈ سے سائن ان کرتا ہے) اپنی کلاس کے فرضی نام اور اوتار، دیے گئے اسباق میں پیش رفت، اور فرضی ناموں اور XP کا ہفتہ وار بورڈ دیکھتا ہے۔ ہم جماعت بھی وہ بورڈ دیکھتے ہیں۔
 - **جس کے پاس سرٹیفکیٹ کا کوڈ ہو** وہ اس کی تصدیق کر سکتا ہے: وہ فرضی نام، ماڈیول اور تاریخ دیکھتا ہے، اور کچھ نہیں۔
 - **ہماری ٹیم**: صرف وہ لوگ جنہیں سروس چلانے اور محفوظ رکھنے کے لیے اس کی ضرورت ہے، اور ان کا ہر کام ریکارڈ ہوتا ہے۔
 - **سروس فراہم کرنے والے** جو ہمارے لیے سائٹ ہوسٹ کرتے، فائلیں محفوظ کرتے، ای میلز بھیجتے اور کارڈ سے ادائیگی وصول کرتے ہیں (Stripe)، صرف یہ کام کرنے کے لیے اور معاہدے کے تحت۔

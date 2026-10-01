@@ -17,6 +17,13 @@ export function setTokenRefresher(refresh: (() => Promise<unknown>) | null): voi
   refresher = refresh;
 }
 
+/** The current access token (for the rooms' live connection), renewed first if it's stale. */
+export async function freshAccessToken(): Promise<string | null> {
+  const expired = expiresAt > 0 && Date.now() > expiresAt - 15_000;
+  if (accessToken && expired && refresher) await refresher().catch(() => undefined);
+  return accessToken;
+}
+
 export const api: ApiClient = createApiClient({ baseUrl: API_URL });
 
 api.use({

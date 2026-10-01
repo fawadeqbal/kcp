@@ -1,0 +1,29 @@
+id: explorer-m01-l01-q2
+order: 2
+kind: choice
+xp: 5
+prompt:
+  en: 'Bit has three blocks: move right, move right, move down. Where does Bit end up?'
+  ar: 'لدى بِت ثلاثة مكعبات: تحرّك لليمين، تحرّك لليمين، تحرّك للأسفل. أين ينتهي بِت؟'
+  ur: 'بِٹ کے پاس تین بلاکس ہیں: دائیں چلو، دائیں چلو، نیچے چلو۔ بِٹ کہاں پہنچے گا؟'
+options:
+  - id: a
+    text:
+      en: Two squares right and one square down.
+      ar: مربعان لليمين ومربع واحد للأسفل.
+      ur: دو خانے دائیں اور ایک خانہ نیچے۔
+  - id: b
+    text:
+      en: One square right and two squares down.
+      ar: مربع واحد لليمين ومربعان للأسفل.
+      ur: ایک خانہ دائیں اور دو خانے نیچے۔
+  - id: c
+    text:
+      en: Three squares right.
+      ar: ثلاثة مربعات لليمين.
+      ur: تین خانے دائیں۔
+answer: a
+explanation:
+  en: 'Each block moves Bit one square: right, right, then down.'
+  ar: 'كل مكعب ينقل بِت مربعًا واحدًا: يمين، يمين، ثم أسفل.'
+  ur: 'ہر بلاک بِٹ کو ایک خانہ لے جاتا ہے: دائیں، دائیں، پھر نیچے۔'

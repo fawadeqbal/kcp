@@ -8,9 +8,10 @@
 /**
  * The web pages the app can open, per language (the app maps them to its screens):
  * the lesson list, lessons (IDs like builder-m01-l03, not /learn/projects/…,
- * /learn/portfolio…, which only the website has) and the parent dashboard.
+ * /learn/portfolio…, which only the website has), the parent dashboard and the
+ * page where a parent signs in a child's device (the QR code a child's device shows).
  */
-export const APP_LINK_PATHS = ['/*/learn', '/*/learn/*-m*-l*', '/*/dashboard'];
+export const APP_LINK_PATHS = ['/*/learn', '/*/learn/*-m*-l*', '/*/dashboard', '/*/pair'];
 
 export interface AppLinkConfig {
   /** Android package name, e.g. org.kidscoding.app. */

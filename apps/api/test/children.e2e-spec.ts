@@ -226,11 +226,28 @@ describe('child accounts and consent (e2e)', () => {
     });
     flags.invalidate();
     try {
-      await createChild(parent.accessToken, { birthYear: year - 11 });
+      // The flag alone isn't enough: the country needs a verified consent method too.
+      await t
+        .http()
+        .post('/v1/children')
+        .set(auth(parent.accessToken))
+        .send(childBody({ birthYear: year - 11 }))
+        .expect(400);
+      await t.prisma.country.update({
+        where: { code: 'PK' },
+        data: { under13ConsentMethods: ['EMAIL_PLUS'] },
+      });
+      const child = await createChild(parent.accessToken, { birthYear: year - 11 });
+      // Closed until the parent gives verified consent (parental-consent.e2e-spec.ts).
+      expect(child.status).toBe('PENDING_CONSENT');
     } finally {
       await t.prisma.featureFlag.update({
         where: { key: 'under_13_accounts' },
         data: { enabled: false },
+      });
+      await t.prisma.country.update({
+        where: { code: 'PK' },
+        data: { under13ConsentMethods: [] },
       });
       flags.invalidate();
     }

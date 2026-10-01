@@ -6,6 +6,10 @@ import {
   BADGES,
   CHILD_MAX_AGE,
   isAvatarKey,
+  LEAGUE_TIERS,
+  leagueLevelBand,
+  leagueOutcome,
+  normalizeFriendCode,
   NICKNAME_PATTERN,
   STUDENT_USERNAME_PATTERN,
 } from './index.js';
@@ -78,5 +82,33 @@ describe('familyPrice', () => {
 
   it('never charges for fewer than one child', () => {
     expect(familyPrice(25_000, 0, 30).totalMinor).toBe(25_000);
+  });
+});
+
+describe('leagues', () => {
+  it('puts levels into bands', () => {
+    expect([1, 2, 3, 5, 6, 9, 10, 40].map(leagueLevelBand)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+  });
+
+  it('moves the top five up and, in a full group, the bottom five down', () => {
+    const outcomes = Array.from({ length: 30 }, (_, i) => leagueOutcome(i + 1, 30, 2, 100));
+    expect(outcomes.filter((o) => o === 'PROMOTED')).toHaveLength(5);
+    expect(outcomes.slice(0, 5).every((o) => o === 'PROMOTED')).toBe(true);
+    expect(outcomes.slice(25).every((o) => o === 'RELEGATED')).toBe(true);
+    expect(outcomes.slice(5, 25).every((o) => o === 'STAYED')).toBe(true);
+  });
+
+  it('keeps small groups, the lowest tier and the top tier fair', () => {
+    // Eight students: five go up, no one goes down.
+    const small = Array.from({ length: 8 }, (_, i) => leagueOutcome(i + 1, 8, 3, 50));
+    expect(small).toEqual([...Array(5).fill('PROMOTED'), ...Array(3).fill('STAYED')]);
+    expect(leagueOutcome(30, 30, 0, 10)).toBe('STAYED');
+    expect(leagueOutcome(1, 30, LEAGUE_TIERS.length - 1, 500)).toBe('STAYED');
+    // No XP, no promotion.
+    expect(leagueOutcome(1, 3, 0, 0)).toBe('STAYED');
+  });
+
+  it('reads friend codes however they were typed', () => {
+    expect(normalizeFriendCode(' k7mq-4x ')).toBe('K7MQ4X');
   });
 });

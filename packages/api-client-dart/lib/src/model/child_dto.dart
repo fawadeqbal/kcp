@@ -39,6 +39,8 @@ class ChildDto {
 
     required this.status,
 
+    required this.hasPicturePassword,
+
     required this.consents,
 
     required this.createdAt,
@@ -92,6 +94,7 @@ class ChildDto {
   @JsonKey(name: r'cityId', required: true, includeIfNull: true)
   final String? cityId;
 
+  /// PENDING_CONSENT: under 13 and waiting for the parent's verified consent.
   @JsonKey(
     name: r'status',
     required: true,
@@ -99,6 +102,10 @@ class ChildDto {
     unknownEnumValue: ChildDtoStatusEnum.unknownDefaultOpenApi,
   )
   final ChildDtoStatusEnum status;
+
+  /// The child can sign in with a picture password (set by the parent).
+  @JsonKey(name: r'hasPicturePassword', required: true, includeIfNull: false)
+  final bool hasPicturePassword;
 
   @JsonKey(name: r'consents', required: true, includeIfNull: false)
   final ChildConsentsDto consents;
@@ -163,6 +170,7 @@ class ChildDto {
           other.regionId == regionId &&
           other.cityId == cityId &&
           other.status == status &&
+          other.hasPicturePassword == hasPicturePassword &&
           other.consents == consents &&
           other.createdAt == createdAt &&
           other.lastLoginAt == lastLoginAt &&
@@ -188,6 +196,7 @@ class ChildDto {
       (regionId == null ? 0 : regionId.hashCode) +
       (cityId == null ? 0 : cityId.hashCode) +
       status.hashCode +
+      hasPicturePassword.hashCode +
       consents.hashCode +
       createdAt.hashCode +
       (lastLoginAt == null ? 0 : lastLoginAt.hashCode) +
@@ -212,6 +221,7 @@ class ChildDto {
   }
 }
 
+/// PENDING_CONSENT: under 13 and waiting for the parent's verified consent.
 enum ChildDtoStatusEnum {
   @JsonValue(r'PENDING_VERIFICATION')
   PENDING_VERIFICATION(r'PENDING_VERIFICATION'),
@@ -221,6 +231,8 @@ enum ChildDtoStatusEnum {
   SUSPENDED(r'SUSPENDED'),
   @JsonValue(r'DELETED')
   DELETED(r'DELETED'),
+  @JsonValue(r'PENDING_CONSENT')
+  PENDING_CONSENT(r'PENDING_CONSENT'),
   @JsonValue(r'unknown_default_open_api')
   unknownDefaultOpenApi(r'unknown_default_open_api');
 

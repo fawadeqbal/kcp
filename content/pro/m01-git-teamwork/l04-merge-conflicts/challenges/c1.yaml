@@ -1,0 +1,51 @@
+id: pro-m01-l04-c1
+order: 1
+type: git
+xp: 15
+repo:
+  files:
+    index.html: |
+      <h1>Our club</h1>
+      <p>We meet every Saturday.</p>
+  setup:
+    - run: git init
+    - run: git add .
+    - run: git commit -m "Add the club page"
+    - run: git switch -c title
+    - write: index.html
+      content: |
+        <h1>Hello, friends!</h1>
+        <p>We meet every Saturday.</p>
+    - run: git commit -am "A friendlier title"
+    - run: git switch main
+    - write: index.html
+      content: |
+        <h1>Welcome to our club</h1>
+        <p>We meet every Saturday.</p>
+    - run: git commit -am "A welcoming title"
+starter:
+  git: []
+solution:
+  git:
+    - run: git merge title
+    - write: index.html
+      content: |
+        <h1>Welcome, friends!</h1>
+        <p>We meet every Saturday.</p>
+    - run: git add index.html
+    - run: git commit -m "Merge the new title"
+checks:
+  - id: merged
+    expect: git
+    merged: title
+    mergeCommit: true
+    hint: merge
+  - id: resolved
+    expect: git
+    resolved: true
+    hint: markers
+  - id: clean
+    expect: git
+    clean: true
+    onBranch: main
+    hint: commit

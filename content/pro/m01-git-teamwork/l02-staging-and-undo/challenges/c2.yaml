@@ -1,0 +1,33 @@
+id: pro-m01-l02-c2
+order: 2
+type: git
+xp: 10
+repo:
+  files:
+    index.html: |
+      <h1>Space facts</h1>
+      <p>The Moon is about 384,000 km away.</p>
+  setup:
+    - run: git init
+    - run: git add .
+    - run: git commit -m "Add the space facts page"
+    - write: index.html
+      content: |
+        <h1>Space fac
+        oops, the cat walked on the keyboard
+starter:
+  git: []
+solution:
+  git:
+    - run: git restore index.html
+checks:
+  - id: page-back
+    expect: git
+    contains:
+      path: index.html
+      text: '<h1>Space facts</h1>'
+    hint: restore
+  - id: clean
+    expect: git
+    clean: true
+    hint: restore

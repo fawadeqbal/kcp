@@ -54,6 +54,25 @@ describe('AllExceptionsFilter', () => {
     expect(res.body?.message).toEqual(['nickname must be shorter than 20 characters']);
   });
 
+  it('passes small plain details through, and nothing nested', () => {
+    const { host, res } = mockHost();
+    filter.catch(
+      new BadRequestException({
+        error: 'MESSAGE_BLOCKED',
+        message: 'Try again',
+        details: { reason: 'LINK' },
+      }),
+      host,
+    );
+    expect(res.body).toMatchObject({ error: 'MESSAGE_BLOCKED', details: { reason: 'LINK' } });
+    const other = mockHost();
+    filter.catch(
+      new BadRequestException({ error: 'X', message: 'y', details: { nested: { secret: 1 } } }),
+      other.host,
+    );
+    expect(other.res.body).not.toHaveProperty('details');
+  });
+
   it('hides the details of unexpected errors and logs them', () => {
     const logError = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
     const { host, res } = mockHost();

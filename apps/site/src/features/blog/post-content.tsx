@@ -40,7 +40,7 @@ function components(locale: Locale): NonNullable<MDXRemoteProps['components']> {
     pre: (props: ComponentProps<'pre'>) => (
       <pre
         dir="ltr"
-        className="mt-6 overflow-x-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm leading-7 text-ink [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit"
+        className="mt-6 max-h-[70dvh] overflow-auto rounded-well bg-code-bg p-4 text-start font-mono text-sm leading-7 text-ink [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit"
         {...props}
       />
     ),

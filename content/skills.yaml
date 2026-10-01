@@ -1,0 +1,87 @@
+# Every skill a lesson can teach (lesson.yaml: skills: [key, …]). Students and
+# parents see them on the skill map; the weekly report names the new ones.
+skills:
+  - key: sequencing
+    category: logic
+    names:
+      en: Steps in order
+      ar: خطوات بالترتيب
+      ur: ترتیب سے قدم
+  - key: loops
+    category: logic
+    names:
+      en: Repeating (loops)
+      ar: التكرار (الحلقات)
+      ur: دہرانا (لوپس)
+  - key: conditions
+    category: logic
+    names:
+      en: Decisions (if)
+      ar: القرارات (إذا)
+      ur: فیصلے (اگر)
+  - key: events
+    category: logic
+    names:
+      en: Events
+      ar: الأحداث
+      ur: ایونٹس
+  - key: variables
+    category: logic
+    names:
+      en: Variables
+      ar: المتغيرات
+      ur: متغیرات
+  - key: html
+    category: web
+    names:
+      en: Web pages (HTML)
+      ar: صفحات الويب (HTML)
+      ur: ویب صفحات (HTML)
+  - key: links-images
+    category: web
+    names:
+      en: Links and images
+      ar: الروابط والصور
+      ur: لنکس اور تصویریں
+  - key: css-style
+    category: web
+    names:
+      en: Colours and fonts (CSS)
+      ar: الألوان والخطوط (CSS)
+      ur: رنگ اور فونٹس (CSS)
+  - key: css-layout
+    category: web
+    names:
+      en: Boxes and layout (CSS)
+      ar: الصناديق والتخطيط (CSS)
+      ur: باکس اور لے آؤٹ (CSS)
+  - key: python-output
+    category: python
+    names:
+      en: Showing text (print)
+      ar: عرض النصوص (print)
+      ur: متن دکھانا (print)
+  - key: input
+    category: python
+    names:
+      en: Asking questions (input)
+      ar: طرح الأسئلة (input)
+      ur: سوال پوچھنا (input)
+  - key: version-control
+    category: teamwork
+    names:
+      en: Saving versions (git)
+      ar: حفظ النسخ (git)
+      ur: ورژن محفوظ کرنا (git)
+  - key: branches
+    category: teamwork
+    names:
+      en: Branches and merging
+      ar: الفروع والدمج
+      ur: برانچز اور مرج
+  - key: collaboration
+    category: teamwork
+    names:
+      en: Building as a team
+      ar: البناء كفريق
+      ur: ٹیم کے طور پر بنانا

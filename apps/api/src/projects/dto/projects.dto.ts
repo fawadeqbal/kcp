@@ -1,6 +1,7 @@
+import { ReviewSummaryDto } from '../../reviews/reviews.dto.js';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, IsArray, ValidateNested } from 'class-validator';
-import { CheckResultDto, CodeFilesDto } from '../../learning/dto/learning.dto.js';
+import { CheckResultDto, CodeFilesDto, StageDto } from '../../learning/dto/learning.dto.js';
 
 export type ProjectStatusValue = 'NOT_STARTED' | 'DRAFT' | 'SHIPPED';
 
@@ -17,8 +18,10 @@ export class ProjectDto {
   language!: string;
   xp!: number;
   /** The editor tabs, in order: index.html, style.css, script.js. */
-  files!: ('html' | 'css' | 'js' | 'py')[];
+  files!: ('html' | 'css' | 'js' | 'py' | 'blocks' | 'git')[];
   starter!: CodeFilesDto;
+  /** Block projects (Explorer): the level. */
+  stage!: StageDto | null;
   /** What the project needs before it can ship (see packages/checks). */
   checks!: Record<string, unknown>[];
   /** Hint texts by key, in the requested language with English filling gaps. */
@@ -31,6 +34,8 @@ export class ProjectDto {
   shippedAt!: Date | null;
   /** The portfolio version shipped last (1, 2, …), or null. */
   version!: number | null;
+  /** The latest mentor review of this project (premium), or null. */
+  review!: ReviewSummaryDto | null;
 }
 
 export class SaveProjectDraftDto {
@@ -75,6 +80,10 @@ export class PortfolioItemDto {
   publishedAt!: Date;
   /** The shipped files, to show in the sandbox. */
   files!: CodeFilesDto;
+  /** Block projects: the level the program plays on. */
+  stage!: StageDto | null;
+  /** The latest mentor review (for the student and parents; never on the public page). */
+  review!: ReviewSummaryDto | null;
 }
 
 export class PortfolioDto {

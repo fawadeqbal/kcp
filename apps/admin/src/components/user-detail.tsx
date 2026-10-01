@@ -25,6 +25,8 @@ import { Details, StatusBadge } from './data';
 import { PageHeader } from './shell';
 import { FamilyBillingCard } from './family-billing';
 import { StudentCertificatesCard } from './student-certificates';
+import { StudentFriendsCard } from './student-friends';
+import { StudentModerationCard } from './moderation';
 import { StudentProgressCard } from './student-progress';
 
 type User = components['schemas']['UserSummaryDto'];
@@ -72,6 +74,8 @@ export function UserDetail({ id }: { id: string }) {
     CUSTOMER_ROLES.has(account.role.key) && state.ability.can('read', 'PremiumGrant');
   const showProgress = isStudent && state.ability.can('read', 'XpAdjustment');
   const showCertificates = isStudent && state.ability.can('read', 'Certificate');
+  const showFriends = isStudent && state.ability.can('read', 'Friendship');
+  const showModeration = isStudent && state.ability.can('read', 'Moderation');
   const showBilling = account.role.key === 'parent' && state.ability.can('read', 'Payment');
 
   const done = (message: string) => {
@@ -138,6 +142,8 @@ export function UserDetail({ id }: { id: string }) {
           {showPremium ? <PremiumCard account={account} onDone={done} /> : null}
           {showProgress ? <StudentProgressCard userId={account.id} onDone={done} /> : null}
           {showCertificates ? <StudentCertificatesCard userId={account.id} onDone={done} /> : null}
+          {showFriends ? <StudentFriendsCard userId={account.id} onDone={done} /> : null}
+          {showModeration ? <StudentModerationCard userId={account.id} onDone={done} /> : null}
           {showBilling ? <FamilyBillingCard parentId={account.id} onDone={done} /> : null}
           <Card title="Family">
             {family.data ? (

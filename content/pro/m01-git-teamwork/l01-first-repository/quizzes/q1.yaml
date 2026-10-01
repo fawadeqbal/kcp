@@ -1,0 +1,24 @@
+id: pro-m01-l01-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: You changed style.css. Which commands save that change as a commit?
+  ar: غيّرت style.css. أي الأوامر تحفظ هذا التغيير كإيداع؟
+  ur: آپ نے style.css بدلی۔ کون سی کمانڈز اس تبدیلی کو کمٹ کے طور پر محفوظ کرتی ہیں؟
+options:
+  - id: a
+    code: 'git commit -m "New colours"'
+  - id: b
+    code: |-
+      git add style.css
+      git commit -m "New colours"
+  - id: c
+    code: |-
+      git init
+      git log
+answer: b
+explanation:
+  en: A commit saves what is staged. git add stages the change first; then git commit saves it with a message.
+  ar: الإيداع يحفظ ما هو مُجهَّز. الأمر git add يجهّز التغيير أولًا، ثم يحفظه git commit مع رسالة.
+  ur: کمٹ وہی محفوظ کرتا ہے جو اسٹیج کیا گیا ہو۔ پہلے git add تبدیلی کو اسٹیج کرتا ہے، پھر git commit اسے پیغام کے ساتھ محفوظ کرتا ہے۔

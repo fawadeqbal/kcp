@@ -1,0 +1,29 @@
+id: explorer-m01-l01-q1
+order: 1
+kind: choice
+xp: 5
+prompt:
+  en: What is a program?
+  ar: ما هو البرنامج؟
+  ur: پروگرام کیا ہوتا ہے؟
+options:
+  - id: a
+    text:
+      en: A list of instructions a computer follows, in order.
+      ar: قائمة تعليمات ينفّذها الحاسوب بالترتيب.
+      ur: ہدایات کی فہرست جس پر کمپیوٹر ترتیب سے عمل کرتا ہے۔
+  - id: b
+    text:
+      en: A robot that thinks for itself.
+      ar: روبوت يفكّر بنفسه.
+      ur: ایک روبوٹ جو خود سوچتا ہے۔
+  - id: c
+    text:
+      en: A picture on the screen.
+      ar: صورة على الشاشة.
+      ur: اسکرین پر ایک تصویر۔
+answer: a
+explanation:
+  en: A program is a list of instructions. Bit follows them one by one, from top to bottom.
+  ar: البرنامج قائمة تعليمات. يتبعها بِت واحدة تلو الأخرى، من الأعلى إلى الأسفل.
+  ur: پروگرام ہدایات کی فہرست ہے۔ بِٹ ان پر ایک ایک کر کے، اوپر سے نیچے عمل کرتا ہے۔

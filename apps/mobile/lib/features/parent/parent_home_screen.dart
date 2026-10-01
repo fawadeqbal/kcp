@@ -12,6 +12,11 @@ import '../../theme/app_theme.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/common.dart';
 import '../../widgets/parental_gate.dart';
+import '../social/growth.dart';
+import '../social/parent_classes.dart';
+import '../social/parent_events.dart';
+import '../social/parent_friends.dart';
+import '../social/social_data.dart';
 import 'parent_data.dart';
 import 'premium_text.dart';
 
@@ -36,6 +41,10 @@ class ParentHomeScreen extends ConsumerWidget {
     Future<void> refresh() async {
       ref.invalidate(childrenProvider);
       ref.invalidate(billingProvider);
+      ref.invalidate(parentFriendRequestsProvider);
+      ref.invalidate(parentEventRequestsProvider);
+      ref.invalidate(parentClassRequestsProvider);
+      ref.invalidate(parentReportsProvider);
       await ref.read(authControllerProvider.notifier).reloadMe().catchError((_) {});
       await ref.read(childrenProvider.future);
     }
@@ -103,6 +112,10 @@ class ParentHomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
               ],
+              const FriendRequestsSection(),
+              const EventRequestsSection(),
+              const ClassRequestsSection(),
+              const WeeklyReportCard(),
               switch (children) {
                 AsyncData(:final value) when value.isEmpty => SectionCard(
                   child: Text(t.parentNoChildren),
@@ -121,6 +134,16 @@ class ParentHomeScreen extends ConsumerWidget {
                 ),
                 _ => const SizedBox(height: 160, child: LoadingView()),
               },
+              if (children case AsyncData(:final value) when value.isNotEmpty) ...[
+                RowCard(
+                  icon: 'logIn',
+                  iconBackground: p.brand100,
+                  iconColor: p.brandText,
+                  title: t.parentPairLink,
+                  onTap: () => context.push('/parent/pair'),
+                ),
+                const SizedBox(height: 12),
+              ],
               SectionCard(
                 color: p.sage100,
                 radius: KcpRadius.row,
@@ -247,6 +270,30 @@ class _ChildCardState extends ConsumerState<_ChildCard> {
               ],
             ),
           ),
+          if (child.status == ChildDtoStatusEnum.PENDING_CONSENT) ...[
+            const SizedBox(height: 12),
+            SectionCard(
+              color: p.warnSoft,
+              radius: KcpRadius.row,
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.parentConsentPending, style: TextStyle(color: p.warnText)),
+                  const SizedBox(height: 10),
+                  OutlinedButton(
+                    onPressed: () => openExternalLink(
+                      context,
+                      ref
+                          .read(appConfigProvider)
+                          .webPage(ref.read(appLanguageProvider), '/children/${child.id}/consent'),
+                    ),
+                    child: Text(t.openWebsite),
+                  ),
+                ],
+              ),
+            ),
+          ],
           if (seen) ...[
             const SizedBox(height: 14),
             Row(

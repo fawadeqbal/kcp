@@ -12,15 +12,16 @@ website; have it reviewed before the first release.
 
 ## What leaves the phone
 
-| Data                                  | Sent to                    | When                                         | Why                             |
-| ------------------------------------- | -------------------------- | -------------------------------------------- | ------------------------------- |
-| Parent's email and password           | Our API                    | Parent signs in                              | Sign-in                         |
-| Student's login name and password     | Our API                    | Student signs in                             | Sign-in                         |
-| Quiz answers, practice, lesson opened | Our API                    | While learning                               | Grading, XP, streaks, progress  |
-| Parent's switches                     | Our API                    | After the parental gate                      | Consent and settings            |
-| Feedback message                      | Our API                    | Someone sends feedback                       | Support, safety reports         |
-| Push token, platform, app language    | Our API; Google (Firebase) | Only after "Turn on reminders/notifications" | Streak and family notifications |
-| Crash report (versions, error, stack) | Our API                    | The app crashes (release builds)             | Fixing bugs; no account in it   |
+| Data                                  | Sent to                    | When                                         | Why                              |
+| ------------------------------------- | -------------------------- | -------------------------------------------- | -------------------------------- |
+| Parent's email and password           | Our API                    | Parent signs in                              | Sign-in                          |
+| Student's login name and password     | Our API                    | Student signs in                             | Sign-in                          |
+| Quiz answers, practice, lesson opened | Our API                    | While learning                               | Grading, XP, streaks, progress   |
+| Parent's switches                     | Our API                    | After the parental gate                      | Consent and settings             |
+| Feedback message                      | Our API                    | Someone sends feedback                       | Support, safety reports          |
+| Room messages and reports             | Our API                    | A student sends a phrase or text, or reports | Team rooms; moderation (90 days) |
+| Push token, platform, app language    | Our API; Google (Firebase) | Only after "Turn on reminders/notifications" | Streak and family notifications  |
+| Crash report (versions, error, stack) | Our API                    | The app crashes (release builds)             | Fixing bugs; no account in it    |
 
 Nothing goes to analytics, advertising or tracking services; there are none in the app.
 No location, contacts, photos, camera, microphone or advertising ID. All traffic is
@@ -61,7 +62,15 @@ Analytics **disabled**. The Firebase SDKs ship their own privacy manifests on iO
 
 **Not in the app, on purpose:** analytics (Google Analytics, Firebase Analytics,
 Mixpanel…), crash SDKs (Crashlytics, Sentry: we report crashes to our own API), ads,
-attribution, social sign-in, in-app purchases, webviews.
+attribution, social sign-in, in-app purchases, web content from the internet.
+
+**One WebView, offline only.** Explorer steps (block coding for ages 9–12) show a page
+that ships inside the app (`assets/explorer`, built from `tools/explorer-embed`): the
+block editor and Bit's world. It loads nothing from the network (its Content Security
+Policy is `default-src 'none'`, scripts and images from the app only), cannot open other
+pages (navigation is refused), and talks only to the app (a JavaScript channel). The app
+itself saves the program and sends the results to our API. `qr_flutter` draws the QR
+code a child's device shows for a parent to scan; it is pure Dart and sends nothing.
 
 Check after every dependency change:
 
@@ -117,13 +126,16 @@ to a third party that is not our service provider):
 **Families policy checklist.** No ads, no advertising ID, no location, no
 tracking; the app doesn't ask for personal data beyond signing in (accounts are made by
 a parent on the website with verified consent); links out of the app and account
-changes are behind a parental gate; no social features between children in the app;
+changes are behind a parental gate; the only contact between children is moderated team
+rooms (phrases only under 13, filtered text from 13, parents can read them, every
+message can be reported);
 the privacy policy link is in the store listing and in the app (Settings).
 
 **Content rating (IARC questionnaire).** Category: Reference, News, or Educational.
 No violence, sexuality, language, controlled substances, gambling. Users interact:
-**No** (children can't message each other; leaderboards show nicknames only with a
-parent's consent). Shares location: No. Digital purchases: No. Expected rating:
+**Yes, moderated**: team, class and event rooms (no private messages; ready-made
+phrases under 13, filtered text from 13; reports go to moderators; parents can read
+the rooms; leaderboards show nicknames only with a parent's consent). Shares location: No. Digital purchases: No. Expected rating:
 Everyone / PEGI 3 / USK 0.
 
 **App access.** Reviewers need an account: create a demo parent and student
@@ -137,7 +149,7 @@ none for tracking, advertising or third-party purposes):
 - Contact Info → Email Address (parents)
 - Identifiers → User ID (login name / account)
 - Identifiers → Device ID (push token; only if notifications are turned on)
-- User Content → Other User Content (feedback messages)
+- User Content → Other User Content (feedback messages, team room messages)
 - Usage Data → Product Interaction (quiz answers, practice, lessons opened)
 
 Data not linked to you: Diagnostics → Crash Data.

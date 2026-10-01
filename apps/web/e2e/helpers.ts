@@ -3,6 +3,9 @@ import ar from '@kcp/i18n/messages/ar.json' with { type: 'json' };
 import en from '@kcp/i18n/messages/en.json' with { type: 'json' };
 import ur from '@kcp/i18n/messages/ur.json' with { type: 'json' };
 import { type APIRequestContext, expect, type Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
+import path from 'node:path';
 import { waitForEmail } from './mailpit';
 
 export type Messages = typeof en;
@@ -48,7 +51,7 @@ export async function logInAsParent(page: Page, locale: Locale, email: string) {
   const m = MESSAGES[locale];
   await page.goto(`/${locale}/login`);
   await page.getByLabel(m.auth.email).fill(email);
-  await page.getByLabel(m.auth.password, { exact: true }).fill(PARENT_PASSWORD);
+  await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(PARENT_PASSWORD);
   await page.getByRole('main').getByRole('button', { name: m.auth.login.submit }).click();
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
 }
@@ -95,7 +98,7 @@ export async function logInAsStudent(page: Page, locale: Locale, username: strin
   const m = MESSAGES[locale];
   await page.goto(`/${locale}/login/student`);
   await page.getByLabel(m.auth.student.username).fill(username);
-  await page.getByLabel(m.auth.password, { exact: true }).fill(STUDENT_PASSWORD);
+  await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(STUDENT_PASSWORD);
   await page.getByRole('button', { name: m.auth.student.submit }).click();
   await expect(page).toHaveURL(new RegExp(`/${locale}/learn$`));
 }
@@ -109,4 +112,76 @@ export async function celebrate(page: Page, m: Messages, keys: string[]) {
     await dialog.getByRole('button', { name: m.badges.celebrateClose }).click();
   }
   await expect(dialog).toHaveCount(0);
+}
+
+/**
+ * A mentor or teacher account, made with the same CLI people use (`pnpm staff:create`).
+ * They sign in to the web app with a password and a two-factor code.
+ */
+export function createAdult(role: 'mentor' | 'teacher') {
+  const email = uniqueEmail(role);
+  const output = execFileSync(
+    'node',
+    ['dist/cli/create-staff.js', '--email', email, '--name', `Test ${role}`, '--role', role],
+    { cwd: path.resolve(import.meta.dirname, '../../api'), encoding: 'utf8' },
+  );
+  const password = output.match(/Temporary password: (\S+)/)?.[1];
+  if (!password) throw new Error(`No password in the CLI output:\n${output}`);
+  return { email, password };
+}
+
+/**
+ * Logs a mentor or teacher in for the first time: password, then setting up the
+ * authenticator app (the secret is read off the page), landing on their home.
+ */
+export async function firstTwoFactorLogin(
+  page: Page,
+  locale: Locale,
+  account: { email: string; password: string },
+) {
+  const m = MESSAGES[locale];
+  await page.goto(`/${locale}/login`);
+  await page.getByLabel(m.auth.email).fill(account.email);
+  await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(account.password);
+  await page.getByRole('main').getByRole('button', { name: m.auth.login.submit }).click();
+  await expect(page.getByRole('heading', { name: m.auth.twoFactor.setupTitle })).toBeVisible();
+  await expect(page.getByRole('img', { name: m.auth.twoFactor.qrAlt })).toBeVisible();
+  const secret = (await page.getByTestId('mfa-secret').textContent())?.replaceAll(' ', '') ?? '';
+  await page.getByLabel(m.auth.twoFactor.codeLabel).fill(totp(secret));
+  await page.getByRole('button', { name: m.auth.twoFactor.setupSubmit }).click();
+}
+
+// RFC 6238 time-based codes, as an authenticator app computes them.
+function base32Decode(input: string): Buffer {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = 0;
+  let value = 0;
+  const bytes: number[] = [];
+  for (const char of input.replaceAll(/[\s=]/g, '').toUpperCase()) {
+    value = (value << 5) | alphabet.indexOf(char);
+    bits += 5;
+    if (bits >= 8) {
+      bytes.push((value >>> (bits - 8)) & 0xff);
+      bits -= 8;
+    }
+  }
+  return Buffer.from(bytes);
+}
+
+export function totp(secret: string, atMs = Date.now()): string {
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(atMs / 1000 / 30)));
+  const hmac = createHmac('sha1', base32Decode(secret)).update(counter).digest();
+  const offset = hmac[hmac.length - 1]! & 0xf;
+  const code = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
+  return String(code).padStart(6, '0');
+}
+
+/** A student's access token (API login), for setting things up without the browser. */
+export async function studentToken(request: APIRequestContext, username: string) {
+  const login = await request.post(`${API_URL}/v1/auth/students/login`, {
+    data: { username, password: STUDENT_PASSWORD, tokenDelivery: 'body' },
+  });
+  expect(login.ok()).toBe(true);
+  return ((await login.json()) as { accessToken: string }).accessToken;
 }

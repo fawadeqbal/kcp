@@ -17,6 +17,8 @@ import {
   type QuizFile,
   quizSchema,
   projectSchema,
+  type SkillsFile,
+  skillsSchema,
   type TrackFile,
   trackSchema,
 } from './schema.js';
@@ -94,6 +96,8 @@ export interface LoadedTrack {
 
 export interface LoadResult {
   tracks: LoadedTrack[];
+  /** content/skills.yaml, when there is one. */
+  skills: SkillsFile['skills'] | null;
   issues: Issue[];
 }
 
@@ -199,6 +203,35 @@ class Loader {
       if (match?.[1]) byLanguage.set(match[1], path.join(dir, name));
     }
     return byLanguage;
+  }
+
+  /** content/skills.yaml, and that every lesson's skills are in it. */
+  async loadSkills(tracks: LoadedTrack[]): Promise<SkillsFile['skills'] | null> {
+    const file = path.join(this.root, 'skills.yaml');
+    const lessons = tracks.flatMap((t) => t.modules.flatMap((m) => m.lessons));
+    if (!(await files(this.root)).includes('skills.yaml')) {
+      if (lessons.some((l) => l.data.skills.length)) {
+        this.error(file, 'lessons name skills, but there is no skills.yaml');
+      }
+      return null;
+    }
+    const data = await this.yaml(file, skillsSchema);
+    if (!data) return null;
+    const known = new Set(data.skills.map((skill) => skill.key));
+    for (const lesson of lessons) {
+      for (const key of lesson.data.skills) {
+        if (!known.has(key)) {
+          this.error(
+            path.join(lesson.dir, 'lesson.yaml'),
+            `unknown skill "${key}" (not in skills.yaml)`,
+          );
+        }
+      }
+    }
+    for (const skill of data.skills) {
+      this.checkLanguages(Object.keys(skill.names), file, `name for skill "${skill.key}"`);
+    }
+    return data.skills;
   }
 
   async load(): Promise<LoadedTrack[]> {
@@ -443,5 +476,6 @@ class Loader {
 export async function loadContent(root: string): Promise<LoadResult> {
   const loader = new Loader(path.resolve(root));
   const tracks = await loader.load();
-  return { tracks, issues: loader.issues };
+  const skills = await loader.loadSkills(tracks);
+  return { tracks, skills, issues: loader.issues };
 }

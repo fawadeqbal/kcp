@@ -26,7 +26,22 @@ type TitleKey =
   | 'portfolio.title'
   | 'legal.safetyTitle'
   | 'legal.termsTitle'
-  | 'legal.privacyTitle';
+  | 'legal.privacyTitle'
+  | 'mentor.title'
+  | 'mentor.conductTitle'
+  | 'review.title'
+  | 'consent.confirmTitle'
+  | 'pair.title'
+  | 'league.title'
+  | 'friends.title'
+  | 'reports.title'
+  | 'skills.title'
+  | 'rooms.title'
+  | 'events.title'
+  | 'mentorEvents.title'
+  | 'classes.title'
+  | 'teacher.title'
+  | 'readiness.title';
 
 /**
  * A page made of one client component: sets the language for static rendering,

@@ -10,6 +10,8 @@ import '../../l10n/badge_texts.g.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/common.dart';
+import '../rooms/room_screen.dart';
+import '../social/growth.dart';
 import 'progress_widgets.dart';
 import 'student_data.dart';
 
@@ -67,6 +69,11 @@ class MeScreen extends ConsumerWidget {
           if (progress case AsyncData(:final value)) ...[
             const SizedBox(height: 18),
             XpBar(progress: value),
+          ],
+          const RoomsEntry(),
+          if (ref.watch(skillMapProvider).value case final map?) ...[
+            const SizedBox(height: 18),
+            SkillMapCard(map: map, title: t.skillsTitle),
           ],
           const SizedBox(height: 24),
           Semantics(

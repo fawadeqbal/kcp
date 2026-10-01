@@ -15,7 +15,7 @@ const uniqueEmail = (locale: string) =>
 async function fillSignUp(page: Page, m: typeof en, email: string) {
   await page.getByLabel(m.auth.signUp.name).fill('Test Parent');
   await page.getByLabel(m.auth.email).fill(email);
-  await page.getByLabel(m.auth.password, { exact: true }).fill(PASSWORD);
+  await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(PASSWORD);
   await page.getByLabel(m.auth.signUp.country).selectOption('PK');
   await page.getByLabel(m.auth.signUp.acceptTerms).check();
   await page.getByRole('button', { name: m.auth.signUp.submit }).click();
@@ -23,7 +23,7 @@ async function fillSignUp(page: Page, m: typeof en, email: string) {
 
 async function logIn(page: Page, m: typeof en, email: string, password = PASSWORD) {
   await page.getByLabel(m.auth.email).fill(email);
-  await page.getByLabel(m.auth.password, { exact: true }).fill(password);
+  await page.getByRole('textbox', { name: m.auth.password, exact: true }).fill(password);
   await page.getByRole('main').getByRole('button', { name: m.auth.login.submit }).click();
 }
 

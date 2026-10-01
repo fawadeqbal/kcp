@@ -98,11 +98,11 @@ button{font:inherit;font-weight:700;padding:.8rem 1.4rem;border-radius:999px;bor
 .pay{background:#a05626;color:#fffaf3}.cancel{background:transparent;color:#8c491a}</style></head>
 <body><main>
 <p class="note"><strong>Test mode.</strong> This is the development stand-in for Stripe Checkout. No card is charged.</p>
-<h1>Kids Coding Platform Premium</h1>
-<p>${escapeHtml(session.status === 'open' ? `Total today: ${amount}` : `This checkout is ${session.status}.`)}</p>
+<h1>${session.mode === 'setup' ? 'Confirm a card' : 'Kids Coding Platform Premium'}</h1>
+<p>${escapeHtml(session.status !== 'open' ? `This checkout is ${session.status}.` : session.mode === 'setup' ? 'Your bank checks the card. Nothing is charged.' : `Total today: ${amount}`)}</p>
 ${
   session.status === 'open'
-    ? `<form method="post" action="${action('pay')}"><button class="pay" type="submit">Pay ${escapeHtml(amount)} with a test card</button></form>
+    ? `<form method="post" action="${action('pay')}"><button class="pay" type="submit">${session.mode === 'setup' ? 'Confirm a test card' : `Pay ${escapeHtml(amount)} with a test card`}</button></form>
 <form method="post" action="${action('cancel')}"><button class="cancel" type="submit">Cancel and go back</button></form>`
     : ''
 }

@@ -32,6 +32,7 @@ import { LeaderboardService } from '../progress/leaderboard.service.js';
 import { LeaderboardsAdminService } from '../progress/leaderboards-admin.service.js';
 import { ProgressService } from '../progress/progress.service.js';
 import { REDIS } from '../redis/redis.constants.js';
+import { ReportsService } from '../reports/reports.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { loadCatalog, simulateLearning } from './demo-data/activity.js';
 import { createBilling, createGrants } from './demo-data/billing.js';
@@ -49,6 +50,7 @@ import {
   trialReminders,
   waitlist,
 } from './demo-data/extras.js';
+import { createPhase2, createWebAdults, WEB_ADULTS } from './demo-data/phase2.js';
 import {
   createDevices,
   createFamilies,
@@ -150,6 +152,20 @@ async function printLogins(ctx: DemoContext, progress: ProgressService) {
   console.info(`  password for all: ${PASSWORDS.staff}`);
 
   console.info(
+    '\nMentors and teachers: http://localhost:3001/en/login (two-factor login is set up the first time)',
+  );
+  for (const adult of WEB_ADULTS) {
+    const note =
+      adult.role === 'mentor'
+        ? adult.checked
+          ? 'mentor (background check passed)'
+          : 'mentor (background check in progress)'
+        : 'teacher at Crescent Model School';
+    console.info(`  ${`${adult.email}@${DEMO_DOMAIN}`.padEnd(34)} ${note}`);
+  }
+  console.info(`  password for all: ${PASSWORDS.staff}`);
+
+  console.info(
     `\nParents: http://localhost:3001/en/login (password "${PASSWORDS.parent}")` +
       `\nChildren: http://localhost:3001/en/login/student (password "${PASSWORDS.child}")`,
   );
@@ -226,6 +242,7 @@ async function main() {
 
     log('Staff and families…');
     const staff = await createStaff(ctx);
+    const adults = await createWebAdults(ctx);
     const families = await createFamilies(ctx);
     const children = families.flatMap((f) => f.children);
     log(`${families.length} families, ${children.length} children, ${staff.length} staff.`);
@@ -276,6 +293,18 @@ async function main() {
     await createPasswordResets(ctx, families);
     await waitlist(ctx);
     await appCrashes(ctx);
+
+    log('Mentors, rooms, hackathons, a school and readiness checks…');
+    const phase2 = await createPhase2(
+      ctx,
+      { reports: app.get(ReportsService) },
+      families,
+      staff,
+      adults,
+    );
+    log(
+      `${phase2.reports} weekly reports; a younger child (${phase2.young.username}) with verified consent.`,
+    );
 
     log('Leaderboards: weeks, seasons and the live boards…');
     const closed = await finishBoards(ctx, boards, seasons);

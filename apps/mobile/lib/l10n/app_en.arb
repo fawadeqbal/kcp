@@ -40,7 +40,7 @@
   "loginParentForgot": "Forgot your password? Reset it on our website.",
   "tabToday": "Today",
   "tabLearn": "Lessons",
-  "tabLeaderboard": "Leaderboard",
+  "tabLeaderboard": "League",
   "tabMe": "Me",
   "homeGreeting": "Hi, {name}!",
   "@homeGreeting": {
@@ -637,5 +637,779 @@
         "type": "int"
       }
     }
-  }
+  },
+  "explorerForAges": "Ages {from}–{to}",
+  "@explorerForAges": {
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "explorerTapStep": "Tap a step to build it with blocks.",
+  "explorerWhatToDo": "What to do",
+  "explorerCheck": "Check my blocks",
+  "@explorerCheck": {
+    "description": "Button: runs the checks of an Explorer (blocks) step."
+  },
+  "explorerChecking": "Checking…",
+  "explorerChecks": "Checks",
+  "explorerLoading": "Getting the blocks ready…",
+  "explorerLoadFailed": "The blocks couldn't load. Please try again.",
+  "explorerStartAgain": "Start again",
+  "explorerResetTitle": "Start this step again?",
+  "explorerResetBody": "Your blocks go back to how they were at the start of this step.",
+  "explorerAllPassed": "Well done! Every check passed.",
+  "explorerSomeFailed": "Almost there! {passed} of {total} checks passed. Try this:",
+  "@explorerSomeFailed": {
+    "placeholders": {
+      "passed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "explorerNoHint": "One check did not pass yet.",
+  "explorerCheckFailed": "We couldn't check your blocks. Try again in a moment.",
+  "explorerSaveFailed": "Couldn't save your blocks. We'll try again.",
+  "explorerXp": "+{xp} XP",
+  "@explorerXp": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "explorerNextStep": "Next step",
+  "explorerLessonComplete": "Lesson complete!",
+  "explorerBackToLesson": "Back to the lesson",
+  "explorerMascot": "Bit, the Explorer robot",
+  "loginTabPassword": "Password",
+  "loginTabPictures": "Pictures",
+  "loginTabPhone": "Parent's phone",
+  "@loginTabPhone": {
+    "description": "Student sign-in tab: a parent approves the device from their own phone."
+  },
+  "loginPicturesIntro": "Type your login name, then tap your four pictures in order.",
+  "loginTapPictures": "Tap your pictures",
+  "loginPicturesPicked": "{count} of 4",
+  "@loginPicturesPicked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loginPictureUndo": "Undo",
+  "loginPictureWrong": "Those pictures aren't right. Try again!",
+  "pictureCat": "Cat",
+  "pictureDog": "Dog",
+  "pictureFish": "Fish",
+  "pictureBird": "Bird",
+  "pictureRabbit": "Rabbit",
+  "pictureSun": "Sun",
+  "pictureMoon": "Moon",
+  "pictureStar": "Star",
+  "pictureTree": "Tree",
+  "pictureFlower": "Flower",
+  "pictureApple": "Apple",
+  "pictureCar": "Car",
+  "pairTitle": "Sign in with a parent's phone",
+  "pairBody": "Ask your parent to scan this code with their phone, or to open {url} and type the code.",
+  "@pairBody": {
+    "description": "url: the website address to type the code into, e.g. app.kidscoding.example/pair.",
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "pairCode": "Code",
+  "pairQr": "QR code to sign in",
+  "pairWaiting": "Waiting for your parent…",
+  "pairExpired": "This code expired.",
+  "pairNew": "Get a new code",
+  "pairApproved": "Signing you in…",
+  "errorConsentPending": "Your parent needs to finish setting up your account first.",
+  "errorPictureLocked": "Too many tries. Ask your parent, or wait a while and try again.",
+  "errorPairingNotFound": "This code doesn't work (any more). Ask for a new one on the child's device.",
+  "parentPairLink": "Sign in a child's device",
+  "parentPairTitle": "Sign in your child's device",
+  "parentPairIntro": "On your child's tablet or phone, open the app, choose \"I'm a student\" and then \"Parent's phone\". Type the code it shows.",
+  "parentPairCode": "The code on your child's device",
+  "parentPairFind": "Continue",
+  "parentPairDevice": "{device}, a few minutes ago.",
+  "@parentPairDevice": {
+    "description": "device: the kind of device that asked, e.g. \"An Android tablet\".",
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "parentPairWarning": "Only continue if this code is on a device in front of you.",
+  "parentPairWho": "Who is using that device?",
+  "parentPairApprove": "Sign {nickname} in",
+  "@parentPairApprove": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "parentPairDone": "{nickname} is signed in on that device.",
+  "@parentPairDone": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "parentPairNoChildren": "Add a child on our website first.",
+  "parentConsentPending": "Waiting for your consent: this account is closed until you confirm you are the parent. Finish it on our website.",
+  "explorerSteps": "Build it with blocks",
+  "childPictureTitle": "Picture password",
+  "childPictureBody": "Younger children can sign in by tapping four pictures in order instead of typing. Tap four pictures for {nickname}, in the order to remember.",
+  "@childPictureBody": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "childPictureHas": "{nickname} has a picture password. Set a new one to change it.",
+  "@childPictureHas": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "childPictureChoose": "Choose pictures",
+  "childPictureSave": "Save picture password",
+  "childPictureRemove": "Remove it",
+  "childPictureSaved": "Picture password saved. Show {nickname} the pictures, in order.",
+  "@childPictureSaved": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "childPictureRemoved": "Picture password removed.",
+  "childPictureWeak": "Use at least two different pictures.",
+  "socialTabLeague": "League",
+  "socialTabFriends": "Friends",
+  "socialTabEveryone": "Everyone",
+  "leagueBronze": "Bronze",
+  "leagueSilver": "Silver",
+  "leagueGold": "Gold",
+  "leagueSapphire": "Sapphire",
+  "leagueRuby": "Ruby",
+  "leagueEmerald": "Emerald",
+  "leagueDiamond": "Diamond",
+  "leagueTitle": "{tier} league",
+  "@leagueTitle": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueIntro": "About 30 students in your league compete on XP this week. The top 5 move up a league, the bottom 5 move down.",
+  "leagueNotJoined": "Earn XP this week to join a group in your league: finish today's practice or a lesson!",
+  "leagueZoneUp": "The top {count} move up to {tier}.",
+  "@leagueZoneUp": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueZoneDown": "The bottom {count} move down to {tier}.",
+  "@leagueZoneDown": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueTopTier": "Diamond is the top league. Stay near the top to keep your place!",
+  "leagueHiddenPlayer": "A player",
+  "leagueFriend": "Friend",
+  "leagueMovesUp": "Moves up",
+  "leagueMovesDown": "Moves down",
+  "leagueResultPromoted": "Last week you finished #{rank} in the {tier} league and moved up to {newTier}!",
+  "@leagueResultPromoted": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      },
+      "newTier": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueResultRelegated": "Last week you finished #{rank} in the {tier} league and moved down to {newTier}. You can climb back this week!",
+  "@leagueResultRelegated": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      },
+      "newTier": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueResultStayed": "Last week you finished #{rank} in the {tier} league and stayed there.",
+  "@leagueResultStayed": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueOk": "Nice!",
+  "leagueSafety": "Students whose parents keep them off public boards show as \"A player\". Friends always see each other.",
+  "friendsYourCode": "Your friend code",
+  "friendsCodeHelp": "Give it only to friends you know, so they can add you.",
+  "friendsCopy": "Copy",
+  "friendsCopied": "Copied",
+  "friendsAdd": "Add a friend",
+  "friendsCodeLabel": "Your friend's code",
+  "friendsSend": "Send request",
+  "friendsSent": "Sent! You and {nickname} become friends once a parent of each of you says yes.",
+  "@friendsSent": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "friendsWaiting": "Waiting for parents",
+  "friendsYouAsked": "You asked {nickname}",
+  "@friendsYouAsked": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "friendsTheyAsked": "{nickname} asked you",
+  "@friendsTheyAsked": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "friendsDeclined": "Not approved",
+  "friendsExpired": "Expired",
+  "friendsNone": "No friends yet. Share your code with a friend you know!",
+  "friendsBoard": "This week with friends",
+  "friendsRemove": "Remove",
+  "friendsRemoveTitle": "Remove {nickname} from your friends?",
+  "@friendsRemoveTitle": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "friendsRemoveBody": "You won't see each other on your friends board any more. You can add each other again later.",
+  "parentFriendRequests": "Friend requests",
+  "parentFriendsIntro": "Friends see each other's nickname, avatar and weekly XP, nothing else. A parent of each child approves.",
+  "parentFriendReceived": "{other} wants to be friends with {child}",
+  "@parentFriendReceived": {
+    "placeholders": {
+      "other": {
+        "type": "String"
+      },
+      "child": {
+        "type": "String"
+      }
+    }
+  },
+  "parentFriendSent": "{child} wants to be friends with {other}",
+  "@parentFriendSent": {
+    "placeholders": {
+      "child": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "parentFriendWaitingOther": "Waiting for the other family",
+  "parentFriendApprove": "Approve",
+  "parentFriendDecline": "Decline",
+  "parentFriendApproved": "Approved. They become friends once the other family approves too.",
+  "parentFriendDone": "{child} and {other} are friends now.",
+  "@parentFriendDone": {
+    "placeholders": {
+      "child": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "parentFriendDeclined": "Declined. {child} will see it was not approved.",
+  "@parentFriendDeclined": {
+    "placeholders": {
+      "child": {
+        "type": "String"
+      }
+    }
+  },
+  "childFriendsTitle": "Friends",
+  "childFriendsNone": "{nickname} has no friends on the platform yet.",
+  "@childFriendsNone": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "childFriendsEnd": "End friendship",
+  "childFriendsEnded": "Friendship ended.",
+  "notificationLeagueUp": "You moved up to the {tier} league!",
+  "@notificationLeagueUp": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationLeagueDown": "You moved down to the {tier} league. Climb back this week!",
+  "@notificationLeagueDown": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationFriendRequest": "{nickname} and {friend} want to be friends: approve or decline",
+  "@notificationFriendRequest": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "friend": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationFriendAdded": "You and {nickname} are friends now!",
+  "@notificationFriendAdded": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFriendCodeNotFound": "No one has that code. Check it and try again.",
+  "errorFriendSelf": "That's your own code!",
+  "errorAlreadyFriends": "You are friends already.",
+  "errorFriendRequestExists": "A request between you is already waiting for your parents.",
+  "errorTooManyFriendRequests": "Wait until your parents answer the requests you sent.",
+  "errorTooManyFriends": "A student can have up to 50 friends.",
+  "errorFriendRequestClosed": "This request was already answered.",
+  "weeklyReportEmail": "Weekly report email",
+  "weeklyReportEmailBody": "Sunday evenings: each child's minutes, XP, lessons and new skills.",
+  "reportThisWeek": "Last weekly report",
+  "reportMinutes": "{minutes} min",
+  "@reportMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportLessons": "{count, plural, =1{1 lesson} other{{count} lessons}}",
+  "@reportLessons": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportNewSkills": "New skills: {skills}",
+  "@reportNewSkills": {
+    "placeholders": {
+      "skills": {
+        "type": "String"
+      }
+    }
+  },
+  "skillsTitle": "My skills",
+  "childSkillsTitle": "Skills",
+  "skillsCount": "{learned} of {total} skills",
+  "@skillsCount": {
+    "placeholders": {
+      "learned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "skillCategoryLogic": "Thinking like a coder",
+  "skillCategoryWeb": "Building websites",
+  "skillCategoryPython": "Python",
+  "skillLearned": "Learned",
+  "skillNotYet": "Not yet",
+  "notificationReferralRewarded": "A family you invited is learning: your children got {days} days of premium!",
+  "@notificationReferralRewarded": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationWeeklyReport": "Your children's weekly report is ready",
+  "roomsTitle": "Team rooms",
+  "roomsSubtitle": "Talk with your team, your class or your event group. Moderators keep rooms safe.",
+  "roomsNone": "You’re not in any rooms yet. A room opens when you join a team, a class or an event.",
+  "roomsCount": "{count, plural, =1{1 room} other{{count} rooms}}",
+  "@roomsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roomUnread": "{count, plural, =1{1 new message} other{{count} new messages}}",
+  "@roomUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roomClosed": "Closed",
+  "roomKindTeam": "Team",
+  "roomKindClass": "Class",
+  "roomKindEvent": "Event",
+  "roomSafety": "Be kind. Never share your real name, school, phone number or where you live. If something feels wrong, tap the flag to tell a moderator.",
+  "roomParentSafety": "You can read this room; you can’t write in it. Links, phone numbers and unkind words are blocked, and moderators read every report.",
+  "roomEmpty": "No messages yet. Say hello!",
+  "roomMessagesLabel": "Messages in {room}",
+  "@roomMessagesLabel": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "roomYou": "You",
+  "roomAdult": "Grown-up",
+  "roomRemoved": "A moderator removed this message.",
+  "roomReportMessage": "Report this message from {name}",
+  "@roomReportMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReported": "Thanks for telling us. A moderator will look at it soon.",
+  "roomArchived": "This room is closed. You can still read it.",
+  "roomMuted": "A moderator paused your messages until {until}. You can still read the room.",
+  "@roomMuted": {
+    "placeholders": {
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "roomTypeLabel": "Type a message",
+  "roomSend": "Send",
+  "roomPhrasesOnly": "You can send these phrases. From 13 you can type your own messages too.",
+  "roomReportTitle": "Tell a moderator",
+  "roomReportIntro": "A moderator will read this message and what was said around it. The person won’t know it was you.",
+  "roomReportSend": "Send to a moderator",
+  "roomReasonUnkind": "It’s unkind or rude",
+  "roomReasonPersonalInfo": "It asks for or shares personal information",
+  "roomReasonSpam": "It’s spam or keeps repeating",
+  "roomReasonScary": "It scares or worries me",
+  "roomReasonOther": "Something else",
+  "roomBlockedLink": "Links can’t be sent in rooms. Describe it in words instead.",
+  "roomBlockedEmail": "Email addresses can’t be sent in rooms. Keep your contact details private.",
+  "roomBlockedPhone": "Phone numbers can’t be sent in rooms. Keep your contact details private.",
+  "roomBlockedContact": "Please keep talking here, not in other apps.",
+  "roomBlockedWords": "This message can’t be sent. Try saying it in a kinder way.",
+  "roomPhraseHello": "Hello!",
+  "roomPhraseThanks": "Thank you!",
+  "roomPhraseGreatJob": "Great job!",
+  "roomPhraseLetsGo": "Let’s go!",
+  "roomPhraseINeedHelp": "I need help",
+  "roomPhraseCanYouCheck": "Can you check my part?",
+  "roomPhraseIHaveAnIdea": "I have an idea!",
+  "roomPhraseMyPartIsDone": "My part is done",
+  "roomPhraseGoodIdea": "Good idea!",
+  "roomPhraseGiveMeAMinute": "Give me a minute",
+  "roomPhraseYes": "Yes",
+  "roomPhraseNo": "No",
+  "roomPhraseSeeYou": "See you!",
+  "childRoomsTitle": "Team rooms",
+  "childRoomsIntro": "The rooms your child is in. You can read them; only members write.",
+  "errorPhrasesOnly": "You can send the ready-made phrases.",
+  "errorChatMuted": "A moderator paused your messages for a while.",
+  "errorTooManyMessages": "That’s a lot of messages. Wait a moment, then try again.",
+  "errorRoomArchived": "This room is closed. You can read it, not send.",
+  "errorReportSelf": "You can’t report your own message.",
+  "notificationChatWarning": "A moderator reminded you of the room rules: be kind and keep personal things private.",
+  "notificationChatMuted": "A moderator paused your room messages until {until}.",
+  "@notificationChatMuted": {
+    "placeholders": {
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildChatWarned": "A moderator reminded {nickname} of the room rules.",
+  "@notificationChildChatWarned": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildChatMuted": "A moderator paused {nickname}’s room messages until {until}.",
+  "@notificationChildChatMuted": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildChatSuspended": "A moderator suspended {nickname}’s account after a report in a room. Contact us if you have questions.",
+  "@notificationChildChatSuspended": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChatReportDone": "A moderator looked at what you reported. Thank you for helping keep rooms kind.",
+  "parentEventsTitle": "Hackathon teams",
+  "parentEventsIntro": "Your child wants to join a team. Teammates see each other’s nickname and avatar, build in a private repository with a mentor, and talk in a moderated team room.",
+  "parentEventRequest": "{nickname} wants to join {team} in {event}",
+  "@parentEventRequest": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      },
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "parentEventWhen": "{start} – {end}",
+  "@parentEventWhen": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "parentEventWith": "with {names}",
+  "@parentEventWith": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "parentEventNewTeam": "a new team",
+  "parentEventApprove": "Approve",
+  "parentEventDecline": "Decline",
+  "parentEventApproved": "{nickname} is in {team}.",
+  "@parentEventApproved": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "parentEventDeclined": "{nickname} won’t join {team}.",
+  "@parentEventDeclined": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationEventJoinRequest": "{nickname} wants to join {team} in {event}: approve or decline on your home screen.",
+  "@notificationEventJoinRequest": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      },
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationEventJoined": "You’re in {team} for {event}!",
+  "@notificationEventJoined": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationEventResults": "The results of {event} are in.",
+  "@notificationEventResults": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "errorEventClosed": "Teams can’t change now.",
+  "errorTeamFull": "This team is full.",
+  "errorChildInTeam": "Your child is in a team for this event already.",
+  "skillCategoryTeamwork": "Working together (git)",
+  "parentClassesTitle": "Class requests",
+  "parentClassesIntro": "Your child wants to join a teacher’s class. The teacher sees their nickname, avatar and progress on the lessons they set; the class sees a weekly board of nicknames and XP and talks in a moderated class room.",
+  "parentClassRequest": "{nickname} wants to join {className} at {school}",
+  "@parentClassRequest": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "className": {
+        "type": "String"
+      },
+      "school": {
+        "type": "String"
+      }
+    }
+  },
+  "parentClassTeacher": "Teacher: {teacher}",
+  "@parentClassTeacher": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "parentClassApproved": "{nickname} is in {className}.",
+  "@parentClassApproved": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "parentClassDeclined": "{nickname} won’t join {className}.",
+  "@parentClassDeclined": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationClassJoinRequest": "{nickname} wants to join {className} at {school}: approve or decline on your home screen.",
+  "@notificationClassJoinRequest": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      },
+      "className": {
+        "type": "String"
+      },
+      "school": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationClassJoined": "You’re in {className}!",
+  "@notificationClassJoined": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationAssignmentNew": "Your teacher set a new lesson in {className}.",
+  "@notificationAssignmentNew": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationReadinessPassed": "You passed the hub readiness check!",
+  "notificationReadinessNotYet": "Your readiness check was graded: see the mentor’s feedback on the website.",
+  "notificationChildReadinessPassed": "{nickname} passed the hub readiness check.",
+  "@notificationChildReadinessPassed": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChildReadinessNotYet": "{nickname}’s readiness check was graded.",
+  "@notificationChildReadinessNotYet": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "errorClassFull": "This class is full.",
+  "errorRequestAnswered": "That request was already answered."
 }

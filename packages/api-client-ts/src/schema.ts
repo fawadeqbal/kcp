@@ -244,6 +244,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/students/picture-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Younger children: four pictures instead of a password (set by the parent). */
+        post: operations["Auth_pictureLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/pairing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A child's device asks for a code to show, to be signed in from a parent's phone. */
+        post: operations["Auth_startPairing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/pairing/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The child's device checks whether a parent approved it yet. */
+        post: operations["Auth_pairingStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/pairing/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Once approved: the child's session, for the device that showed the code. */
+        post: operations["Auth_claimPairing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/pairing/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A parent looks at a code before approving it: which device asked. */
+        post: operations["Auth_pairingInfo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/pairing/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A parent signs one of their children in on the device that shows the code. */
+        post: operations["Auth_approvePairing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/mfa/setup": {
         parameters: {
             query?: never;
@@ -363,6 +465,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/referrals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The parent's invite link, and how the families they invited are doing. */
+        get: operations["Referrals_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/users": {
         parameters: {
             query?: never;
@@ -459,6 +578,40 @@ export interface paths {
         get: operations["Progress_board"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/league": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's league this week: their group of about 30, and last week's result. */
+        get: operations["Progress_league"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/league/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The student saw last week's league result. */
+        post: operations["Progress_leagueSeen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -843,6 +996,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/children/{id}/picture-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets (or, with null, removes) the child's picture password. */
+        put: operations["Children_setPicturePassword"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/projects/{id}": {
         parameters: {
             query?: never;
@@ -1187,6 +1357,353 @@ export interface paths {
         get: operations["PaymentsPublic_publicPricing"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether the mentor may review yet (background check, code of conduct). */
+        get: operations["Mentor_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/code-of-conduct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Mentor_signConduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Mentor_queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/reviews/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Mentor_review"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/reviews/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Mentor_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/reviews/{id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Mentor_release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/reviews/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Mentor_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/reviews/{id}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["Mentor_uncomment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/reviews/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Mentor_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/students/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Mentor_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reviews/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Reviews_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reviews/{id}/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The student opened their result. */
+        post: operations["Reviews_seen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/mentors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MentorsAdmin_list"];
+        put?: never;
+        /** Makes a mentor account and emails them a link to choose their password. */
+        post: operations["MentorsAdmin_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/mentors/{id}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MentorsAdmin_resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/mentors/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Background check, languages, capacity, active (with a reason, in the audit log). */
+        patch: operations["MentorsAdmin_update"];
+        trace?: never;
+    };
+    "/v1/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's modules: finished or not, with their certificates. */
+        get: operations["Certificates_list"];
+        put?: never;
+        /** Gets the certificate for a finished module (premium). */
+        post: operations["Certificates_issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/certificates/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The certificate as a PDF (the student, their parents, or staff). */
+        get: operations["Certificates_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{id}/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A child's certificates, for their parent. */
+        get: operations["Certificates_forChild"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/{id}/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff: a student's certificates, revoked ones too. */
+        get: operations["Certificates_forStaff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/public/certificates/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Checks a certificate by the code printed on it. */
+        get: operations["Certificates_verify"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/certificates/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Staff revoke a certificate, with a reason (verification then says so). */
+        post: operations["Certificates_revoke"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1582,109 +2099,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/certificates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The student's modules: finished or not, with their certificates. */
-        get: operations["Certificates_list"];
-        put?: never;
-        /** Gets the certificate for a finished module (premium). */
-        post: operations["Certificates_issue"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/certificates/{id}/pdf": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The certificate as a PDF (the student, their parents, or staff). */
-        get: operations["Certificates_pdf"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/children/{id}/certificates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** A child's certificates, for their parent. */
-        get: operations["Certificates_forChild"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/users/{id}/certificates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Staff: a student's certificates, revoked ones too. */
-        get: operations["Certificates_forStaff"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/public/certificates/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Checks a certificate by the code printed on it. */
-        get: operations["Certificates_verify"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/admin/certificates/{id}/revoke": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Staff revoke a certificate, with a reason (verification then says so). */
-        post: operations["Certificates_revoke"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/admin/content": {
         parameters: {
             query?: never;
@@ -1743,6 +2157,1530 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["ContentAdmin_unpublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContentStudio_languages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContentStudio_reviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/modules/{id}/{lang}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContentStudio_module"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContentStudio_text"];
+        put: operations["ContentStudio_save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ContentStudio_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ContentStudio_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ContentStudio_returnDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ContentStudio_discard"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}/versions/{versionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContentStudio_version"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/content/studio/texts/{entity}/{id}/{lang}/versions/{versionId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ContentStudio_restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{id}/parental-consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentalConsent_status"];
+        put?: never;
+        /** Starts a method: a card check page (CARD_CHECK), an email (EMAIL_PLUS), or nothing yet (SIGNED_FORM). */
+        post: operations["ParentalConsent_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{id}/parental-consent/form": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The signed form: the file itself as the body (PDF, PNG or JPEG, up to 5 MB). */
+        post: operations["ParentalConsent_uploadForm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/parental-consent/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The link in the "email plus" email (no sign-in: the one-time token is the proof). */
+        post: operations["ParentalConsent_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/parental-consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentalConsentAdmin_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/parental-consents/{id}/form": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The uploaded form, to look at (downloaded; never shown on the admin page itself). */
+        get: operations["ParentalConsentAdmin_form"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/parental-consents/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentalConsentAdmin_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Chat_rooms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rooms/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Chat_messages"];
+        put?: never;
+        /** A ready-made phrase, or (13 and older, and adults) a text that passes the filter. */
+        post: operations["Chat_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rooms/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Chat_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rooms/{id}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tells the moderators about a message or a member. */
+        post: operations["Chat_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{childId}/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentChat_rooms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{childId}/rooms/{roomId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentChat_messages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/moderation/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ModerationAdmin_queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/moderation/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ModerationAdmin_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/moderation/reports/{id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Warn, mute, suspend, remove the message, or dismiss (kept in the audit log). */
+        post: operations["ModerationAdmin_act"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/moderation/students/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ModerationAdmin_student"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/moderation/students/{id}/unmute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ModerationAdmin_unmute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/rooms/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ModerationAdmin_room"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/blocked-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ModerationAdmin_terms"];
+        put?: never;
+        post: operations["ModerationAdmin_addTerm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/blocked-terms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ModerationAdmin_removeTerm"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/blocked-terms/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tries a text against the filter (built-in lists and the staff's words). */
+        post: operations["ModerationAdmin_check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Events_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Events_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events/{slug}/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Events_createTeam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events/{slug}/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Events_join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/events/{slug}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Events_leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/event-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentEvents_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/event-requests/{teamId}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentEvents_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/workspace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Teams_open"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/pulls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Teams_pulls"];
+        put?: never;
+        post: operations["Teams_openPull"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/pulls/{number}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Teams_pull"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/pulls/{number}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teams_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/pulls/{number}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teams_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/pulls/{number}/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teams_merge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/submission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Hands the work in: a title, a description, and the latest commit on main. */
+        put: operations["Teams_submit"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teams/{id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Teams_files"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MentorEvents_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/judging/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MentorEvents_judge"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/mentor/judging/teams/{id}/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["MentorEvents_score"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EventsAdmin_list"];
+        put?: never;
+        post: operations["EventsAdmin_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EventsAdmin_get"];
+        put: operations["EventsAdmin_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EventsAdmin_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events/{id}/judges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["EventsAdmin_judges"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events/teams/{teamId}/mentor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["EventsAdmin_mentor"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/events/teams/{teamId}/members/{userId}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EventsAdmin_removeMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Teacher_home"];
+        put?: never;
+        post: operations["Teacher_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/lessons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The lessons a teacher can assign, by track and module. */
+        get: operations["Teacher_catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Teacher_detail"];
+        put: operations["Teacher_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes/{id}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teacher_newCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teacher_archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes/{id}/students/{userId}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teacher_removeStudent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes/{id}/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Teacher_assign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/teacher/classes/{id}/assignments/{assignmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["Teacher_unassign"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentClasses_mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classes/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StudentClasses_join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classes/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StudentClasses_leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/class-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentClasses_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/class-requests/{classId}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentClasses_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SchoolsAdmin_list"];
+        put?: never;
+        post: operations["SchoolsAdmin_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SchoolsAdmin_get"];
+        put: operations["SchoolsAdmin_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools/{id}/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SchoolsAdmin_addTeacher"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools/{id}/teachers/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["SchoolsAdmin_removeTeacher"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools/{id}/licenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SchoolsAdmin_addLicense"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools/licenses/{licenseId}/paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SchoolsAdmin_paid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/schools/licenses/{licenseId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SchoolsAdmin_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Readiness_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/readiness/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Starts the timer. */
+        post: operations["Readiness_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/readiness/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves the work so far (the page saves as the student types). */
+        put: operations["Readiness_save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/readiness/current/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hands the work in for a mentor to grade. */
+        post: operations["Readiness_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Friends_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friends/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends a request with a friend's code: a parent of each child must approve. */
+        post: operations["Friends_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friends/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Takes back a request the parents haven't answered yet. */
+        delete: operations["Friends_cancel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friends/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** This week's XP of the student and their friends. */
+        get: operations["Friends_board"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friends/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["Friends_unfriend"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friend-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentFriends_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/friend-requests/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ParentFriends_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{id}/friends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ParentFriends_childFriends"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{id}/friends/{friendId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ParentFriends_endChildFriendship"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/students/{id}/friends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FriendsAdmin_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/friendships/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["FriendsAdmin_end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/activity/heartbeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The student is working (every minute while a lesson or practice is open): counts a minute. */
+        post: operations["Reports_heartbeat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's skill map: what the lessons they finished taught them. */
+        get: operations["Reports_skills"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/children/{id}/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A child's skill map, for their parent. */
+        get: operations["Reports_childSkills"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The parent's weekly reports (the last eight), newest first. */
+        get: operations["Reports_list"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1971,6 +3909,8 @@ export interface components {
             countryCode: string;
             /** @description Must be true: the parent accepts the terms and privacy policy. */
             acceptTerms: boolean;
+            /** @description The code from another family's invite link (…/sign-up?ref=CODE); unknown codes are ignored. */
+            referralCode?: string;
         };
         AcceptedResponseDto: {
             /**
@@ -2085,6 +4025,84 @@ export interface components {
              */
             app?: "web" | "admin" | "mobile";
         };
+        PictureLoginDto: {
+            username: string;
+            /** @description Four picture keys in the order the child tapped them. */
+            pictures: ("cat" | "dog" | "fish" | "bird" | "rabbit" | "sun" | "moon" | "star" | "tree" | "flower" | "apple" | "car")[];
+            /**
+             * @description How to hand over the refresh token. Browsers use "cookie" (the default): an
+             *     httpOnly cookie scripts can't read. The mobile app uses "body" and keeps it in
+             *     secure storage.
+             * @enum {string}
+             */
+            tokenDelivery?: "cookie" | "body";
+            /**
+             * @description Which app is signing in. The admin panel keeps its own refresh cookie, so a
+             *     staff session and a parent session in the same browser never overwrite each
+             *     other, and only staff can sign in to it. The mobile app is for students and
+             *     parents only, and always gets its refresh token in the body.
+             * @enum {string}
+             */
+            app?: "web" | "admin" | "mobile";
+        };
+        PairingStartDto: {
+            /**
+             * @description Which app shows the code (the mobile app keeps its tokens itself).
+             * @enum {string}
+             */
+            app: "web" | "mobile";
+        };
+        PairingStartedDto: {
+            pairingId: string;
+            /** @description Shown on the child's device (and in its QR code), e.g. "K7MQ-4XPR". */
+            code: string;
+            /** @description Only the device that asked holds it: it proves the device when claiming. */
+            secret: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        PairingDeviceDto: {
+            /** Format: uuid */
+            pairingId: string;
+            secret: string;
+            /**
+             * @description How to hand over the refresh token. Browsers use "cookie" (the default): an
+             *     httpOnly cookie scripts can't read. The mobile app uses "body" and keeps it in
+             *     secure storage.
+             * @enum {string}
+             */
+            tokenDelivery?: "cookie" | "body";
+            /**
+             * @description Which app is signing in. The admin panel keeps its own refresh cookie, so a
+             *     staff session and a parent session in the same browser never overwrite each
+             *     other, and only staff can sign in to it. The mobile app is for students and
+             *     parents only, and always gets its refresh token in the body.
+             * @enum {string}
+             */
+            app?: "web" | "admin" | "mobile";
+        };
+        PairingStatusDto: {
+            /** @enum {string} */
+            status: "expired" | "waiting" | "approved";
+        };
+        PairingCodeDto: {
+            /** @description What the parent typed or scanned; spaces and dashes don't matter. */
+            code: string;
+        };
+        PairingInfoDto: {
+            /** @description The browser or app and system, e.g. "Chrome on Android". */
+            device: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        PairingApproveDto: {
+            /** @description What the parent typed or scanned; spaces and dashes don't matter. */
+            code: string;
+            /** Format: uuid */
+            childId: string;
+        };
         MfaTokenDto: {
             /** @description The short-lived token returned by login when a second step is needed. */
             mfaToken: string;
@@ -2142,6 +4160,28 @@ export interface components {
             /** @description The version the parent read (TERMS_VERSION), e.g. "2026-10". */
             version: string;
         };
+        ReferralItemDto: {
+            /** @enum {string} */
+            status: "PENDING" | "REWARDED" | "NOT_REWARDED";
+            /** @description Why there was no reward: SAME_NETWORK, SAME_FAMILY, YEARLY_LIMIT, NO_CHILDREN, REFERRER_GONE. */
+            reason: string | null;
+            rewardDays: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+        };
+        ReferralSummaryDto: {
+            code: string;
+            /** @description The invite link: the sign-up page with the code. */
+            link: string;
+            /** @description Premium days each child gets per rewarded invitation. */
+            rewardDays: number;
+            maxPerYear: number;
+            /** @description Rewarded invitations in the last 365 days. */
+            rewardedThisYear: number;
+            invitations: components["schemas"]["ReferralItemDto"][];
+        };
         UserRoleDto: {
             key: string;
             name: string;
@@ -2151,7 +4191,7 @@ export interface components {
             /** @enum {string} */
             kind: "STUDENT" | "ADULT";
             /** @enum {string} */
-            status: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED";
+            status: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED" | "PENDING_CONSENT";
             /** @description Adults only. */
             email: string | null;
             /** @description Students only. */
@@ -2280,6 +4320,62 @@ export interface components {
                 xp: number;
                 hidden: boolean;
             };
+        };
+        LeagueWeekDto: {
+            key: string;
+            startDay: string;
+            /** @description The day after the week (it ends at Monday 00:00, the student's time; results come by Monday 00:00 UTC). */
+            endDay: string;
+        };
+        LeagueStandingDto: {
+            /**
+             * @description Where this place goes if the week ended now: up a league, down, or neither.
+             * @enum {string|null}
+             */
+            zone: "up" | "down" | null;
+            rank: number;
+            /**
+             * @description Null for a student whose parent keeps them off public boards (shown as "A player"),
+             *     unless it's the viewer or one of their friends.
+             */
+            nickname: string | null;
+            avatarKey: string | null;
+            /** @description XP this week. */
+            xp: number;
+            isMe: boolean;
+            isFriend: boolean;
+        };
+        LeagueResultDto: {
+            /**
+             * @description The league the student played that week in.
+             * @enum {string}
+             */
+            tier: "bronze" | "silver" | "gold" | "sapphire" | "ruby" | "emerald" | "diamond";
+            /** @enum {string} */
+            outcome: "PROMOTED" | "STAYED" | "RELEGATED";
+            /**
+             * @description The league they are in now.
+             * @enum {string}
+             */
+            newTier: "bronze" | "silver" | "gold" | "sapphire" | "ruby" | "emerald" | "diamond";
+            weekKey: string;
+            rank: number;
+        };
+        LeagueDto: {
+            /** @enum {string} */
+            tier: "bronze" | "silver" | "gold" | "sapphire" | "ruby" | "emerald" | "diamond";
+            /** @description 0 = Bronze … 6 = Diamond. */
+            tierIndex: number;
+            week: components["schemas"]["LeagueWeekDto"];
+            /** @description False until the student earns XP this week (that puts them in a group). */
+            joined: boolean;
+            /** @description The group, best first. Empty until joined. */
+            standings: components["schemas"]["LeagueStandingDto"][];
+            /** @description How many move up and down when the week closes (in a group this size). */
+            promoteCount: number;
+            relegateCount: number;
+            /** @description Last week's result, until the student has seen it. */
+            lastResult: components["schemas"]["LeagueResultDto"] | null;
         };
         BadgeDto: {
             key: string;
@@ -2449,8 +4545,13 @@ export interface components {
             countryCode: string | null;
             regionId: string | null;
             cityId: string | null;
-            /** @enum {string} */
-            status: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED";
+            /**
+             * @description PENDING_CONSENT: under 13 and waiting for the parent's verified consent.
+             * @enum {string}
+             */
+            status: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED" | "PENDING_CONSENT";
+            /** @description The child can sign in with a picture password (set by the parent). */
+            hasPicturePassword: boolean;
             consents: components["schemas"]["ChildConsentsDto"];
             /** Format: date-time */
             createdAt: string;
@@ -2489,6 +4590,8 @@ export interface components {
             avatarKeys: string[];
             /** @description Whether accounts for children under 13 are open. */
             under13Open: boolean;
+            /** @description How parents in the parent's country can give verified consent for under-13s. */
+            under13Methods: ("SIGNED_FORM" | "EMAIL_PLUS" | "CARD_CHECK")[];
         };
         NicknameSuggestionsDto: {
             suggestions: string[];
@@ -2546,6 +4649,34 @@ export interface components {
             js?: string;
             /** @description Python lessons: the program (runs with Pyodide in the sandbox). */
             py?: string;
+            /** @description Explorer lessons: the block program, as JSON (see packages/checks, stage). */
+            blocks?: string;
+            /** @description Git lessons: the steps taken in the practice repository, as JSON (packages/checks, git). */
+            git?: string;
+        };
+        StageDto: {
+            /** @enum {string} */
+            mode: "maze" | "game";
+            /** @description Rows, top to bottom: "#" wall, "." floor, "S" start, "G" flag, "*" gem, "T" star. */
+            map: string[];
+            /** @description The blocks in the toolbox, in order. */
+            toolbox: ("repeat" | "star" | "when-run" | "when-key" | "when-star" | "move" | "collect" | "say" | "until-goal" | "if" | "if-else" | "score")[];
+            /** @enum {string} */
+            theme?: "meadow" | "space" | "sea";
+            /** @description Games: seconds per round. */
+            seconds?: number;
+        };
+        ReviewSummaryDto: {
+            id: string;
+            /** @enum {string} */
+            status: "WAITING" | "IN_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "CANCELLED";
+            version: number;
+            /** Format: date-time */
+            requestedAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @description The student opened the result. */
+            seen: boolean;
         };
         PortfolioItemDto: {
             id: string;
@@ -2557,6 +4688,10 @@ export interface components {
             publishedAt: string;
             /** @description The shipped files, to show in the sandbox. */
             files: components["schemas"]["CodeFilesDto"];
+            /** @description Block projects: the level the program plays on. */
+            stage: components["schemas"]["StageDto"] | null;
+            /** @description The latest mentor review (for the student and parents; never on the public page). */
+            review: components["schemas"]["ReviewSummaryDto"] | null;
         };
         ChildPortfolioDto: {
             share: components["schemas"]["PortfolioShareDto"];
@@ -2564,6 +4699,10 @@ export interface components {
         };
         ResetChildPasswordDto: {
             password: string;
+        };
+        PicturePasswordDto: {
+            /** @description Four picture keys in order (see PICTURE_KEYS), or null to remove the picture password. */
+            pictures: ("cat" | "dog" | "fish" | "bird" | "rabbit" | "sun" | "moon" | "star" | "tree" | "flower" | "apple" | "car")[] | null;
         };
         DeleteChildDto: {
             /** @description Type the child's nickname to confirm. */
@@ -2582,8 +4721,10 @@ export interface components {
             language: string;
             xp: number;
             /** @description The editor tabs, in order: index.html, style.css, script.js. */
-            files: ("html" | "css" | "js" | "py")[];
+            files: ("html" | "css" | "js" | "py" | "blocks" | "git")[];
             starter: components["schemas"]["CodeFilesDto"];
+            /** @description Block projects (Explorer): the level. */
+            stage: components["schemas"]["StageDto"] | null;
             /** @description What the project needs before it can ship (see packages/checks). */
             checks: Record<string, never>[];
             /** @description Hint texts by key, in the requested language with English filling gaps. */
@@ -2602,6 +4743,8 @@ export interface components {
             shippedAt: string | null;
             /** @description The portfolio version shipped last (1, 2, …), or null. */
             version: number | null;
+            /** @description The latest mentor review of this project (premium), or null. */
+            review: components["schemas"]["ReviewSummaryDto"] | null;
         };
         SaveProjectDraftDto: {
             code: components["schemas"]["CodeFilesDto"];
@@ -2903,6 +5046,8 @@ export interface components {
             currency: string;
             isActive: boolean;
             familyDiscountPercent: number;
+            /** @description How parents of under-13s give verified consent here (Admin → Countries). */
+            under13ConsentMethods: ("SIGNED_FORM" | "EMAIL_PLUS" | "CARD_CHECK")[];
             /** @description Per child, by plan key; null when not set yet. */
             prices: {
                 [key: string]: unknown;
@@ -2934,6 +5079,303 @@ export interface components {
             /** @description The smallest family discount across countries (each country has its own too). */
             familyDiscountPercent: number;
             countries: components["schemas"]["PublicCountryPriceDto"][];
+        };
+        MentorStatusDto: {
+            /** @description Background check passed, code of conduct signed, account active: may review. */
+            ready: boolean;
+            /** @enum {string} */
+            backgroundCheck: "PENDING" | "FAILED" | "NOT_STARTED" | "PASSED";
+            /** @description Signed the current code of conduct. */
+            codeOfConductSigned: boolean;
+            /** @description The version to sign. */
+            codeOfConductVersion: string;
+            languages: string[];
+            capacity: number;
+            isActive: boolean;
+            /** @description Reviews this mentor has open now. */
+            open: number;
+        };
+        SignConductDto: {
+            /** @description The version the mentor read (must be the current one: codeOfConductVersion). */
+            version: string;
+        };
+        MentorQueueItemDto: {
+            id: string;
+            /** @enum {string} */
+            kind: "PROJECT" | "READINESS";
+            /** @enum {string} */
+            status: "WAITING" | "IN_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "CANCELLED";
+            nickname: string;
+            avatarKey: string;
+            /** @description The project's title, in the mentor's language. */
+            title: string;
+            moduleTitle: string;
+            /** @description The student's language. */
+            languageCode: string;
+            version: number;
+            /** Format: date-time */
+            requestedAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            hoursWaiting: number;
+            /** @description Waiting longer than the 48-hour target. */
+            overdue: boolean;
+        };
+        MentorStatsDto: {
+            waiting: number;
+            overdue: number;
+            decidedLast30Days: number;
+            /** @description This mentor's average, in hours (null before the first review). */
+            averageTurnaroundHours: number | null;
+        };
+        MentorQueueDto: {
+            /** @description Waiting for a mentor, oldest first. */
+            waiting: components["schemas"]["MentorQueueItemDto"][];
+            /** @description Reviews this mentor is doing. */
+            mine: components["schemas"]["MentorQueueItemDto"][];
+            /** @description This mentor's latest decisions. */
+            decided: components["schemas"]["MentorQueueItemDto"][];
+            stats: components["schemas"]["MentorStatsDto"];
+        };
+        ReviewBriefDto: {
+            title: string;
+            summary: string;
+            body: string;
+            /** @description What each requirement checks, by check ID. */
+            checkLabels: {
+                [key: string]: string;
+            };
+        };
+        MentorReviewCommentDto: {
+            /** @description Written by the signed-in mentor (they may delete it while reviewing). */
+            mine: boolean;
+            id: string;
+            /** @enum {string} */
+            file: "html" | "css" | "js" | "py" | "blocks";
+            line: number;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        MentorNoteDto: {
+            id: string;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            author: string;
+        };
+        ReviewHistoryItemDto: {
+            id: string;
+            version: number;
+            /** @enum {string} */
+            status: "WAITING" | "IN_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "CANCELLED";
+            /** Format: date-time */
+            decidedAt: string | null;
+        };
+        MentorReviewDto: {
+            id: string;
+            /** @enum {string} */
+            kind: "PROJECT" | "READINESS";
+            /** @enum {string} */
+            status: "WAITING" | "IN_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "CANCELLED";
+            studentId: string;
+            nickname: string;
+            avatarKey: string;
+            languageCode: string;
+            version: number;
+            /** Format: date-time */
+            requestedAt: string;
+            /** Format: date-time */
+            claimedAt: string | null;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @description The signed-in mentor is doing this review. */
+            isMine: boolean;
+            brief: components["schemas"]["ReviewBriefDto"] | null;
+            files: components["schemas"]["CodeFilesDto"];
+            /** @description Block projects: the level the program plays on. */
+            stage: components["schemas"]["StageDto"] | null;
+            comments: components["schemas"]["MentorReviewCommentDto"][];
+            /** @description The rubric's criteria, in order (names in the web messages: review.criteria.*). */
+            criteria: string[];
+            scores: {
+                [key: string]: number;
+            };
+            summary: string | null;
+            notes: components["schemas"]["MentorNoteDto"][];
+            /** @description Earlier reviews of the same project. */
+            history: components["schemas"]["ReviewHistoryItemDto"][];
+        };
+        AddCommentDto: {
+            /** @enum {string} */
+            file: "html" | "css" | "js" | "py" | "blocks" | "git";
+            line: number;
+            body: string;
+        };
+        DecisionDto: {
+            /** @enum {string} */
+            decision: "APPROVED" | "CHANGES_REQUESTED";
+            /** @description Rubric scores by criterion, 1 to 4 (every criterion). */
+            scores: {
+                [key: string]: number;
+            };
+            /** @description The message to the student, in their language. */
+            summary: string;
+        };
+        AddNoteDto: {
+            body: string;
+        };
+        ReviewCommentDto: {
+            id: string;
+            /** @enum {string} */
+            file: "html" | "css" | "js" | "py" | "blocks";
+            line: number;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        StudentReviewDto: {
+            id: string;
+            /** @enum {string} */
+            status: "WAITING" | "IN_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "CANCELLED";
+            version: number;
+            /** Format: date-time */
+            requestedAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** @description The student opened the result. */
+            seen: boolean;
+            /** @enum {string} */
+            kind: "PROJECT" | "READINESS";
+            /** @description The mentor's first name (mentors see only the student's nickname). */
+            mentorName: string | null;
+            /** @description The code the mentor reviewed. */
+            files: components["schemas"]["CodeFilesDto"];
+            comments: components["schemas"]["ReviewCommentDto"][];
+            criteria: string[];
+            scores: {
+                [key: string]: number;
+            };
+            summary: string | null;
+            /** @description The project's title, in the requested language. */
+            title: string;
+            briefId: string | null;
+        };
+        AdminMentorDto: {
+            id: string;
+            name: string;
+            email: string;
+            /** @description Invited but hasn't chosen a password yet. */
+            invited: boolean;
+            /** @enum {string} */
+            backgroundCheck: "PENDING" | "FAILED" | "NOT_STARTED" | "PASSED";
+            /** Format: date-time */
+            backgroundCheckedAt: string | null;
+            backgroundCheckNote: string | null;
+            /** Format: date-time */
+            codeOfConductSignedAt: string | null;
+            codeOfConductVersion: string | null;
+            languages: string[];
+            capacity: number;
+            isActive: boolean;
+            ready: boolean;
+            open: number;
+            decidedLast30Days: number;
+            averageTurnaroundHours: number | null;
+        };
+        AdminTutorDto: {
+            id: string;
+            name: string;
+            email: string;
+            /** @description Drafts they are writing now. */
+            drafts: number;
+            /** @description Translations of theirs published in the last 30 days. */
+            publishedLast30Days: number;
+        };
+        ReviewQueueStatsDto: {
+            waiting: number;
+            overdue: number;
+            inReview: number;
+            /** @description Hours the oldest waiting review has waited. */
+            oldestHours: number | null;
+            averageTurnaroundHours: number | null;
+        };
+        AdminMentorsDto: {
+            mentors: components["schemas"]["AdminMentorDto"][];
+            tutors: components["schemas"]["AdminTutorDto"][];
+            queue: components["schemas"]["ReviewQueueStatsDto"];
+        };
+        InviteMentorDto: {
+            /** Format: email */
+            email: string;
+            displayName: string;
+            /** @description The language of the invitation email and the account. */
+            languageCode: string;
+            /** @description Languages they review in. */
+            languages: string[];
+            capacity: number;
+        };
+        InvitedDto: Record<string, never>;
+        UpdateMentorDto: {
+            /** @enum {string} */
+            backgroundCheck?: "NOT_STARTED" | "PENDING" | "PASSED" | "FAILED";
+            /** @description Provider and reference of the check (staff only). */
+            backgroundCheckNote?: string;
+            languages?: string[];
+            capacity?: number;
+            isActive?: boolean;
+            reason: string;
+        };
+        CertificateDto: {
+            id: string;
+            /** @description "KCP-7F3K-9Q2M" */
+            code: string;
+            moduleId: string;
+            nickname: string;
+            /** @description In the requested language (English when missing). */
+            moduleTitle: string;
+            trackTitle: string;
+            /** Format: date-time */
+            issuedAt: string;
+            revoked: boolean;
+        };
+        ModuleCertificateDto: {
+            moduleId: string;
+            moduleTitle: string;
+            /** @description Every lesson done and the module's project shipped. */
+            finished: boolean;
+            /**
+             * @description Finished, but a mentor hasn't approved the module project yet (premium students
+             *     get their certificate once the review is approved).
+             */
+            awaitingReview: boolean;
+            certificate: components["schemas"]["CertificateDto"] | null;
+        };
+        CertificateListDto: {
+            /** @description Whether the student has premium now (needed for a new certificate). */
+            premium: boolean;
+            modules: components["schemas"]["ModuleCertificateDto"][];
+        };
+        IssueCertificateDto: {
+            moduleId: string;
+        };
+        ChildCertificatesDto: {
+            certificates: components["schemas"]["CertificateDto"][];
+        };
+        VerifiedCertificateDto: {
+            code: string;
+            nickname: string;
+            /** @description Titles by language code. */
+            moduleTitles: {
+                [key: string]: string;
+            };
+            trackTitles: {
+                [key: string]: string;
+            };
+            /** Format: date-time */
+            issuedAt: string;
+            /** @description False once staff revoked it. */
+            valid: boolean;
         };
         CountByStatusDto: {
             pendingVerification: number;
@@ -3053,6 +5495,9 @@ export interface components {
         TrackDto: {
             id: string;
             title: string;
+            /** @description Ages the track is made for (Explorer: 9–12), or null for everyone. */
+            ageFrom: number | null;
+            ageTo: number | null;
             modules: components["schemas"]["ModuleDto"][];
         };
         PremiumInfoDto: {
@@ -3080,17 +5525,29 @@ export interface components {
             provider: string;
             id: string;
         };
+        GitSetupDto: {
+            /** @description The folder's files: path → content. */
+            files: {
+                [key: string]: string;
+            };
+            /** @description Steps already taken before the student starts: { run } | { write, content } | { remove }. */
+            setup?: Record<string, never>[];
+        };
         ChallengeDto: {
             id: string;
             title: string;
             /** @description Markdown. */
             instructions: string;
             /** @enum {string} */
-            type: "HTML" | "CSS" | "JS" | "PYTHON";
+            type: "HTML" | "CSS" | "JS" | "PYTHON" | "BLOCKS" | "GIT";
             xp: number;
             /** @description The editor tabs, in order. */
-            files: ("html" | "css" | "js" | "py")[];
+            files: ("html" | "css" | "js" | "py" | "blocks" | "git")[];
             starter: components["schemas"]["CodeFilesDto"];
+            /** @description BLOCKS: the level. */
+            stage: components["schemas"]["StageDto"] | null;
+            /** @description GIT: the practice repository. */
+            repo: components["schemas"]["GitSetupDto"] | null;
             /** @description Checks for the browser sandbox (see packages/checks). */
             checks: Record<string, never>[];
             /** @description Hint texts by key, in the requested language with English filling gaps. */
@@ -3371,6 +5828,12 @@ export interface components {
         EmailPreferencesDto: {
             /** @description The monthly email about the children's progress. */
             monthlySummary: boolean;
+            /** @description The weekly report on Sunday evenings. */
+            weeklyReport: boolean;
+        };
+        UpdateEmailPreferencesDto: {
+            monthlySummary?: boolean;
+            weeklyReport?: boolean;
         };
         JoinWaitlistDto: {
             /** Format: email */
@@ -3401,52 +5864,6 @@ export interface components {
             countries: components["schemas"]["WaitlistCountryDto"][];
             /** @description The latest confirmed entries (to write to when a country opens). */
             latest: components["schemas"]["WaitlistEntryDto"][];
-        };
-        CertificateDto: {
-            id: string;
-            /** @description "KCP-7F3K-9Q2M" */
-            code: string;
-            moduleId: string;
-            nickname: string;
-            /** @description In the requested language (English when missing). */
-            moduleTitle: string;
-            trackTitle: string;
-            /** Format: date-time */
-            issuedAt: string;
-            revoked: boolean;
-        };
-        ModuleCertificateDto: {
-            moduleId: string;
-            moduleTitle: string;
-            /** @description Every lesson done and the module's project shipped. */
-            finished: boolean;
-            certificate: components["schemas"]["CertificateDto"] | null;
-        };
-        CertificateListDto: {
-            /** @description Whether the student has premium now (needed for a new certificate). */
-            premium: boolean;
-            modules: components["schemas"]["ModuleCertificateDto"][];
-        };
-        IssueCertificateDto: {
-            moduleId: string;
-        };
-        ChildCertificatesDto: {
-            certificates: components["schemas"]["CertificateDto"][];
-        };
-        VerifiedCertificateDto: {
-            code: string;
-            nickname: string;
-            /** @description Titles by language code. */
-            moduleTitles: {
-                [key: string]: string;
-            };
-            trackTitles: {
-                [key: string]: string;
-            };
-            /** Format: date-time */
-            issuedAt: string;
-            /** @description False once staff revoked it. */
-            valid: boolean;
         };
         ContentModuleSummaryDto: {
             id: string;
@@ -3544,16 +5961,1265 @@ export interface components {
         UnpublishDto: {
             reason?: string;
         };
+        StudioLanguageDto: {
+            code: string;
+            name: string;
+            nativeName: string;
+            /** @enum {string} */
+            direction: "LTR" | "RTL";
+            /** @description Switched on for students. Others can be translated before they're switched on. */
+            isActive: boolean;
+        };
+        StudioLanguagesDto: {
+            languages: components["schemas"]["StudioLanguageDto"][];
+        };
+        StudioPersonDto: {
+            id: string;
+            name: string;
+        };
+        StudioReviewItemDto: {
+            /** @enum {string} */
+            entityType: "PROJECT" | "CHALLENGE" | "LESSON" | "QUIZ";
+            entityId: string;
+            language: string;
+            title: string;
+            moduleId: string;
+            editedBy: components["schemas"]["StudioPersonDto"] | null;
+            /** Format: date-time */
+            submittedAt: string | null;
+        };
+        StudioReviewsDto: {
+            items: components["schemas"]["StudioReviewItemDto"][];
+        };
+        StudioItemDto: {
+            /** @enum {string} */
+            entityType: "PROJECT" | "CHALLENGE" | "LESSON" | "QUIZ";
+            entityId: string;
+            /** @description The lesson it belongs to (null for the module's project). */
+            lessonId: string | null;
+            /** @description Its name in English. */
+            title: string;
+            /**
+             * @description MISSING: no text in this language; LIVE: students read it; DRAFT / IN_REVIEW: a draft waits.
+             * @enum {string}
+             */
+            status: "DRAFT" | "IN_REVIEW" | "MISSING" | "LIVE";
+            /** @description The live text was published in the studio (not yet in content/). */
+            fromStudio: boolean;
+            /** @description The English text changed after this language's text went live. */
+            englishChanged: boolean;
+            /** Format: date-time */
+            draftUpdatedAt: string | null;
+            editedBy: components["schemas"]["StudioPersonDto"] | null;
+            /** @description Why a reviewer asked for changes. */
+            reviewNote: string | null;
+        };
+        StudioCountsDto: {
+            total: number;
+            live: number;
+            missing: number;
+            draft: number;
+            inReview: number;
+            englishChanged: number;
+        };
+        StudioModuleDto: {
+            id: string;
+            trackId: string;
+            title: string;
+            language: string;
+            items: components["schemas"]["StudioItemDto"][];
+            counts: components["schemas"]["StudioCountsDto"];
+        };
+        StudioDraftDto: {
+            data: {
+                [key: string]: unknown;
+            };
+            /** @enum {string} */
+            status: "DRAFT" | "IN_REVIEW";
+            editedBy: components["schemas"]["StudioPersonDto"] | null;
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: date-time */
+            submittedAt: string | null;
+            reviewNote: string | null;
+        };
+        StudioCheckDto: {
+            id: string;
+            /** @description What the check looks at, in words. */
+            description: string;
+        };
+        StudioVersionDto: {
+            id: string;
+            /**
+             * @description IMPORT: from the content/ files; PUBLISH: published in the studio.
+             * @enum {string}
+             */
+            action: "IMPORT" | "PUBLISH";
+            /** Format: date-time */
+            createdAt: string;
+            publishedBy: components["schemas"]["StudioPersonDto"] | null;
+            editedBy: components["schemas"]["StudioPersonDto"] | null;
+        };
+        StudioTextDto: {
+            /** @enum {string} */
+            entityType: "PROJECT" | "CHALLENGE" | "LESSON" | "QUIZ";
+            entityId: string;
+            language: string;
+            trackId: string;
+            moduleId: string;
+            lessonId: string | null;
+            title: string;
+            isActive: boolean;
+            /** @description The live English text: what translators translate. */
+            english: {
+                [key: string]: unknown;
+            } | null;
+            /** @description What students read in this language now. */
+            live: {
+                [key: string]: unknown;
+            } | null;
+            draft: components["schemas"]["StudioDraftDto"] | null;
+            /** @description Hints the checks use (challenges, projects). */
+            hintKeys: string[];
+            /** @description Checks whose labels need translating. */
+            checks: components["schemas"]["StudioCheckDto"][];
+            /** @description Text options of a quiz, by ID. */
+            options: string[];
+            versions: components["schemas"]["StudioVersionDto"][];
+            englishChanged: boolean;
+            /** @description The signed-in person may publish the draft (someone else wrote it). */
+            canPublish: boolean;
+        };
+        SaveTextDto: {
+            /** @description The translated fields, as in StudioTextDto.english. */
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        ReturnTextDto: {
+            /** @description What to change, for the translator. */
+            note: string;
+        };
+        StudioVersionDetailDto: {
+            id: string;
+            /** @enum {string} */
+            action: "IMPORT" | "PUBLISH";
+            /** Format: date-time */
+            createdAt: string;
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        ParentalConsentStatusDto: {
+            /**
+             * @description NOT_NEEDED: the child is 13 or older, or was set up before this was required.
+             * @enum {string}
+             */
+            status: "PENDING" | "SUBMITTED" | "EXPIRED" | "VERIFIED" | "REJECTED" | "NOT_NEEDED";
+            /**
+             * @description The method of the latest attempt, if the parent picked one.
+             * @enum {string|null}
+             */
+            method: "SIGNED_FORM" | "EMAIL_PLUS" | "CARD_CHECK" | null;
+            /** @description The methods the child's country accepts, in the order to offer them. */
+            methods: ("SIGNED_FORM" | "EMAIL_PLUS" | "CARD_CHECK")[];
+            /** @description Staff's reason when a signed form was rejected. */
+            rejectReason: string | null;
+            /** Format: date-time */
+            submittedAt: string | null;
+            /** @description Card checks need card payments to be available. */
+            cardsAvailable: boolean;
+            /**
+             * Format: date-time
+             * @description When the account is deleted if consent isn't finished (pending children).
+             */
+            deleteAfter: string | null;
+        };
+        StartConsentDto: {
+            /** @enum {string} */
+            method: "CARD_CHECK" | "SIGNED_FORM" | "EMAIL_PLUS";
+            /** @description The web app's language, for the card check's return address. */
+            locale?: string;
+        };
+        StartConsentResultDto: {
+            /** @description CARD_CHECK: the card check page to open. */
+            url: string | null;
+            /** @description EMAIL_PLUS: the consent email was sent. */
+            emailSent: boolean;
+        };
+        ConfirmConsentEmailDto: {
+            token: string;
+        };
+        ConfirmedConsentDto: {
+            /** @description The child's nickname, to say who is ready. */
+            nickname: string;
+        };
+        ConsentRequestAdminDto: {
+            id: string;
+            childId: string;
+            nickname: string;
+            birthYear: number;
+            parentId: string;
+            /** @description The parent's name, to compare with the name on the form. */
+            parentName: string | null;
+            parentEmail: string | null;
+            countryCode: string | null;
+            /** @enum {string|null} */
+            method: "SIGNED_FORM" | "EMAIL_PLUS" | "CARD_CHECK" | null;
+            /** @enum {string} */
+            status: "PENDING" | "SUBMITTED" | "EXPIRED" | "VERIFIED" | "REJECTED";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            submittedAt: string | null;
+            /** Format: date-time */
+            decidedAt: string | null;
+            decidedBy: string | null;
+            rejectReason: string | null;
+            /** @description A signed form is stored (not deleted yet). */
+            hasForm: boolean;
+        };
+        ConsentQueueDto: {
+            items: components["schemas"]["ConsentRequestAdminDto"][];
+            /** @description Signed forms waiting for a check, however the list is filtered. */
+            waiting: number;
+        };
+        ConsentDecisionDto: {
+            /** @enum {string} */
+            decision: "APPROVE" | "REJECT";
+            /** @description Why a form was rejected: the parent reads it in the email (required to reject). */
+            reason?: string;
+        };
+        ChatRoomDto: {
+            /** @enum {string} */
+            kind: "TEAM" | "CLASS" | "EVENT";
+            id: string;
+            name: string;
+            /** @description Messages since the member last read the room. */
+            unread: number;
+            /** Format: date-time */
+            lastMessageAt: string | null;
+            /** @description The viewer may type text (13 and older, and adults); otherwise phrases only. */
+            canType: boolean;
+            /**
+             * Format: date-time
+             * @description Muted by a moderator until then (no sending).
+             */
+            mutedUntil: string | null;
+            /** @description The team, class or event ended: readable, no sending. */
+            archived: boolean;
+        };
+        ChatAuthorDto: {
+            id: string;
+            /** @description A student's nickname, or an adult's name. */
+            name: string;
+            /** @description Students only. */
+            avatarKey: string | null;
+            /** @description A teacher or mentor. */
+            isAdult: boolean;
+        };
+        ChatMessageDto: {
+            /** @enum {string} */
+            kind: "PHRASE" | "TEXT";
+            id: string;
+            roomId: string;
+            author: components["schemas"]["ChatAuthorDto"];
+            /** @description PHRASE: which one (the apps show it in the reader's language). */
+            phraseKey: string | null;
+            /** @description TEXT: what was typed; null when a moderator removed the message. */
+            text: string | null;
+            hidden: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ChatMessagesDto: {
+            room: components["schemas"]["ChatRoomDto"];
+            /** @description Oldest first. */
+            messages: components["schemas"]["ChatMessageDto"][];
+            /** @description Pass the first message's createdAt as `before` for older ones. */
+            hasMore: boolean;
+        };
+        SendChatMessageDto: {
+            /** @enum {string} */
+            phrase?: "hello" | "thanks" | "great-job" | "lets-go" | "i-need-help" | "can-you-check" | "i-have-an-idea" | "my-part-is-done" | "good-idea" | "give-me-a-minute" | "yes" | "no" | "see-you";
+            text?: string;
+        };
+        ReportChatDto: {
+            /**
+             * Format: uuid
+             * @description The message (or, without one, the member) being reported.
+             */
+            messageId?: string;
+            /** Format: uuid */
+            userId?: string;
+            /** @enum {string} */
+            reason: "UNKIND" | "PERSONAL_INFO" | "SPAM" | "SCARY" | "OTHER";
+        };
+        ChatReportCreatedDto: {
+            id: string;
+        };
+        ModerationActionDto: {
+            /** @enum {string} */
+            kind: "WARN" | "MUTE" | "SUSPEND" | "HIDE" | "DISMISS";
+            id: string;
+            reason: string;
+            /**
+             * Format: date-time
+             * @description MUTE: until when.
+             */
+            until: string | null;
+            staffName: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ModerationRoomDto: {
+            /** @enum {string} */
+            kind: "TEAM" | "CLASS" | "EVENT";
+            id: string;
+            name: string;
+        };
+        ModerationPersonDto: {
+            id: string;
+            /** @description A student's nickname, or an adult's name. */
+            name: string;
+            avatarKey: string | null;
+            isAdult: boolean;
+            /** @description Students: their username (staff look them up with it). */
+            username: string | null;
+        };
+        ModerationSubjectDto: {
+            /** @enum {string} */
+            status: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED" | "PENDING_CONSENT";
+            /** Format: date-time */
+            mutedUntil: string | null;
+            /** @description Open reports about them (this one included). */
+            openReports: number;
+            /** @description What moderators did about them before. */
+            pastActions: number;
+            id: string;
+            /** @description A student's nickname, or an adult's name. */
+            name: string;
+            avatarKey: string | null;
+            isAdult: boolean;
+            /** @description Students: their username (staff look them up with it). */
+            username: string | null;
+        };
+        ModerationReportDto: {
+            /** @enum {string} */
+            reason: "UNKIND" | "PERSONAL_INFO" | "SPAM" | "SCARY" | "OTHER";
+            /** @enum {string} */
+            status: "OPEN" | "RESOLVED";
+            /** @description Messages around it (or, for a member, their latest in the room), oldest first. */
+            context: components["schemas"]["ChatMessageDto"][];
+            /** @description What was done (resolved reports). */
+            actions: components["schemas"]["ModerationActionDto"][];
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            room: components["schemas"]["ModerationRoomDto"] | null;
+            reporter: components["schemas"]["ModerationPersonDto"];
+            subject: components["schemas"]["ModerationSubjectDto"];
+            /** @description The reported message as it is now (null for a report about a member, or if deleted). */
+            message: components["schemas"]["ChatMessageDto"] | null;
+            /** @description The message as it was when reported. */
+            snapshot: string | null;
+            /** Format: date-time */
+            resolvedAt: string | null;
+        };
+        ModerationQueueDto: {
+            reports: components["schemas"]["ModerationReportDto"][];
+            /** @description Open reports in all. */
+            open: number;
+        };
+        ModerationActDto: {
+            /** @enum {string} */
+            kind: "WARN" | "MUTE" | "SUSPEND" | "HIDE" | "DISMISS";
+            /** @description Why (kept in the audit log; never shown to the student). */
+            reason: string;
+            /**
+             * @description MUTE: for how many hours.
+             * @enum {number}
+             */
+            hours?: 1 | 24 | 72 | 168;
+            /** @description WARN, MUTE or SUSPEND: also remove the reported message. */
+            hideMessage?: boolean;
+        };
+        StudentModerationDto: {
+            actions: components["schemas"]["ModerationActionDto"][];
+            /** Format: date-time */
+            mutedUntil: string | null;
+            openReports: number;
+        };
+        BlockedTermDto: {
+            /** @enum {string} */
+            language: "en" | "ar" | "ur" | "roman-ur" | "any";
+            id: string;
+            term: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateBlockedTermDto: {
+            term: string;
+            /** @enum {string} */
+            language: "en" | "ar" | "ur" | "roman-ur" | "any";
+        };
+        CheckTextDto: {
+            text: string;
+        };
+        CheckTextResultDto: {
+            /** @enum {string|null} */
+            problem: "LINK" | "EMAIL" | "PHONE" | "CONTACT" | "WORDS" | null;
+        };
+        EventSummaryDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "OPEN" | "RUNNING" | "JUDGING" | "FINISHED";
+            slug: string;
+            title: string;
+            description: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            teamSize: number;
+            minAge: number;
+            teams: number;
+            myTeam: {
+                id: string;
+                name: string;
+                approved: boolean;
+            };
+            /** @description The viewer can make or join a team now (open, old enough, not in one). */
+            canJoin: boolean;
+        };
+        RubricItemDto: {
+            key: string;
+            label: string;
+            max: number;
+        };
+        EventPersonDto: {
+            nickname: string;
+            avatarKey: string;
+        };
+        EventResultDto: {
+            rank: number;
+            team: string;
+            score: number;
+            members: components["schemas"]["EventPersonDto"][];
+        };
+        EventMemberDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED";
+            isCaptain: boolean;
+            isMe: boolean;
+            nickname: string;
+            avatarKey: string;
+        };
+        EventSubmissionDto: {
+            title: string;
+            description: string;
+            /** @description The commit on main that was handed in. */
+            commit: string | null;
+            /** Format: date-time */
+            submittedAt: string;
+        };
+        EventTeamDto: {
+            id: string;
+            name: string;
+            /** @description Given to friends to join (approved members only). */
+            joinCode: string | null;
+            members: components["schemas"]["EventMemberDto"][];
+            /** @description The mentor's name, once staff assign one. */
+            mentorName: string | null;
+            /** @description The team's room (approved members). */
+            roomId: string | null;
+            submission: components["schemas"]["EventSubmissionDto"] | null;
+            rank: number | null;
+            /** @description The viewer's own membership is approved (their parent said yes). */
+            approved: boolean;
+        };
+        EventDetailDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "OPEN" | "RUNNING" | "JUDGING" | "FINISHED";
+            rubric: components["schemas"]["RubricItemDto"][];
+            /** @description Finished events: the teams, best first. */
+            results: components["schemas"]["EventResultDto"][];
+            team: components["schemas"]["EventTeamDto"] | null;
+            /** @description Team repositories are set up on this server. */
+            gitEnabled: boolean;
+            slug: string;
+            title: string;
+            description: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            teamSize: number;
+            minAge: number;
+            teams: number;
+            myTeam: {
+                id: string;
+                name: string;
+                approved: boolean;
+            };
+            /** @description The viewer can make or join a team now (open, old enough, not in one). */
+            canJoin: boolean;
+        };
+        CreateTeamDto: {
+            name: string;
+        };
+        JoinTeamDto: {
+            code: string;
+        };
+        ParentEventRequestDto: {
+            teamId: string;
+            child: {
+                id: string;
+                nickname: string;
+                avatarKey: string;
+            };
+            event: {
+                slug: string;
+                title: string;
+                /** Format: date-time */
+                startsAt: string;
+                /** Format: date-time */
+                endsAt: string;
+            };
+            team: {
+                name: string;
+                members: string[];
+            };
+            /** Format: date-time */
+            requestedAt: string;
+        };
+        EventDecisionDto: {
+            /** Format: uuid */
+            childId: string;
+            approve: boolean;
+        };
+        EventDecisionResultDto: {
+            /** @enum {string} */
+            status: "APPROVED" | "DECLINED";
+        };
+        WorkspaceDto: {
+            teamId: string;
+            /** @description Git's URL for the repository (through this API; send the access token with it). */
+            gitUrl: string;
+            /** @description The viewer's own branch (made from main the first time). */
+            branch: string;
+            /** @description Pushing is allowed while the event runs. */
+            canPush: boolean;
+            author: {
+                name: string;
+                email: string;
+            };
+        };
+        PullAuthorDto: {
+            name: string;
+            isAdult: boolean;
+            isMe: boolean;
+        };
+        PullSummaryDto: {
+            /** @enum {string} */
+            state: "open" | "closed" | "merged";
+            number: number;
+            title: string;
+            author: components["schemas"]["PullAuthorDto"];
+            branch: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        OpenPullDto: {
+            branch: string;
+            title: string;
+            body?: string;
+        };
+        PullCommentDto: {
+            id: number;
+            body: string;
+            author: components["schemas"]["PullAuthorDto"];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PullReviewDto: {
+            /** @enum {string} */
+            state: "APPROVED" | "REQUEST_CHANGES" | "COMMENT";
+            id: number;
+            body: string;
+            author: components["schemas"]["PullAuthorDto"];
+            /** Format: date-time */
+            submittedAt: string;
+        };
+        PullDetailDto: {
+            /** @enum {string} */
+            state: "open" | "closed" | "merged";
+            comments: components["schemas"]["PullCommentDto"][];
+            reviews: components["schemas"]["PullReviewDto"][];
+            body: string;
+            /** @description The changes, as a unified diff (long diffs are cut). */
+            diff: string;
+            diffTruncated: boolean;
+            canReview: boolean;
+            canMerge: boolean;
+            /** @description Why it can't be merged yet (e.g. APPROVAL_NEEDED). */
+            mergeBlocked: string | null;
+            number: number;
+            title: string;
+            author: components["schemas"]["PullAuthorDto"];
+            branch: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PullCommentBodyDto: {
+            body: string;
+        };
+        PullReviewBodyDto: {
+            /** @enum {string} */
+            event: "APPROVED" | "REQUEST_CHANGES" | "COMMENT";
+            body?: string;
+        };
+        SubmitWorkDto: {
+            title: string;
+            description: string;
+        };
+        TeamFilesDto: {
+            /** @description The commit the files come from. */
+            ref: string;
+            /** @description index.html, style.css and script.js (those that exist). */
+            files: {
+                [key: string]: string;
+            };
+        };
+        MentorTeamDto: {
+            id: string;
+            name: string;
+            event: {
+                slug: string;
+                title: string;
+                /** @enum {string} */
+                status: "OPEN" | "DRAFT" | "RUNNING" | "JUDGING" | "FINISHED";
+            };
+            members: components["schemas"]["EventPersonDto"][];
+            hasRepo: boolean;
+            roomId: string | null;
+        };
+        MentorEventsDto: {
+            teams: components["schemas"]["MentorTeamDto"][];
+            judging: {
+                slug: string;
+                title: string;
+                /** @enum {string} */
+                status: "OPEN" | "DRAFT" | "RUNNING" | "JUDGING" | "FINISHED";
+            }[];
+        };
+        JudgingTeamDto: {
+            id: string;
+            name: string;
+            members: components["schemas"]["EventPersonDto"][];
+            submission: components["schemas"]["EventSubmissionDto"] | null;
+            /** @description The viewer's scores, once given. */
+            myScores: {
+                [key: string]: number;
+            } | null;
+            myComment: string | null;
+        };
+        JudgingDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "OPEN" | "RUNNING" | "JUDGING" | "FINISHED";
+            rubric: components["schemas"]["RubricItemDto"][];
+            teams: components["schemas"]["JudgingTeamDto"][];
+            slug: string;
+            title: string;
+        };
+        ScoreTeamDto: {
+            scores: {
+                [key: string]: number;
+            };
+            comment?: string;
+        };
+        AdminEventSummaryDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "OPEN" | "RUNNING" | "JUDGING" | "FINISHED";
+            id: string;
+            slug: string;
+            title: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            teams: number;
+        };
+        SaveEventDto: {
+            title: string;
+            /** @description In addresses and the git server: lowercase letters, digits and dashes. */
+            slug: string;
+            description: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            teamSize: number;
+            minAge: number;
+            rubric?: components["schemas"]["RubricItemDto"][];
+            /** @description The files each team's repository starts with. */
+            starter?: {
+                [key: string]: string;
+            };
+        };
+        StaffPersonDto: {
+            id: string;
+            name: string;
+        };
+        AdminTeamMemberDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED";
+            userId: string;
+            nickname: string;
+            username: string | null;
+            isCaptain: boolean;
+        };
+        AdminTeamDto: {
+            id: string;
+            name: string;
+            joinCode: string;
+            mentor: components["schemas"]["StaffPersonDto"] | null;
+            repo: string | null;
+            members: components["schemas"]["AdminTeamMemberDto"][];
+            submission: components["schemas"]["EventSubmissionDto"] | null;
+            scores: {
+                judge: string;
+                total: number;
+            }[];
+            rank: number | null;
+            score: number | null;
+        };
+        AdminEventDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "OPEN" | "RUNNING" | "JUDGING" | "FINISHED";
+            rubric: components["schemas"]["RubricItemDto"][];
+            judges: components["schemas"]["StaffPersonDto"][];
+            teamList: components["schemas"]["AdminTeamDto"][];
+            /** @description Mentors who can review or judge (background check passed). */
+            mentors: components["schemas"]["StaffPersonDto"][];
+            description: string;
+            teamSize: number;
+            minAge: number;
+            starter: {
+                [key: string]: string;
+            };
+            id: string;
+            slug: string;
+            title: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            teams: number;
+        };
+        EventStatusDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "OPEN" | "RUNNING" | "JUDGING" | "FINISHED";
+        };
+        EventJudgesDto: {
+            judgeIds: string[];
+        };
+        TeamMentorDto: {
+            /** Format: uuid */
+            mentorId: string | null;
+        };
+        RemoveMemberDto: {
+            /** @description Why (kept in the audit log). */
+            reason: string;
+        };
+        NamedDto: {
+            id: string;
+            name: string;
+        };
+        TeacherClassSummaryDto: {
+            id: string;
+            name: string;
+            school: components["schemas"]["NamedDto"];
+            joinCode: string;
+            trackId: string | null;
+            approved: number;
+            pending: number;
+            assignments: number;
+            archived: boolean;
+        };
+        TeacherHomeDto: {
+            schools: components["schemas"]["NamedDto"][];
+            classes: components["schemas"]["TeacherClassSummaryDto"][];
+            /** @description Tracks a class can follow. */
+            tracks: components["schemas"]["NamedDto"][];
+        };
+        CreateClassDto: {
+            /** Format: uuid */
+            schoolId: string;
+            name: string;
+            trackId?: string | null;
+        };
+        ClassStudentDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED";
+            userId: string;
+            nickname: string;
+            avatarKey: string;
+            /** @description Premium paid by the school's licence. */
+            schoolPremium: boolean;
+        };
+        AssignmentDto: {
+            id: string;
+            lessonId: string;
+            title: string;
+            moduleTitle: string;
+            /** Format: date-time */
+            dueAt: string | null;
+            /** @description Approved students who finished the lesson. */
+            done: number;
+        };
+        ProgressRowDto: {
+            /** @description Each assignment's lesson for this student, by assignment ID. */
+            lessons: {
+                [key: string]: "DONE" | "STARTED" | "NOT_STARTED";
+            };
+            userId: string;
+            nickname: string;
+            avatarKey: string;
+        };
+        BoardRowDto: {
+            rank: number;
+            nickname: string;
+            avatarKey: string;
+            /** @description XP in the last 7 days. */
+            xp: number;
+        };
+        SeatsDto: {
+            total: number;
+            used: number;
+            /** Format: date-time */
+            endsAt: string;
+        };
+        TeacherClassDto: {
+            students: components["schemas"]["ClassStudentDto"][];
+            assignmentList: components["schemas"]["AssignmentDto"][];
+            progress: components["schemas"]["ProgressRowDto"][];
+            board: components["schemas"]["BoardRowDto"][];
+            /** @description The school's paid licence now, if any. */
+            seats: components["schemas"]["SeatsDto"] | null;
+            /** @description The class room (made when the class is). */
+            roomId: string | null;
+            id: string;
+            name: string;
+            school: components["schemas"]["NamedDto"];
+            joinCode: string;
+            trackId: string | null;
+            approved: number;
+            pending: number;
+            assignments: number;
+            archived: boolean;
+        };
+        CatalogLessonDto: {
+            id: string;
+            title: string;
+        };
+        CatalogModuleDto: {
+            lessons: components["schemas"]["CatalogLessonDto"][];
+            id: string;
+            title: string;
+        };
+        CatalogTrackDto: {
+            modules: components["schemas"]["CatalogModuleDto"][];
+            id: string;
+            title: string;
+        };
+        UpdateClassDto: {
+            name: string;
+            trackId?: string | null;
+        };
+        CreateAssignmentDto: {
+            lessonId: string;
+            /** Format: date-time */
+            dueAt?: string | null;
+        };
+        StudentAssignmentDto: {
+            lessonId: string;
+            title: string;
+            moduleTitle: string;
+            /** Format: date-time */
+            dueAt: string | null;
+            done: boolean;
+        };
+        StudentClassDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED";
+            assignments: components["schemas"]["StudentAssignmentDto"][];
+            board: components["schemas"]["BoardRowDto"][];
+            id: string;
+            name: string;
+            school: string;
+            /** @description The teacher's name, as the school gave it. */
+            teacher: string;
+            roomId: string | null;
+        };
+        JoinClassDto: {
+            code: string;
+        };
+        JoinClassResultDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED";
+            id: string;
+            name: string;
+        };
+        ParentClassRequestDto: {
+            classId: string;
+            child: {
+                id: string;
+                nickname: string;
+                avatarKey: string;
+            };
+            className: string;
+            school: string;
+            teacher: string;
+            /** Format: date-time */
+            requestedAt: string;
+        };
+        ClassDecisionDto: {
+            /** Format: uuid */
+            childId: string;
+            approve: boolean;
+        };
+        ClassDecisionResultDto: {
+            /** @enum {string} */
+            status: "APPROVED" | "DECLINED";
+        };
+        AdminSchoolSummaryDto: {
+            id: string;
+            name: string;
+            countryCode: string;
+            city: string | null;
+            teachers: number;
+            classes: number;
+            /** @description Approved students in the school's classes. */
+            students: number;
+            seats: components["schemas"]["SeatsDto"] | null;
+        };
+        SaveSchoolDto: {
+            name: string;
+            countryCode: string;
+            city?: string | null;
+            contactName: string;
+            /** Format: email */
+            contactEmail: string;
+        };
+        AdminTeacherDto: {
+            id: string;
+            name: string;
+            email: string;
+            /** @description Hasn't chosen a password from the invitation yet. */
+            invited: boolean;
+            classes: number;
+        };
+        AdminLicenseDto: {
+            /** @enum {string} */
+            state: "INVOICED" | "PAID" | "ENDED" | "CANCELLED";
+            id: string;
+            seats: number;
+            /** @description Students with premium from it now. */
+            used: number;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            invoiceNumber: string;
+            amountMinor: number;
+            currency: string;
+            /** Format: date-time */
+            paidAt: string | null;
+            paymentReference: string | null;
+            /** Format: date-time */
+            cancelledAt: string | null;
+        };
+        AdminClassDto: {
+            id: string;
+            name: string;
+            teacher: string;
+            approved: number;
+            pending: number;
+            assignments: number;
+            archived: boolean;
+        };
+        AdminSchoolDto: {
+            teacherList: components["schemas"]["AdminTeacherDto"][];
+            licenses: components["schemas"]["AdminLicenseDto"][];
+            classList: components["schemas"]["AdminClassDto"][];
+            contactName: string;
+            contactEmail: string;
+            id: string;
+            name: string;
+            countryCode: string;
+            city: string | null;
+            teachers: number;
+            classes: number;
+            /** @description Approved students in the school's classes. */
+            students: number;
+            seats: components["schemas"]["SeatsDto"] | null;
+        };
+        AddTeacherDto: {
+            /** Format: email */
+            email: string;
+            /** @description For a new account (the invitation): the name students see. */
+            displayName?: string;
+            /** @enum {string} */
+            languageCode?: "en" | "ar" | "ur";
+        };
+        AddTeacherResultDto: {
+            userId: string;
+            /** @description A new account was made and the invitation sent. */
+            invited: boolean;
+        };
+        CreateLicenseDto: {
+            seats: number;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            invoiceNumber: string;
+            amountMinor: number;
+            currency: string;
+        };
+        LicensePaidDto: {
+            /** @description The bank transfer's reference. */
+            paymentReference: string;
+        };
+        LicenseCancelDto: {
+            reason: string;
+        };
+        ReadinessCheckDto: {
+            /** @enum {string} */
+            status: "STARTED" | "SUBMITTED" | "PASSED" | "NOT_PASSED" | "EXPIRED";
+            id: string;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            dueAt: string;
+            /** Format: date-time */
+            submittedAt: string | null;
+            /** @description The work so far (only while it is the student's own open attempt). */
+            files: components["schemas"]["CodeFilesDto"];
+            /** @description The mentor's review, once handed in. */
+            reviewId: string | null;
+            /** @description The rubric total once graded, out of `maxScore`. */
+            score: number | null;
+            maxScore: number;
+            /** Format: date-time */
+            decidedAt: string | null;
+            /** Format: date-time */
+            passedAt: string | null;
+        };
+        ReadinessBriefDto: {
+            title: string;
+            summary: string;
+            /** @description Markdown. */
+            body: string;
+            /** @description What the mentor looks for, by key. */
+            requirements: {
+                [key: string]: string;
+            };
+        };
+        ReadinessDto: {
+            blockers: ("AGE" | "PRO_TRACK" | "PREMIUM" | "WAIT" | "PASSED" | "OPEN")[];
+            /** @description Finished attempts, newest first. */
+            history: components["schemas"]["ReadinessCheckDto"][];
+            /** @description The student may start a check now. */
+            canStart: boolean;
+            /**
+             * Format: date-time
+             * @description After "not yet": when they may try again.
+             */
+            retryAt: string | null;
+            minutes: number;
+            brief: components["schemas"]["ReadinessBriefDto"];
+            /** @description The attempt going on or waiting for a mentor, if any. */
+            current: components["schemas"]["ReadinessCheckDto"] | null;
+            /** @description The Pro track's lessons: done and in all. */
+            proLessonsDone: number;
+            proLessons: number;
+        };
+        SaveReadinessDto: {
+            files: components["schemas"]["CodeFilesDto"];
+        };
+        ReadinessSavedDto: {
+            /** Format: date-time */
+            savedAt: string;
+        };
+        FriendDto: {
+            userId: string;
+            nickname: string;
+            avatarKey: string;
+            /**
+             * Format: date-time
+             * @description When both parents approved.
+             */
+            since: string;
+        };
+        StudentFriendRequestDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "DECLINED" | "CANCELLED" | "EXPIRED";
+            id: string;
+            nickname: string;
+            avatarKey: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FriendsDto: {
+            /** @description The student's friend code, to give to friends. */
+            code: string;
+            friends: components["schemas"]["FriendDto"][];
+            /** @description Requests the student sent (waiting for the parents, or recently declined). */
+            sent: components["schemas"]["StudentFriendRequestDto"][];
+            /** @description Requests other students sent them, waiting for the parents. */
+            received: components["schemas"]["StudentFriendRequestDto"][];
+        };
+        SendFriendRequestDto: {
+            /** @description A friend's code, as typed (spaces and dashes are fine). */
+            code: string;
+        };
+        FriendBoardEntryDto: {
+            rank: number;
+            userId: string;
+            nickname: string;
+            avatarKey: string;
+            /** @description XP this week. */
+            xp: number;
+            isMe: boolean;
+        };
+        FriendBoardDto: {
+            week: {
+                key: string;
+                startDay: string;
+                endDay: string;
+            };
+            entries: components["schemas"]["FriendBoardEntryDto"][];
+        };
+        FriendChildDto: {
+            id: string;
+            nickname: string;
+            avatarKey: string;
+        };
+        FriendOtherDto: {
+            nickname: string;
+            avatarKey: string;
+        };
+        ParentFriendRequestDto: {
+            /**
+             * @description "sent": the parent's child asked; "received": the other child asked.
+             * @enum {string}
+             */
+            direction: "sent" | "received";
+            id: string;
+            /** @description The parent's own child. */
+            child: components["schemas"]["FriendChildDto"];
+            /** @description The other child (nickname and avatar only). */
+            other: components["schemas"]["FriendOtherDto"];
+            /** @description This parent still has to approve or decline. */
+            waitingForYou: boolean;
+            /** @description The other family still has to approve. */
+            waitingForOtherFamily: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FriendDecisionDto: {
+            approve: boolean;
+        };
+        ParentFriendDecisionResultDto: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "DECLINED" | "CANCELLED" | "EXPIRED";
+        };
+        StaffFriendDto: {
+            userId: string;
+            nickname: string;
+            avatarKey: string;
+            /**
+             * Format: date-time
+             * @description When both parents approved.
+             */
+            since: string;
+            friendshipId: string;
+        };
+        EndFriendshipDto: {
+            /** @description Why staff ended it (kept in the audit log). */
+            reason: string;
+        };
+        SkillDto: {
+            key: string;
+            name: string;
+            /** @description Lessons that teach it, finished by the student. */
+            lessonsDone: number;
+            lessonsTotal: number;
+            /** @description At least one lesson that teaches it is finished. */
+            learned: boolean;
+        };
+        SkillCategoryDto: {
+            /** @enum {string} */
+            key: "logic" | "web" | "python" | "teamwork";
+            skills: components["schemas"]["SkillDto"][];
+        };
+        SkillMapDto: {
+            categories: components["schemas"]["SkillCategoryDto"][];
+            learned: number;
+            total: number;
+        };
+        ReportChildDto: {
+            childId: string;
+            nickname: string;
+            avatarKey: string;
+            /** @description Minutes spent learning (from the apps, while the student works). */
+            minutes: number;
+            xp: number;
+            lessons: number;
+            projects: number;
+            badges: number;
+            /** @description The streak at the end of the week. */
+            streak: number;
+            /** @description The league they finished the week in (e.g. "silver"). */
+            league: string;
+            /** @description Skills learned this week (keys; names come with the report in its language). */
+            skills: string[];
+            /** @description Minutes on each day of the week, Monday first. */
+            days: number[];
+        };
+        ParentReportDto: {
+            weekKey: string;
+            startDay: string;
+            endDay: string;
+            /** Format: date-time */
+            createdAt: string;
+            children: components["schemas"]["ReportChildDto"][];
+            /** @description Skill names in the requested language, by key. */
+            skillNames: {
+                [key: string]: string;
+            };
+        };
+        ParentReportsDto: {
+            /** @description Newest first (the last eight weeks). */
+            reports: components["schemas"]["ParentReportDto"][];
+        };
         UpdateCountryDto: {
             /** @description Families in this country can sign up (and see its prices). */
             isActive?: boolean;
             /** @description ISO 4217, e.g. "PKR". Only while the country is switched off; prices are set again after. */
             currency?: string;
+            /**
+             * @description How parents of children under 13 can give verified consent here (the lawyer
+             *     decides). None: no under-13 accounts in this country.
+             */
+            under13ConsentMethods?: ("CARD_CHECK" | "SIGNED_FORM" | "EMAIL_PLUS")[];
         };
         CountryAdminDto: {
             code: string;
             isActive: boolean;
             currency: string;
+            under13ConsentMethods: ("SIGNED_FORM" | "EMAIL_PLUS" | "CARD_CHECK")[];
         };
         LanguageAdminDto: {
             code: string;
@@ -3660,12 +7326,22 @@ export type StudentSummaryDto = components['schemas']['StudentSummaryDto'];
 export type MeDto = components['schemas']['MeDto'];
 export type LoginResponseDto = components['schemas']['LoginResponseDto'];
 export type StudentLoginDto = components['schemas']['StudentLoginDto'];
+export type PictureLoginDto = components['schemas']['PictureLoginDto'];
+export type PairingStartDto = components['schemas']['PairingStartDto'];
+export type PairingStartedDto = components['schemas']['PairingStartedDto'];
+export type PairingDeviceDto = components['schemas']['PairingDeviceDto'];
+export type PairingStatusDto = components['schemas']['PairingStatusDto'];
+export type PairingCodeDto = components['schemas']['PairingCodeDto'];
+export type PairingInfoDto = components['schemas']['PairingInfoDto'];
+export type PairingApproveDto = components['schemas']['PairingApproveDto'];
 export type MfaTokenDto = components['schemas']['MfaTokenDto'];
 export type MfaSetupResponseDto = components['schemas']['MfaSetupResponseDto'];
 export type MfaVerifyDto = components['schemas']['MfaVerifyDto'];
 export type RefreshDto = components['schemas']['RefreshDto'];
 export type ChangePasswordDto = components['schemas']['ChangePasswordDto'];
 export type AcceptTermsDto = components['schemas']['AcceptTermsDto'];
+export type ReferralItemDto = components['schemas']['ReferralItemDto'];
+export type ReferralSummaryDto = components['schemas']['ReferralSummaryDto'];
 export type UserRoleDto = components['schemas']['UserRoleDto'];
 export type UserSummaryDto = components['schemas']['UserSummaryDto'];
 export type UserListDto = components['schemas']['UserListDto'];
@@ -3680,6 +7356,10 @@ export type ProgressDto = components['schemas']['ProgressDto'];
 export type BoardWeekDto = components['schemas']['BoardWeekDto'];
 export type LeaderboardEntryDto = components['schemas']['LeaderboardEntryDto'];
 export type LeaderboardDto = components['schemas']['LeaderboardDto'];
+export type LeagueWeekDto = components['schemas']['LeagueWeekDto'];
+export type LeagueStandingDto = components['schemas']['LeagueStandingDto'];
+export type LeagueResultDto = components['schemas']['LeagueResultDto'];
+export type LeagueDto = components['schemas']['LeagueDto'];
 export type BadgeDto = components['schemas']['BadgeDto'];
 export type BadgesDto = components['schemas']['BadgesDto'];
 export type MarkBadgesSeenDto = components['schemas']['MarkBadgesSeenDto'];
@@ -3710,9 +7390,12 @@ export type UpdateChildDto = components['schemas']['UpdateChildDto'];
 export type ConsentRecordDto = components['schemas']['ConsentRecordDto'];
 export type PortfolioShareDto = components['schemas']['PortfolioShareDto'];
 export type CodeFilesDto = components['schemas']['CodeFilesDto'];
+export type StageDto = components['schemas']['StageDto'];
+export type ReviewSummaryDto = components['schemas']['ReviewSummaryDto'];
 export type PortfolioItemDto = components['schemas']['PortfolioItemDto'];
 export type ChildPortfolioDto = components['schemas']['ChildPortfolioDto'];
 export type ResetChildPasswordDto = components['schemas']['ResetChildPasswordDto'];
+export type PicturePasswordDto = components['schemas']['PicturePasswordDto'];
 export type DeleteChildDto = components['schemas']['DeleteChildDto'];
 export type ProjectDto = components['schemas']['ProjectDto'];
 export type SaveProjectDraftDto = components['schemas']['SaveProjectDraftDto'];
@@ -3746,6 +7429,34 @@ export type PriceListDto = components['schemas']['PriceListDto'];
 export type UpdateCountryPricesDto = components['schemas']['UpdateCountryPricesDto'];
 export type PublicCountryPriceDto = components['schemas']['PublicCountryPriceDto'];
 export type PublicPricingDto = components['schemas']['PublicPricingDto'];
+export type MentorStatusDto = components['schemas']['MentorStatusDto'];
+export type SignConductDto = components['schemas']['SignConductDto'];
+export type MentorQueueItemDto = components['schemas']['MentorQueueItemDto'];
+export type MentorStatsDto = components['schemas']['MentorStatsDto'];
+export type MentorQueueDto = components['schemas']['MentorQueueDto'];
+export type ReviewBriefDto = components['schemas']['ReviewBriefDto'];
+export type MentorReviewCommentDto = components['schemas']['MentorReviewCommentDto'];
+export type MentorNoteDto = components['schemas']['MentorNoteDto'];
+export type ReviewHistoryItemDto = components['schemas']['ReviewHistoryItemDto'];
+export type MentorReviewDto = components['schemas']['MentorReviewDto'];
+export type AddCommentDto = components['schemas']['AddCommentDto'];
+export type DecisionDto = components['schemas']['DecisionDto'];
+export type AddNoteDto = components['schemas']['AddNoteDto'];
+export type ReviewCommentDto = components['schemas']['ReviewCommentDto'];
+export type StudentReviewDto = components['schemas']['StudentReviewDto'];
+export type AdminMentorDto = components['schemas']['AdminMentorDto'];
+export type AdminTutorDto = components['schemas']['AdminTutorDto'];
+export type ReviewQueueStatsDto = components['schemas']['ReviewQueueStatsDto'];
+export type AdminMentorsDto = components['schemas']['AdminMentorsDto'];
+export type InviteMentorDto = components['schemas']['InviteMentorDto'];
+export type InvitedDto = components['schemas']['InvitedDto'];
+export type UpdateMentorDto = components['schemas']['UpdateMentorDto'];
+export type CertificateDto = components['schemas']['CertificateDto'];
+export type ModuleCertificateDto = components['schemas']['ModuleCertificateDto'];
+export type CertificateListDto = components['schemas']['CertificateListDto'];
+export type IssueCertificateDto = components['schemas']['IssueCertificateDto'];
+export type ChildCertificatesDto = components['schemas']['ChildCertificatesDto'];
+export type VerifiedCertificateDto = components['schemas']['VerifiedCertificateDto'];
 export type CountByStatusDto = components['schemas']['CountByStatusDto'];
 export type AuditActorDto = components['schemas']['AuditActorDto'];
 export type AuditEntryDto = components['schemas']['AuditEntryDto'];
@@ -3763,6 +7474,7 @@ export type TrackDto = components['schemas']['TrackDto'];
 export type PremiumInfoDto = components['schemas']['PremiumInfoDto'];
 export type LearningOverviewDto = components['schemas']['LearningOverviewDto'];
 export type VideoDto = components['schemas']['VideoDto'];
+export type GitSetupDto = components['schemas']['GitSetupDto'];
 export type ChallengeDto = components['schemas']['ChallengeDto'];
 export type QuizLineDto = components['schemas']['QuizLineDto'];
 export type QuizOptionDto = components['schemas']['QuizOptionDto'];
@@ -3791,17 +7503,12 @@ export type RevokePremiumDto = components['schemas']['RevokePremiumDto'];
 export type MetricsRowDto = components['schemas']['MetricsRowDto'];
 export type MetricsDto = components['schemas']['MetricsDto'];
 export type EmailPreferencesDto = components['schemas']['EmailPreferencesDto'];
+export type UpdateEmailPreferencesDto = components['schemas']['UpdateEmailPreferencesDto'];
 export type JoinWaitlistDto = components['schemas']['JoinWaitlistDto'];
 export type ConfirmWaitlistDto = components['schemas']['ConfirmWaitlistDto'];
 export type WaitlistCountryDto = components['schemas']['WaitlistCountryDto'];
 export type WaitlistEntryDto = components['schemas']['WaitlistEntryDto'];
 export type WaitlistSummaryDto = components['schemas']['WaitlistSummaryDto'];
-export type CertificateDto = components['schemas']['CertificateDto'];
-export type ModuleCertificateDto = components['schemas']['ModuleCertificateDto'];
-export type CertificateListDto = components['schemas']['CertificateListDto'];
-export type IssueCertificateDto = components['schemas']['IssueCertificateDto'];
-export type ChildCertificatesDto = components['schemas']['ChildCertificatesDto'];
-export type VerifiedCertificateDto = components['schemas']['VerifiedCertificateDto'];
 export type ContentModuleSummaryDto = components['schemas']['ContentModuleSummaryDto'];
 export type ContentTrackDto = components['schemas']['ContentTrackDto'];
 export type ContentTreeDto = components['schemas']['ContentTreeDto'];
@@ -3811,6 +7518,144 @@ export type PreviewLessonDto = components['schemas']['PreviewLessonDto'];
 export type PreviewProjectDto = components['schemas']['PreviewProjectDto'];
 export type ModulePreviewDto = components['schemas']['ModulePreviewDto'];
 export type UnpublishDto = components['schemas']['UnpublishDto'];
+export type StudioLanguageDto = components['schemas']['StudioLanguageDto'];
+export type StudioLanguagesDto = components['schemas']['StudioLanguagesDto'];
+export type StudioPersonDto = components['schemas']['StudioPersonDto'];
+export type StudioReviewItemDto = components['schemas']['StudioReviewItemDto'];
+export type StudioReviewsDto = components['schemas']['StudioReviewsDto'];
+export type StudioItemDto = components['schemas']['StudioItemDto'];
+export type StudioCountsDto = components['schemas']['StudioCountsDto'];
+export type StudioModuleDto = components['schemas']['StudioModuleDto'];
+export type StudioDraftDto = components['schemas']['StudioDraftDto'];
+export type StudioCheckDto = components['schemas']['StudioCheckDto'];
+export type StudioVersionDto = components['schemas']['StudioVersionDto'];
+export type StudioTextDto = components['schemas']['StudioTextDto'];
+export type SaveTextDto = components['schemas']['SaveTextDto'];
+export type ReturnTextDto = components['schemas']['ReturnTextDto'];
+export type StudioVersionDetailDto = components['schemas']['StudioVersionDetailDto'];
+export type ParentalConsentStatusDto = components['schemas']['ParentalConsentStatusDto'];
+export type StartConsentDto = components['schemas']['StartConsentDto'];
+export type StartConsentResultDto = components['schemas']['StartConsentResultDto'];
+export type ConfirmConsentEmailDto = components['schemas']['ConfirmConsentEmailDto'];
+export type ConfirmedConsentDto = components['schemas']['ConfirmedConsentDto'];
+export type ConsentRequestAdminDto = components['schemas']['ConsentRequestAdminDto'];
+export type ConsentQueueDto = components['schemas']['ConsentQueueDto'];
+export type ConsentDecisionDto = components['schemas']['ConsentDecisionDto'];
+export type ChatRoomDto = components['schemas']['ChatRoomDto'];
+export type ChatAuthorDto = components['schemas']['ChatAuthorDto'];
+export type ChatMessageDto = components['schemas']['ChatMessageDto'];
+export type ChatMessagesDto = components['schemas']['ChatMessagesDto'];
+export type SendChatMessageDto = components['schemas']['SendChatMessageDto'];
+export type ReportChatDto = components['schemas']['ReportChatDto'];
+export type ChatReportCreatedDto = components['schemas']['ChatReportCreatedDto'];
+export type ModerationActionDto = components['schemas']['ModerationActionDto'];
+export type ModerationRoomDto = components['schemas']['ModerationRoomDto'];
+export type ModerationPersonDto = components['schemas']['ModerationPersonDto'];
+export type ModerationSubjectDto = components['schemas']['ModerationSubjectDto'];
+export type ModerationReportDto = components['schemas']['ModerationReportDto'];
+export type ModerationQueueDto = components['schemas']['ModerationQueueDto'];
+export type ModerationActDto = components['schemas']['ModerationActDto'];
+export type StudentModerationDto = components['schemas']['StudentModerationDto'];
+export type BlockedTermDto = components['schemas']['BlockedTermDto'];
+export type CreateBlockedTermDto = components['schemas']['CreateBlockedTermDto'];
+export type CheckTextDto = components['schemas']['CheckTextDto'];
+export type CheckTextResultDto = components['schemas']['CheckTextResultDto'];
+export type EventSummaryDto = components['schemas']['EventSummaryDto'];
+export type RubricItemDto = components['schemas']['RubricItemDto'];
+export type EventPersonDto = components['schemas']['EventPersonDto'];
+export type EventResultDto = components['schemas']['EventResultDto'];
+export type EventMemberDto = components['schemas']['EventMemberDto'];
+export type EventSubmissionDto = components['schemas']['EventSubmissionDto'];
+export type EventTeamDto = components['schemas']['EventTeamDto'];
+export type EventDetailDto = components['schemas']['EventDetailDto'];
+export type CreateTeamDto = components['schemas']['CreateTeamDto'];
+export type JoinTeamDto = components['schemas']['JoinTeamDto'];
+export type ParentEventRequestDto = components['schemas']['ParentEventRequestDto'];
+export type EventDecisionDto = components['schemas']['EventDecisionDto'];
+export type EventDecisionResultDto = components['schemas']['EventDecisionResultDto'];
+export type WorkspaceDto = components['schemas']['WorkspaceDto'];
+export type PullAuthorDto = components['schemas']['PullAuthorDto'];
+export type PullSummaryDto = components['schemas']['PullSummaryDto'];
+export type OpenPullDto = components['schemas']['OpenPullDto'];
+export type PullCommentDto = components['schemas']['PullCommentDto'];
+export type PullReviewDto = components['schemas']['PullReviewDto'];
+export type PullDetailDto = components['schemas']['PullDetailDto'];
+export type PullCommentBodyDto = components['schemas']['PullCommentBodyDto'];
+export type PullReviewBodyDto = components['schemas']['PullReviewBodyDto'];
+export type SubmitWorkDto = components['schemas']['SubmitWorkDto'];
+export type TeamFilesDto = components['schemas']['TeamFilesDto'];
+export type MentorTeamDto = components['schemas']['MentorTeamDto'];
+export type MentorEventsDto = components['schemas']['MentorEventsDto'];
+export type JudgingTeamDto = components['schemas']['JudgingTeamDto'];
+export type JudgingDto = components['schemas']['JudgingDto'];
+export type ScoreTeamDto = components['schemas']['ScoreTeamDto'];
+export type AdminEventSummaryDto = components['schemas']['AdminEventSummaryDto'];
+export type SaveEventDto = components['schemas']['SaveEventDto'];
+export type StaffPersonDto = components['schemas']['StaffPersonDto'];
+export type AdminTeamMemberDto = components['schemas']['AdminTeamMemberDto'];
+export type AdminTeamDto = components['schemas']['AdminTeamDto'];
+export type AdminEventDto = components['schemas']['AdminEventDto'];
+export type EventStatusDto = components['schemas']['EventStatusDto'];
+export type EventJudgesDto = components['schemas']['EventJudgesDto'];
+export type TeamMentorDto = components['schemas']['TeamMentorDto'];
+export type RemoveMemberDto = components['schemas']['RemoveMemberDto'];
+export type NamedDto = components['schemas']['NamedDto'];
+export type TeacherClassSummaryDto = components['schemas']['TeacherClassSummaryDto'];
+export type TeacherHomeDto = components['schemas']['TeacherHomeDto'];
+export type CreateClassDto = components['schemas']['CreateClassDto'];
+export type ClassStudentDto = components['schemas']['ClassStudentDto'];
+export type AssignmentDto = components['schemas']['AssignmentDto'];
+export type ProgressRowDto = components['schemas']['ProgressRowDto'];
+export type BoardRowDto = components['schemas']['BoardRowDto'];
+export type SeatsDto = components['schemas']['SeatsDto'];
+export type TeacherClassDto = components['schemas']['TeacherClassDto'];
+export type CatalogLessonDto = components['schemas']['CatalogLessonDto'];
+export type CatalogModuleDto = components['schemas']['CatalogModuleDto'];
+export type CatalogTrackDto = components['schemas']['CatalogTrackDto'];
+export type UpdateClassDto = components['schemas']['UpdateClassDto'];
+export type CreateAssignmentDto = components['schemas']['CreateAssignmentDto'];
+export type StudentAssignmentDto = components['schemas']['StudentAssignmentDto'];
+export type StudentClassDto = components['schemas']['StudentClassDto'];
+export type JoinClassDto = components['schemas']['JoinClassDto'];
+export type JoinClassResultDto = components['schemas']['JoinClassResultDto'];
+export type ParentClassRequestDto = components['schemas']['ParentClassRequestDto'];
+export type ClassDecisionDto = components['schemas']['ClassDecisionDto'];
+export type ClassDecisionResultDto = components['schemas']['ClassDecisionResultDto'];
+export type AdminSchoolSummaryDto = components['schemas']['AdminSchoolSummaryDto'];
+export type SaveSchoolDto = components['schemas']['SaveSchoolDto'];
+export type AdminTeacherDto = components['schemas']['AdminTeacherDto'];
+export type AdminLicenseDto = components['schemas']['AdminLicenseDto'];
+export type AdminClassDto = components['schemas']['AdminClassDto'];
+export type AdminSchoolDto = components['schemas']['AdminSchoolDto'];
+export type AddTeacherDto = components['schemas']['AddTeacherDto'];
+export type AddTeacherResultDto = components['schemas']['AddTeacherResultDto'];
+export type CreateLicenseDto = components['schemas']['CreateLicenseDto'];
+export type LicensePaidDto = components['schemas']['LicensePaidDto'];
+export type LicenseCancelDto = components['schemas']['LicenseCancelDto'];
+export type ReadinessCheckDto = components['schemas']['ReadinessCheckDto'];
+export type ReadinessBriefDto = components['schemas']['ReadinessBriefDto'];
+export type ReadinessDto = components['schemas']['ReadinessDto'];
+export type SaveReadinessDto = components['schemas']['SaveReadinessDto'];
+export type ReadinessSavedDto = components['schemas']['ReadinessSavedDto'];
+export type FriendDto = components['schemas']['FriendDto'];
+export type StudentFriendRequestDto = components['schemas']['StudentFriendRequestDto'];
+export type FriendsDto = components['schemas']['FriendsDto'];
+export type SendFriendRequestDto = components['schemas']['SendFriendRequestDto'];
+export type FriendBoardEntryDto = components['schemas']['FriendBoardEntryDto'];
+export type FriendBoardDto = components['schemas']['FriendBoardDto'];
+export type FriendChildDto = components['schemas']['FriendChildDto'];
+export type FriendOtherDto = components['schemas']['FriendOtherDto'];
+export type ParentFriendRequestDto = components['schemas']['ParentFriendRequestDto'];
+export type FriendDecisionDto = components['schemas']['FriendDecisionDto'];
+export type ParentFriendDecisionResultDto = components['schemas']['ParentFriendDecisionResultDto'];
+export type StaffFriendDto = components['schemas']['StaffFriendDto'];
+export type EndFriendshipDto = components['schemas']['EndFriendshipDto'];
+export type SkillDto = components['schemas']['SkillDto'];
+export type SkillCategoryDto = components['schemas']['SkillCategoryDto'];
+export type SkillMapDto = components['schemas']['SkillMapDto'];
+export type ReportChildDto = components['schemas']['ReportChildDto'];
+export type ParentReportDto = components['schemas']['ParentReportDto'];
+export type ParentReportsDto = components['schemas']['ParentReportsDto'];
 export type UpdateCountryDto = components['schemas']['UpdateCountryDto'];
 export type CountryAdminDto = components['schemas']['CountryAdminDto'];
 export type LanguageAdminDto = components['schemas']['LanguageAdminDto'];
@@ -4413,6 +8258,156 @@ export interface operations {
             };
         };
     };
+    Auth_pictureLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PictureLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+        };
+    };
+    Auth_startPairing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PairingStartDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PairingStartedDto"];
+                };
+            };
+        };
+    };
+    Auth_pairingStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PairingDeviceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PairingStatusDto"];
+                };
+            };
+        };
+    };
+    Auth_claimPairing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PairingDeviceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+        };
+    };
+    Auth_pairingInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PairingCodeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PairingInfoDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Auth_approvePairing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PairingApproveDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Auth_setupMfa: {
         parameters: {
             query?: never;
@@ -4585,6 +8580,32 @@ export interface operations {
             };
         };
     };
+    Referrals_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferralSummaryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Users_list: {
         parameters: {
             query?: {
@@ -4594,7 +8615,7 @@ export interface operations {
                 search?: string;
                 /** @description Role key, e.g. "parent". */
                 role?: string;
-                status?: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED";
+                status?: "PENDING_VERIFICATION" | "ACTIVE" | "SUSPENDED" | "DELETED" | "PENDING_CONSENT";
             };
             header?: never;
             path?: never;
@@ -4782,6 +8803,70 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LeaderboardDto"];
                 };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Progress_league: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeagueDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Progress_leagueSeen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Not signed in */
             401: {
@@ -5734,6 +9819,45 @@ export interface operations {
             };
         };
     };
+    Children_setPicturePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PicturePasswordDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Projects_get: {
         parameters: {
             query?: {
@@ -6471,6 +10595,808 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PublicPricingDto"];
                 };
+            };
+        };
+    };
+    Mentor_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MentorStatusDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_signConduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignConductDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_queue: {
+        parameters: {
+            query?: {
+                /** @description "mine": only the mentor's languages (default); "all": every language. */
+                languages?: "mine" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MentorQueueDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MentorReviewDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_release: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddCommentDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_uncomment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Mentor_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddNoteDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reviews_get: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentReviewDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reviews_seen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorsAdmin_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMentorsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorsAdmin_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteMentorDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitedDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorsAdmin_resend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorsAdmin_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMentorDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Certificates_list: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateListDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Certificates_issue: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueCertificateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Certificates_pdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDF */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Certificates_forChild: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildCertificatesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Certificates_forStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildCertificatesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Certificates_verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifiedCertificateDto"];
+                };
+            };
+        };
+    };
+    Certificates_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveBadgeBody"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -7239,7 +12165,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["EmailPreferencesDto"];
+                "application/json": components["schemas"]["UpdateEmailPreferencesDto"];
             };
         };
         responses: {
@@ -7320,247 +12246,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["WaitlistSummaryDto"];
                 };
-            };
-            /** @description Not signed in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Signed in, but not allowed */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Certificates_list: {
-        parameters: {
-            query?: {
-                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
-                lang?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CertificateListDto"];
-                };
-            };
-            /** @description Not signed in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Signed in, but not allowed */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Certificates_issue: {
-        parameters: {
-            query?: {
-                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
-                lang?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["IssueCertificateDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CertificateDto"];
-                };
-            };
-            /** @description Not signed in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Signed in, but not allowed */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Certificates_pdf: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The PDF */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not signed in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Signed in, but not allowed */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Certificates_forChild: {
-        parameters: {
-            query?: {
-                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
-                lang?: string;
-            };
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChildCertificatesDto"];
-                };
-            };
-            /** @description Not signed in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Signed in, but not allowed */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Certificates_forStaff: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChildCertificatesDto"];
-                };
-            };
-            /** @description Not signed in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Signed in, but not allowed */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Certificates_verify: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VerifiedCertificateDto"];
-                };
-            };
-        };
-    };
-    Certificates_revoke: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RemoveBadgeBody"];
-            };
-        };
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Not signed in */
             401: {
@@ -7712,6 +12397,3762 @@ export interface operations {
             };
             /** @description Signed in, but not allowed */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_languages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudioLanguagesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_reviews: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudioReviewsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_module: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudioModuleDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_text: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudioTextDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveTextDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_returnDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReturnTextDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_discard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudioVersionDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContentStudio_restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity: "lesson" | "challenge" | "project" | "quiz";
+                id: string;
+                /** @description Language code, e.g. "ur". */
+                lang: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentalConsent_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentalConsentStatusDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentalConsent_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartConsentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartConsentResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentalConsent_uploadForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/pdf": string;
+                "image/png": string;
+                "image/jpeg": string;
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentalConsentStatusDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentalConsent_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmConsentEmailDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmedConsentDto"];
+                };
+            };
+        };
+    };
+    ParentalConsentAdmin_list: {
+        parameters: {
+            query?: {
+                status?: "PENDING" | "SUBMITTED" | "VERIFIED" | "REJECTED" | "EXPIRED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentQueueDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentalConsentAdmin_form: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentalConsentAdmin_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentDecisionDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Chat_rooms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatRoomDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Chat_messages: {
+        parameters: {
+            query?: {
+                /** @description Messages sent before this moment (for scrolling back). */
+                before?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatMessagesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Chat_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendChatMessageDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatMessageDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Chat_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Chat_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportChatDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatReportCreatedDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentChat_rooms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatRoomDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentChat_messages: {
+        parameters: {
+            query?: {
+                /** @description Messages sent before this moment (for scrolling back). */
+                before?: string;
+            };
+            header?: never;
+            path: {
+                childId: string;
+                roomId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatMessagesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_queue: {
+        parameters: {
+            query?: {
+                status?: "OPEN" | "RESOLVED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModerationQueueDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModerationReportDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_act: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModerationActDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModerationReportDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_student: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentModerationDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_unmute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_room: {
+        parameters: {
+            query?: {
+                /** @description Messages sent before this moment (for scrolling back). */
+                before?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatMessagesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_terms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockedTermDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_addTerm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBlockedTermDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockedTermDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_removeTerm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationAdmin_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckTextDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckTextResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Events_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Events_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Events_createTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTeamDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Events_join: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinTeamDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Events_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentEvents_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentEventRequestDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentEvents_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventDecisionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventDecisionResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_open: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_pulls: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PullSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_openPull: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenPullDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PullSummaryDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_pull: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PullDetailDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PullCommentBodyDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PullReviewBodyDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_merge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                number: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitWorkDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventSubmissionDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teams_files: {
+        parameters: {
+            query?: {
+                /** @description "submission" (the handed-in commit, the default when there is one) or "main". */
+                ref?: "submission" | "main";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamFilesDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorEvents_events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MentorEventsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorEvents_judge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JudgingDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MentorEvents_score: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoreTeamDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveEventDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveEventDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventStatusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_judges: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventJudgesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_mentor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TeamMentorDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminEventDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EventsAdmin_removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveMemberDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_home: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherHomeDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateClassDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_catalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogTrackDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateClassDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_newCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_archive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_removeStudent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAssignmentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Teacher_unassign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                assignmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherClassDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentClasses_mine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentClassDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentClasses_join: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinClassDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinClassResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StudentClasses_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentClasses_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentClassRequestDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentClasses_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                classId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClassDecisionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassDecisionResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolSummaryDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveSchoolDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveSchoolDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_addTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddTeacherDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddTeacherResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_removeTeacher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_addLicense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLicenseDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_paid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                licenseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicensePaidDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SchoolsAdmin_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                licenseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicenseCancelDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSchoolDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Readiness_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadinessDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Readiness_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadinessCheckDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Readiness_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveReadinessDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadinessSavedDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Readiness_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveReadinessDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadinessCheckDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Friends_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FriendsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Friends_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendFriendRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentFriendRequestDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Friends_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Friends_board: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FriendBoardDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Friends_unfriend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentFriends_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentFriendRequestDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentFriends_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FriendDecisionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentFriendDecisionResultDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentFriends_childFriends: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FriendDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ParentFriends_endChildFriendship: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                friendId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FriendsAdmin_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffFriendDto"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    FriendsAdmin_end: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndFriendshipDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reports_heartbeat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reports_skills: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillMapDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reports_childSkills: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillMapDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Signed in, but not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reports_list: {
+        parameters: {
+            query?: {
+                /** @description Language for titles and texts, e.g. "ar". Falls back to English for anything untranslated. */
+                lang?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentReportsDto"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

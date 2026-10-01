@@ -7,5 +7,6 @@ import { CertificatesService } from './certificates.service.js';
   imports: [BillingModule],
   controllers: [CertificatesController],
   providers: [CertificatesService],
+  exports: [CertificatesService],
 })
 export class CertificatesModule {}

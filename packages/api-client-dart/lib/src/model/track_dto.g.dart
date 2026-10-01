@@ -11,6 +11,10 @@ abstract class _$TrackDtoCWProxy {
 
   TrackDto title(String title);
 
+  TrackDto ageFrom(num? ageFrom);
+
+  TrackDto ageTo(num? ageTo);
+
   TrackDto modules(List<ModuleDto> modules);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `TrackDto(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
@@ -19,7 +23,13 @@ abstract class _$TrackDtoCWProxy {
   /// ```dart
   /// TrackDto(...).copyWith(id: 12, name: "My name")
   /// ````
-  TrackDto call({String id, String title, List<ModuleDto> modules});
+  TrackDto call({
+    String id,
+    String title,
+    num? ageFrom,
+    num? ageTo,
+    List<ModuleDto> modules,
+  });
 }
 
 /// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfTrackDto.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfTrackDto.copyWith.fieldName(...)`
@@ -35,6 +45,12 @@ class _$TrackDtoCWProxyImpl implements _$TrackDtoCWProxy {
   TrackDto title(String title) => this(title: title);
 
   @override
+  TrackDto ageFrom(num? ageFrom) => this(ageFrom: ageFrom);
+
+  @override
+  TrackDto ageTo(num? ageTo) => this(ageTo: ageTo);
+
+  @override
   TrackDto modules(List<ModuleDto> modules) => this(modules: modules);
 
   @override
@@ -47,6 +63,8 @@ class _$TrackDtoCWProxyImpl implements _$TrackDtoCWProxy {
   TrackDto call({
     Object? id = const $CopyWithPlaceholder(),
     Object? title = const $CopyWithPlaceholder(),
+    Object? ageFrom = const $CopyWithPlaceholder(),
+    Object? ageTo = const $CopyWithPlaceholder(),
     Object? modules = const $CopyWithPlaceholder(),
   }) {
     return TrackDto(
@@ -58,6 +76,14 @@ class _$TrackDtoCWProxyImpl implements _$TrackDtoCWProxy {
           ? _value.title
           // ignore: cast_nullable_to_non_nullable
           : title as String,
+      ageFrom: ageFrom == const $CopyWithPlaceholder()
+          ? _value.ageFrom
+          // ignore: cast_nullable_to_non_nullable
+          : ageFrom as num?,
+      ageTo: ageTo == const $CopyWithPlaceholder()
+          ? _value.ageTo
+          // ignore: cast_nullable_to_non_nullable
+          : ageTo as num?,
       modules: modules == const $CopyWithPlaceholder()
           ? _value.modules
           // ignore: cast_nullable_to_non_nullable
@@ -78,10 +104,15 @@ extension $TrackDtoCopyWith on TrackDto {
 
 TrackDto _$TrackDtoFromJson(Map<String, dynamic> json) =>
     $checkedCreate('TrackDto', json, ($checkedConvert) {
-      $checkKeys(json, requiredKeys: const ['id', 'title', 'modules']);
+      $checkKeys(
+        json,
+        requiredKeys: const ['id', 'title', 'ageFrom', 'ageTo', 'modules'],
+      );
       final val = TrackDto(
         id: $checkedConvert('id', (v) => v as String),
         title: $checkedConvert('title', (v) => v as String),
+        ageFrom: $checkedConvert('ageFrom', (v) => v as num?),
+        ageTo: $checkedConvert('ageTo', (v) => v as num?),
         modules: $checkedConvert(
           'modules',
           (v) => (v as List<dynamic>)
@@ -95,5 +126,7 @@ TrackDto _$TrackDtoFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$TrackDtoToJson(TrackDto instance) => <String, dynamic>{
   'id': instance.id,
   'title': instance.title,
+  'ageFrom': instance.ageFrom,
+  'ageTo': instance.ageTo,
   'modules': instance.modules.map((e) => e.toJson()).toList(),
 };

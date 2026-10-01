@@ -1,5 +1,6 @@
 import {
   CreateBucketCommand,
+  DeleteObjectCommand,
   DeleteObjectsCommand,
   GetObjectCommand,
   HeadBucketCommand,
@@ -84,7 +85,33 @@ export class StorageService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  /** Deletes every file whose key starts with `prefix` (e.g. everything of one student). */
+  async putBinary(key: string, body: Buffer, contentType: string): Promise<void> {
+    await this.client.send(
+      new PutObjectCommand({ Bucket: this.bucket, Key: key, Body: body, ContentType: contentType }),
+    );
+  }
+
+  /** The file's bytes, or null when it doesn't exist. */
+  async getBinary(key: string): Promise<Buffer | null> {
+    try {
+      const result = await this.client.send(
+        new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+      );
+      const bytes = await result.Body?.transformToByteArray();
+      return bytes ? Buffer.from(bytes) : Buffer.alloc(0);
+    } catch (error) {
+      if (error instanceof NoSuchKey || (error as { name?: string }).name === 'NoSuchKey') {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  /** Deletes one file (nothing happens if it's gone already). */
+  async deleteKey(key: string): Promise<void> {
+    await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }));
+  }
+
   /**
    * Deletes every file in a folder, except those under `keep` (a sub-folder). Throws
    * if any file could not be deleted, so callers can try again.

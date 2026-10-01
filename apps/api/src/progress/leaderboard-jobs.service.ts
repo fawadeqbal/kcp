@@ -7,6 +7,7 @@ import { REDIS } from '../redis/redis.constants.js';
 import { BadgesService } from './badges.service.js';
 import { LeaderboardService, type PeriodRef } from './leaderboard.service.js';
 import { LeaderboardsAdminService } from './leaderboards-admin.service.js';
+import { LeaguesService } from './leagues.service.js';
 import { addDays, localDay, weekOfDay } from './xp-rules.js';
 
 const CLOSED_KEEP_SECONDS = 60 * 24 * 60 * 60;
@@ -19,6 +20,8 @@ const WEEKLY_TOP = BADGES.filter((b) => b.criteria.type === 'weekly_top');
  * - every 15 minutes: close weeks that ended at Monday 00:00 in each country's time
  *   zone (store the final top 10s, give "Top 10 of the week" badges), and end seasons
  *   whose planned end has passed;
+ * - every 15 minutes too: close league groups of weeks that are over everywhere
+ *   (Monday 00:00 UTC), moving the top of each group up a league and the bottom down;
  * - every night: rebuild every current board from PostgreSQL.
  * New weeks need no reset: boards are keyed by week, so a new week starts empty.
  */
@@ -31,6 +34,7 @@ export class LeaderboardJobsService {
     private readonly leaderboards: LeaderboardService,
     private readonly admin: LeaderboardsAdminService,
     private readonly badges: BadgesService,
+    private readonly leagues: LeaguesService,
     @Inject(REDIS) private readonly redis: Redis,
   ) {}
 
@@ -51,6 +55,14 @@ export class LeaderboardJobsService {
   @Cron('*/15 * * * *', { name: 'leaderboards-close', timeZone: 'UTC' })
   async closeScheduled() {
     await this.locked('close', () => this.closeFinished());
+  }
+
+  @Cron('5,20,35,50 * * * *', { name: 'leagues-close', timeZone: 'UTC' })
+  async closeLeaguesScheduled() {
+    await this.locked('leagues', async () => {
+      const count = await this.leagues.closeFinished();
+      if (count) this.logger.log(`Closed ${count} league groups`);
+    });
   }
 
   @Cron('30 2 * * *', { name: 'leaderboards-rebuild', timeZone: 'UTC' })

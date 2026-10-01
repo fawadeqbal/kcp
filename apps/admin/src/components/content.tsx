@@ -1,7 +1,17 @@
 'use client';
 
 import type { components } from '@kcp/api-client-ts';
-import { Alert, Badge, Button, Card, Dialog, PageSpinner, SelectField, TextField } from '@kcp/ui';
+import {
+  Alert,
+  Badge,
+  Button,
+  buttonClass,
+  Card,
+  Dialog,
+  PageSpinner,
+  SelectField,
+  TextField,
+} from '@kcp/ui';
 import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -29,6 +39,8 @@ const titleOf = (titles: Record<string, string>) => titles['en'] ?? Object.value
  * production new modules wait here until someone publishes them.
  */
 export function ContentList() {
+  const { state } = useAuth();
+  const canTranslate = state.status === 'authenticated' && state.ability.can('read', 'ContentText');
   const tree = useLoad(() => api.GET('/v1/admin/content'), 'content');
   if (tree.error) return <Alert tone="error">{tree.error}</Alert>;
   if (!tree.data) return <PageSpinner label="Loading" />;
@@ -36,7 +48,14 @@ export function ContentList() {
     <>
       <PageHeader
         title="Content"
-        description="Modules from content/ (imported on every deploy). Students see a module once it is published: preview it in each language first."
+        description="Modules from content/ (imported on every deploy). Students see a module once it is published: preview it in each language first. Translate texts here; a second person reviews and publishes them."
+        actions={
+          canTranslate ? (
+            <Link href="/content/reviews" className={buttonClass('secondary', 'sm')}>
+              Waiting for review
+            </Link>
+          ) : null
+        }
       />
       <div className="flex flex-col gap-6">
         {tree.data.tracks.map((track) => (
@@ -76,12 +95,22 @@ export function ContentList() {
                   <Cell>{module.challenges}</Cell>
                   <Cell>{module.languages.join(', ') || '—'}</Cell>
                   <Cell>
-                    <Link
-                      href={`/content/${module.id}`}
-                      className="font-semibold text-brand-text underline-offset-4 hover:underline"
-                    >
-                      Preview
-                    </Link>
+                    <span className="flex flex-wrap gap-x-4 gap-y-1">
+                      <Link
+                        href={`/content/${module.id}`}
+                        className="font-semibold text-brand-text underline-offset-4 hover:underline"
+                      >
+                        Preview
+                      </Link>
+                      {canTranslate ? (
+                        <Link
+                          href={`/content/${module.id}/translate`}
+                          className="font-semibold text-brand-text underline-offset-4 hover:underline"
+                        >
+                          Translate
+                        </Link>
+                      ) : null}
+                    </span>
                   </Cell>
                 </tr>
               ))}
@@ -172,12 +201,21 @@ export function ContentPreview({ id }: { id: string }) {
   );
 }
 
-function Text({ language, children }: { language: string; children: string }) {
+/** Lesson Markdown as students see it (raw HTML left out, like the web app). */
+export function Text({
+  language,
+  rtl = RTL.has(language),
+  children,
+}: {
+  language: string;
+  rtl?: boolean;
+  children: string;
+}) {
   return (
     <div
       lang={language}
-      dir={RTL.has(language) ? 'rtl' : 'ltr'}
-      className="leading-relaxed [&:lang(ur)]:leading-[2.2] [&_code]:rounded [&_code]:bg-brand-100 [&_code]:px-1 [&_li]:ms-6 [&_li]:list-disc [&_p]:mt-2 [&_pre]:overflow-x-auto [&_pre]:rounded-row [&_pre]:bg-code-bg [&_pre]:p-3 [&_pre]:text-ink"
+      dir={rtl ? 'rtl' : 'ltr'}
+      className="leading-relaxed [&:lang(ur)]:leading-[2.2] [&_code]:rounded [&_code]:bg-brand-100 [&_code]:px-1 [&_li]:ms-6 [&_li]:list-disc [&_p]:mt-2 [&_pre]:max-h-96 [&_pre]:overflow-auto [&_pre]:rounded-row [&_pre]:bg-code-bg [&_pre]:p-3 [&_pre]:text-ink"
     >
       <ReactMarkdown skipHtml>{children}</ReactMarkdown>
     </div>
@@ -192,7 +230,10 @@ function Code({ files }: { files: Record<string, string> }) {
       {entries.map(([name, code]) => (
         <div key={name}>
           <p className="text-sm font-semibold">{name}</p>
-          <pre dir="ltr" className="overflow-x-auto rounded-well bg-code-bg p-3 text-sm text-ink">
+          <pre
+            dir="ltr"
+            className="max-h-96 overflow-auto rounded-well bg-code-bg p-3 text-sm text-ink"
+          >
             {code}
           </pre>
         </div>

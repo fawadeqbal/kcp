@@ -18,10 +18,16 @@ import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { isolate } from '../auth/validation';
 import { type Child, ChildCard } from '../children/child-card';
+import { EventRequestsCard } from '../events/parent-events';
+import { FriendRequestsCard } from '../friends/parent-friends';
+import { ReferralCard } from '../reports/referral-card';
+import { ClassRequestsCard } from '../schools/parent-classes';
 
 export function ParentDashboard() {
   const t = useTranslations('dashboard');
-  const user = useAccount('ADULT');
+  const tp = useTranslations('pair');
+  const tr = useTranslations('reports');
+  const user = useAccount('PARENT');
   const [children, setChildren] = useState<Child[] | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
@@ -59,7 +65,15 @@ export function ParentDashboard() {
           </h1>
           <p className="mt-1.5 max-w-xl text-lg text-muted">{t('subtitle')}</p>
         </div>
-        {children?.length ? addChild : null}
+        {children?.length ? (
+          <div className="flex flex-wrap gap-3">
+            <Link href="/pair" className={buttonClass('secondary', 'lg')}>
+              <Icon name="laptop" />
+              {tp('dashboardLink')}
+            </Link>
+            {addChild}
+          </div>
+        ) : null}
       </section>
 
       {notice ? (
@@ -71,6 +85,10 @@ export function ParentDashboard() {
           {notice}
         </p>
       ) : null}
+
+      <FriendRequestsCard />
+      <EventRequestsCard />
+      <ClassRequestsCard />
 
       <section aria-labelledby="children-heading" className="flex flex-col gap-4.5">
         <SectionHeading
@@ -124,6 +142,19 @@ export function ParentDashboard() {
           <h2 className="mt-1 text-xl">{t('safetyTitle')}</h2>
           <p className="text-sm text-sage-800">{t('safetyBody')}</p>
         </section>
+        <section className="flex flex-col gap-2.5 rounded-card bg-sand-200 p-6.5">
+          <IconBubble icon="chart" tone="neutral" />
+          <h2 className="mt-1 text-xl">{tr('title')}</h2>
+          <p className="text-sm text-muted">{tr('subtitle')}</p>
+          <Link
+            href="/reports"
+            className="mt-auto flex items-center gap-1.5 self-start rounded-full py-1 text-sm font-bold text-brand-text hover:underline"
+          >
+            {tr('dashboardLink')}
+            <Icon name="arrow" />
+          </Link>
+        </section>
+        <ReferralCard />
         <section className="flex flex-col gap-2.5 rounded-card bg-surface p-6.5">
           <IconBubble icon="user" tone="neutral" />
           <h2 className="mt-1 text-xl">{t('accountTitle')}</h2>
@@ -144,38 +175,58 @@ export function ParentDashboard() {
   );
 }
 
-/** The monthly progress email: on unless the parent switches it off. */
+/** The family emails: the monthly progress email and the weekly report (on unless switched off). */
 function MonthlySummarySwitch() {
   const t = useTranslations('dashboard');
-  const [on, setOn] = useState<boolean | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [prefs, setPrefs] = useState<{ monthlySummary: boolean; weeklyReport: boolean } | null>(
+    null,
+  );
+  const [saved, setSaved] = useState<'monthlySummary' | 'weeklyReport' | null>(null);
 
   useEffect(() => {
     api
       .GET('/v1/account/email-preferences')
-      .then(({ data }) => setOn(data?.monthlySummary ?? null))
+      .then(({ data }) => setPrefs(data ?? null))
       .catch(() => undefined);
   }, []);
 
-  if (on === null) return null;
+  if (!prefs) return null;
+  const change = async (key: 'monthlySummary' | 'weeklyReport', checked: boolean) => {
+    const before = prefs;
+    setPrefs({ ...prefs, [key]: checked });
+    setSaved(null);
+    const { data } = await api
+      .PUT('/v1/account/email-preferences', { body: { [key]: checked } })
+      .catch(() => ({ data: undefined }));
+    if (data) {
+      setPrefs(data);
+      setSaved(key);
+    } else {
+      setPrefs(before);
+    }
+  };
   return (
-    <div className="flex flex-col gap-1 rounded-row bg-raised px-4 py-3">
-      <Switch
-        label={t('monthlySummary')}
-        checked={on}
-        onChange={async (checked: boolean) => {
-          setOn(checked);
-          setSaved(false);
-          const { data } = await api
-            .PUT('/v1/account/email-preferences', { body: { monthlySummary: checked } })
-            .catch(() => ({ data: undefined }));
-          if (data) setSaved(true);
-          else setOn(!checked);
-        }}
-      />
-      <p className="text-sm text-muted" aria-live="polite">
-        {saved ? t('saved') : t('monthlySummaryHint')}
-      </p>
-    </div>
+    <>
+      <div className="flex flex-col gap-1 rounded-row bg-raised px-4 py-3">
+        <Switch
+          label={t('monthlySummary')}
+          checked={prefs.monthlySummary}
+          onChange={(checked: boolean) => void change('monthlySummary', checked)}
+        />
+        <p className="text-sm text-muted" aria-live="polite">
+          {saved === 'monthlySummary' ? t('saved') : t('monthlySummaryHint')}
+        </p>
+      </div>
+      <div className="flex flex-col gap-1 rounded-row bg-raised px-4 py-3">
+        <Switch
+          label={t('weeklyReport')}
+          checked={prefs.weeklyReport}
+          onChange={(checked: boolean) => void change('weeklyReport', checked)}
+        />
+        <p className="text-sm text-muted" aria-live="polite">
+          {saved === 'weeklyReport' ? t('saved') : t('weeklyReportHint')}
+        </p>
+      </div>
+    </>
   );
 }

@@ -10,7 +10,7 @@ export class UserRoleDto {
 export class UserSummaryDto {
   id!: string;
   kind!: 'STUDENT' | 'ADULT';
-  status!: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+  status!: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED' | 'PENDING_CONSENT';
   /** Adults only. */
   email!: string | null;
   /** Students only. */
@@ -44,8 +44,8 @@ export class ListUsersQueryDto {
   role?: string;
 
   @IsOptional()
-  @IsIn(['PENDING_VERIFICATION', 'ACTIVE', 'SUSPENDED', 'DELETED'])
-  status?: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+  @IsIn(['PENDING_VERIFICATION', 'ACTIVE', 'SUSPENDED', 'DELETED', 'PENDING_CONSENT'])
+  status?: 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED' | 'PENDING_CONSENT';
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()

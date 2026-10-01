@@ -12,7 +12,7 @@ import { useAccount } from '@/lib/use-account';
 /** A parent's password, a copy of the family's data, and deleting the account. */
 export function AccountPage() {
   const t = useTranslations('account');
-  const user = useAccount('ADULT');
+  const user = useAccount('PARENT');
   const [deleted, setDeleted] = useState(false);
   if (deleted) {
     return (

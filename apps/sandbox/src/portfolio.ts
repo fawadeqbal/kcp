@@ -7,8 +7,12 @@
 import {
   type CodeFiles,
   isRunnerMessage,
+  mountStage,
+  parseProgram,
   type PythonManifest,
   type PythonRuntimeFiles,
+  type StageLabels,
+  type StageLevel,
 } from '@kcp/checks';
 
 /** Set at build time (scripts/build.mjs). */
@@ -23,6 +27,8 @@ interface Item {
   version: number;
   publishedAt: string;
   files: CodeFiles;
+  /** Block projects: the level their program plays on. */
+  stage: StageLevel | null;
 }
 
 interface Portfolio {
@@ -57,6 +63,87 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+/** Interface icons (Lucide paths, as in packages/ui/src/icons.tsx), drawn in the text colour. */
+const ICONS = {
+  maximize: [
+    'M8 3H5a2 2 0 0 0-2 2v3',
+    'M21 8V5a2 2 0 0 0-2-2h-3',
+    'M3 16v3a2 2 0 0 0 2 2h3',
+    'M16 21h3a2 2 0 0 0 2-2v-3',
+  ],
+  minimize: [
+    'M8 3v3a2 2 0 0 1-2 2H3',
+    'M21 8h-3a2 2 0 0 1-2-2V3',
+    'M3 16h3a2 2 0 0 1 2 2v3',
+    'M16 21v-3a2 2 0 0 1 2-2h3',
+  ],
+};
+
+function icon(name: keyof typeof ICONS) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  for (const [key, value] of Object.entries({
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': '2.75',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    'aria-hidden': 'true',
+  })) {
+    svg.setAttribute(key, value);
+  }
+  for (const d of ICONS[name]) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+  }
+  return svg;
+}
+
+/**
+ * A "Full screen" button for a project's card: it shows the whole card (name, details
+ * and the running project) on the whole screen, and the button (or Esc) brings it back.
+ * Where the browser has no full-screen mode (Safari on iPhone), the card covers the
+ * window instead. The card is never moved, so a running program keeps running.
+ */
+function fullScreenButton(card: HTMLElement) {
+  const button = element('button', { type: 'button', class: 'secondary' });
+  let covering = false;
+  const isFull = () => covering || document.fullscreenElement === card;
+  const render = () => {
+    const full = isFull();
+    card.classList.toggle('is-full', full);
+    document.documentElement.classList.toggle('covered', covering);
+    button.replaceChildren(
+      icon(full ? 'minimize' : 'maximize'),
+      text(full ? 'exitFullScreen' : 'fullScreen'),
+    );
+  };
+  button.addEventListener('click', async () => {
+    if (isFull()) {
+      if (document.fullscreenElement === card) await document.exitFullscreen().catch(() => {});
+      covering = false;
+    } else if (document.fullscreenEnabled && typeof card.requestFullscreen === 'function') {
+      covering = await card.requestFullscreen().then(
+        () => false,
+        () => true,
+      );
+    } else {
+      covering = true;
+    }
+    render();
+  });
+  document.addEventListener('fullscreenchange', render);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && covering) {
+      covering = false;
+      render();
+    }
+  });
+  render();
+  return button;
+}
+
 /** Latin nicknames stay left-to-right inside Arabic and Urdu sentences. */
 const isolate = (value: string) => element('bdi', {}, value);
 
@@ -86,6 +173,60 @@ function loadPython() {
   return python;
 }
 
+const STAGE_KEYS = [
+  'stage',
+  'score',
+  'gems',
+  'time',
+  'says',
+  'bumped',
+  'collected',
+  'nothingHere',
+  'reachedGoal',
+  'loop',
+  'timeUp',
+  'howToPlay',
+  'up',
+  'down',
+  'left',
+  'right',
+] as const satisfies readonly (keyof StageLabels)[];
+
+/** The stage's texts, raw: it fills in "{score}" and the like itself. */
+const stageLabels = (): StageLabels =>
+  Object.fromEntries(
+    STAGE_KEYS.map((key) => [
+      key,
+      messages[`stage.${key}`] ?? PORTFOLIO_MESSAGES.en[`stage.${key}`] ?? key,
+    ]),
+  ) as unknown as StageLabels;
+
+/**
+ * A block project (Explorer): Bit's world, and a button that plays the program. The
+ * program is data, played by the stage; no code from the project runs.
+ */
+function stageCard(card: HTMLElement, item: Item, stage: StageLevel) {
+  const host = element('div', { class: 'stage' });
+  const play = element('button', { type: 'button' }, text('play'));
+  const stop = element('button', { type: 'button', class: 'secondary', hidden: '' }, text('stop'));
+  const player = mountStage(host, stage, {
+    labels: stageLabels(),
+    reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+  });
+  play.addEventListener('click', () => {
+    stop.hidden = false;
+    void player.play(parseProgram(item.files.blocks) ?? []).then(() => {
+      stop.hidden = true;
+    });
+  });
+  stop.addEventListener('click', () => {
+    player.stop();
+    stop.hidden = true;
+  });
+  card.append(host, element('div', { class: 'actions' }, play, stop));
+  return card;
+}
+
 /** One project, running in its own sandboxed runner. */
 function projectCard(item: Item) {
   const date = new Intl.DateTimeFormat(language, { dateStyle: 'long' }).format(
@@ -98,12 +239,21 @@ function projectCard(item: Item) {
     loading: 'lazy',
     src: '/',
   });
-  const card = element(
-    'article',
-    { class: 'card' },
-    element('h2', {}, item.title),
-    element('p', { class: 'muted' }, `${item.moduleTitle} · ${text('shippedOn', { date })}`),
+  const card = element('article', { class: 'card' });
+  card.append(
+    element(
+      'div',
+      { class: 'card-head' },
+      element(
+        'div',
+        {},
+        element('h2', {}, item.title),
+        element('p', { class: 'muted' }, `${item.moduleTitle} · ${text('shippedOn', { date })}`),
+      ),
+      fullScreenButton(card),
+    ),
   );
+  if (item.files.blocks !== undefined && item.stage) return stageCard(card, item, item.stage);
   let ready = false;
   let pending: { stdin: string } | null = isPython ? null : { stdin: '' };
   const run = (stdin: string) => {

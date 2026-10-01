@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 import { isolate } from '@/features/auth/validation';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { useAuth } from '@/lib/auth-provider';
+import { areaOf, useAuth } from '@/lib/auth-provider';
 import { LanguageSwitcher } from './language-switcher';
 import { NotificationBell } from './notification-bell';
 import { Avatar, buttonClass, Icon, LogoMark } from './ui';
@@ -35,7 +35,7 @@ function PillNav({ label, items }: { label: string; items: NavItem[] }) {
               href={item.href}
               aria-current={item.current ? 'page' : undefined}
               className={clsx(
-                'flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors',
+                'flex min-h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold whitespace-nowrap transition-colors',
                 item.current ? 'elev-sm bg-canvas text-ink' : 'text-muted hover:text-ink',
               )}
             >
@@ -63,20 +63,38 @@ export function SiteHeader() {
 
   let nav: NavItem[] | null = null;
   if (state.status === 'authenticated' && state.user.kind === 'STUDENT') {
-    const other = ['/learn/leaderboard', '/learn/badges', '/learn/portfolio'].some(is);
+    const other = [
+      '/learn/league',
+      '/learn/friends',
+      '/learn/rooms',
+      '/learn/events',
+      '/learn/classes',
+      '/learn/skills',
+      '/learn/leaderboard',
+      '/learn/badges',
+      '/learn/portfolio',
+    ].some(is);
     nav = [
       { href: '/learn', label: t('nav.learn'), icon: 'book', current: is('/learn') && !other },
+      // The league page links to the other leaderboards.
       {
-        href: '/learn/leaderboard',
-        label: t('nav.leaderboard'),
+        href: '/learn/league',
+        label: t('nav.league'),
         icon: 'trophy',
-        current: is('/learn/leaderboard'),
+        current: is('/learn/league') || is('/learn/leaderboard'),
+      },
+      {
+        href: '/learn/friends',
+        label: t('nav.friends'),
+        icon: 'users',
+        current:
+          is('/learn/friends') || is('/learn/rooms') || is('/learn/events') || is('/learn/classes'),
       },
       {
         href: '/learn/badges',
         label: t('nav.badges'),
         icon: 'award',
-        current: is('/learn/badges'),
+        current: is('/learn/badges') || is('/learn/skills'),
       },
       {
         href: '/learn/portfolio',
@@ -85,13 +103,47 @@ export function SiteHeader() {
         current: is('/learn/portfolio'),
       },
     ];
+  } else if (state.status === 'authenticated' && areaOf(state.user) === 'MENTOR') {
+    nav = [
+      {
+        href: '/mentor',
+        label: t('nav.reviews'),
+        icon: 'msg',
+        current:
+          is('/mentor') &&
+          !is('/mentor/events') &&
+          !is('/mentor/teams') &&
+          !is('/mentor/judging') &&
+          !is('/mentor/rooms'),
+      },
+      {
+        href: '/mentor/events',
+        label: t('nav.events'),
+        icon: 'trophy',
+        current:
+          is('/mentor/events') ||
+          is('/mentor/teams') ||
+          is('/mentor/judging') ||
+          is('/mentor/rooms'),
+      },
+    ];
+  } else if (state.status === 'authenticated' && areaOf(state.user) === 'TEACHER') {
+    nav = [
+      {
+        href: '/teacher',
+        label: t('nav.classes'),
+        icon: 'users',
+        current: is('/teacher') && !is('/teacher/rooms'),
+      },
+      { href: '/teacher/rooms', label: t('nav.rooms'), icon: 'msg', current: is('/teacher/rooms') },
+    ];
   } else if (state.status === 'authenticated') {
     nav = [
       {
         href: '/dashboard',
         label: t('nav.dashboard'),
         icon: 'grid',
-        current: is('/dashboard') || is('/children'),
+        current: is('/dashboard') || is('/children') || is('/reports'),
       },
       { href: '/billing', label: t('nav.billing'), icon: 'card', current: is('/billing') },
     ];
@@ -99,7 +151,7 @@ export function SiteHeader() {
 
   return (
     <header className="print-hidden">
-      <div className="mx-auto flex max-w-320 flex-wrap items-center gap-x-7 gap-y-3 px-4 py-4.5 sm:px-6 lg:px-10">
+      <div className="mx-auto flex max-w-320 flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4.5 sm:px-6 lg:px-10">
         <Brand />
         {nav ? (
           // On phones the sections get a row of their own, which scrolls sideways.

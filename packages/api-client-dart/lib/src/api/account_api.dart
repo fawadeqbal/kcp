@@ -10,6 +10,7 @@ import 'package:kcp_api/src/deserialize.dart';
 import 'package:dio/dio.dart';
 
 import 'package:kcp_api/src/model/email_preferences_dto.dart';
+import 'package:kcp_api/src/model/update_email_preferences_dto.dart';
 
 class AccountApi {
   final Dio _dio;
@@ -95,7 +96,7 @@ class AccountApi {
   ///
   ///
   /// Parameters:
-  /// * [emailPreferencesDto]
+  /// * [updateEmailPreferencesDto]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -106,7 +107,7 @@ class AccountApi {
   /// Returns a [Future] containing a [Response] with a [EmailPreferencesDto] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<EmailPreferencesDto>> familyEmailsUpdate({
-    required EmailPreferencesDto emailPreferencesDto,
+    required UpdateEmailPreferencesDto updateEmailPreferencesDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -131,7 +132,7 @@ class AccountApi {
     dynamic _bodyData;
 
     try {
-      _bodyData = jsonEncode(emailPreferencesDto);
+      _bodyData = jsonEncode(updateEmailPreferencesDto);
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _options.compose(_dio.options, _path),

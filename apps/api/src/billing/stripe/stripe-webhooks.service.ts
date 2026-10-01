@@ -110,6 +110,20 @@ export class StripeWebhooksService {
     stripe.useLocalWebhookHandler((rawBody, signature) => this.handle(rawBody, signature));
   }
 
+  /** Card checks (Checkout in setup mode), by the `purpose` in their metadata. */
+  private readonly setupHandlers = new Map<
+    string,
+    (session: StripeCheckoutSession) => Promise<{ parentId?: string }>
+  >();
+
+  /** Other modules act on completed card checks (e.g. verified parental consent). */
+  onSetupCompleted(
+    purpose: string,
+    handler: (session: StripeCheckoutSession) => Promise<{ parentId?: string }>,
+  ) {
+    this.setupHandlers.set(purpose, handler);
+  }
+
   async handle(rawBody: Buffer | undefined, signature: string | undefined): Promise<void> {
     if (!rawBody?.length || !signature) {
       throw new BadRequestException({
@@ -157,6 +171,10 @@ export class StripeWebhooksService {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = object as StripeCheckoutSession;
+        if (session.mode === 'setup') {
+          const handler = this.setupHandlers.get(session.metadata?.['purpose'] ?? '');
+          return handler ? handler(session) : {};
+        }
         const subscriptionId = idOf(session.subscription);
         if (session.mode !== 'subscription' || !subscriptionId) return {};
         const synced = await this.sync(subscriptionId);

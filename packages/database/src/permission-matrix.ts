@@ -20,6 +20,15 @@ import {
  *   Project → userId
  *   Billing → parentId
  *   Certificate → userId, parentIds
+ *   Review → studentId, parentIds
+ *   MentorProfile → userId
+ *   Friendship → userIds (the two students), parentIds (their parents)
+ *   Chat → memberIds (the room's members), parentIds (the members' parents)
+ *   EventTeam → memberIds (its students), parentIds (their parents), mentorId
+ *   School → teacherIds
+ *   SchoolClass → teacherId, memberIds (approved students), parentIds (their parents)
+ *   ClassMember → userId, parentIds
+ *   ReadinessCheck → studentId, parentIds
  */
 
 /** Fields any adult may change on their own account. */
@@ -48,6 +57,30 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     // Certificates for the modules they finished (premium).
     { action: 'create', subject: 'Certificate' },
     { action: 'read', subject: 'Certificate', conditions: { userId: SELF } },
+    // Mentors' reviews of their own projects.
+    { action: 'read', subject: 'Review', conditions: { studentId: SELF } },
+    // Friends: ask by friend code (both parents approve), see and end their own.
+    { action: 'create', subject: 'Friendship' },
+    { action: 'read', subject: 'Friendship', conditions: { userIds: { $all: [SELF] } } },
+    { action: 'delete', subject: 'Friendship', conditions: { userIds: { $all: [SELF] } } },
+    // Rooms they're in (team, class, event): read, write and report.
+    { action: 'read', subject: 'Chat', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'create', subject: 'Chat', conditions: { memberIds: { $all: [SELF] } } },
+    // Hackathons: see open events, make or join a team (a parent approves), and work
+    // in their team's repository.
+    { action: 'read', subject: 'Event' },
+    { action: 'create', subject: 'EventTeam' },
+    { action: 'read', subject: 'EventTeam', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'EventTeam', conditions: { memberIds: { $all: [SELF] } } },
+    // Classes: join with the teacher's code (a parent approves), see their classes and
+    // assignments, leave a class.
+    { action: 'create', subject: 'ClassMember' },
+    { action: 'delete', subject: 'ClassMember', conditions: { userId: SELF } },
+    { action: 'read', subject: 'SchoolClass', conditions: { memberIds: { $all: [SELF] } } },
+    // The hub readiness check (the service checks they may take it).
+    { action: 'create', subject: 'ReadinessCheck' },
+    { action: 'read', subject: 'ReadinessCheck', conditions: { studentId: SELF } },
+    { action: 'update', subject: 'ReadinessCheck', conditions: { studentId: SELF } },
   ],
 
   [ROLE_KEYS.PARENT]: [
@@ -67,13 +100,78 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'update', subject: 'Billing', conditions: { parentId: SELF } },
     // Their children's certificates (checked against the family in the service).
     { action: 'read', subject: 'Certificate', conditions: { parentIds: { $all: [SELF] } } },
+    // Mentors' reviews of their children's projects.
+    { action: 'read', subject: 'Review', conditions: { parentIds: { $all: [SELF] } } },
+    // Their children's friends: approve or decline requests, end a friendship.
+    { action: 'read', subject: 'Friendship', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'Friendship', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'delete', subject: 'Friendship', conditions: { parentIds: { $all: [SELF] } } },
+    // Their children's rooms: read only.
+    { action: 'read', subject: 'Chat', conditions: { parentIds: { $all: [SELF] } } },
+    // Hackathons: approve their child joining a team.
+    { action: 'read', subject: 'Event' },
+    { action: 'read', subject: 'EventTeam', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'EventTeam', conditions: { parentIds: { $all: [SELF] } } },
+    // Approve (or decline) a child's place in a class; see their classes and results.
+    { action: 'read', subject: 'ClassMember', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'update', subject: 'ClassMember', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'read', subject: 'SchoolClass', conditions: { parentIds: { $all: [SELF] } } },
+    { action: 'read', subject: 'ReadinessCheck', conditions: { parentIds: { $all: [SELF] } } },
   ],
 
-  [ROLE_KEYS.MENTOR]: [readSelf, updateOwnProfile],
-  // Preview lessons before they're published (publishing is for admins).
-  [ROLE_KEYS.CONTENT_CREATOR]: [readSelf, updateOwnProfile, { action: 'read', subject: 'Content' }],
+  // Mentors review students' projects (they see nicknames only, never accounts), keep
+  // notes for other mentors, and sign the code of conduct on their own profile. The
+  // service lets them review only once their background check passed.
+  [ROLE_KEYS.MENTOR]: [
+    readSelf,
+    updateOwnProfile,
+    { action: 'read', subject: 'Review' },
+    { action: 'update', subject: 'Review' },
+    { action: 'create', subject: 'MentorNote' },
+    { action: 'read', subject: 'MentorNote' },
+    { action: 'read', subject: 'MentorProfile', conditions: { userId: SELF } },
+    {
+      action: 'update',
+      subject: 'MentorProfile',
+      conditions: { userId: SELF },
+      fields: ['codeOfConduct'],
+    },
+    // Rooms of the teams they mentor: read and write (as an adult member).
+    { action: 'read', subject: 'Chat', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'create', subject: 'Chat', conditions: { memberIds: { $all: [SELF] } } },
+    // Hackathons: review the pull requests of the teams they mentor, and score the
+    // submissions of events they judge (the service checks both).
+    { action: 'read', subject: 'Event' },
+    { action: 'read', subject: 'EventTeam', conditions: { mentorId: SELF } },
+    { action: 'update', subject: 'EventTeam', conditions: { mentorId: SELF } },
+    { action: 'create', subject: 'EventScore' },
+    { action: 'read', subject: 'EventScore' },
+  ],
+  // Preview lessons before they're published (publishing modules is for admins), and
+  // translate in the content studio: write drafts, review and publish each other's
+  // (the service makes sure the reviewer isn't the last editor).
+  [ROLE_KEYS.CONTENT_CREATOR]: [
+    readSelf,
+    updateOwnProfile,
+    { action: 'read', subject: 'Content' },
+    { action: 'create', subject: 'ContentText' },
+    { action: 'read', subject: 'ContentText' },
+    { action: 'update', subject: 'ContentText' },
+  ],
   [ROLE_KEYS.CLIENT]: [readSelf, updateOwnProfile],
-  [ROLE_KEYS.TEACHER]: [readSelf, updateOwnProfile],
+  [ROLE_KEYS.TEACHER]: [
+    readSelf,
+    updateOwnProfile,
+    // The schools they teach at (staff add them), and their own classes: codes,
+    // students, assignments, progress on those lessons and the class board.
+    { action: 'read', subject: 'School', conditions: { teacherIds: { $all: [SELF] } } },
+    { action: 'create', subject: 'SchoolClass' },
+    { action: 'read', subject: 'SchoolClass', conditions: { teacherId: SELF } },
+    { action: 'update', subject: 'SchoolClass', conditions: { teacherId: SELF } },
+    // Their classes' rooms: read and write (as an adult member).
+    { action: 'read', subject: 'Chat', conditions: { memberIds: { $all: [SELF] } } },
+    { action: 'create', subject: 'Chat', conditions: { memberIds: { $all: [SELF] } } },
+  ],
 
   [ROLE_KEYS.MODERATOR]: [
     { action: 'read', subject: 'User' },
@@ -91,6 +189,20 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     // Looks into the boards and a student's XP history when cheating is reported.
     { action: 'read', subject: 'LeaderboardSeason' },
     { action: 'read', subject: 'XpAdjustment' },
+    // Ends a friendship that was reported (with a reason, in the audit log).
+    { action: 'read', subject: 'Friendship' },
+    { action: 'delete', subject: 'Friendship' },
+    // The moderation queue: reports with their context, and warn, mute, hide or dismiss
+    // (suspending goes through User.status above). Reads any room for context.
+    { action: 'read', subject: 'Moderation' },
+    { action: 'update', subject: 'Moderation' },
+    { action: 'read', subject: 'Chat' },
+    { action: 'read', subject: 'BlockedTerm' },
+    // Hackathons: see events and teams (for reports about them).
+    { action: 'read', subject: 'Event' },
+    { action: 'read', subject: 'EventTeam' },
+    // Classes (for reports about a class room).
+    { action: 'read', subject: 'SchoolClass' },
   ],
 
   [ROLE_KEYS.ADMIN]: [
@@ -110,10 +222,22 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'manage', subject: 'FeatureFlag' },
     // Switch a country on (with its prices set) and change its currency; switch a
     // language on or off. Preview and publish content.
-    { action: 'update', subject: 'Country', fields: ['isActive', 'currency'] },
+    {
+      action: 'update',
+      subject: 'Country',
+      fields: ['isActive', 'currency', 'under13ConsentMethods'],
+    },
+    // Checks the consent forms parents of under-13s upload (approve or reject).
+    { action: 'read', subject: 'ParentalConsent' },
+    { action: 'update', subject: 'ParentalConsent' },
     { action: 'update', subject: 'Language', fields: ['isActive'] },
     { action: 'read', subject: 'Content' },
     { action: 'update', subject: 'Content' },
+    { action: 'manage', subject: 'ContentText' },
+    // Mentors: invites, background checks, languages and workload; reviews at a glance
+    // (not mentors' private notes about students).
+    { action: 'manage', subject: 'MentorProfile' },
+    { action: 'read', subject: 'Review' },
     // Crash reports from the mobile app.
     { action: 'read', subject: 'AppCrash' },
     { action: 'read', subject: 'Feedback' },
@@ -137,6 +261,21 @@ export const permissionMatrix: Record<RoleKey, PermissionRule[]> = {
     { action: 'create', subject: 'XpAdjustment' },
     { action: 'create', subject: 'UserBadge' },
     { action: 'delete', subject: 'UserBadge' },
+    { action: 'read', subject: 'Friendship' },
+    { action: 'delete', subject: 'Friendship' },
+    { action: 'read', subject: 'Moderation' },
+    { action: 'update', subject: 'Moderation' },
+    { action: 'read', subject: 'Chat' },
+    { action: 'manage', subject: 'BlockedTerm' },
+    // Hackathons: set up and run events, teams, mentors and judges; read the scores.
+    { action: 'manage', subject: 'Event' },
+    { action: 'manage', subject: 'EventTeam' },
+    { action: 'read', subject: 'EventScore' },
+    // Schools: licences (invoices, payments), teachers; classes to help teachers.
+    { action: 'manage', subject: 'School' },
+    { action: 'read', subject: 'SchoolClass' },
+    // How many students passed the readiness check (the Gate 2 number).
+    { action: 'read', subject: 'ReadinessCheck' },
   ],
 
   [ROLE_KEYS.SUPER_ADMIN]: [{ action: 'manage', subject: 'all' }],

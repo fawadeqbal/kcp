@@ -8,7 +8,7 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ROLE_KEYS, type User } from '@kcp/database';
+import { requiresTwoFactor, ROLE_KEYS, type User } from '@kcp/database';
 import type { Redis } from 'ioredis';
 import { dummyPasswordHash, hashPassword, verifyPassword } from '../common/crypto/passwords.js';
 import { SecretBox } from '../common/crypto/secret-box.js';
@@ -27,6 +27,7 @@ import { MailService } from '../mail/mail.service.js';
 import { type MailTemplate, toMailLanguage } from '../mail/templates.js';
 import { AbilityFactory } from '../permissions/ability.factory.js';
 import { REDIS } from '../redis/redis.constants.js';
+import { ReferralsService } from '../referrals/referrals.service.js';
 import { AccessTokenService, type MfaStage } from './access-token.service.js';
 import {
   EMAIL_VERIFICATION_TTL_HOURS,
@@ -70,6 +71,7 @@ export class AuthService {
     private readonly audit: AuditService,
     private readonly abilities: AbilityFactory,
     private readonly limiter: RateLimiterService,
+    private readonly referrals: ReferralsService,
     @Inject(REDIS) private readonly redis: Redis,
   ) {
     this.secretBox = new SecretBox(config.get('ENCRYPTION_KEY'));
@@ -137,6 +139,7 @@ export class AuthService {
         termsAcceptedAt: new Date(),
       },
     });
+    await this.referrals.recordSignUp(user.id, dto.referralCode, ctx);
     await this.audit.record({
       actor: { id: user.id, roleKey: ROLE_KEYS.PARENT },
       action: 'auth.sign_up',
@@ -268,10 +271,17 @@ export class AuthService {
       throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
     this.assertCanSignIn(user);
-    // Staff: the failed-login count clears only after the two-factor code (verifyMfa),
-    // so a known password can't be used to try codes over and over.
-    if (!user.role.isStaff) await this.limiter.reset('login-email', email);
+    const twoFactor = requiresTwoFactor(user.role.key);
+    // Two-factor accounts: the failed-login count clears only after the code
+    // (verifyMfa), so a known password can't be used to try codes over and over.
+    if (!twoFactor) await this.limiter.reset('login-email', email);
 
+    if (app === 'web' && user.role.isStaff) {
+      throw new ForbiddenException({
+        error: 'STAFF_ACCOUNT',
+        message: 'Staff accounts sign in to the admin panel.',
+      });
+    }
     if (app === 'admin' && !user.role.isStaff) {
       throw new ForbiddenException({
         error: 'NOT_STAFF',
@@ -285,7 +295,7 @@ export class AuthService {
       });
     }
 
-    if (user.role.isStaff) {
+    if (twoFactor) {
       const stage: MfaStage = user.totpEnabledAt ? 'verify' : 'setup';
       return {
         response: {
@@ -364,6 +374,7 @@ export class AuthService {
     mfaToken: string,
     code: string,
     ctx: RequestContext,
+    app: ClientApp = 'admin',
   ): Promise<AuthenticatedResult> {
     const claims = await this.tokens.verifyMfa(mfaToken);
     const user = await this.prisma.user.findUniqueOrThrow({
@@ -371,6 +382,14 @@ export class AuthService {
       include: { role: true },
     });
     this.assertCanSignIn(user);
+    // Staff finish in the admin panel; mentors and teachers in the web app.
+    if (user.role.isStaff !== (app === 'admin')) {
+      throw new ForbiddenException(
+        user.role.isStaff
+          ? { error: 'STAFF_ACCOUNT', message: 'Staff accounts sign in to the admin panel.' }
+          : { error: 'NOT_STAFF', message: 'The admin panel is for staff accounts only.' },
+      );
+    }
     if (!user.totpSecret) {
       throw new BadRequestException({
         error: 'MFA_NOT_SET_UP',
@@ -454,7 +473,7 @@ export class AuthService {
     }
     await this.audit.record({
       actor: { id: user.id, roleKey: user.role.key },
-      action: 'auth.staff_login',
+      action: user.role.isStaff ? 'auth.staff_login' : 'auth.two_factor_login',
       entityType: 'User',
       entityId: user.id,
       context: ctx,
@@ -641,7 +660,29 @@ export class AuthService {
     };
   }
 
+  /**
+   * A session for a student whose sign-in was proven another way (a picture password,
+   * or a parent approving the device).
+   */
+  async signInStudent(userId: string, ctx: RequestContext): Promise<AuthenticatedResult> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.kind !== 'STUDENT' || user.status === 'DELETED') {
+      throw new UnauthorizedException({
+        error: 'INVALID_CREDENTIALS',
+        message: 'Username or password is incorrect.',
+      });
+    }
+    this.assertCanSignIn(user);
+    return this.startSession(user.id, ctx);
+  }
+
   private assertCanSignIn(user: Pick<User, 'status'>): void {
+    if (user.status === 'PENDING_CONSENT') {
+      throw new ForbiddenException({
+        error: 'CONSENT_PENDING',
+        message: 'Your parent needs to finish setting up your account first.',
+      });
+    }
     if (user.status === 'PENDING_VERIFICATION') {
       throw new ForbiddenException({
         error: 'EMAIL_NOT_VERIFIED',

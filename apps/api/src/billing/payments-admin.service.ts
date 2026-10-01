@@ -403,6 +403,7 @@ export class PaymentsAdminService {
         currency: c.currency,
         isActive: c.isActive,
         familyDiscountPercent: c.familyDiscountPercent,
+        under13ConsentMethods: c.under13ConsentMethods,
         prices: {
           monthly: c.prices.find((p) => p.planKey === 'monthly')?.amountMinor ?? null,
           yearly: c.prices.find((p) => p.planKey === 'yearly')?.amountMinor ?? null,

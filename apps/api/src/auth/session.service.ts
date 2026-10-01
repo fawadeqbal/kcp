@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { requiresTwoFactor } from '@kcp/database';
 import type { Redis } from 'ioredis';
 import { randomToken, sha256 } from '../common/crypto/tokens.js';
 import type { RequestContext } from '../common/request-context.js';
@@ -62,9 +63,10 @@ export class SessionService {
   private async lifetimeMs(userId: string): Promise<number> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { role: { select: { isStaff: true } } },
+      select: { role: { select: { key: true } } },
     });
-    return user?.role.isStaff
+    // Staff, mentors and teachers: a working day, like the two-factor code they used.
+    return user && requiresTwoFactor(user.role.key)
       ? this.config.get('STAFF_SESSION_HOURS') * 3_600_000
       : this.config.get('REFRESH_TOKEN_TTL_DAYS') * 86_400_000;
   }

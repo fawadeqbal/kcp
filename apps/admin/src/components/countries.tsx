@@ -1,7 +1,17 @@
 'use client';
 
 import type { components } from '@kcp/api-client-ts';
-import { Alert, Badge, Button, Card, Dialog, PageSpinner, Switch, TextField } from '@kcp/ui';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Dialog,
+  PageSpinner,
+  Switch,
+  TextField,
+} from '@kcp/ui';
 import { type FormEvent, useState } from 'react';
 import { useAction } from '@/lib/action';
 import { api } from '@/lib/api';
@@ -29,6 +39,8 @@ export function Countries() {
   const [editing, setEditing] = useState<Country | null>(null);
   const canPrice = ability?.can('update', 'PlanPrice') ?? false;
   const canSwitch = ability?.can('update', 'Country') ?? false;
+  const canConsent = ability?.can('update', 'Country', 'under13ConsentMethods') ?? false;
+  const [consentFor, setConsentFor] = useState<Country | null>(null);
 
   if (prices.error) return <Alert tone="error">{prices.error}</Alert>;
   if (!prices.data) return <PageSpinner label="Loading" />;
@@ -55,6 +67,7 @@ export function Countries() {
               'Monthly (per child)',
               'Yearly (per child)',
               'Family discount',
+              'Under 13',
               '',
             ]}
           >
@@ -65,6 +78,7 @@ export function Countries() {
                 canSwitch={canSwitch}
                 canPrice={canPrice}
                 onEdit={() => setEditing(country)}
+                onConsent={canConsent ? () => setConsentFor(country) : null}
                 onDone={done}
               />
             ))}
@@ -72,6 +86,16 @@ export function Countries() {
         </Card>
         <Languages onDone={done} />
       </div>
+      {consentFor ? (
+        <ConsentMethodsDialog
+          country={consentFor}
+          onClose={() => setConsentFor(null)}
+          onSaved={(message) => {
+            setConsentFor(null);
+            done(message);
+          }}
+        />
+      ) : null}
       {editing ? (
         <PricesDialog
           country={editing}
@@ -92,12 +116,14 @@ function CountryRow({
   canSwitch,
   canPrice,
   onEdit,
+  onConsent,
   onDone,
 }: {
   country: Country;
   canSwitch: boolean;
   canPrice: boolean;
   onEdit: () => void;
+  onConsent: (() => void) | null;
   onDone: (message: string) => void;
 }) {
   const action = useAction();
@@ -139,6 +165,24 @@ function CountryRow({
       <Cell>{price('yearly')}</Cell>
       <Cell>{country.familyDiscountPercent}% from the second child</Cell>
       <Cell>
+        {country.under13ConsentMethods.length ? (
+          <span className="flex flex-col gap-1">
+            {country.under13ConsentMethods.map((method) => (
+              <span key={method} className="text-sm">
+                {METHOD_LABELS[method]}
+              </span>
+            ))}
+          </span>
+        ) : (
+          <Badge tone="neutral">Closed</Badge>
+        )}
+        {onConsent ? (
+          <Button size="sm" variant="ghost" onClick={onConsent} className="mt-1">
+            Change
+          </Button>
+        ) : null}
+      </Cell>
+      <Cell>
         {canPrice ? (
           <Button size="sm" variant="secondary" onClick={onEdit}>
             Edit prices
@@ -146,6 +190,78 @@ function CountryRow({
         ) : null}
       </Cell>
     </tr>
+  );
+}
+
+type Method = Country['under13ConsentMethods'][number];
+const METHOD_LABELS: Record<Method, string> = {
+  CARD_CHECK: 'Card check',
+  EMAIL_PLUS: 'Email plus',
+  SIGNED_FORM: 'Signed form',
+};
+
+/**
+ * How parents of children under 13 give verified consent in a country (the lawyer
+ * decides). With none, the country has no under-13 accounts; the under_13_accounts
+ * feature flag must be on there too.
+ */
+function ConsentMethodsDialog({
+  country,
+  onClose,
+  onSaved,
+}: {
+  country: Country;
+  onClose: () => void;
+  onSaved: (message: string) => void;
+}) {
+  const [methods, setMethods] = useState<Method[]>(country.under13ConsentMethods);
+  const action = useAction();
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    const ok = await action.run(() =>
+      api.PATCH('/v1/admin/countries/{code}', {
+        params: { path: { code: country.code } },
+        body: { under13ConsentMethods: methods },
+      }),
+    );
+    if (ok) {
+      onSaved(
+        methods.length
+          ? `Parents in ${nameOf(country)} can confirm consent by: ${methods.map((m) => METHOD_LABELS[m]).join(', ')}.`
+          : `No under-13 accounts in ${nameOf(country)}.`,
+      );
+    }
+  }
+  return (
+    <Dialog open onClose={onClose} title={`Under-13 consent in ${nameOf(country)}`}>
+      <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
+        <p className="text-sm text-muted">
+          The methods the lawyer approved for this country. Under-13 accounts open only when at
+          least one is chosen and the under_13_accounts flag is on here.
+        </p>
+        {(Object.keys(METHOD_LABELS) as Method[]).map((method) => (
+          <Checkbox
+            key={method}
+            label={METHOD_LABELS[method]}
+            checked={methods.includes(method)}
+            onChange={(e) =>
+              setMethods((current) =>
+                e.target.checked ? [...current, method] : current.filter((m) => m !== method),
+              )
+            }
+          />
+        ))}
+        {action.error ? <Alert tone="error">{action.error}</Alert> : null}
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={action.busy}>
+            Save
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   );
 }
 

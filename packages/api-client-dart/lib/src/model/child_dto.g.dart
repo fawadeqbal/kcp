@@ -27,6 +27,8 @@ abstract class _$ChildDtoCWProxy {
 
   ChildDto status(ChildDtoStatusEnum status);
 
+  ChildDto hasPicturePassword(bool hasPicturePassword);
+
   ChildDto consents(ChildConsentsDto consents);
 
   ChildDto createdAt(DateTime createdAt);
@@ -68,6 +70,7 @@ abstract class _$ChildDtoCWProxy {
     String? regionId,
     String? cityId,
     ChildDtoStatusEnum status,
+    bool hasPicturePassword,
     ChildConsentsDto consents,
     DateTime createdAt,
     DateTime? lastLoginAt,
@@ -119,6 +122,10 @@ class _$ChildDtoCWProxyImpl implements _$ChildDtoCWProxy {
 
   @override
   ChildDto status(ChildDtoStatusEnum status) => this(status: status);
+
+  @override
+  ChildDto hasPicturePassword(bool hasPicturePassword) =>
+      this(hasPicturePassword: hasPicturePassword);
 
   @override
   ChildDto consents(ChildConsentsDto consents) => this(consents: consents);
@@ -178,6 +185,7 @@ class _$ChildDtoCWProxyImpl implements _$ChildDtoCWProxy {
     Object? regionId = const $CopyWithPlaceholder(),
     Object? cityId = const $CopyWithPlaceholder(),
     Object? status = const $CopyWithPlaceholder(),
+    Object? hasPicturePassword = const $CopyWithPlaceholder(),
     Object? consents = const $CopyWithPlaceholder(),
     Object? createdAt = const $CopyWithPlaceholder(),
     Object? lastLoginAt = const $CopyWithPlaceholder(),
@@ -232,6 +240,10 @@ class _$ChildDtoCWProxyImpl implements _$ChildDtoCWProxy {
           ? _value.status
           // ignore: cast_nullable_to_non_nullable
           : status as ChildDtoStatusEnum,
+      hasPicturePassword: hasPicturePassword == const $CopyWithPlaceholder()
+          ? _value.hasPicturePassword
+          // ignore: cast_nullable_to_non_nullable
+          : hasPicturePassword as bool,
       consents: consents == const $CopyWithPlaceholder()
           ? _value.consents
           // ignore: cast_nullable_to_non_nullable
@@ -294,90 +306,90 @@ extension $ChildDtoCopyWith on ChildDto {
 // JsonSerializableGenerator
 // **************************************************************************
 
-ChildDto _$ChildDtoFromJson(Map<String, dynamic> json) =>
-    $checkedCreate('ChildDto', json, ($checkedConvert) {
-      $checkKeys(
-        json,
-        requiredKeys: const [
-          'id',
-          'username',
-          'nickname',
-          'avatarKey',
-          'birthYear',
-          'languageCode',
-          'countryCode',
-          'regionId',
-          'cityId',
-          'status',
-          'consents',
-          'createdAt',
-          'lastLoginAt',
-          'lessonsCompleted',
-          'premiumUntil',
-          'premiumSource',
-          'trialEndsAt',
-          'xpTotal',
-          'level',
-          'streak',
-          'badges',
-          'streakReminders',
-        ],
-      );
-      final val = ChildDto(
-        id: $checkedConvert('id', (v) => v as String),
-        username: $checkedConvert('username', (v) => v as String),
-        nickname: $checkedConvert('nickname', (v) => v as String),
-        avatarKey: $checkedConvert('avatarKey', (v) => v as String),
-        birthYear: $checkedConvert('birthYear', (v) => v as num),
-        languageCode: $checkedConvert('languageCode', (v) => v as String),
-        countryCode: $checkedConvert('countryCode', (v) => v as String?),
-        regionId: $checkedConvert('regionId', (v) => v as String?),
-        cityId: $checkedConvert('cityId', (v) => v as String?),
-        status: $checkedConvert(
-          'status',
-          (v) => $enumDecode(
-            _$ChildDtoStatusEnumEnumMap,
-            v,
-            unknownValue: ChildDtoStatusEnum.unknownDefaultOpenApi,
-          ),
-        ),
-        consents: $checkedConvert(
-          'consents',
-          (v) => ChildConsentsDto.fromJson(v as Map<String, dynamic>),
-        ),
-        createdAt: $checkedConvert(
-          'createdAt',
-          (v) => DateTime.parse(v as String),
-        ),
-        lastLoginAt: $checkedConvert(
-          'lastLoginAt',
-          (v) => v == null ? null : DateTime.parse(v as String),
-        ),
-        lessonsCompleted: $checkedConvert('lessonsCompleted', (v) => v as num),
-        premiumUntil: $checkedConvert(
-          'premiumUntil',
-          (v) => v == null ? null : DateTime.parse(v as String),
-        ),
-        premiumSource: $checkedConvert(
-          'premiumSource',
-          (v) => $enumDecodeNullable(
-            _$ChildDtoPremiumSourceEnumEnumMap,
-            v,
-            unknownValue: ChildDtoPremiumSourceEnum.unknownDefaultOpenApi,
-          ),
-        ),
-        trialEndsAt: $checkedConvert(
-          'trialEndsAt',
-          (v) => v == null ? null : DateTime.parse(v as String),
-        ),
-        xpTotal: $checkedConvert('xpTotal', (v) => v as num),
-        level: $checkedConvert('level', (v) => v as num),
-        streak: $checkedConvert('streak', (v) => v as num),
-        badges: $checkedConvert('badges', (v) => v as num),
-        streakReminders: $checkedConvert('streakReminders', (v) => v as bool),
-      );
-      return val;
-    });
+ChildDto _$ChildDtoFromJson(
+  Map<String, dynamic> json,
+) => $checkedCreate('ChildDto', json, ($checkedConvert) {
+  $checkKeys(
+    json,
+    requiredKeys: const [
+      'id',
+      'username',
+      'nickname',
+      'avatarKey',
+      'birthYear',
+      'languageCode',
+      'countryCode',
+      'regionId',
+      'cityId',
+      'status',
+      'hasPicturePassword',
+      'consents',
+      'createdAt',
+      'lastLoginAt',
+      'lessonsCompleted',
+      'premiumUntil',
+      'premiumSource',
+      'trialEndsAt',
+      'xpTotal',
+      'level',
+      'streak',
+      'badges',
+      'streakReminders',
+    ],
+  );
+  final val = ChildDto(
+    id: $checkedConvert('id', (v) => v as String),
+    username: $checkedConvert('username', (v) => v as String),
+    nickname: $checkedConvert('nickname', (v) => v as String),
+    avatarKey: $checkedConvert('avatarKey', (v) => v as String),
+    birthYear: $checkedConvert('birthYear', (v) => v as num),
+    languageCode: $checkedConvert('languageCode', (v) => v as String),
+    countryCode: $checkedConvert('countryCode', (v) => v as String?),
+    regionId: $checkedConvert('regionId', (v) => v as String?),
+    cityId: $checkedConvert('cityId', (v) => v as String?),
+    status: $checkedConvert(
+      'status',
+      (v) => $enumDecode(
+        _$ChildDtoStatusEnumEnumMap,
+        v,
+        unknownValue: ChildDtoStatusEnum.unknownDefaultOpenApi,
+      ),
+    ),
+    hasPicturePassword: $checkedConvert('hasPicturePassword', (v) => v as bool),
+    consents: $checkedConvert(
+      'consents',
+      (v) => ChildConsentsDto.fromJson(v as Map<String, dynamic>),
+    ),
+    createdAt: $checkedConvert('createdAt', (v) => DateTime.parse(v as String)),
+    lastLoginAt: $checkedConvert(
+      'lastLoginAt',
+      (v) => v == null ? null : DateTime.parse(v as String),
+    ),
+    lessonsCompleted: $checkedConvert('lessonsCompleted', (v) => v as num),
+    premiumUntil: $checkedConvert(
+      'premiumUntil',
+      (v) => v == null ? null : DateTime.parse(v as String),
+    ),
+    premiumSource: $checkedConvert(
+      'premiumSource',
+      (v) => $enumDecodeNullable(
+        _$ChildDtoPremiumSourceEnumEnumMap,
+        v,
+        unknownValue: ChildDtoPremiumSourceEnum.unknownDefaultOpenApi,
+      ),
+    ),
+    trialEndsAt: $checkedConvert(
+      'trialEndsAt',
+      (v) => v == null ? null : DateTime.parse(v as String),
+    ),
+    xpTotal: $checkedConvert('xpTotal', (v) => v as num),
+    level: $checkedConvert('level', (v) => v as num),
+    streak: $checkedConvert('streak', (v) => v as num),
+    badges: $checkedConvert('badges', (v) => v as num),
+    streakReminders: $checkedConvert('streakReminders', (v) => v as bool),
+  );
+  return val;
+});
 
 Map<String, dynamic> _$ChildDtoToJson(ChildDto instance) => <String, dynamic>{
   'id': instance.id,
@@ -390,6 +402,7 @@ Map<String, dynamic> _$ChildDtoToJson(ChildDto instance) => <String, dynamic>{
   'regionId': instance.regionId,
   'cityId': instance.cityId,
   'status': _$ChildDtoStatusEnumEnumMap[instance.status]!,
+  'hasPicturePassword': instance.hasPicturePassword,
   'consents': instance.consents.toJson(),
   'createdAt': instance.createdAt.toIso8601String(),
   'lastLoginAt': instance.lastLoginAt?.toIso8601String(),
@@ -409,6 +422,7 @@ const _$ChildDtoStatusEnumEnumMap = {
   ChildDtoStatusEnum.ACTIVE: 'ACTIVE',
   ChildDtoStatusEnum.SUSPENDED: 'SUSPENDED',
   ChildDtoStatusEnum.DELETED: 'DELETED',
+  ChildDtoStatusEnum.PENDING_CONSENT: 'PENDING_CONSENT',
   ChildDtoStatusEnum.unknownDefaultOpenApi: 'unknown_default_open_api',
 };
 

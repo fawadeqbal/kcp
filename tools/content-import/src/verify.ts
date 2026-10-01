@@ -5,10 +5,14 @@ import {
   type CodeFiles,
   composeDocument,
   evaluateChecks,
+  evaluateGitChecks,
+  evaluateStageChecks,
+  type GitSetup,
   isPythonCheck,
   type PyodideLike,
   runPythonChecks,
   runPythonProgram,
+  type StageLevel,
   windowTestRunner,
 } from '@kcp/checks';
 import { runInNewContext } from 'node:vm';
@@ -33,8 +37,18 @@ function python(): Promise<PyodideLike> {
 export async function runChecks(
   files: CodeFiles,
   checks: Check[],
-  { scripts = true }: { scripts?: boolean } = {},
+  { scripts = true, stage, repo }: { scripts?: boolean; stage?: StageLevel; repo?: GitSetup } = {},
 ): Promise<CheckResult[]> {
+  if (files.git !== undefined) {
+    // Git steps: the same simulator as the browser and the API.
+    if (!repo) throw new Error('git steps need a repo');
+    return evaluateGitChecks(repo, files.git, checks);
+  }
+  if (files.blocks !== undefined) {
+    // Block programs: the same interpreter as the browser and the API.
+    if (!stage) throw new Error('a block program needs a stage');
+    return evaluateStageChecks(stage, files.blocks, checks);
+  }
   if (files.py !== undefined) {
     return runPythonChecks(await python(), files.py, checks.filter(isPythonCheck)).results;
   }
@@ -80,7 +94,14 @@ const STATIC_CHECKS = new Set(['exists', 'text', 'attribute', 'css']);
  * starter has (the editor's tabs; the API drops any other file).
  */
 async function verifyWork(
-  data: { solution: CodeFiles; starter: CodeFiles; checks: unknown[]; type?: string },
+  data: {
+    solution: CodeFiles;
+    starter: CodeFiles;
+    checks: unknown[];
+    type?: string;
+    stage?: unknown;
+    repo?: unknown;
+  },
   file: string,
   issues: Issue[],
 ) {
@@ -97,12 +118,14 @@ async function verifyWork(
       });
     }
   }
+  const stage = data.stage as StageLevel | undefined;
+  const repo = data.repo as GitSetup | undefined;
   try {
-    const solved = await runChecks(data.solution, checks);
+    const solved = await runChecks(data.solution, checks, { stage, repo });
     for (const result of solved.filter((r) => !r.passed)) {
       issues.push({ level: 'error', file, message: `the solution fails check "${result.id}"` });
     }
-    if (data.type !== 'js' && data.solution.py === undefined) {
+    if (data.type !== 'js' && data.solution.py === undefined && !stage && !repo) {
       const readable = checks.filter((check) => STATIC_CHECKS.has(check.expect));
       const withoutScript = await runChecks({ ...data.solution, js: '' }, readable, {
         scripts: false,
@@ -116,7 +139,7 @@ async function verifyWork(
         });
       }
     }
-    const started = await runChecks(data.starter, checks);
+    const started = await runChecks(data.starter, checks, { stage, repo });
     if (allPassed(started)) {
       issues.push({ level: 'error', file, message: 'the starter code already passes every check' });
     }

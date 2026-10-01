@@ -1,0 +1,29 @@
+id: explorer-m01-l02-q2
+order: 2
+kind: choice
+xp: 5
+prompt:
+  en: Bit runs "collect the gem" on a square with no gem. What happens?
+  ar: ينفّذ بِت «اجمع الجوهرة» على مربع لا جوهرة فيه. ماذا يحدث؟
+  ur: بِٹ ایسے خانے پر "جوہر اٹھاؤ" چلاتا ہے جہاں جوہر نہیں۔ کیا ہوگا؟
+options:
+  - id: a
+    text:
+      en: Nothing — there was nothing to pick up.
+      ar: لا شيء — لم يكن هناك ما يُلتقط.
+      ur: کچھ نہیں — اٹھانے کو کچھ تھا ہی نہیں۔
+  - id: b
+    text:
+      en: A new gem appears.
+      ar: تظهر جوهرة جديدة.
+      ur: ایک نیا جوہر آ جاتا ہے۔
+  - id: c
+    text:
+      en: Bit jumps to the nearest gem.
+      ar: يقفز بِت إلى أقرب جوهرة.
+      ur: بِٹ قریب ترین جوہر پر کود جاتا ہے۔
+answer: a
+explanation:
+  en: Bit only collects a gem it is standing on. Move first, then collect.
+  ar: يجمع بِت فقط الجوهرة التي يقف فوقها. تحرّك أولًا، ثم اجمع.
+  ur: بِٹ صرف وہی جوہر اٹھاتا ہے جس پر کھڑا ہو۔ پہلے چلیں، پھر اٹھائیں۔

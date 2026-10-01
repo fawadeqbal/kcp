@@ -20,7 +20,9 @@ import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 import { useAccount } from '@/lib/use-account';
 import { isolate } from '../auth/validation';
+import { Mascot } from '../explorer/mascot';
 import { ProgressSummary } from '../progress/progress-summary';
+import { ClassLessonsCard } from '../schools/class-lessons-card';
 
 type Overview = components['schemas']['LearningOverviewDto'];
 type Module = Overview['tracks'][number]['modules'][number];
@@ -58,6 +60,19 @@ function PremiumBanner({ premium }: { premium: NonNullable<Overview['premium']> 
     return <Alert tone="warning">{t('trialEnded')}</Alert>;
   }
   return null;
+}
+
+/** Tracks the student has begun first (so "Continue" stays in the track they're on). */
+function continueOrder(tracks: Overview['tracks']): Module[] {
+  const begun = (track: Overview['tracks'][number]) =>
+    track.modules.some(
+      (m) =>
+        m.lessons.some((lesson) => lesson.status !== 'NOT_STARTED') ||
+        (m.project && m.project.status !== 'NOT_STARTED'),
+    );
+  return [...tracks.filter(begun), ...tracks.filter((track) => !begun(track))].flatMap(
+    (track) => track.modules,
+  );
 }
 
 /** Where to carry on: the first lesson not done yet or, once a module's lessons are all
@@ -299,6 +314,7 @@ function ModuleCard({
 /** A child's home: where to carry on, how far they've come, and every lesson. */
 export function StudentHome() {
   const t = useTranslations('learn');
+  const te = useTranslations('explorer');
   const locale = useLocale();
   const user = useAccount('STUDENT');
   const signedIn = user !== null;
@@ -330,7 +346,7 @@ export function StudentHome() {
   const lessons = modules.flatMap((m) => m.lessons);
   const total = lessons.length;
   const done = lessons.filter((lesson) => lesson.status === 'COMPLETED').length;
-  const next = findNext(modules);
+  const next = findNext(continueOrder(overview?.tracks ?? []));
 
   const tips = (
     <>
@@ -376,6 +392,7 @@ export function StudentHome() {
       {!failed && !overview ? <PageSpinner /> : null}
       {overview && total > 0 ? <ContinueCard next={next} done={done} total={total} /> : null}
       {overview?.premium ? <PremiumBanner premium={overview.premium} /> : null}
+      <ClassLessonsCard />
 
       <ProgressSummary />
 
@@ -395,22 +412,35 @@ export function StudentHome() {
             nextProjectId={next?.project?.id}
           />
         );
+        // Tracks for the youngest (Explorer, up to 12) get their own look and Bit.
+        const explorer = track.ageTo !== null && track.ageTo <= 12;
         return (
           <section
             key={track.id}
             aria-labelledby={`track-${track.id}`}
+            data-mood={explorer ? 'explorer' : undefined}
             className="mt-2 flex flex-col gap-5"
           >
-            <SectionHeading
-              id={`track-${track.id}`}
-              detail={t('trackDetail', {
-                modules: String(track.modules.length),
-                lessons: String(count),
-                projects: String(projects),
-              })}
-            >
-              {track.title}
-            </SectionHeading>
+            <div className="flex items-center gap-4">
+              {explorer ? <Mascot className="size-14" /> : null}
+              <div className="min-w-0 flex-1">
+                <SectionHeading
+                  id={`track-${track.id}`}
+                  detail={t('trackDetail', {
+                    modules: String(track.modules.length),
+                    lessons: String(count),
+                    projects: String(projects),
+                  })}
+                >
+                  {track.title}
+                </SectionHeading>
+              </div>
+              {track.ageFrom !== null && track.ageTo !== null ? (
+                <Badge tone="brand">
+                  {te('forAges', { from: String(track.ageFrom), to: String(track.ageTo) })}
+                </Badge>
+              ) : null}
+            </div>
             <div className="grid items-start gap-4.5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
               <div className="flex flex-col gap-4.5">{columns[0]?.map(card)}</div>
               <div className="flex flex-col gap-4.5">
@@ -418,6 +448,19 @@ export function StudentHome() {
                 {track === overview.tracks.at(-1) ? tips : null}
               </div>
             </div>
+            {track.id === 'pro' ? (
+              <Link
+                href="/learn/readiness"
+                className="flex flex-wrap items-center gap-4 rounded-card bg-brand-100 p-5 hover:bg-brand-200"
+              >
+                <IconBubble icon="target" />
+                <span className="flex min-w-56 flex-1 flex-col gap-0.5">
+                  <span className="text-xl font-bold text-brand-800">{t('readinessTitle')}</span>
+                  <span className="text-sm text-brand-800">{t('readinessBody')}</span>
+                </span>
+                <Icon name="chevR" className="rtl:rotate-180" />
+              </Link>
+            ) : null}
           </section>
         );
       })}

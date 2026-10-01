@@ -1,0 +1,48 @@
+id: explorer-m01-l05-c2
+order: 2
+type: blocks
+xp: 15
+stage:
+  mode: game
+  map:
+    - '.....'
+    - S...T
+    - '.....'
+  seconds: 20
+  toolbox:
+    - when-key
+    - move
+    - when-star
+    - score
+starter:
+  blocks:
+    - when: key-right
+      do:
+        - move: right
+solution:
+  blocks:
+    - when: key-right
+      do:
+        - move: right
+    - when: key-up
+      do:
+        - move: up
+    - when: star
+      do:
+        - score: 1
+checks:
+  - id: up-key
+    expect: stage
+    keys:
+      - up
+    endsAt: [0, 0]
+    hint: up_key
+  - id: scores
+    expect: stage
+    keys:
+      - right
+      - right
+      - right
+      - right
+    minScore: 1
+    hint: star_score

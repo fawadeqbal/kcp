@@ -1,23 +1,170 @@
 Created Super admin fawadeqbal@gmail.com
 Temporary password: gnWwd7HfE4YRihY-
 
+Staff: admin panel at http://localhost:3002 (two-factor login is set up the first time)
+  superadmin@kcp-demo.test           super_admin
+  admin@kcp-demo.test                admin
+  moderator@kcp-demo.test            moderator
+  content@kcp-demo.test              content_creator
+  password for all: demo staff password
 
-Demo accounts (local database only):
+Mentors and teachers: http://localhost:3001/en/login (two-factor login is set up the first time)
+  mentor@kcp-demo.test               mentor (background check passed)
+  mentor.new@kcp-demo.test           mentor (background check in progress)
+  teacher@kcp-demo.test              teacher at Crescent Model School
+  password for all: demo staff password
 
-Demo Parent (English)      parent.en@demo.test  demo password 123  
-  CometCoder (child, en)   atomic-phoenix-8528  kid pass 42        2 lesson(s) done, next one started, 200 XP
-  PixelPanda (child, en)   atomic-owl-6039      kid pass 42        new
-Demo Parent (Arabic)       parent.ar@demo.test  demo password 123
-  StarBuilder (child, ar)  ninja-yak-4597       kid pass 42        1 lesson(s) done, 40 XP
-Demo Parent (Urdu)         parent.ur@demo.test  demo password 123
-  MoonMaker (child, ur)    brave-eagle-7195     kid pass 42        new
+Parents: http://localhost:3001/en/login (password "demo password 123")
+Children: http://localhost:3001/en/login/student (password "kid pass 42")
 
-Parents log in at http://localhost:3001/en/login, children at http://localhost:3001/en/login/student.
+  omer.hayat@kcp-demo.test           PK en  card monthly, active
+    jolly-fox-2641             FearlessJaguar55     level  9, 2305 XP, streak 10  islamabad
+    neon-jaguar-5952           NimbleHawk           level  6, 1085 XP, streak  4  islamabad
 
+  imran.qureshi@kcp-demo.test        PK ur  card yearly, active
+    mighty-bison-2309          CrystalBeetle        level  9, 2210 XP, streak 17  lahore
 
-pnpm db:generate
-pnpm install
-pnpm db:deploy
-pnpm build
-pnpm content:import
-pnpm dev
+  nabeel.akhtar@kcp-demo.test        PK en  card monthly, active
+    galactic-yak-1645          QuantumDolphin65     level  9, 2260 XP, streak 16  rawalpindi
+
+  samina.yousaf@kcp-demo.test        PK ur  no plan
+    swift-shark-2928           FrostyViking66       level  3,  360 XP, streak  0  islamabad  [suspended]
+
+  mona.adel@kcp-demo.test            EG ar  card monthly, active
+    solar-coder-7597           AtomicNebula         level  8, 2190 XP, streak 10  cairo
+    stellar-beetle-3704        StellarRaven14       level  6, 1155 XP, streak  1  cairo
+
+  sana.malik@kcp-demo.test           PK en  card monthly, active
+    crystal-bison-8917         BlazingPanther20     level  9, 2250 XP, streak 40  lahore
+    atomic-panda-3956          NimbleEagle68        level  6, 1080 XP, streak  2  lahore
+    demo-young-a6ec            LittleComet          level  1,    0 XP, streak  0  no city
+
+  maria.fernandes@kcp-demo.test      PK en  card monthly, active
+    bright-yak-5927            CleverTurtle         level  8, 2165 XP, streak 18  karachi
+    sonic-fox-5004             MagicComet68         level  6, 1045 XP, streak  2  karachi
+
+  asad.mirza@kcp-demo.test           PK en  card monthly, canceled
+    vivid-turtle-7853          RapidDolphin52       level  3,  345 XP, streak  0  lahore
+
+  dina.magdy@kcp-demo.test           EG ar  manual monthly, active
+    lunar-coder-1219           CosmicBeetle         level  8, 2120 XP, streak  4  alexandria
+
+  tarek.hassan@kcp-demo.test         EG ar  card yearly, active
+    atomic-panda-9446          StellarZebra65       level  9, 2330 XP, streak 49  cairo
+
+  adeel.malik@kcp-demo.test          PK en  no plan
+
+  kamran.javed@kcp-demo.test         PK ur  no plan
+    orbital-wolf-8370          StellarDragon        level  3,  310 XP, streak  0  lahore
+    ninja-turtle-7989          CrystalRocket        level  1,    0 XP, streak  0  lahore
+
+  heba.samir@kcp-demo.test           EG ar  no plan
+    mighty-tiger-6532          FearlessDragon       level  3,  250 XP, streak  0  cairo
+    brave-panther-8180         SonicOwl24           level  4,  495 XP, streak  2  cairo
+
+  ayesha.raza@kcp-demo.test          PK en  no plan
+    atomic-viking-8216         VividUnicorn76       level  8, 2090 XP, streak 20  lahore
+
+  saad.iqbal@kcp-demo.test           PK ur  manual monthly, canceled
+    brave-viking-3058          PixelLynx            level  3,  285 XP, streak  0  lahore
+
+  hina.butt@kcp-demo.test            PK ur  manual monthly, active
+    thunder-sparrow-9058       StellarWolf86        level  4,  690 XP, streak  0  lahore
+    neon-unicorn-5603          MagicNebula          level  6, 1175 XP, streak  2  lahore
+
+  areeba.hussain@kcp-demo.test       PK en  no plan
+    nimble-shark-7858          SwiftCheetah88       level  5,  730 XP, streak  1  karachi
+
+  mahmoud.saeed@kcp-demo.test        EG ar  no plan
+    orbital-beetle-9292        NimbleLynx26         level  2,  245 XP, streak  0  alexandria
+    fearless-phoenix-6049      PixelTiger32         level  3,  365 XP, streak  8  alexandria
+
+  nadia.aslam@kcp-demo.test          PK en  card monthly, active (cancelling)
+    daring-koala-6494          WildPenguin41        level  5,  815 XP, streak  1  lahore
+
+  adnan.latif@kcp-demo.test          PK ur  manual monthly, canceled
+    atomic-penguin-7334        GalacticJaguar43     level  4,  525 XP, streak  0  faisalabad
+
+  farhan.sheikh@kcp-demo.test        PK en  card monthly, past due
+    curious-gecko-4133         StellarOwl72         level  5,  965 XP, streak  4  lahore
+
+  rabia.khalid@kcp-demo.test         PK en  no plan
+    crystal-owl-1371           FearlessCheetah      level  5,  770 XP, streak  0  lahore
+
+  karim.mostafa@kcp-demo.test        EG ar  manual monthly, active
+    pixel-jaguar-9350          CleverRaven92        level  5,  745 XP, streak  2  cairo
+
+  rania.lotfy@kcp-demo.test          EG ar  card monthly, active
+    sonic-viking-7090          HyperComet93         level  4,  625 XP, streak  0  giza
+    jolly-gecko-2610           HyperHawk77          level  5,  945 XP, streak  1  giza
+
+  owais.memon@kcp-demo.test          PK ur  no plan
+    ultimate-yak-8014          TurboUnicorn         level  6, 1020 XP, streak  4  karachi
+
+  bilal.chaudhry@kcp-demo.test       PK ur  manual monthly, active
+    cosmic-otter-1637          AtomicCoder17        level  5,  945 XP, streak  1  lahore
+
+  sadia.baig@kcp-demo.test           PK en  card yearly, active
+    wild-otter-1212            BravePenguin55       level  5,  780 XP, streak  0  karachi
+
+  faisal.khan@kcp-demo.test          PK ur  no plan
+    electric-sparrow-7422      CleverRobot28        level  5,  780 XP, streak  5  hyderabad
+
+  mehwish.anwar@kcp-demo.test        PK en  card monthly, active
+    jolly-bison-7912           UltimateOtter82      level  5,  730 XP, streak  1  lahore
+    nimble-lion-7907           PolarLion            level  5,  875 XP, streak  2  lahore
+    vivid-panther-5262         JollyMeteor14        level  4,  455 XP, streak  2  lahore
+
+  laila.gamal@kcp-demo.test          EG en  no plan
+    golden-quasar-5385         LunarDolphin50       level  4,  680 XP, streak  1  alexandria
+
+  shazia.parveen@kcp-demo.test       PK ur  no plan
+    orbital-phoenix-6224       ZippyPenguin         level  1,    0 XP, streak  0  rawalpindi
+    magic-koala-8070           MagicEagle91         level  5,  805 XP, streak  1  rawalpindi
+
+  yasmin.fathy@kcp-demo.test         EG en  no plan
+    bright-unicorn-5719        LunarShark81         level  3,  320 XP, streak  0  cairo
+    mighty-coder-1244          NeonZebra79          level  3,  330 XP, streak  6  cairo
+
+  hamza.siddiqui@kcp-demo.test       PK en  no plan
+    galactic-hawk-5208         FrostyFox43          level  4,  500 XP, streak  0  lahore
+
+  junaid.shah@kcp-demo.test          PK ur  no plan
+    brave-panther-7801         NinjaQuasar48        level  4,  460 XP, streak  1  karachi
+    vivid-tiger-3764           SonicBison33         level  2,  165 XP, streak  2  karachi
+
+  gul.khan@kcp-demo.test             PK ur  no plan
+    rapid-jaguar-2214          SuperPanda59         level  3,  295 XP, streak  0  peshawar
+
+  ahmed.zaki@kcp-demo.test           EG en  no plan
+    bright-lynx-4626           NeonRaven89          level  4,  500 XP, streak  3  giza
+    galactic-penguin-6164      SuperRobot12         level  2,  205 XP, streak  3  giza
+
+  tahir.abbas@kcp-demo.test          PK en  no plan
+    super-panther-2482         DaringQuasar23       level  4,  670 XP, streak  0  lahore
+
+  irfan.haider@kcp-demo.test         PK en  no plan
+    solar-robot-1637           MagicBeetle67        level  4,  515 XP, streak  5  no city
+
+  sobia.rafiq@kcp-demo.test          PK ur  no plan
+    rapid-beetle-8683          VividNebula26        level  1,    0 XP, streak  0  lahore
+
+  sherif.nabil@kcp-demo.test         EG ar  no plan
+    clever-viking-4017         StellarPenguin75     level  1,    0 XP, streak  0  cairo
+
+  waqas.ahmed@kcp-demo.test          PK en  no plan
+    sonic-lynx-4238            BrightOctopus70      level  1,    0 XP, streak  0  islamabad
+    zippy-viking-9711          MightyMeteor         level  4,  535 XP, streak  4  islamabad
+
+  hassan.raza@kcp-demo.test          PK en  email not confirmed yet
+
+  zainab.tariq@kcp-demo.test         PK en  no plan
+    rapid-koala-7048           CrystalDragon99      level  3,  265 XP, streak  2  lahore
+
+  usman.ghani@kcp-demo.test          PK ur  no plan
+    solar-sparrow-8432         FrostyBeetle90       level  2,  150 XP, streak  2  lahore
+
+  amna.saleem@kcp-demo.test          PK ur  no plan
+
+  fatima.noor@kcp-demo.test          PK ur  no plan
+    stellar-wolf-2998          GalacticOctopus16    level  1,   40 XP, streak  1  lahore

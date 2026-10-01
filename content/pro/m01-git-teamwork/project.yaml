@@ -1,0 +1,78 @@
+id: pro-m01-project
+xp: 100
+isPremium: true
+starter:
+  html: |
+    <h1>Our project</h1>
+
+    <!-- 1. A paragraph: what your project does, in one or two sentences -->
+
+    <!-- 2. A list of at least three features -->
+
+    <!-- 3. "How we work": the steps your team follows, as a numbered list -->
+
+    <footer>Made by our team</footer>
+  css: |
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 16px;
+    }
+
+    /* Give the page a background colour, and style the footer. */
+  js: ''
+solution:
+  html: |
+    <h1>Homework helper</h1>
+    <p>A page that turns your homework list into a plan for the week.</p>
+    <ul>
+      <li>Add tasks with a due day</li>
+      <li>See the week at a glance</li>
+      <li>Tick tasks off when they are done</li>
+    </ul>
+    <h2>How we work</h2>
+    <ol>
+      <li>Each of us works on their own branch.</li>
+      <li>We open a pull request when a part is ready.</li>
+      <li>A teammate or our mentor reviews it, then we merge.</li>
+    </ol>
+    <footer>Made by our team</footer>
+  css: |
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 16px;
+      background-color: #f4f7ff;
+    }
+
+    footer {
+      color: gray;
+    }
+  js: ''
+checks:
+  - id: has-heading
+    expect: exists
+    selector: h1
+    hint: heading
+  - id: has-summary
+    expect: text
+    selector: p
+    notEmpty: true
+    hint: summary
+  - id: three-features
+    expect: exists
+    selector: ul > li
+    min: 3
+    hint: features
+  - id: how-we-work
+    expect: exists
+    selector: ol > li
+    min: 3
+    hint: steps
+  - id: has-footer
+    expect: exists
+    selector: footer
+    hint: footer
+  - id: page-background
+    expect: css
+    selector: body
+    property: background-color
+    hint: background

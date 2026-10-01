@@ -1,0 +1,29 @@
+id: explorer-m01-l04-q2
+order: 2
+kind: choice
+xp: 5
+prompt:
+  en: What does "repeat until Bit reaches the flag" do?
+  ar: ماذا يفعل «كرّر حتى يصل بِت إلى العلم»؟
+  ur: '"دہراؤ جب تک بِٹ جھنڈے تک نہ پہنچے" کیا کرتا ہے؟'
+options:
+  - id: a
+    text:
+      en: Runs its blocks again and again, and stops once Bit is on the flag.
+      ar: يشغّل مكعباته مرة بعد مرة، ويتوقف عندما يصبح بِت عند العلم.
+      ur: اپنے بلاکس بار بار چلاتا ہے، اور بِٹ کے جھنڈے پر پہنچتے ہی رک جاتا ہے۔
+  - id: b
+    text:
+      en: Runs its blocks exactly once.
+      ar: يشغّل مكعباته مرة واحدة فقط.
+      ur: اپنے بلاکس صرف ایک بار چلاتا ہے۔
+  - id: c
+    text:
+      en: Moves the flag closer to Bit.
+      ar: يقرّب العلم من بِت.
+      ur: جھنڈے کو بِٹ کے قریب لے آتا ہے۔
+answer: a
+explanation:
+  en: It keeps looping until something is true — here, until Bit reaches the flag.
+  ar: يستمر في التكرار حتى يصبح شيء ما صحيحًا — هنا، حتى يصل بِت إلى العلم.
+  ur: یہ تب تک دہراتا رہتا ہے جب تک کوئی بات سچ نہ ہو جائے — یہاں، بِٹ کے جھنڈے تک پہنچنے تک۔

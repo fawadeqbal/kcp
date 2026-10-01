@@ -10,6 +10,7 @@ import {
   Avatar,
   AvatarPicker,
   Button,
+  buttonClass,
   Dialog,
   Icon,
   type IconName,
@@ -18,12 +19,17 @@ import {
   Switch,
   TextField,
 } from '@/components/ui';
+import { Link } from '@/i18n/navigation';
 import { api, errorCode } from '@/lib/api';
 import { errorMessageKey, isNicknameError } from '@/lib/errors';
 import { CHILD_PASSWORD_MIN_LENGTH, isNickname, isolate } from '../auth/validation';
 import { useAvatarLabels } from './avatar-labels';
 import { ChildCertificates } from '../certificates/child-certificates';
 import { ConsentSwitches } from './consent-switches';
+import { ChildFriendsSection } from '../friends/parent-friends';
+import { ChildRoomsLink } from '../rooms/social-tabs';
+import { ChildSkillsSection } from '../reports/skills-page';
+import { PicturePasswordSection } from './picture-password';
 import { ProjectsSection } from './projects-section';
 import { useLanguages } from './reference-data';
 
@@ -133,6 +139,15 @@ export function ChildCard({
           <Icon name={open ? 'chevU' : 'chevD'} />
         </Button>
       </div>
+      {child.status === 'PENDING_CONSENT' ? (
+        <div className="flex flex-wrap items-center gap-3 border-t border-line px-5 py-4 sm:px-7">
+          <Icon name="clock" className="text-lg text-warn-text" />
+          <p className="flex-1 font-bold">{t('consentPending')}</p>
+          <Link href={`/children/${child.id}/consent`} className={buttonClass('primary', 'md')}>
+            {t('consentFinish')}
+          </Link>
+        </div>
+      ) : null}
       {open ? (
         <div id={panelId} className="grid gap-3.5 px-5 pb-6 sm:px-7 sm:pb-7 lg:grid-cols-3">
           <Panel title={t('sharingTitle', { nickname })}>
@@ -162,7 +177,9 @@ function AccountActions({
   onDeleted: (child: Child) => void;
 }) {
   const t = useTranslations('dashboard');
-  const [dialog, setDialog] = useState<'profile' | 'password' | null>(null);
+  const [dialog, setDialog] = useState<
+    'profile' | 'password' | 'pictures' | 'friends' | 'skills' | null
+  >(null);
   const row =
     'flex min-h-12 w-full items-center gap-3 rounded-full px-3 text-start text-sm font-semibold hover:bg-ink/7';
   return (
@@ -177,6 +194,22 @@ function AccountActions({
         <span className="flex-1">{t('passwordTitle')}</span>
         <Icon name="chevR" className="text-sm text-muted" />
       </button>
+      <button type="button" className={row} onClick={() => setDialog('pictures')}>
+        <Icon name="star" className="text-base text-muted" />
+        <span className="flex-1">{t('picturePassword')}</span>
+        <Icon name="chevR" className="text-sm text-muted" />
+      </button>
+      <button type="button" className={row} onClick={() => setDialog('skills')}>
+        <Icon name="target" className="text-base text-muted" />
+        <span className="flex-1">{t('skillsTitle')}</span>
+        <Icon name="chevR" className="text-sm text-muted" />
+      </button>
+      <button type="button" className={row} onClick={() => setDialog('friends')}>
+        <Icon name="users" className="text-base text-muted" />
+        <span className="flex-1">{t('friendsTitle')}</span>
+        <Icon name="chevR" className="text-sm text-muted" />
+      </button>
+      <ChildRoomsLink childId={child.id} className={row} />
       <RemindersSection child={child} onChange={onChange} />
       <DeleteSection child={child} onDeleted={onDeleted} rowClassName={row} />
       <Dialog open={dialog === 'profile'} onClose={() => setDialog(null)} title={t('profileTitle')}>
@@ -188,6 +221,23 @@ function AccountActions({
         title={t('passwordTitle')}
       >
         <PasswordSection child={child} onDone={() => setDialog(null)} />
+      </Dialog>
+      <Dialog
+        open={dialog === 'pictures'}
+        onClose={() => setDialog(null)}
+        title={t('picturePassword')}
+      >
+        <PicturePasswordSection child={child} onChange={onChange} />
+      </Dialog>
+      <Dialog open={dialog === 'skills'} onClose={() => setDialog(null)} title={t('skillsTitle')}>
+        {dialog === 'skills' ? (
+          <ChildSkillsSection childId={child.id} nickname={child.nickname} />
+        ) : null}
+      </Dialog>
+      <Dialog open={dialog === 'friends'} onClose={() => setDialog(null)} title={t('friendsTitle')}>
+        {dialog === 'friends' ? (
+          <ChildFriendsSection childId={child.id} nickname={child.nickname} />
+        ) : null}
       </Dialog>
     </div>
   );

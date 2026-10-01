@@ -14,3 +14,43 @@
     opacity: 1;
   }
 }
+
+/*
+ * Explorer (block lessons, ages 9–12): the same grounds with a brighter teal accent.
+ * Set with data-mood="explorer" on a block lesson's workspace. `brand` is decoration
+ * (3:1 on the ground); text uses brand-text and fills with text use primary (4.5:1+).
+ */
+[data-mood='explorer'] {
+  --color-brand: #23857a;
+  --color-brand-100: #e6f7f4;
+  --color-brand-200: #c8ece6;
+  --color-brand-300: #9fdcd2;
+  --color-brand-400: #6cc5b8;
+  --color-brand-500: #3faa9b;
+  --color-brand-600: #2a8c7f;
+  --color-brand-700: #1c6b62;
+  --color-brand-800: #134b45;
+  --color-brand-900: #0b2e2a;
+  --color-brand-text: #1c6b62;
+  --color-primary: #1c6b62;
+  --color-primary-hover: #175b53;
+  --color-primary-active: #134b45;
+}
+@media (prefers-color-scheme: dark) {
+  [data-mood='explorer'] {
+    --color-brand: #3faa9b;
+    --color-brand-100: #0b2e2a;
+    --color-brand-200: #134b45;
+    --color-brand-300: #1c6b62;
+    --color-brand-400: #2a8c7f;
+    --color-brand-500: #3faa9b;
+    --color-brand-600: #6cc5b8;
+    --color-brand-700: #9fdcd2;
+    --color-brand-800: #c8ece6;
+    --color-brand-900: #e6f7f4;
+    --color-brand-text: #7fd3c6;
+    --color-primary: #5cc4b5;
+    --color-primary-hover: #7fd3c6;
+    --color-primary-active: #9fdcd2;
+  }
+}

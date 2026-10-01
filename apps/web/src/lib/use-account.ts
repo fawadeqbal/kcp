@@ -2,26 +2,32 @@
 
 import { useEffect } from 'react';
 import { useRouter } from '@/i18n/navigation';
-import { homePath, type Me, useAuth } from './auth-provider';
+import { type Area, areaOf, homePath, type Me, useAuth } from './auth-provider';
 
 /**
- * For pages that belong to one kind of account. Visitors who aren't signed in go to
- * the matching login page; a parent on a child's page (or the other way round) goes
- * to their own home. Returns the account once it's the right kind, otherwise null.
+ * For pages that belong to one part of the app (students, parents, mentors, teachers).
+ * Visitors who aren't signed in go to the matching login page; anyone else goes to
+ * their own home. Returns the account once it's the right kind, otherwise null.
  */
-export function useAccount(kind: Me['kind']): Me | null {
+export function useAccount(area: Area): Me | null {
+  return useAccountIn([area]);
+}
+
+/** Like useAccount, for pages several kinds of account share (e.g. a review result). */
+export function useAccountIn(areas: readonly Area[]): Me | null {
   const { state } = useAuth();
   const router = useRouter();
+  const key = areas.join(',');
 
   useEffect(() => {
     if (state.status === 'authenticated') {
-      if (state.user.kind !== kind) router.replace(homePath(state.user));
+      if (!key.split(',').includes(areaOf(state.user))) router.replace(homePath(state.user));
     } else if (state.status === 'anonymous' && !state.loggedOut) {
       // Signed out, or the session ended (for example a parent set a new password).
       // After "Log out" the header sends people home instead.
-      router.replace(kind === 'STUDENT' ? '/login/student' : '/login');
+      router.replace(key === 'STUDENT' ? '/login/student' : '/login');
     }
-  }, [state, kind, router]);
+  }, [state, key, router]);
 
-  return state.status === 'authenticated' && state.user.kind === kind ? state.user : null;
+  return state.status === 'authenticated' && areas.includes(areaOf(state.user)) ? state.user : null;
 }
